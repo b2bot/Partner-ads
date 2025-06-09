@@ -64,7 +64,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
               </Select>
               
               <Button variant="outline" size="sm">
-                <Refresh className="w-4 h-4 mr-2" />
+                <RefreshCw as Refresh className="w-4 h-4 mr-2" />
                 Atualizar
               </Button>
               
