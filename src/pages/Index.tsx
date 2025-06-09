@@ -1,13 +1,51 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import { Sidebar } from '@/components/Sidebar';
+import { Header } from '@/components/Header';
+import { Dashboard } from '@/components/Dashboard';
+import { CampaignsTab } from '@/components/CampaignsTab';
+import { AdSetsTab } from '@/components/AdSetsTab';
+import { AdsTab } from '@/components/AdsTab';
+import { SettingsTab } from '@/components/SettingsTab';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'campaigns':
+        return <CampaignsTab viewMode={viewMode} />;
+      case 'adsets':
+        return <AdSetsTab viewMode={viewMode} />;
+      case 'ads':
+        return <AdsTab viewMode={viewMode} />;
+      case 'settings':
+        return <SettingsTab />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <div className="flex-1 flex flex-col">
+          <Header 
+            activeTab={activeTab} 
+            viewMode={viewMode} 
+            setViewMode={setViewMode} 
+          />
+          <main className="flex-1 p-6 overflow-auto">
+            {renderContent()}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
