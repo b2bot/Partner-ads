@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Table, 
   LayoutGrid, 
-  Refresh, 
+  RefreshCw, 
   Download,
   Calendar
 } from 'lucide-react';
