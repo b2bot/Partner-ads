@@ -66,6 +66,14 @@ export interface CampaignInsights {
   cost_per_action_type?: any[];
 }
 
+export interface AdCreative {
+  id: string;
+  name: string;
+  object_story_spec: any;
+  image_hash?: string;
+  video_id?: string;
+}
+
 const META_API_BASE = 'https://graph.facebook.com/v18.0';
 
 export async function saveMetaCredentials(appId: string, appSecret: string, accessToken: string) {
@@ -201,6 +209,73 @@ export async function getCampaignInsights(
   }
 }
 
+export async function getAdAccountInsights(
+  accessToken: string, 
+  adAccountId: string, 
+  dateRange: { since: string; until: string }
+) {
+  try {
+    const fields = 'impressions,clicks,spend,cpm,cpc,ctr,reach,frequency,actions,cost_per_action_type';
+    const response = await fetch(
+      `${META_API_BASE}/${adAccountId}/insights?fields=${fields}&time_range=${JSON.stringify(dateRange)}&access_token=${accessToken}`
+    );
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.data?.[0] || null;
+  } catch (error) {
+    console.error('Error fetching ad account insights:', error);
+    throw error;
+  }
+}
+
+export async function uploadImage(accessToken: string, adAccountId: string, imageFile: File): Promise<string> {
+  try {
+    const formData = new FormData();
+    formData.append('source', imageFile);
+    formData.append('access_token', accessToken);
+
+    const response = await fetch(`${META_API_BASE}/${adAccountId}/adimages`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    
+    const imageHash = Object.keys(data.images)[0];
+    return imageHash;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+}
+
+export async function createAdCreative(
+  accessToken: string,
+  adAccountId: string,
+  creativeData: {
+    name: string;
+    object_story_spec: any;
+  }
+): Promise<AdCreative> {
+  try {
+    const formData = new FormData();
+    formData.append('name', creativeData.name);
+    formData.append('object_story_spec', JSON.stringify(creativeData.object_story_spec));
+    formData.append('access_token', accessToken);
+
+    const response = await fetch(`${META_API_BASE}/${adAccountId}/adcreatives`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data;
+  } catch (error) {
+    console.error('Error creating ad creative:', error);
+    throw error;
+  }
+}
+
 export async function updateCampaign(
   accessToken: string,
   campaignId: string,
@@ -311,6 +386,82 @@ export async function createCampaign(
     return data;
   } catch (error) {
     console.error('Error creating campaign:', error);
+    throw error;
+  }
+}
+
+export async function createAdSet(
+  accessToken: string,
+  adAccountId: string,
+  adSetData: {
+    name: string;
+    campaign_id: string;
+    status: string;
+    daily_budget?: string;
+    lifetime_budget?: string;
+    targeting: any;
+    billing_event: string;
+    optimization_goal: string;
+  }
+) {
+  try {
+    const formData = new FormData();
+    Object.entries(adSetData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        if (key === 'targeting') {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, String(value));
+        }
+      }
+    });
+    formData.append('access_token', accessToken);
+
+    const response = await fetch(`${META_API_BASE}/${adAccountId}/adsets`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data;
+  } catch (error) {
+    console.error('Error creating ad set:', error);
+    throw error;
+  }
+}
+
+export async function createAd(
+  accessToken: string,
+  adAccountId: string,
+  adData: {
+    name: string;
+    adset_id: string;
+    creative: { creative_id: string };
+    status: string;
+  }
+) {
+  try {
+    const formData = new FormData();
+    Object.entries(adData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        if (key === 'creative') {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, String(value));
+        }
+      }
+    });
+    formData.append('access_token', accessToken);
+
+    const response = await fetch(`${META_API_BASE}/${adAccountId}/ads`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data;
+  } catch (error) {
+    console.error('Error creating ad:', error);
     throw error;
   }
 }
