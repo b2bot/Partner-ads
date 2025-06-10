@@ -18,6 +18,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { MetricsCustomization } from './MetricsCustomization';
 
 export function SettingsTab() {
   const [apiKey, setApiKey] = useState('');
@@ -147,6 +148,9 @@ export function SettingsTab() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Personalização de Métricas */}
+      <MetricsCustomization />
 
       {/* Preferências */}
       <Card>

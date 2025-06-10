@@ -6,6 +6,8 @@ import { Dashboard } from '@/components/Dashboard';
 import { CampaignsTab } from '@/components/CampaignsTab';
 import { AdSetsTab } from '@/components/AdSetsTab';
 import { AdsTab } from '@/components/AdsTab';
+import { WhatsAppReportsTab } from '@/components/WhatsAppReportsTab';
+import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
 import { SidebarProvider } from '@/components/ui/sidebar';
 
@@ -23,6 +25,10 @@ const Index = () => {
         return <AdSetsTab viewMode={viewMode} />;
       case 'ads':
         return <AdsTab viewMode={viewMode} />;
+      case 'whatsapp-reports':
+        return <WhatsAppReportsTab />;
+      case 'metrics-objectives':
+        return <MetricsObjectivesTab />;
       case 'settings':
         return <SettingsTab />;
       default:

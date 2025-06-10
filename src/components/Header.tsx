@@ -4,11 +4,10 @@ import {
   Table, 
   LayoutGrid, 
   RefreshCw, 
-  Download,
-  Calendar
+  Download
 } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DateRangeFilter } from './DateRangeFilter';
 
 interface HeaderProps {
   activeTab: string;
@@ -27,6 +26,10 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
         return 'Conjuntos de Anúncios';
       case 'ads':
         return 'Anúncios';
+      case 'whatsapp-reports':
+        return 'Relatórios via WhatsApp';
+      case 'metrics-objectives':
+        return 'Objetivos de Métricas';
       case 'settings':
         return 'Configurações';
       default:
@@ -35,6 +38,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
   };
 
   const showViewModeControls = ['campaigns', 'adsets', 'ads'].includes(activeTab);
+  const showDateFilter = ['dashboard', 'campaigns', 'adsets', 'ads'].includes(activeTab);
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-blue-100 p-4">
@@ -48,23 +52,12 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          {activeTab !== 'settings' && (
+          {showDateFilter && <DateRangeFilter />}
+          
+          {activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
             <>
-              <Select defaultValue="7d">
-                <SelectTrigger className="w-32">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">Hoje</SelectItem>
-                  <SelectItem value="7d">Últimos 7 dias</SelectItem>
-                  <SelectItem value="30d">Últimos 30 dias</SelectItem>
-                  <SelectItem value="90d">Últimos 90 dias</SelectItem>
-                </SelectContent>
-              </Select>
-              
               <Button variant="outline" size="sm">
-                <RefreshCw as Refresh className="w-4 h-4 mr-2" />
+                <RefreshCw className="w-4 h-4 mr-2" />
                 Atualizar
               </Button>
               
