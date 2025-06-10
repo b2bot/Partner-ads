@@ -10,7 +10,9 @@ import {
   Copy,
   MoreHorizontal,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
 import {
   Table,
@@ -26,75 +28,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useMetaData } from '@/hooks/useMetaData';
+import { useToast } from '@/hooks/use-toast';
+import { updateCampaign } from '@/lib/metaApi';
 
 interface CampaignsTabProps {
   viewMode: 'table' | 'cards';
 }
 
-const campaigns = [
-  {
-    id: '1',
-    name: 'Campanha Black Friday 2024',
-    status: 'active',
-    objective: 'Conversões',
-    budget: 500,
-    budgetType: 'diário',
-    spend: 2450,
-    roas: 5.2,
-    roasChange: 12,
-    impressions: 45320,
-    clicks: 1280,
-    ctr: 2.8,
-    cpc: 1.91,
-    conversions: 89,
-    conversionRate: 6.95
-  },
-  {
-    id: '2',
-    name: 'Retargeting - Carrinho Abandonado',
-    status: 'active',
-    objective: 'Conversões',
-    budget: 200,
-    budgetType: 'diário',
-    spend: 890,
-    roas: 3.8,
-    roasChange: -5,
-    impressions: 12450,
-    clicks: 456,
-    ctr: 3.7,
-    cpc: 1.95,
-    conversions: 34,
-    conversionRate: 7.46
-  },
-  {
-    id: '3',
-    name: 'Prospecção - Lookalike',
-    status: 'paused',
-    objective: 'Tráfego',
-    budget: 300,
-    budgetType: 'diário',
-    spend: 1200,
-    roas: 2.1,
-    roasChange: -8,
-    impressions: 28670,
-    clicks: 890,
-    ctr: 3.1,
-    cpc: 1.35,
-    conversions: 18,
-    conversionRate: 2.02
-  }
-];
-
 export function CampaignsTab({ viewMode }: CampaignsTabProps) {
-  const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
+  const { campaigns, loading, credentials, refetch } = useMetaData();
+  const [updatingCampaign, setUpdatingCampaign] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'active':
         return 'bg-green-100 text-green-700';
       case 'paused':
         return 'bg-yellow-100 text-yellow-700';
-      case 'ended':
+      case 'deleted':
+      case 'archived':
         return 'bg-red-100 text-red-700';
       default:
         return 'bg-gray-100 text-gray-700';
@@ -102,26 +56,122 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
   };
 
   const getStatusText = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'active':
         return 'Ativa';
       case 'paused':
         return 'Pausada';
-      case 'ended':
-        return 'Finalizada';
+      case 'deleted':
+        return 'Excluída';
+      case 'archived':
+        return 'Arquivada';
       default:
         return status;
     }
   };
 
+  const formatBudget = (dailyBudget?: string, lifetimeBudget?: string) => {
+    if (dailyBudget) {
+      return `R$ ${(parseInt(dailyBudget) / 100).toFixed(2)}/dia`;
+    }
+    if (lifetimeBudget) {
+      return `R$ ${(parseInt(lifetimeBudget) / 100).toFixed(2)} total`;
+    }
+    return 'Não definido';
+  };
+
+  const handleStatusToggle = async (campaignId: string, currentStatus: string) => {
+    if (!credentials?.access_token) {
+      toast({
+        title: 'Erro',
+        description: 'Credenciais da Meta API não encontradas.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUpdatingCampaign(campaignId);
+    const newStatus = currentStatus.toLowerCase() === 'active' ? 'PAUSED' : 'ACTIVE';
+
+    try {
+      await updateCampaign(credentials.access_token, campaignId, { status: newStatus });
+      await refetch.campaigns();
+      toast({
+        title: 'Sucesso',
+        description: `Campanha ${newStatus.toLowerCase() === 'active' ? 'ativada' : 'pausada'} com sucesso.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message || 'Erro ao atualizar campanha.',
+        variant: 'destructive',
+      });
+    } finally {
+      setUpdatingCampaign(null);
+    }
+  };
+
+  if (!credentials) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Campanhas</h2>
+        </div>
+        <Card>
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-600 mb-2">
+              Conexão com Meta API necessária
+            </h3>
+            <p className="text-slate-500 mb-4">
+              Configure suas credenciais da Meta API na página de configurações para visualizar suas campanhas.
+            </p>
+            <Button variant="outline" onClick={() => window.location.href = '#settings'}>
+              Ir para Configurações
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (loading.campaigns) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Campanhas</h2>
+          <div className="flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span className="text-sm text-slate-500">Carregando campanhas...</span>
+          </div>
+        </div>
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-16 bg-slate-100 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (viewMode === 'table') {
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Suas Campanhas</h2>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            + Nova Campanha
-          </Button>
+          <h2 className="text-lg font-semibold">Suas Campanhas ({campaigns.length})</h2>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => refetch.campaigns()}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Atualizar
+            </Button>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              + Nova Campanha
+            </Button>
+          </div>
         </div>
 
         <Card>
@@ -133,11 +183,7 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                   <TableHead>Status</TableHead>
                   <TableHead>Objetivo</TableHead>
                   <TableHead>Orçamento</TableHead>
-                  <TableHead>Gasto</TableHead>
-                  <TableHead>ROAS</TableHead>
-                  <TableHead>CTR</TableHead>
-                  <TableHead>CPC</TableHead>
-                  <TableHead>Conversões</TableHead>
+                  <TableHead>Criada em</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
@@ -150,27 +196,18 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                         {getStatusText(campaign.status)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{campaign.objective}</TableCell>
-                    <TableCell>R$ {campaign.budget}/{campaign.budgetType}</TableCell>
-                    <TableCell>R$ {campaign.spend.toLocaleString()}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        {campaign.roas}x
-                        {campaign.roasChange > 0 ? (
-                          <TrendingUp className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <TrendingDown className="w-3 h-3 text-red-500" />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{campaign.ctr}%</TableCell>
-                    <TableCell>R$ {campaign.cpc}</TableCell>
-                    <TableCell>{campaign.conversions}</TableCell>
+                    <TableCell>{campaign.objective || 'Não definido'}</TableCell>
+                    <TableCell>{formatBudget(campaign.daily_budget, campaign.lifetime_budget)}</TableCell>
+                    <TableCell>{new Date(campaign.created_time).toLocaleDateString('pt-BR')}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="w-4 h-4" />
+                          <Button variant="ghost" size="sm" disabled={updatingCampaign === campaign.id}>
+                            {updatingCampaign === campaign.id ? (
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <MoreHorizontal className="w-4 h-4" />
+                            )}
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -182,8 +219,10 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                             <Copy className="w-4 h-4 mr-2" />
                             Duplicar
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            {campaign.status === 'active' ? (
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusToggle(campaign.id, campaign.status)}
+                          >
+                            {campaign.status.toLowerCase() === 'active' ? (
                               <>
                                 <Pause className="w-4 h-4 mr-2" />
                                 Pausar
@@ -211,114 +250,105 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Suas Campanhas</h2>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          + Nova Campanha
-        </Button>
+        <h2 className="text-lg font-semibold">Suas Campanhas ({campaigns.length})</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => refetch.campaigns()}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Atualizar
+          </Button>
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            + Nova Campanha
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {campaigns.map((campaign) => (
-          <Card key={campaign.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="text-lg font-semibold leading-tight">
-                    {campaign.name}
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getStatusColor(campaign.status)}>
-                      {getStatusText(campaign.status)}
-                    </Badge>
-                    <span className="text-sm text-slate-500">{campaign.objective}</span>
+      {campaigns.length === 0 ? (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-600 mb-2">
+              Nenhuma campanha encontrada
+            </h3>
+            <p className="text-slate-500 mb-4">
+              Você ainda não possui campanhas ativas nesta conta de anúncios.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {campaigns.map((campaign) => (
+            <Card key={campaign.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <CardTitle className="text-lg font-semibold leading-tight">
+                      {campaign.name}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getStatusColor(campaign.status)}>
+                        {getStatusText(campaign.status)}
+                      </Badge>
+                      <span className="text-sm text-slate-500">{campaign.objective}</span>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" disabled={updatingCampaign === campaign.id}>
+                        {updatingCampaign === campaign.id ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <MoreHorizontal className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Duplicar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusToggle(campaign.id, campaign.status)}
+                      >
+                        {campaign.status.toLowerCase() === 'active' ? (
+                          <>
+                            <Pause className="w-4 h-4 mr-2" />
+                            Pausar
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4 mr-2" />
+                            Ativar
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wide">Orçamento</p>
+                    <p className="font-semibold">{formatBudget(campaign.daily_budget, campaign.lifetime_budget)}</p>
                   </div>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Duplicar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      {campaign.status === 'active' ? (
-                        <>
-                          <Pause className="w-4 h-4 mr-2" />
-                          Pausar
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-4 h-4 mr-2" />
-                          Ativar
-                        </>
-                      )}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">Orçamento</p>
-                  <p className="font-semibold">R$ {campaign.budget}/{campaign.budgetType}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">Gasto</p>
-                  <p className="font-semibold">R$ {campaign.spend.toLocaleString()}</p>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">ROAS</p>
-                  <div className="flex items-center gap-1">
-                    <span className="font-bold text-lg">{campaign.roas}x</span>
-                    {campaign.roasChange > 0 ? (
-                      <TrendingUp className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4 text-red-500" />
-                    )}
-                    <span className={`text-xs ${campaign.roasChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {campaign.roasChange > 0 ? '+' : ''}{campaign.roasChange}%
-                    </span>
+                <div className="pt-2 border-t border-slate-100">
+                  <div className="text-center">
+                    <p className="text-xs text-slate-500">Criada em</p>
+                    <p className="font-medium text-sm">{new Date(campaign.created_time).toLocaleDateString('pt-BR')}</p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">Conversões</p>
-                  <p className="font-bold text-lg">{campaign.conversions}</p>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-slate-100">
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div>
-                    <p className="text-xs text-slate-500">CTR</p>
-                    <p className="font-medium text-sm">{campaign.ctr}%</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">CPC</p>
-                    <p className="font-medium text-sm">R$ {campaign.cpc}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Taxa Conv.</p>
-                    <p className="font-medium text-sm">{campaign.conversionRate}%</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

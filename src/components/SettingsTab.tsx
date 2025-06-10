@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { saveMetaCredentials, getMetaCredentials } from '@/lib/metaApi';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { saveMetaCredentials, getMetaCredentials, testMetaConnection, getAdAccounts } from '@/lib/metaApi';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -16,7 +18,8 @@ import {
   Shield,
   Save,
   TestTube,
-  AlertCircle
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 import { MetricsCustomization } from './MetricsCustomization';
 
@@ -26,7 +29,9 @@ export function SettingsTab() {
   const [accessToken, setAccessToken] = useState('');
   const [notifications, setNotifications] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [connectionStatus, setConnectionStatus] = useState<'conectado' | 'não conectado'>('não conectado');
+  const [connectionStatus, setConnectionStatus] = useState<'conectado' | 'não conectado' | 'testando'>('não conectado');
+  const [adAccounts, setAdAccounts] = useState<any[]>([]);
+  const [selectedAdAccount, setSelectedAdAccount] = useState('');
   const { toast } = useToast();
 
   const handleSaveSettings = () => {
@@ -35,7 +40,8 @@ export function SettingsTab() {
       appSecret,
       accessToken,
       notifications,
-      autoRefresh
+      autoRefresh,
+      selectedAdAccount
     }));
 
     toast({
@@ -45,17 +51,46 @@ export function SettingsTab() {
   };
 
   const handleTestConnection = async () => {
-    try {
-      await saveMetaCredentials(appId, appSecret, accessToken);
+    if (!appId || !appSecret || !accessToken) {
       toast({
-        title: 'Credenciais salvas!',
-        description: 'Conexão com a API da Meta configurada.',
+        title: 'Dados incompletos',
+        description: 'Preencha todos os campos antes de testar a conexão.',
+        variant: 'destructive',
       });
+      return;
+    }
+
+    setConnectionStatus('testando');
+    
+    try {
+      // Test connection first
+      const isValid = await testMetaConnection(accessToken);
+      
+      if (!isValid) {
+        throw new Error('Access Token inválido');
+      }
+
+      // Save credentials
+      await saveMetaCredentials(appId, appSecret, accessToken);
+      
+      // Get ad accounts
+      const accounts = await getAdAccounts(accessToken);
+      setAdAccounts(accounts);
+      
+      if (accounts.length > 0 && !selectedAdAccount) {
+        setSelectedAdAccount(accounts[0].id);
+      }
+
       setConnectionStatus('conectado');
-    } catch (err) {
       toast({
-        title: 'Erro ao salvar',
-        description: 'Verifique os dados e tente novamente.',
+        title: 'Conexão bem-sucedida!',
+        description: `Conectado com sucesso. ${accounts.length} conta(s) de anúncio encontrada(s).`,
+      });
+    } catch (err: any) {
+      setConnectionStatus('não conectado');
+      toast({
+        title: 'Erro na conexão',
+        description: err.message || 'Verifique seus dados e tente novamente.',
         variant: 'destructive',
       });
     }
@@ -66,10 +101,19 @@ export function SettingsTab() {
       try {
         const creds = await getMetaCredentials();
         if (creds) {
-          setConnectionStatus('conectado');
           setAppId(creds.app_id);
           setAppSecret(creds.app_secret);
           setAccessToken(creds.access_token);
+          
+          // Test existing connection
+          const isValid = await testMetaConnection(creds.access_token);
+          if (isValid) {
+            setConnectionStatus('conectado');
+            const accounts = await getAdAccounts(creds.access_token);
+            setAdAccounts(accounts);
+          } else {
+            setConnectionStatus('não conectado');
+          }
         }
       } catch {
         setConnectionStatus('não conectado');
@@ -77,7 +121,44 @@ export function SettingsTab() {
     };
 
     fetchCreds();
+
+    // Load local settings
+    const saved = localStorage.getItem('metaAdsSettings');
+    if (saved) {
+      const settings = JSON.parse(saved);
+      setNotifications(settings.notifications ?? true);
+      setAutoRefresh(settings.autoRefresh ?? true);
+      if (settings.selectedAdAccount) {
+        setSelectedAdAccount(settings.selectedAdAccount);
+      }
+    }
   }, []);
+
+  const getStatusBadge = () => {
+    switch (connectionStatus) {
+      case 'conectado':
+        return (
+          <Badge className="bg-green-100 text-green-700">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Conectado
+          </Badge>
+        );
+      case 'testando':
+        return (
+          <Badge variant="secondary">
+            <TestTube className="w-3 h-3 mr-1" />
+            Testando...
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="secondary">
+            <AlertCircle className="w-3 h-3 mr-1" />
+            Não conectado
+          </Badge>
+        );
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -101,7 +182,10 @@ export function SettingsTab() {
               <div>
                 <h4 className="font-medium text-yellow-800">Como obter suas credenciais</h4>
                 <p className="text-sm text-yellow-700 mt-1">
-                  Acesse o <strong>Meta for Developers</strong>, crie um app, e copie o App ID, App Secret e gere um Access Token.
+                  1. Acesse <strong>developers.facebook.com</strong><br/>
+                  2. Crie um app e vá em <strong>Configurações Básicas</strong><br/>
+                  3. Copie o <strong>ID do App</strong> e <strong>Chave Secreta</strong><br/>
+                  4. Em <strong>Ferramentas</strong> → <strong>Explorador da API</strong>, gere um token de acesso
                 </p>
               </div>
             </div>
@@ -144,14 +228,16 @@ export function SettingsTab() {
             </p>
           </div>
 
-          <div className="flex gap-2">
-            <Button onClick={handleTestConnection} variant="outline">
+          <div className="flex items-center gap-4">
+            <Button 
+              onClick={handleTestConnection} 
+              variant="outline"
+              disabled={connectionStatus === 'testando'}
+            >
               <TestTube className="w-4 h-4 mr-2" />
-              Testar Conexão
+              {connectionStatus === 'testando' ? 'Testando...' : 'Testar Conexão'}
             </Button>
-            <Badge variant={connectionStatus === 'conectado' ? 'default' : 'secondary'}>
-              Status: {connectionStatus === 'conectado' ? '✅ Conectado' : '❌ Não conectado'}
-            </Badge>
+            {getStatusBadge()}
           </div>
         </CardContent>
       </Card>
@@ -166,14 +252,55 @@ export function SettingsTab() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <p className="text-sm text-slate-600">
-              Após conectar sua API, suas contas de anúncios aparecerão aqui.
-            </p>
-            <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
-              <Database className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <p className="text-slate-500">Nenhuma conta conectada</p>
-              <p className="text-xs text-slate-400">Configure sua API key primeiro</p>
-            </div>
+            {adAccounts.length > 0 ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Conta Padrão</Label>
+                  <Select value={selectedAdAccount} onValueChange={setSelectedAdAccount}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma conta de anúncios" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {adAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          {account.name} ({account.id})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="grid gap-2">
+                  <p className="text-sm text-slate-600 font-medium">
+                    {adAccounts.length} conta(s) de anúncios conectada(s):
+                  </p>
+                  {adAccounts.map((account) => (
+                    <div key={account.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div>
+                        <p className="font-medium text-green-800">{account.name}</p>
+                        <p className="text-xs text-green-600">{account.id}</p>
+                      </div>
+                      <Badge className="bg-green-100 text-green-700">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Ativa
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : connectionStatus === 'conectado' ? (
+              <div className="border-2 border-dashed border-yellow-200 rounded-lg p-6 text-center bg-yellow-50">
+                <AlertCircle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
+                <p className="text-yellow-700 font-medium">Nenhuma conta de anúncios encontrada</p>
+                <p className="text-xs text-yellow-600">Verifique as permissões do seu Access Token</p>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
+                <Database className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-slate-500">Nenhuma conta conectada</p>
+                <p className="text-xs text-slate-400">Configure sua API primeiro</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
