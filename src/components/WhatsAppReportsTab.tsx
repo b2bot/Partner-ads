@@ -198,7 +198,7 @@ export function WhatsAppReportsTab() {
                 rows={5}
               />
               <div className="text-xs text-slate-500">
-                Use: {{client_name}}, {{date_range}}, {{metrics_data}}
+                Use: {'{{client_name}}'}, {'{{date_range}}'}, {'{{metrics_data}}'}
               </div>
             </div>
 
