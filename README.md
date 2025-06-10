@@ -1,73 +1,71 @@
-# Welcome to your Lovable project
+📊 Meta Ads Pro — Gerenciador Inteligente de Facebook Ads
+Meta Ads Pro é uma plataforma moderna e profissional para gestão completa de campanhas de Facebook Ads, construída com foco em agilidade, clareza visual e automatização de rotina para gestores de tráfego.
 
-## Project info
+🚀 Funcionalidades Principais
+✅ Gerenciamento Total via API da Meta
+Conexão direta com a Meta Marketing API.
 
-**URL**: https://lovable.dev/projects/6557f9af-aa68-4f3d-a0bc-dc34906e8a10
+Visualização, edição e atualização de Campanhas, Conjuntos de Anúncios e Anúncios diretamente da interface.
 
-## How can I edit this code?
+Envio de criativos, textos e públicos — tudo sincronizado com o Gerenciador da Meta.
 
-There are several ways of editing your application.
+✅ UI Avançada com Modo Cards ou Tabela
+Alternância entre visão por tabela (estilo gerenciador) e visão por cards (foco em performance).
 
-**Use Lovable**
+Abas separadas por nível (Campanhas / Conjuntos / Anúncios).
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6557f9af-aa68-4f3d-a0bc-dc34906e8a10) and start prompting.
+✅ Relatórios Automáticos via WhatsApp
+Geração e envio automático de relatórios para clientes via WhatsApp.
 
-Changes made via Lovable will be committed automatically to this repo.
+Configuração de nome do cliente, número, frequência, horário e conteúdo da mensagem.
 
-**Use your preferred IDE**
+Integração com API oficial ou QR Code (Web).
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Templates de mensagem dinâmicos com variáveis {{client_name}}, {{date_range}}, {{metrics_data}}.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+✅ Objetivos de Métricas (com Visual Feedback)
+Definição de metas de performance por métrica (CPC, CTR, CPA, ROAS etc).
 
-Follow these steps:
+Sliders para configurar o que é Bom / Médio / Ruim.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Cores aplicadas automaticamente em tabelas e relatórios com base nos objetivos.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+✅ Filtro de Datas Avançado
+Filtro com calendário completo, suporte a data de início e fim personalizadas.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Aplica dinamicamente em Dashboard, Campanhas, AdSets e Anúncios.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+✅ Configuração e Personalização
+Área administrativa para configurar App ID, App Secret e Access Token.
 
-**Edit a file directly in GitHub**
+Validação de conexão com a Meta diretamente do painel.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Seleção personalizada de métricas por página (Dashboard, Campanhas etc), com ordem customizável.
 
-**Use GitHub Codespaces**
+🛠️ Tecnologias Utilizadas
+React + TypeScript
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Tailwind CSS + shadcn/ui
 
-## What technologies are used for this project?
+Lucide Icons
 
-This project is built with:
+Supabase (para persistência de dados)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Meta Marketing API
 
-## How can I deploy this project?
+WhatsApp API
 
-Simply open [Lovable](https://lovable.dev/projects/6557f9af-aa68-4f3d-a0bc-dc34906e8a10) and click on Share -> Publish.
+🔐 Armazenamento Seguro
+As credenciais da API (App ID, App Secret e Access Token) são armazenadas no Supabase com segurança, e utilizadas para autenticação nas chamadas da Meta API.
 
-## Can I connect a custom domain to my Lovable project?
+🧪 Em Andamento (Roadmap)
+📈 Integração com gráficos comparativos de performance
 
-Yes, you can!
+📤 Upload direto de criativos e bibliotecas
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+🧠 Sugestões automáticas de otimização com IA
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+🌐 Suporte multi-conta com switch rápido
+
+🔔 Notificações de performance via WhatsApp
+
