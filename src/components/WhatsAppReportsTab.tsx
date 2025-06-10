@@ -27,6 +27,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
+const client_name = 'João da Silva';
+const date_range = '01/06/2024 - 10/06/2024';
+const metrics_data = [];
 
 export function WhatsAppReportsTab() {
   const [isWhatsAppConnected, setIsWhatsAppConnected] = useState(false);
