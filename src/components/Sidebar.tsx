@@ -1,4 +1,3 @@
-
 import { 
   BarChart3, 
   Target, 
@@ -6,7 +5,9 @@ import {
   Image, 
   Settings, 
   ChevronLeft,
-  Facebook
+  Facebook,
+  MessageSquare,
+  Gauge
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -30,6 +31,8 @@ const menuItems = [
   { id: 'campaigns', label: 'Campanhas', icon: Target },
   { id: 'adsets', label: 'Conjuntos de Anúncios', icon: Users },
   { id: 'ads', label: 'Anúncios', icon: Image },
+  { id: 'whatsapp-reports', label: 'Relatórios WhatsApp', icon: MessageSquare },
+  { id: 'metrics-objectives', label: 'Objetivos de Métricas', icon: Gauge },
   { id: 'settings', label: 'Configurações', icon: Settings },
 ];
 
