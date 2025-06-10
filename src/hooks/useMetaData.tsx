@@ -8,6 +8,7 @@ import {
   getAdSets, 
   getAds,
   getCampaignInsights,
+  AdAccount,
   Campaign,
   AdSet,
   Ad,
@@ -53,10 +54,14 @@ export function useMetaData() {
     }
   }, [adAccounts, selectedAdAccount]);
 
+  // Get selected ad account name
+  const selectedAdAccountName = adAccounts?.find(acc => acc.id === selectedAdAccount)?.name || '';
+
   return {
     credentials,
-    adAccounts,
+    adAccounts: adAccounts || [],
     selectedAdAccount,
+    selectedAdAccountName,
     setSelectedAdAccount,
     campaigns: campaigns || [],
     adSets: adSets || [],

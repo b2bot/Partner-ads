@@ -9,8 +9,6 @@ import {
   Edit, 
   Copy,
   MoreHorizontal,
-  TrendingUp,
-  TrendingDown,
   RefreshCw,
   AlertCircle
 } from 'lucide-react';
@@ -30,15 +28,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useMetaData } from '@/hooks/useMetaData';
 import { useToast } from '@/hooks/use-toast';
-import { updateCampaign } from '@/lib/metaApi';
+import { updateCampaign, Campaign } from '@/lib/metaApi';
+import { AccountFilter } from './AccountFilter';
+import { EditCampaignModal } from './EditCampaignModal';
 
 interface CampaignsTabProps {
   viewMode: 'table' | 'cards';
 }
 
 export function CampaignsTab({ viewMode }: CampaignsTabProps) {
-  const { campaigns, loading, credentials, refetch } = useMetaData();
+  const { campaigns, loading, credentials, refetch, selectedAdAccount } = useMetaData();
   const [updatingCampaign, setUpdatingCampaign] = useState<string | null>(null);
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
@@ -135,6 +136,28 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
     );
   }
 
+  if (!selectedAdAccount) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Campanhas</h2>
+        </div>
+        <AccountFilter />
+        <Card>
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-600 mb-2">
+              Selecione uma conta de anúncios
+            </h3>
+            <p className="text-slate-500 mb-4">
+              Escolha uma conta de anúncios para visualizar suas campanhas.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (loading.campaigns) {
     return (
       <div className="space-y-6">
@@ -145,6 +168,7 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
             <span className="text-sm text-slate-500">Carregando campanhas...</span>
           </div>
         </div>
+        <AccountFilter />
         <Card>
           <CardContent className="p-8 text-center">
             <div className="space-y-4">
@@ -173,6 +197,8 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
             </Button>
           </div>
         </div>
+
+        <AccountFilter />
 
         <Card>
           <CardContent className="p-0">
@@ -211,7 +237,7 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setEditingCampaign(campaign)}>
                             <Edit className="w-4 h-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
@@ -243,6 +269,13 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
             </Table>
           </CardContent>
         </Card>
+
+        <EditCampaignModal
+          campaign={editingCampaign}
+          isOpen={!!editingCampaign}
+          onClose={() => setEditingCampaign(null)}
+          onSuccess={() => refetch.campaigns()}
+        />
       </div>
     );
   }
@@ -261,6 +294,8 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
           </Button>
         </div>
       </div>
+
+      <AccountFilter />
 
       {campaigns.length === 0 ? (
         <Card>
@@ -302,7 +337,7 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setEditingCampaign(campaign)}>
                         <Edit className="w-4 h-4 mr-2" />
                         Editar
                       </DropdownMenuItem>
@@ -349,6 +384,13 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
           ))}
         </div>
       )}
+
+      <EditCampaignModal
+        campaign={editingCampaign}
+        isOpen={!!editingCampaign}
+        onClose={() => setEditingCampaign(null)}
+        onSuccess={() => refetch.campaigns()}
+      />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,15 +27,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useMetaData } from '@/hooks/useMetaData';
 import { useToast } from '@/hooks/use-toast';
-import { updateAd } from '@/lib/metaApi';
+import { updateAd, Ad } from '@/lib/metaApi';
+import { AccountFilter } from './AccountFilter';
+import { EditAdModal } from './EditAdModal';
 
 interface AdsTabProps {
   viewMode: 'table' | 'cards';
 }
 
 export function AdsTab({ viewMode }: AdsTabProps) {
-  const { ads, adSets, loading, credentials, refetch } = useMetaData();
+  const { ads, adSets, loading, credentials, refetch, selectedAdAccount } = useMetaData();
   const [updatingAd, setUpdatingAd] = useState<string | null>(null);
+  const [editingAd, setEditingAd] = useState<Ad | null>(null);
   const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
@@ -128,6 +130,28 @@ export function AdsTab({ viewMode }: AdsTabProps) {
     );
   }
 
+  if (!selectedAdAccount) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Anúncios</h2>
+        </div>
+        <AccountFilter />
+        <Card>
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-600 mb-2">
+              Selecione uma conta de anúncios
+            </h3>
+            <p className="text-slate-500 mb-4">
+              Escolha uma conta de anúncios para visualizar seus anúncios.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (loading.ads) {
     return (
       <div className="space-y-6">
@@ -138,6 +162,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
             <span className="text-sm text-slate-500">Carregando anúncios...</span>
           </div>
         </div>
+        <AccountFilter />
         <Card>
           <CardContent className="p-8 text-center">
             <div className="space-y-4">
@@ -166,6 +191,8 @@ export function AdsTab({ viewMode }: AdsTabProps) {
             </Button>
           </div>
         </div>
+
+        <AccountFilter />
 
         <Card>
           <CardContent className="p-0">
@@ -202,7 +229,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setEditingAd(ad)}>
                             <Edit className="w-4 h-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
@@ -234,6 +261,13 @@ export function AdsTab({ viewMode }: AdsTabProps) {
             </Table>
           </CardContent>
         </Card>
+
+        <EditAdModal
+          ad={editingAd}
+          isOpen={!!editingAd}
+          onClose={() => setEditingAd(null)}
+          onSuccess={() => refetch.ads()}
+        />
       </div>
     );
   }
@@ -252,6 +286,8 @@ export function AdsTab({ viewMode }: AdsTabProps) {
           </Button>
         </div>
       </div>
+
+      <AccountFilter />
 
       {ads.length === 0 ? (
         <Card>
@@ -293,7 +329,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setEditingAd(ad)}>
                         <Edit className="w-4 h-4 mr-2" />
                         Editar
                       </DropdownMenuItem>
@@ -333,6 +369,13 @@ export function AdsTab({ viewMode }: AdsTabProps) {
           ))}
         </div>
       )}
+
+      <EditAdModal
+        ad={editingAd}
+        isOpen={!!editingAd}
+        onClose={() => setEditingAd(null)}
+        onSuccess={() => refetch.ads()}
+      />
     </div>
   );
 }

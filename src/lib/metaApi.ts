@@ -7,6 +7,15 @@ export interface MetaCredentials {
   access_token: string;
 }
 
+export interface AdAccount {
+  id: string;
+  name: string;
+  account_id: string;
+  account_status: number;
+  currency: string;
+  timezone_name: string;
+}
+
 export interface Campaign {
   id: string;
   name: string;
@@ -16,6 +25,7 @@ export interface Campaign {
   lifetime_budget?: string;
   created_time: string;
   updated_time: string;
+  account_id: string;
 }
 
 export interface AdSet {
@@ -28,6 +38,7 @@ export interface AdSet {
   targeting: any;
   created_time: string;
   updated_time: string;
+  account_id: string;
 }
 
 export interface Ad {
@@ -38,6 +49,7 @@ export interface Ad {
   creative: any;
   created_time: string;
   updated_time: string;
+  account_id: string;
 }
 
 export interface CampaignInsights {
@@ -96,12 +108,13 @@ export async function testMetaConnection(accessToken: string): Promise<boolean> 
   }
 }
 
-export async function getAdAccounts(accessToken: string) {
+export async function getAdAccounts(accessToken: string): Promise<AdAccount[]> {
   try {
-    const response = await fetch(`${META_API_BASE}/me/adaccounts?access_token=${accessToken}`);
+    const fields = 'id,name,account_id,account_status,currency,timezone_name';
+    const response = await fetch(`${META_API_BASE}/me/adaccounts?fields=${fields}&access_token=${accessToken}`);
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    return data.data;
+    return data.data || [];
   } catch (error) {
     console.error('Error fetching ad accounts:', error);
     throw error;
@@ -116,7 +129,10 @@ export async function getCampaigns(accessToken: string, adAccountId: string): Pr
     );
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    return data.data || [];
+    return (data.data || []).map((campaign: any) => ({
+      ...campaign,
+      account_id: adAccountId
+    }));
   } catch (error) {
     console.error('Error fetching campaigns:', error);
     throw error;
@@ -131,7 +147,10 @@ export async function getAdSets(accessToken: string, adAccountId: string): Promi
     );
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    return data.data || [];
+    return (data.data || []).map((adSet: any) => ({
+      ...adSet,
+      account_id: adAccountId
+    }));
   } catch (error) {
     console.error('Error fetching ad sets:', error);
     throw error;
@@ -146,7 +165,10 @@ export async function getAds(accessToken: string, adAccountId: string): Promise<
     );
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    return data.data || [];
+    return (data.data || []).map((ad: any) => ({
+      ...ad,
+      account_id: adAccountId
+    }));
   } catch (error) {
     console.error('Error fetching ads:', error);
     throw error;
@@ -182,18 +204,20 @@ export async function getCampaignInsights(
 export async function updateCampaign(
   accessToken: string,
   campaignId: string,
-  updates: Partial<Campaign>
+  updates: Partial<Pick<Campaign, 'name' | 'status' | 'daily_budget' | 'lifetime_budget'>>
 ) {
   try {
+    const formData = new FormData();
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+    formData.append('access_token', accessToken);
+
     const response = await fetch(`${META_API_BASE}/${campaignId}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...updates,
-        access_token: accessToken
-      })
+      body: formData
     });
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
@@ -207,18 +231,20 @@ export async function updateCampaign(
 export async function updateAdSet(
   accessToken: string,
   adSetId: string,
-  updates: Partial<AdSet>
+  updates: Partial<Pick<AdSet, 'name' | 'status' | 'daily_budget' | 'lifetime_budget'>>
 ) {
   try {
+    const formData = new FormData();
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+    formData.append('access_token', accessToken);
+
     const response = await fetch(`${META_API_BASE}/${adSetId}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...updates,
-        access_token: accessToken
-      })
+      body: formData
     });
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
@@ -232,24 +258,59 @@ export async function updateAdSet(
 export async function updateAd(
   accessToken: string,
   adId: string,
-  updates: Partial<Ad>
+  updates: Partial<Pick<Ad, 'name' | 'status'>>
 ) {
   try {
+    const formData = new FormData();
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+    formData.append('access_token', accessToken);
+
     const response = await fetch(`${META_API_BASE}/${adId}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...updates,
-        access_token: accessToken
-      })
+      body: formData
     });
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
     return data;
   } catch (error) {
     console.error('Error updating ad:', error);
+    throw error;
+  }
+}
+
+export async function createCampaign(
+  accessToken: string,
+  adAccountId: string,
+  campaignData: {
+    name: string;
+    objective: string;
+    status: string;
+    daily_budget?: string;
+    lifetime_budget?: string;
+  }
+) {
+  try {
+    const formData = new FormData();
+    Object.entries(campaignData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+    formData.append('access_token', accessToken);
+
+    const response = await fetch(`${META_API_BASE}/${adAccountId}/campaigns`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data;
+  } catch (error) {
+    console.error('Error creating campaign:', error);
     throw error;
   }
 }

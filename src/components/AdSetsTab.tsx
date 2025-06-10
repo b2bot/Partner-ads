@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,15 +27,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useMetaData } from '@/hooks/useMetaData';
 import { useToast } from '@/hooks/use-toast';
-import { updateAdSet } from '@/lib/metaApi';
+import { updateAdSet, AdSet } from '@/lib/metaApi';
+import { AccountFilter } from './AccountFilter';
+import { EditAdSetModal } from './EditAdSetModal';
 
 interface AdSetsTabProps {
   viewMode: 'table' | 'cards';
 }
 
 export function AdSetsTab({ viewMode }: AdSetsTabProps) {
-  const { adSets, campaigns, loading, credentials, refetch } = useMetaData();
+  const { adSets, campaigns, loading, credentials, refetch, selectedAdAccount } = useMetaData();
   const [updatingAdSet, setUpdatingAdSet] = useState<string | null>(null);
+  const [editingAdSet, setEditingAdSet] = useState<AdSet | null>(null);
   const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
@@ -138,6 +140,28 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
     );
   }
 
+  if (!selectedAdAccount) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Conjuntos de Anúncios</h2>
+        </div>
+        <AccountFilter />
+        <Card>
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-600 mb-2">
+              Selecione uma conta de anúncios
+            </h3>
+            <p className="text-slate-500 mb-4">
+              Escolha uma conta de anúncios para visualizar seus conjuntos de anúncios.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (loading.adSets) {
     return (
       <div className="space-y-6">
@@ -148,6 +172,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
             <span className="text-sm text-slate-500">Carregando conjuntos...</span>
           </div>
         </div>
+        <AccountFilter />
         <Card>
           <CardContent className="p-8 text-center">
             <div className="space-y-4">
@@ -176,6 +201,8 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
             </Button>
           </div>
         </div>
+
+        <AccountFilter />
 
         <Card>
           <CardContent className="p-0">
@@ -214,7 +241,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setEditingAdSet(adSet)}>
                             <Edit className="w-4 h-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
@@ -246,6 +273,13 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
             </Table>
           </CardContent>
         </Card>
+
+        <EditAdSetModal
+          adSet={editingAdSet}
+          isOpen={!!editingAdSet}
+          onClose={() => setEditingAdSet(null)}
+          onSuccess={() => refetch.adSets()}
+        />
       </div>
     );
   }
@@ -264,6 +298,8 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
           </Button>
         </div>
       </div>
+
+      <AccountFilter />
 
       {adSets.length === 0 ? (
         <Card>
@@ -305,7 +341,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setEditingAdSet(adSet)}>
                         <Edit className="w-4 h-4 mr-2" />
                         Editar
                       </DropdownMenuItem>
@@ -352,6 +388,13 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
           ))}
         </div>
       )}
+
+      <EditAdSetModal
+        adSet={editingAdSet}
+        isOpen={!!editingAdSet}
+        onClose={() => setEditingAdSet(null)}
+        onSuccess={() => refetch.adSets()}
+      />
     </div>
   );
 }

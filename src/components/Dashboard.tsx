@@ -11,9 +11,10 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useMetaData } from '@/hooks/useMetaData';
+import { AccountFilter } from './AccountFilter';
 
 export function Dashboard() {
-  const { campaigns, adSets, ads, loading, credentials } = useMetaData();
+  const { campaigns, adSets, ads, loading, credentials, selectedAdAccount, selectedAdAccountName } = useMetaData();
 
   if (!credentials) {
     return (
@@ -36,6 +37,28 @@ export function Dashboard() {
     );
   }
 
+  if (!selectedAdAccount) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Dashboard</h2>
+        </div>
+        <AccountFilter />
+        <Card>
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-600 mb-2">
+              Selecione uma conta de anúncios
+            </h3>
+            <p className="text-slate-500 mb-4">
+              Escolha uma conta de anúncios para visualizar o dashboard.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (loading.campaigns || loading.adSets || loading.ads) {
     return (
       <div className="space-y-6">
@@ -46,6 +69,7 @@ export function Dashboard() {
             <span className="text-sm text-slate-500">Carregando dados...</span>
           </div>
         </div>
+        <AccountFilter />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
@@ -96,6 +120,19 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-lg font-semibold">Dashboard</h2>
+          {selectedAdAccountName && (
+            <p className="text-sm text-slate-500 mt-1">
+              Conta: <span className="font-medium">{selectedAdAccountName}</span>
+            </p>
+          )}
+        </div>
+      </div>
+
+      <AccountFilter />
+
       {/* Métricas principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric) => {
