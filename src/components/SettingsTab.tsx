@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { saveMetaCredentials, getMetaCredentials } from '@/lib/metaApi';
-import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -20,11 +18,9 @@ import {
   TestTube,
   AlertCircle
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { MetricsCustomization } from './MetricsCustomization';
 
 export function SettingsTab() {
-  const [apiKey, setApiKey] = useState('');
   const [appId, setAppId] = useState('');
   const [appSecret, setAppSecret] = useState('');
   const [accessToken, setAccessToken] = useState('');
@@ -33,13 +29,11 @@ export function SettingsTab() {
   const [connectionStatus, setConnectionStatus] = useState<'conectado' | 'não conectado'>('não conectado');
   const { toast } = useToast();
 
-
   const handleSaveSettings = () => {
-    // Aqui você salvaria as configurações no localStorage ou backend
     localStorage.setItem('metaAdsSettings', JSON.stringify({
-      apiKey,
       appId,
       appSecret,
+      accessToken,
       notifications,
       autoRefresh
     }));
@@ -50,12 +44,12 @@ export function SettingsTab() {
     });
   };
 
-  const handleTestConnection = () => {
+  const handleTestConnection = async () => {
     try {
       await saveMetaCredentials(appId, appSecret, accessToken);
       toast({
         title: 'Credenciais salvas!',
-          description: 'Conexão com a API da Meta configurada.',
+        description: 'Conexão com a API da Meta configurada.',
       });
       setConnectionStatus('conectado');
     } catch (err) {
@@ -79,11 +73,11 @@ export function SettingsTab() {
         }
       } catch {
         setConnectionStatus('não conectado');
-    }
-  };
+      }
+    };
 
-  fetchCreds();
-}, []);
+    fetchCreds();
+  }, []);
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -137,12 +131,12 @@ export function SettingsTab() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="apiKey">Access Token</Label>
+            <Label htmlFor="accessToken">Access Token</Label>
             <Textarea
-              id="apiKey"
+              id="accessToken"
               placeholder="Cole aqui seu Access Token da Meta API..."
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
+              value={accessToken}
+              onChange={(e) => setAccessToken(e.target.value)}
               rows={3}
             />
             <p className="text-xs text-slate-500">
@@ -155,7 +149,9 @@ export function SettingsTab() {
               <TestTube className="w-4 h-4 mr-2" />
               Testar Conexão
             </Button>
-            <Badge variant="secondary">Status: Não conectado</Badge>
+            <Badge variant={connectionStatus === 'conectado' ? 'default' : 'secondary'}>
+              Status: {connectionStatus === 'conectado' ? '✅ Conectado' : '❌ Não conectado'}
+            </Badge>
           </div>
         </CardContent>
       </Card>
