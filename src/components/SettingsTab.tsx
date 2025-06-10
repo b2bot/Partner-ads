@@ -7,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { saveMetaCredentials, getMetaCredentials } from '@/lib/metaApi';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { 
   Key, 
@@ -24,9 +27,12 @@ export function SettingsTab() {
   const [apiKey, setApiKey] = useState('');
   const [appId, setAppId] = useState('');
   const [appSecret, setAppSecret] = useState('');
+  const [accessToken, setAccessToken] = useState('');
   const [notifications, setNotifications] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState<'conectado' | 'não conectado'>('não conectado');
   const { toast } = useToast();
+
 
   const handleSaveSettings = () => {
     // Aqui você salvaria as configurações no localStorage ou backend
@@ -45,12 +51,39 @@ export function SettingsTab() {
   };
 
   const handleTestConnection = () => {
-    // Aqui você testaria a conexão com a API da Meta
-    toast({
-      title: "Testando conexão...",
-      description: "Verificando suas credenciais da API da Meta.",
-    });
+    try {
+      await saveMetaCredentials(appId, appSecret, accessToken);
+      toast({
+        title: 'Credenciais salvas!',
+          description: 'Conexão com a API da Meta configurada.',
+      });
+      setConnectionStatus('conectado');
+    } catch (err) {
+      toast({
+        title: 'Erro ao salvar',
+        description: 'Verifique os dados e tente novamente.',
+        variant: 'destructive',
+      });
+    }
   };
+
+  useEffect(() => {
+    const fetchCreds = async () => {
+      try {
+        const creds = await getMetaCredentials();
+        if (creds) {
+          setConnectionStatus('conectado');
+          setAppId(creds.app_id);
+          setAppSecret(creds.app_secret);
+          setAccessToken(creds.access_token);
+        }
+      } catch {
+        setConnectionStatus('não conectado');
+    }
+  };
+
+  fetchCreds();
+}, []);
 
   return (
     <div className="space-y-6 max-w-4xl">
