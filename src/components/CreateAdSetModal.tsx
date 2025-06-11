@@ -39,7 +39,7 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess }: CreateAdSetModa
 
     setLoading(true);
     try {
-      const targeting = {
+      const targeting: any = {
         age_min: parseInt(formData.age_min),
         age_max: parseInt(formData.age_max),
         geo_locations: {

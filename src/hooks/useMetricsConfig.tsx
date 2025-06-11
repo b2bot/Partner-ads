@@ -41,7 +41,7 @@ export function useMetricsConfig() {
           parsedConfig = JSON.parse(data.config);
         } else if (typeof data.config === 'object' && data.config !== null) {
           // Type assertion for the config object
-          parsedConfig = data.config as unknown as MetricsConfig;
+          parsedConfig = data.config as MetricsConfig;
         } else {
           parsedConfig = defaultConfig;
         }
