@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   getMetaCredentials, 
@@ -14,9 +14,10 @@ import {
   Ad,
   CampaignInsights
 } from '@/lib/metaApi';
+import { useGlobalAdAccount } from './useGlobalAdAccount';
 
 export function useMetaData() {
-  const [selectedAdAccount, setSelectedAdAccount] = useState<string>('');
+  const { selectedAdAccount, selectedAdAccountName, setSelectedAdAccount } = useGlobalAdAccount();
   
   const { data: credentials } = useQuery({
     queryKey: ['meta-credentials'],
@@ -47,22 +48,26 @@ export function useMetaData() {
     enabled: !!credentials?.access_token && !!selectedAdAccount,
   });
 
-  // Auto-select first ad account if available
+  // Auto-select first ad account if available and none is selected
   useEffect(() => {
     if (adAccounts && adAccounts.length > 0 && !selectedAdAccount) {
-      setSelectedAdAccount(adAccounts[0].id);
+      setSelectedAdAccount(adAccounts[0].id, adAccounts[0].name);
     }
-  }, [adAccounts, selectedAdAccount]);
+  }, [adAccounts, selectedAdAccount, setSelectedAdAccount]);
 
-  // Get selected ad account name
-  const selectedAdAccountName = adAccounts?.find(acc => acc.id === selectedAdAccount)?.name || '';
+  const handleSetSelectedAdAccount = (accountId: string) => {
+    const account = adAccounts?.find(acc => acc.id === accountId);
+    if (account) {
+      setSelectedAdAccount(accountId, account.name);
+    }
+  };
 
   return {
     credentials,
     adAccounts: adAccounts || [],
     selectedAdAccount,
     selectedAdAccountName,
-    setSelectedAdAccount,
+    setSelectedAdAccount: handleSetSelectedAdAccount,
     campaigns: campaigns || [],
     adSets: adSets || [],
     ads: ads || [],

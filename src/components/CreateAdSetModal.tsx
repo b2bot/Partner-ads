@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -12,25 +13,24 @@ interface CreateAdSetModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  campaignId?: string;
 }
 
-export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: CreateAdSetModalProps) {
-  const { credentials, selectedAdAccount } = useMetaData();
+export function CreateAdSetModal({ isOpen, onClose, onSuccess }: CreateAdSetModalProps) {
+  const { credentials, selectedAdAccount, campaigns } = useMetaData();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    campaign_id: campaignId || '',
+    campaign_id: '',
     status: 'PAUSED',
     budgetType: 'daily',
     budget: '',
     billing_event: 'IMPRESSIONS',
     optimization_goal: 'REACH',
-    ageMin: '18',
-    ageMax: '65',
-    gender: 'all',
-    countries: 'BR'
+    age_min: '18',
+    age_max: '65',
+    countries: 'BR',
+    gender: '0' // 0 = All, 1 = Male, 2 = Female
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,12 +39,12 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
 
     setLoading(true);
     try {
-      const targeting: any = {
-        age_min: parseInt(formData.ageMin),
-        age_max: parseInt(formData.ageMax),
+      const targeting = {
+        age_min: parseInt(formData.age_min),
+        age_max: parseInt(formData.age_max),
         geo_locations: {
           countries: [formData.countries],
-          location_types: ['home', 'recent']
+          location_types: ['home']
         },
         publisher_platforms: ['facebook', 'instagram'],
         facebook_positions: ['feed'],
@@ -52,7 +52,8 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
         device_platforms: ['mobile', 'desktop']
       };
 
-      if (formData.gender !== 'all') {
+      // Add gender targeting only if not "All"
+      if (formData.gender !== '0') {
         targeting.genders = [parseInt(formData.gender)];
       }
 
@@ -86,10 +87,10 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
         budget: '',
         billing_event: 'IMPRESSIONS',
         optimization_goal: 'REACH',
-        ageMin: '18',
-        ageMax: '65',
-        gender: 'all',
-        countries: 'BR'
+        age_min: '18',
+        age_max: '65',
+        countries: 'BR',
+        gender: '0'
       });
     } catch (error: any) {
       toast({
@@ -104,7 +105,7 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Criar Novo Conjunto de Anúncios</DialogTitle>
         </DialogHeader>
@@ -120,13 +121,19 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="campaign_id">ID da Campanha</Label>
-            <Input
-              id="campaign_id"
-              value={formData.campaign_id}
-              onChange={(e) => setFormData({ ...formData, campaign_id: e.target.value })}
-              required
-            />
+            <Label htmlFor="campaign_id">Campanha</Label>
+            <Select value={formData.campaign_id} onValueChange={(value) => setFormData({ ...formData, campaign_id: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a campanha" />
+              </SelectTrigger>
+              <SelectContent>
+                {campaigns.map((campaign) => (
+                  <SelectItem key={campaign.id} value={campaign.id}>
+                    {campaign.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -159,90 +166,55 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Evento de Cobrança</Label>
-              <Select value={formData.billing_event} onValueChange={(value) => setFormData({ ...formData, billing_event: value })}>
+              <Label>Idade Mínima</Label>
+              <Input
+                type="number"
+                min="13"
+                max="65"
+                value={formData.age_min}
+                onChange={(e) => setFormData({ ...formData, age_min: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Idade Máxima</Label>
+              <Input
+                type="number"
+                min="13"
+                max="65"
+                value={formData.age_max}
+                onChange={(e) => setFormData({ ...formData, age_max: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>País</Label>
+              <Select value={formData.countries} onValueChange={(value) => setFormData({ ...formData, countries: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="IMPRESSIONS">Impressões</SelectItem>
-                  <SelectItem value="LINK_CLICKS">Cliques no link</SelectItem>
+                  <SelectItem value="BR">Brasil</SelectItem>
+                  <SelectItem value="US">Estados Unidos</SelectItem>
+                  <SelectItem value="AR">Argentina</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Meta de Otimização</Label>
-              <Select value={formData.optimization_goal} onValueChange={(value) => setFormData({ ...formData, optimization_goal: value })}>
+              <Label>Gênero</Label>
+              <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="REACH">Alcance</SelectItem>
-                  <SelectItem value="LINK_CLICKS">Cliques no link</SelectItem>
-                  <SelectItem value="IMPRESSIONS">Impressões</SelectItem>
+                  <SelectItem value="0">Todos</SelectItem>
+                  <SelectItem value="1">Masculino</SelectItem>
+                  <SelectItem value="2">Feminino</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Segmentação</Label>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="ageMin">Idade Mínima</Label>
-                <Input
-                  id="ageMin"
-                  type="number"
-                  min="13"
-                  max="65"
-                  value={formData.ageMin}
-                  onChange={(e) => setFormData({ ...formData, ageMin: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ageMax">Idade Máxima</Label>
-                <Input
-                  id="ageMax"
-                  type="number"
-                  min="18"
-                  max="65"
-                  value={formData.ageMax}
-                  onChange={(e) => setFormData({ ...formData, ageMax: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Gênero</Label>
-                <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="1">Masculino</SelectItem>
-                    <SelectItem value="2">Feminino</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="countries">País</Label>
-                <Select value={formData.countries} onValueChange={(value) => setFormData({ ...formData, countries: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="BR">Brasil</SelectItem>
-                    <SelectItem value="US">Estados Unidos</SelectItem>
-                    <SelectItem value="CA">Canadá</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
 
@@ -264,7 +236,7 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
               Cancelar
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Criando...' : 'Criar Conjunto de Anúncios'}
+              {loading ? 'Criando...' : 'Criar Conjunto'}
             </Button>
           </div>
         </form>

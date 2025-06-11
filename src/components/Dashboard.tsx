@@ -140,7 +140,7 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {insights.data?.ctr ? `${parseFloat(insights.data.ctr).toFixed(2)}%` : '0.00%'}
+              {insights.data?.ctr ? `${parseFloat(insights.data.ctr.toString()).toFixed(2)}%` : '0.00%'}
             </div>
             <p className="text-xs text-slate-500">Taxa de cliques média</p>
           </CardContent>

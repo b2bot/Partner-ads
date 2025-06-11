@@ -35,9 +35,16 @@ export function useMetricsConfig() {
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading metrics config:', error);
       } else if (data && data.config) {
-        const parsedConfig: MetricsConfig = typeof data.config === 'string' 
-          ? JSON.parse(data.config) 
-          : data.config as MetricsConfig;
+        // Safely parse the config data
+        let parsedConfig: MetricsConfig;
+        if (typeof data.config === 'string') {
+          parsedConfig = JSON.parse(data.config);
+        } else if (typeof data.config === 'object' && data.config !== null) {
+          // Type assertion for the config object
+          parsedConfig = data.config as unknown as MetricsConfig;
+        } else {
+          parsedConfig = defaultConfig;
+        }
         setConfig(parsedConfig);
       }
     } catch (error) {
@@ -49,9 +56,12 @@ export function useMetricsConfig() {
 
   const saveConfig = async (newConfig: MetricsConfig) => {
     try {
+      // Convert config to JSON string for storage
+      const configJson = JSON.stringify(newConfig);
+      
       const { error } = await supabase
         .from('metrics_config')
-        .upsert([{ config: newConfig }], { onConflict: 'id' });
+        .upsert([{ config: configJson }], { onConflict: 'id' });
 
       if (error) throw error;
       setConfig(newConfig);
