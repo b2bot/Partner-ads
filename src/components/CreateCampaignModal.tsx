@@ -51,6 +51,7 @@ export function CreateCampaignModal({ isOpen, onClose, onSuccess }: CreateCampai
         name: formData.name,
         objective: formData.objective,
         status: formData.status,
+        special_ad_categories: [],
         ...(formData.budgetType === 'daily' 
           ? { daily_budget: (parseFloat(formData.budget) * 100).toString() }
           : { lifetime_budget: (parseFloat(formData.budget) * 100).toString() }

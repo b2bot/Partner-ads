@@ -364,6 +364,7 @@ export async function createCampaign(
     name: string;
     objective: string;
     status: string;
+    special_ad_categories: string[];
     daily_budget?: string;
     lifetime_budget?: string;
   }
@@ -372,7 +373,11 @@ export async function createCampaign(
     const formData = new FormData();
     Object.entries(campaignData).forEach(([key, value]) => {
       if (value !== undefined) {
-        formData.append(key, String(value));
+        if (key === 'special_ad_categories') {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, String(value));
+        }
       }
     });
     formData.append('access_token', accessToken);
