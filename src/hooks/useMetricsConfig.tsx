@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -28,14 +27,15 @@ export function useMetricsConfig() {
     try {
       const { data, error } = await supabase
         .from('metrics_config')
-        .select('*')
+        .select('config')
         .limit(1)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading metrics config:', error);
-      } else if (data) {
-        setConfig(data.config);
+      } else if (data && data.config) {
+        const parsedConfig: MetricsConfig = JSON.parse(data.config);
+        setConfig(parsedConfig);
       }
     } catch (error) {
       console.error('Error loading metrics config:', error);
@@ -46,9 +46,10 @@ export function useMetricsConfig() {
 
   const saveConfig = async (newConfig: MetricsConfig) => {
     try {
+      const jsonConfig = JSON.stringify(newConfig);
       const { error } = await supabase
         .from('metrics_config')
-        .upsert([{ config: newConfig }], { onConflict: 'id' });
+        .upsert([{ config: jsonConfig }], { onConflict: 'id' });
 
       if (error) throw error;
       setConfig(newConfig);
