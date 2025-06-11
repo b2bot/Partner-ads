@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -40,10 +39,9 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
 
     setLoading(true);
     try {
-      const targeting = {
+      const targeting: any = {
         age_min: parseInt(formData.ageMin),
         age_max: parseInt(formData.ageMax),
-        genders: number[];
         geo_locations: {
           countries: [formData.countries],
           location_types: ['home', 'recent']

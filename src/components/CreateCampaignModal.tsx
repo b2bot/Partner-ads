@@ -16,17 +16,21 @@ interface CreateCampaignModalProps {
 }
 
 const CAMPAIGN_OBJECTIVES = [
-  { value: 'BRAND_AWARENESS', label: 'Reconhecimento da marca' },
+  { value: 'OUTCOME_AWARENESS', label: 'Reconhecimento' },
+  { value: 'OUTCOME_TRAFFIC', label: 'Tráfego' },
+  { value: 'OUTCOME_ENGAGEMENT', label: 'Engajamento' },
+  { value: 'OUTCOME_LEADS', label: 'Leads' },
+  { value: 'OUTCOME_APP_PROMOTION', label: 'Promoção do app' },
+  { value: 'OUTCOME_SALES', label: 'Vendas' },
   { value: 'REACH', label: 'Alcance' },
-  { value: 'TRAFFIC', label: 'Tráfego' },
-  { value: 'ENGAGEMENT', label: 'Engajamento' },
-  { value: 'APP_INSTALLS', label: 'Instalações do app' },
+  { value: 'CONVERSIONS', label: 'Conversões' },
+  { value: 'LINK_CLICKS', label: 'Cliques no link' },
+  { value: 'POST_ENGAGEMENT', label: 'Engajamento da publicação' },
   { value: 'VIDEO_VIEWS', label: 'Visualizações de vídeo' },
+  { value: 'PAGE_LIKES', label: 'Curtidas da página' },
   { value: 'LEAD_GENERATION', label: 'Geração de leads' },
   { value: 'MESSAGES', label: 'Mensagens' },
-  { value: 'CONVERSIONS', label: 'Conversões' },
-  { value: 'CATALOG_SALES', label: 'Vendas do catálogo' },
-  { value: 'STORE_VISITS', label: 'Visitas à loja' }
+  { value: 'APP_INSTALLS', label: 'Instalações do app' }
 ];
 
 export function CreateCampaignModal({ isOpen, onClose, onSuccess }: CreateCampaignModalProps) {

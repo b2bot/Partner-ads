@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +38,13 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [sortField, setSortField] = useState<string>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Refetch campaigns when selectedAdAccount changes
+  useEffect(() => {
+    if (selectedAdAccount) {
+      refetch.campaigns();
+    }
+  }, [selectedAdAccount, refetch]);
 
   const handleToggleStatus = async (campaign: any) => {
     if (!credentials?.access_token) return;
@@ -148,6 +155,40 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
           <Plus className="w-4 h-4 mr-2" />
           Nova Campanha
         </Button>
+      </div>
+
+      {/* Métricas de Campanhas Ativas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold">{campaigns.length}</div>
+            <p className="text-sm text-slate-600">Total de Campanhas</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-green-600">
+              {campaigns.filter(c => c.status === 'ACTIVE').length}
+            </div>
+            <p className="text-sm text-slate-600">Ativas</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-yellow-600">
+              {campaigns.filter(c => c.status === 'PAUSED').length}
+            </div>
+            <p className="text-sm text-slate-600">Pausadas</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold">
+              {new Set(campaigns.map(c => c.objective)).size}
+            </div>
+            <p className="text-sm text-slate-600">Objetivos Únicos</p>
+          </CardContent>
+        </Card>
       </div>
 
       {viewMode === 'cards' ? (

@@ -6,26 +6,36 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Target } from 'lucide-react';
 import { useMetaData } from '@/hooks/useMetaData';
+import { useAccountInsights } from '@/hooks/useAccountInsights';
 import { AccountFilter } from '@/components/AccountFilter';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useMetricsConfig } from '@/hooks/useMetricsConfig';
 import { DateRange } from 'react-day-picker';
 
 export function Dashboard() {
-  const { campaigns, loading } = useMetaData();
+  const { campaigns, loading, selectedAdAccount } = useMetaData();
   const { config } = useMetricsConfig();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  
+  const insights = useAccountInsights(
+    dateRange ? {
+      since: dateRange.from?.toISOString().split('T')[0] || '',
+      until: dateRange.to?.toISOString().split('T')[0] || ''
+    } : undefined
+  );
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | string) => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(value);
+    }).format(numValue || 0);
   };
 
-  const formatNumber = (value: number) => {
-    return new Intl.NumberFormat('pt-BR').format(value);
+  const formatNumber = (value: number | string) => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    return new Intl.NumberFormat('pt-BR').format(numValue || 0);
   };
 
   const getStatusColor = (status: string) => {
@@ -41,17 +51,10 @@ export function Dashboard() {
     }
   };
 
-  const mockMetrics = {
-    impressions: 45230,
-    clicks: 1523,
-    spend: 2547.80,
-    ctr: 3.37,
-    cpc: 1.67,
-    reach: 32145,
-    conversions: 89
-  };
+  // Filtrar apenas campanhas ativas
+  const activeCampaigns = campaigns.filter(campaign => campaign.status === 'ACTIVE');
 
-  if (loading.campaigns) {
+  if (loading.campaigns || !selectedAdAccount) {
     return (
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
@@ -89,7 +92,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Métricas Resumidas */}
+      {/* Métricas da Conta */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -97,11 +100,10 @@ export function Dashboard() {
             <Eye className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{formatNumber(mockMetrics.impressions)}</div>
-            <p className="text-xs text-green-600 flex items-center">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +12% vs período anterior
-            </p>
+            <div className="text-2xl font-bold text-slate-900">
+              {formatNumber(insights.data?.impressions || 0)}
+            </div>
+            <p className="text-xs text-slate-500">Total das campanhas ativas</p>
           </CardContent>
         </Card>
 
@@ -111,11 +113,10 @@ export function Dashboard() {
             <MousePointer className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{formatNumber(mockMetrics.clicks)}</div>
-            <p className="text-xs text-green-600 flex items-center">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +8% vs período anterior
-            </p>
+            <div className="text-2xl font-bold text-slate-900">
+              {formatNumber(insights.data?.clicks || 0)}
+            </div>
+            <p className="text-xs text-slate-500">Total das campanhas ativas</p>
           </CardContent>
         </Card>
 
@@ -125,11 +126,10 @@ export function Dashboard() {
             <DollarSign className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{formatCurrency(mockMetrics.spend)}</div>
-            <p className="text-xs text-red-600 flex items-center">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +15% vs período anterior
-            </p>
+            <div className="text-2xl font-bold text-slate-900">
+              {formatCurrency(insights.data?.spend || 0)}
+            </div>
+            <p className="text-xs text-slate-500">Total das campanhas ativas</p>
           </CardContent>
         </Card>
 
@@ -139,18 +139,19 @@ export function Dashboard() {
             <Target className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{mockMetrics.ctr.toFixed(2)}%</div>
-            <p className="text-xs text-green-600 flex items-center">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +0.5% vs período anterior
-            </p>
+            <div className="text-2xl font-bold text-slate-900">
+              {insights.data?.ctr ? `${parseFloat(insights.data.ctr).toFixed(2)}%` : '0.00%'}
+            </div>
+            <p className="text-xs text-slate-500">Taxa de cliques média</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Controles de Visualização */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-slate-800">Campanhas Ativas</h2>
+        <h2 className="text-xl font-semibold text-slate-800">
+          Campanhas Ativas ({activeCampaigns.length})
+        </h2>
         <div className="flex gap-2">
           <Button
             variant={viewMode === 'cards' ? 'default' : 'outline'}
@@ -169,10 +170,10 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Visualização de Campanhas */}
+      {/* Visualização de Campanhas Ativas */}
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {campaigns.slice(0, 6).map((campaign) => (
+          {activeCampaigns.slice(0, 6).map((campaign) => (
             <Card key={campaign.id} className="hover-lift">
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -180,8 +181,7 @@ export function Dashboard() {
                     {campaign.name}
                   </CardTitle>
                   <Badge className={getStatusColor(campaign.status)}>
-                    {campaign.status === 'ACTIVE' ? 'Ativa' : 
-                     campaign.status === 'PAUSED' ? 'Pausada' : 'Excluída'}
+                    Ativa
                   </Badge>
                 </div>
                 <CardDescription className="text-slate-600">
@@ -191,26 +191,21 @@ export function Dashboard() {
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-slate-500">Impressões:</span>
-                    <div className="font-semibold">{formatNumber(Math.floor(Math.random() * 50000))}</div>
+                    <span className="text-slate-500">Orçamento:</span>
+                    <div className="font-semibold">
+                      {campaign.daily_budget 
+                        ? formatCurrency(parseFloat(campaign.daily_budget) / 100) + '/dia'
+                        : campaign.lifetime_budget 
+                        ? formatCurrency(parseFloat(campaign.lifetime_budget) / 100) + ' total'
+                        : 'N/A'
+                      }
+                    </div>
                   </div>
                   <div>
-                    <span className="text-slate-500">Cliques:</span>
-                    <div className="font-semibold">{formatNumber(Math.floor(Math.random() * 2000))}</div>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">CTR:</span>
-                    <div className="font-semibold">{(Math.random() * 5).toFixed(2)}%</div>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">CPC:</span>
-                    <div className="font-semibold">{formatCurrency(Math.random() * 3)}</div>
-                  </div>
-                </div>
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500 text-sm">Valor Gasto:</span>
-                    <span className="font-bold text-lg">{formatCurrency(Math.random() * 1000)}</span>
+                    <span className="text-slate-500">Criada em:</span>
+                    <div className="font-semibold">
+                      {new Date(campaign.created_time).toLocaleDateString('pt-BR')}
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -224,28 +219,30 @@ export function Dashboard() {
               <TableRow>
                 <TableHead>Nome da Campanha</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Impressões</TableHead>
-                <TableHead>Cliques</TableHead>
-                <TableHead>CTR</TableHead>
-                <TableHead>CPC</TableHead>
-                <TableHead>Valor Gasto</TableHead>
+                <TableHead>Objetivo</TableHead>
+                <TableHead>Orçamento</TableHead>
+                <TableHead>Criada em</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {campaigns.map((campaign) => (
+              {activeCampaigns.map((campaign) => (
                 <TableRow key={campaign.id}>
                   <TableCell className="font-medium">{campaign.name}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(campaign.status)}>
-                      {campaign.status === 'ACTIVE' ? 'Ativa' : 
-                       campaign.status === 'PAUSED' ? 'Pausada' : 'Excluída'}
+                      Ativa
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatNumber(Math.floor(Math.random() * 50000))}</TableCell>
-                  <TableCell>{formatNumber(Math.floor(Math.random() * 2000))}</TableCell>
-                  <TableCell>{(Math.random() * 5).toFixed(2)}%</TableCell>
-                  <TableCell>{formatCurrency(Math.random() * 3)}</TableCell>
-                  <TableCell className="font-semibold">{formatCurrency(Math.random() * 1000)}</TableCell>
+                  <TableCell>{campaign.objective}</TableCell>
+                  <TableCell>
+                    {campaign.daily_budget 
+                      ? formatCurrency(parseFloat(campaign.daily_budget) / 100) + '/dia'
+                      : campaign.lifetime_budget 
+                      ? formatCurrency(parseFloat(campaign.lifetime_budget) / 100) + ' total'
+                      : 'N/A'
+                    }
+                  </TableCell>
+                  <TableCell>{new Date(campaign.created_time).toLocaleDateString('pt-BR')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -253,13 +250,13 @@ export function Dashboard() {
         </Card>
       )}
 
-      {campaigns.length === 0 && (
+      {activeCampaigns.length === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Target className="h-12 w-12 text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-600 mb-2">Nenhuma campanha encontrada</h3>
+            <h3 className="text-lg font-semibold text-slate-600 mb-2">Nenhuma campanha ativa</h3>
             <p className="text-slate-500 text-center">
-              Selecione uma conta de anúncios para visualizar as campanhas
+              Ative campanhas existentes ou crie novas para ver métricas
             </p>
           </CardContent>
         </Card>
