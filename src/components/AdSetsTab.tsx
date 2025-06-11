@@ -9,7 +9,8 @@ import {
   Copy,
   MoreHorizontal,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Plus
 } from 'lucide-react';
 import {
   Table,
@@ -30,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { updateAdSet, AdSet } from '@/lib/metaApi';
 import { AccountFilter } from './AccountFilter';
 import { EditAdSetModal } from './EditAdSetModal';
+import { CreateAdSetModal } from './CreateAdSetModal';
 
 interface AdSetsTabProps {
   viewMode: 'table' | 'cards';
@@ -39,6 +41,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
   const { adSets, campaigns, loading, credentials, refetch, selectedAdAccount } = useMetaData();
   const [updatingAdSet, setUpdatingAdSet] = useState<string | null>(null);
   const [editingAdSet, setEditingAdSet] = useState<AdSet | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
@@ -196,8 +199,9 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
               <RefreshCw className="w-4 h-4 mr-2" />
               Atualizar
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              + Novo Conjunto
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Conjunto
             </Button>
           </div>
         </div>
@@ -280,6 +284,12 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
           onClose={() => setEditingAdSet(null)}
           onSuccess={() => refetch.adSets()}
         />
+
+        <CreateAdSetModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => refetch.adSets()}
+        />
       </div>
     );
   }
@@ -293,8 +303,9 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
             <RefreshCw className="w-4 h-4 mr-2" />
             Atualizar
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            + Novo Conjunto
+          <Button onClick={() => setShowCreateModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Conjunto
           </Button>
         </div>
       </div>
@@ -311,6 +322,10 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
             <p className="text-slate-500 mb-4">
               Você ainda não possui conjuntos de anúncios ativos nesta conta.
             </p>
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Criar Primeiro Conjunto
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -393,6 +408,12 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
         adSet={editingAdSet}
         isOpen={!!editingAdSet}
         onClose={() => setEditingAdSet(null)}
+        onSuccess={() => refetch.adSets()}
+      />
+
+      <CreateAdSetModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
         onSuccess={() => refetch.adSets()}
       />
     </div>

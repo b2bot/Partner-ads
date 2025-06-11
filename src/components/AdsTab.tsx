@@ -9,7 +9,8 @@ import {
   Copy,
   MoreHorizontal,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Plus
 } from 'lucide-react';
 import {
   Table,
@@ -30,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { updateAd, Ad } from '@/lib/metaApi';
 import { AccountFilter } from './AccountFilter';
 import { EditAdModal } from './EditAdModal';
+import { CreateAdModal } from './CreateAdModal';
 
 interface AdsTabProps {
   viewMode: 'table' | 'cards';
@@ -39,6 +41,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
   const { ads, adSets, loading, credentials, refetch, selectedAdAccount } = useMetaData();
   const [updatingAd, setUpdatingAd] = useState<string | null>(null);
   const [editingAd, setEditingAd] = useState<Ad | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
@@ -186,8 +189,9 @@ export function AdsTab({ viewMode }: AdsTabProps) {
               <RefreshCw className="w-4 h-4 mr-2" />
               Atualizar
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              + Novo Anúncio
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Anúncio
             </Button>
           </div>
         </div>
@@ -268,6 +272,12 @@ export function AdsTab({ viewMode }: AdsTabProps) {
           onClose={() => setEditingAd(null)}
           onSuccess={() => refetch.ads()}
         />
+
+        <CreateAdModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => refetch.ads()}
+        />
       </div>
     );
   }
@@ -281,8 +291,9 @@ export function AdsTab({ viewMode }: AdsTabProps) {
             <RefreshCw className="w-4 h-4 mr-2" />
             Atualizar
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            + Novo Anúncio
+          <Button onClick={() => setShowCreateModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Anúncio
           </Button>
         </div>
       </div>
@@ -299,6 +310,10 @@ export function AdsTab({ viewMode }: AdsTabProps) {
             <p className="text-slate-500 mb-4">
               Você ainda não possui anúncios ativos nesta conta.
             </p>
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Criar Primeiro Anúncio
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -374,6 +389,12 @@ export function AdsTab({ viewMode }: AdsTabProps) {
         ad={editingAd}
         isOpen={!!editingAd}
         onClose={() => setEditingAd(null)}
+        onSuccess={() => refetch.ads()}
+      />
+
+      <CreateAdModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
         onSuccess={() => refetch.ads()}
       />
     </div>
