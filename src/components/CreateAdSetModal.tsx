@@ -43,6 +43,7 @@ export function CreateAdSetModal({ isOpen, onClose, onSuccess, campaignId }: Cre
       const targeting = {
         age_min: parseInt(formData.ageMin),
         age_max: parseInt(formData.ageMax),
+        genders: number[];
         geo_locations: {
           countries: [formData.countries],
           location_types: ['home', 'recent']
