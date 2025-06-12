@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Target } from 'lucide-react';
 import { useMetaData } from '@/hooks/useMetaData';
 import { useAccountInsights } from '@/hooks/useAccountInsights';
+import { useCampaignInsights } from '@/hooks/useInsights';
 import { AccountFilter } from '@/components/AccountFilter';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useMetricsConfig } from '@/hooks/useMetricsConfig';
+import { formatMetricValue } from '@/lib/metaInsights';
 import { DateRange } from 'react-day-picker';
 
 export function Dashboard() {
@@ -19,6 +21,14 @@ export function Dashboard() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   
   const insights = useAccountInsights(
+    dateRange ? {
+      since: dateRange.from?.toISOString().split('T')[0] || '',
+      until: dateRange.to?.toISOString().split('T')[0] || ''
+    } : undefined
+  );
+
+  // Hook para insights de campanhas
+  const { data: campaignInsights = [], isLoading: campaignInsightsLoading } = useCampaignInsights(
     dateRange ? {
       since: dateRange.from?.toISOString().split('T')[0] || '',
       until: dateRange.to?.toISOString().split('T')[0] || ''
@@ -53,6 +63,20 @@ export function Dashboard() {
 
   // Filtrar apenas campanhas ativas
   const activeCampaigns = campaigns.filter(campaign => campaign.status === 'ACTIVE');
+
+  // Função para obter insights de uma campanha específica
+  const getCampaignInsightsData = (campaignId: string) => {
+    return campaignInsights.find(insight => insight.id === campaignId);
+  };
+
+  // Calcular custo por conversão
+  const calculateCostPerConversion = (spend: any, conversions: any) => {
+    const spendValue = typeof spend === 'string' ? parseFloat(spend) : spend || 0;
+    const conversionsValue = typeof conversions === 'string' ? parseFloat(conversions) : conversions || 0;
+    
+    if (conversionsValue === 0) return 0;
+    return spendValue / conversionsValue;
+  };
 
   if (loading.campaigns || !selectedAdAccount) {
     return (
@@ -172,45 +196,83 @@ export function Dashboard() {
 
       {/* Visualização de Campanhas Ativas */}
       {viewMode === 'cards' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeCampaigns.slice(0, 6).map((campaign) => (
-            <Card key={campaign.id} className="hover-lift">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg font-semibold text-slate-800 truncate">
-                    {campaign.name}
-                  </CardTitle>
-                  <Badge className={getStatusColor(campaign.status)}>
-                    Ativa
-                  </Badge>
+        <div className="space-y-6">
+          {activeCampaigns.map((campaign) => {
+            const campaignData = getCampaignInsightsData(campaign.id);
+            const costPerConversion = campaignData ? calculateCostPerConversion(campaignData.spend, campaignData.conversions) : 0;
+            
+            return (
+              <div key={campaign.id} className="space-y-2">
+                <h3 className="text-lg font-semibold text-slate-800">{campaign.name}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  {/* Card 1: Custo Total */}
+                  <Card className="hover-lift">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <DollarSign className="h-4 w-4 text-red-600" />
+                        <span className="text-sm font-medium text-slate-600">Custo Total</span>
+                      </div>
+                      <div className="text-xl font-bold text-slate-900">
+                        {campaignData ? formatCurrency(campaignData.spend || 0) : 'R$ 0,00'}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card 2: Impressões */}
+                  <Card className="hover-lift">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Eye className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium text-slate-600">Impressões</span>
+                      </div>
+                      <div className="text-xl font-bold text-slate-900">
+                        {campaignData ? formatNumber(campaignData.impressions || 0) : '0'}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card 3: Cliques */}
+                  <Card className="hover-lift">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <MousePointer className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-slate-600">Cliques</span>
+                      </div>
+                      <div className="text-xl font-bold text-slate-900">
+                        {campaignData ? formatNumber(campaignData.clicks || 0) : '0'}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card 4: Conversões */}
+                  <Card className="hover-lift">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Target className="h-4 w-4 text-purple-600" />
+                        <span className="text-sm font-medium text-slate-600">Conversões</span>
+                      </div>
+                      <div className="text-xl font-bold text-slate-900">
+                        {campaignData ? formatNumber(campaignData.conversions || 0) : '0'}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Card 5: Custo por Conversão */}
+                  <Card className="hover-lift">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="h-4 w-4 text-orange-600" />
+                        <span className="text-sm font-medium text-slate-600">Custo/Conversão</span>
+                      </div>
+                      <div className="text-xl font-bold text-slate-900">
+                        {formatCurrency(costPerConversion)}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                <CardDescription className="text-slate-600">
-                  {campaign.objective}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-slate-500">Orçamento:</span>
-                    <div className="font-semibold">
-                      {campaign.daily_budget 
-                        ? formatCurrency(parseFloat(campaign.daily_budget) / 100) + '/dia'
-                        : campaign.lifetime_budget 
-                        ? formatCurrency(parseFloat(campaign.lifetime_budget) / 100) + ' total'
-                        : 'N/A'
-                      }
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Criada em:</span>
-                    <div className="font-semibold">
-                      {new Date(campaign.created_time).toLocaleDateString('pt-BR')}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       ) : (
         <Card>
@@ -220,31 +282,37 @@ export function Dashboard() {
                 <TableHead>Nome da Campanha</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Objetivo</TableHead>
-                <TableHead>Orçamento</TableHead>
+                <TableHead>Custo Total</TableHead>
+                <TableHead>Impressões</TableHead>
+                <TableHead>Cliques</TableHead>
+                <TableHead>Conversões</TableHead>
+                <TableHead>Custo/Conversão</TableHead>
                 <TableHead>Criada em</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {activeCampaigns.map((campaign) => (
-                <TableRow key={campaign.id}>
-                  <TableCell className="font-medium">{campaign.name}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(campaign.status)}>
-                      Ativa
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{campaign.objective}</TableCell>
-                  <TableCell>
-                    {campaign.daily_budget 
-                      ? formatCurrency(parseFloat(campaign.daily_budget) / 100) + '/dia'
-                      : campaign.lifetime_budget 
-                      ? formatCurrency(parseFloat(campaign.lifetime_budget) / 100) + ' total'
-                      : 'N/A'
-                    }
-                  </TableCell>
-                  <TableCell>{new Date(campaign.created_time).toLocaleDateString('pt-BR')}</TableCell>
-                </TableRow>
-              ))}
+              {activeCampaigns.map((campaign) => {
+                const campaignData = getCampaignInsightsData(campaign.id);
+                const costPerConversion = campaignData ? calculateCostPerConversion(campaignData.spend, campaignData.conversions) : 0;
+                
+                return (
+                  <TableRow key={campaign.id}>
+                    <TableCell className="font-medium">{campaign.name}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(campaign.status)}>
+                        Ativa
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{campaign.objective}</TableCell>
+                    <TableCell>{campaignData ? formatCurrency(campaignData.spend || 0) : 'R$ 0,00'}</TableCell>
+                    <TableCell>{campaignData ? formatNumber(campaignData.impressions || 0) : '0'}</TableCell>
+                    <TableCell>{campaignData ? formatNumber(campaignData.clicks || 0) : '0'}</TableCell>
+                    <TableCell>{campaignData ? formatNumber(campaignData.conversions || 0) : '0'}</TableCell>
+                    <TableCell>{formatCurrency(costPerConversion)}</TableCell>
+                    <TableCell>{new Date(campaign.created_time).toLocaleDateString('pt-BR')}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </Card>
