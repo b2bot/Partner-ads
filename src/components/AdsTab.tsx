@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Play, 
   Pause, 
@@ -10,7 +12,9 @@ import {
   MoreHorizontal,
   RefreshCw,
   AlertCircle,
-  Plus
+  Plus,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import {
   Table,
@@ -27,8 +31,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useMetaData } from '@/hooks/useMetaData';
+import { useAdInsights } from '@/hooks/useInsights';
+import { useMetricsConfig } from '@/hooks/useMetricsConfig';
 import { useToast } from '@/hooks/use-toast';
 import { updateAd, Ad } from '@/lib/metaApi';
+import { getAdCreativeImage, formatMetricValue, getMetricDisplayName } from '@/lib/metaInsights';
 import { AccountFilter } from './AccountFilter';
 import { EditAdModal } from './EditAdModal';
 import { CreateAdModal } from './CreateAdModal';
@@ -37,11 +44,24 @@ interface AdsTabProps {
   viewMode: 'table' | 'cards';
 }
 
+interface SortConfig {
+  key: string;
+  direction: 'asc' | 'desc';
+}
+
 export function AdsTab({ viewMode }: AdsTabProps) {
   const { ads, adSets, loading, credentials, refetch, selectedAdAccount } = useMetaData();
+  const { data: insights = [], isLoading: insightsLoading } = useAdInsights();
+  const { config } = useMetricsConfig();
   const [updatingAd, setUpdatingAd] = useState<string | null>(null);
   const [editingAd, setEditingAd] = useState<Ad | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [imageModal, setImageModal] = useState<{ isOpen: boolean; imageUrl: string; adName: string }>({
+    isOpen: false,
+    imageUrl: '',
+    adName: ''
+  });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
   const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
@@ -78,6 +98,10 @@ export function AdsTab({ viewMode }: AdsTabProps) {
     return adSet?.name || 'Conjunto não encontrado';
   };
 
+  const getAdInsights = (adId: string) => {
+    return insights.find(insight => insight.id === adId);
+  };
+
   const handleStatusToggle = async (adId: string, currentStatus: string) => {
     if (!credentials?.access_token) {
       toast({
@@ -107,6 +131,81 @@ export function AdsTab({ viewMode }: AdsTabProps) {
     } finally {
       setUpdatingAd(null);
     }
+  };
+
+  const loadAdImage = async (adId: string, adName: string) => {
+    if (!credentials?.access_token) return;
+    
+    try {
+      const imageUrl = await getAdCreativeImage(credentials.access_token, adId);
+      if (imageUrl) {
+        setImageModal({ isOpen: true, imageUrl, adName });
+      } else {
+        toast({
+          title: 'Imagem não encontrada',
+          description: 'Não foi possível carregar a imagem deste anúncio.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Erro ao carregar imagem do anúncio.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedAds = React.useMemo(() => {
+    if (!sortConfig.key) return ads;
+
+    return [...ads].sort((a, b) => {
+      let aValue: any = '';
+      let bValue: any = '';
+
+      if (sortConfig.key === 'name') {
+        aValue = a.name;
+        bValue = b.name;
+      } else if (sortConfig.key === 'adset_name') {
+        aValue = getAdSetName(a.adset_id);
+        bValue = getAdSetName(b.adset_id);
+      } else if (sortConfig.key === 'status') {
+        aValue = a.status;
+        bValue = b.status;
+      } else if (sortConfig.key === 'created_time') {
+        aValue = new Date(a.created_time);
+        bValue = new Date(b.created_time);
+      } else {
+        // Métricas
+        const aInsights = getAdInsights(a.id);
+        const bInsights = getAdInsights(b.id);
+        aValue = aInsights?.[sortConfig.key as keyof typeof aInsights] || 0;
+        bValue = bInsights?.[sortConfig.key as keyof typeof bInsights] || 0;
+        
+        // Converter para números se necessário
+        if (typeof aValue === 'string') aValue = parseFloat(aValue) || 0;
+        if (typeof bValue === 'string') bValue = parseFloat(bValue) || 0;
+      }
+
+      if (sortConfig.direction === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+  }, [ads, sortConfig, insights, adSets]);
+
+  const getSortIcon = (key: string) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
   };
 
   if (!credentials) {
@@ -155,14 +254,14 @@ export function AdsTab({ viewMode }: AdsTabProps) {
     );
   }
 
-  if (loading.ads) {
+  if (loading.ads || insightsLoading) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Anúncios</h2>
           <div className="flex items-center gap-2">
             <RefreshCw className="w-4 h-4 animate-spin" />
-            <span className="text-sm text-slate-500">Carregando anúncios...</span>
+            <span className="text-sm text-slate-500">Carregando anúncios e métricas...</span>
           </div>
         </div>
         <AccountFilter />
@@ -203,68 +302,149 @@ export function AdsTab({ viewMode }: AdsTabProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome do Anúncio</TableHead>
-                  <TableHead>Conjunto de Anúncios</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Criado em</TableHead>
+                  <TableHead>Ativo</TableHead>
+                  <TableHead>Imagem</TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-slate-50"
+                    onClick={() => handleSort('name')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Nome do Anúncio
+                      {getSortIcon('name')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-slate-50"
+                    onClick={() => handleSort('adset_name')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Conjunto de Anúncios
+                      {getSortIcon('adset_name')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-slate-50"
+                    onClick={() => handleSort('status')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Status
+                      {getSortIcon('status')}
+                    </div>
+                  </TableHead>
+                  {config.ads.map((metricKey) => (
+                    <TableHead 
+                      key={metricKey}
+                      className="cursor-pointer hover:bg-slate-50"
+                      onClick={() => handleSort(metricKey)}
+                    >
+                      <div className="flex items-center gap-1">
+                        {getMetricDisplayName(metricKey)}
+                        {getSortIcon(metricKey)}
+                      </div>
+                    </TableHead>
+                  ))}
+                  <TableHead 
+                    className="cursor-pointer hover:bg-slate-50"
+                    onClick={() => handleSort('created_time')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Criado em
+                      {getSortIcon('created_time')}
+                    </div>
+                  </TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {ads.map((ad) => (
-                  <TableRow key={ad.id}>
-                    <TableCell className="font-medium">{ad.name}</TableCell>
-                    <TableCell className="text-sm text-slate-600">{getAdSetName(ad.adset_id)}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(ad.status)}>
-                        {getStatusText(ad.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{new Date(ad.created_time).toLocaleDateString('pt-BR')}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" disabled={updatingAd === ad.id}>
-                            {updatingAd === ad.id ? (
-                              <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <MoreHorizontal className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => setEditingAd(ad)}>
-                            <Edit className="w-4 h-4 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Copy className="w-4 h-4 mr-2" />
-                            Duplicar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusToggle(ad.id, ad.status)}
-                          >
-                            {ad.status.toLowerCase() === 'active' ? (
-                              <>
-                                <Pause className="w-4 h-4 mr-2" />
-                                Pausar
-                              </>
-                            ) : (
-                              <>
-                                <Play className="w-4 h-4 mr-2" />
-                                Ativar
-                              </>
-                            )}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {sortedAds.map((ad) => {
+                  const adInsights = getAdInsights(ad.id);
+                  
+                  return (
+                    <TableRow key={ad.id}>
+                      <TableCell>
+                        <Switch
+                          checked={ad.status.toLowerCase() === 'active'}
+                          onCheckedChange={() => handleStatusToggle(ad.id, ad.status)}
+                          disabled={updatingAd === ad.id}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-12 w-12 p-0"
+                          onClick={() => loadAdImage(ad.id, ad.name)}
+                        >
+                          <div className="w-10 h-10 bg-slate-100 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-500">
+                            IMG
+                          </div>
+                        </Button>
+                      </TableCell>
+                      <TableCell className="font-medium">{ad.name}</TableCell>
+                      <TableCell className="text-sm text-slate-600">{getAdSetName(ad.adset_id)}</TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(ad.status)}>
+                          {getStatusText(ad.status)}
+                        </Badge>
+                      </TableCell>
+                      {config.ads.map((metricKey) => (
+                        <TableCell key={metricKey}>
+                          {adInsights && adInsights[metricKey as keyof typeof adInsights] !== undefined
+                            ? formatMetricValue(metricKey, adInsights[metricKey as keyof typeof adInsights])
+                            : '-'
+                          }
+                        </TableCell>
+                      ))}
+                      <TableCell>{new Date(ad.created_time).toLocaleDateString('pt-BR')}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" disabled={updatingAd === ad.id}>
+                              {updatingAd === ad.id ? (
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <MoreHorizontal className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setEditingAd(ad)}>
+                              <Edit className="w-4 h-4 mr-2" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Copy className="w-4 h-4 mr-2" />
+                              Duplicar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
+
+        {/* Modal para visualizar imagem */}
+        <Dialog open={imageModal.isOpen} onOpenChange={(open) => setImageModal({ ...imageModal, isOpen: open })}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Criativo do Anúncio: {imageModal.adName}</DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-center">
+              <img 
+                src={imageModal.imageUrl} 
+                alt={`Criativo do anúncio ${imageModal.adName}`}
+                className="max-w-full max-h-96 object-contain rounded-lg"
+                onError={(e) => {
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <EditAdModal
           ad={editingAd}
@@ -318,72 +498,115 @@ export function AdsTab({ viewMode }: AdsTabProps) {
         </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {ads.map((ad) => (
-            <Card key={ad.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-purple-500">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <CardTitle className="text-lg font-semibold leading-tight">
-                      {ad.name}
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge className={getStatusColor(ad.status)}>
-                        {getStatusText(ad.status)}
-                      </Badge>
+          {sortedAds.map((ad) => {
+            const adInsights = getAdInsights(ad.id);
+            
+            return (
+              <Card key={ad.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-purple-500">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <CardTitle className="text-lg font-semibold leading-tight">
+                        {ad.name}
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={ad.status.toLowerCase() === 'active'}
+                          onCheckedChange={() => handleStatusToggle(ad.id, ad.status)}
+                          disabled={updatingAd === ad.id}
+                        />
+                        <Badge className={getStatusColor(ad.status)}>
+                          {getStatusText(ad.status)}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-500">{getAdSetName(ad.adset_id)}</p>
                     </div>
-                    <p className="text-sm text-slate-500">{getAdSetName(ad.adset_id)}</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" disabled={updatingAd === ad.id}>
+                          {updatingAd === ad.id ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <MoreHorizontal className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => setEditingAd(ad)}>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Copy className="w-4 h-4 mr-2" />
+                          Duplicar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" disabled={updatingAd === ad.id}>
-                        {updatingAd === ad.id ? (
-                          <RefreshCw className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <MoreHorizontal className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => setEditingAd(ad)}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Copy className="w-4 h-4 mr-2" />
-                        Duplicar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusToggle(ad.id, ad.status)}
-                      >
-                        {ad.status.toLowerCase() === 'active' ? (
-                          <>
-                            <Pause className="w-4 h-4 mr-2" />
-                            Pausar
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-2" />
-                            Ativar
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <div className="pt-2 border-t border-slate-100">
-                  <div className="text-center">
-                    <p className="text-xs text-slate-500">Criado em</p>
-                    <p className="font-medium text-sm">{new Date(ad.created_time).toLocaleDateString('pt-BR')}</p>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  {/* Imagem do criativo */}
+                  <div className="flex justify-center">
+                    <Button
+                      variant="ghost"
+                      className="h-24 w-24 p-0"
+                      onClick={() => loadAdImage(ad.id, ad.name)}
+                    >
+                      <div className="w-20 h-20 bg-slate-100 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-500">
+                        Ver Imagem
+                      </div>
+                    </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                  {/* Métricas */}
+                  {adInsights && (
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      {config.ads.slice(0, 6).map((metricKey) => (
+                        <div key={metricKey} className="text-center">
+                          <span className="text-slate-500 block">{getMetricDisplayName(metricKey)}</span>
+                          <div className="font-semibold">
+                            {adInsights[metricKey as keyof typeof adInsights] !== undefined
+                              ? formatMetricValue(metricKey, adInsights[metricKey as keyof typeof adInsights])
+                              : '-'
+                            }
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-slate-100">
+                    <div className="text-center">
+                      <p className="text-xs text-slate-500">Criado em</p>
+                      <p className="font-medium text-sm">{new Date(ad.created_time).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
+
+      {/* Modal para visualizar imagem */}
+      <Dialog open={imageModal.isOpen} onOpenChange={(open) => setImageModal({ ...imageModal, isOpen: open })}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Criativo do Anúncio: {imageModal.adName}</DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center">
+            <img 
+              src={imageModal.imageUrl} 
+              alt={`Criativo do anúncio ${imageModal.adName}`}
+              className="max-w-full max-h-96 object-contain rounded-lg"
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder.svg';
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <EditAdModal
         ad={editingAd}

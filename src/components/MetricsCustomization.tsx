@@ -12,130 +12,79 @@ import {
   EyeOff
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useMetricsConfig } from '@/hooks/useMetricsConfig';
+import { AVAILABLE_METRICS, getMetricDisplayName } from '@/lib/metaInsights';
 
 interface Metric {
-  id: string;
-  name: string;
   key: string;
+  name: string;
   enabled: boolean;
-  order: number;
-}
-
-interface PageMetrics {
-  dashboard: Metric[];
-  campaigns: Metric[];
-  adsets: Metric[];
-  ads: Metric[];
+  category: string;
 }
 
 export function MetricsCustomization() {
-  const [pageMetrics, setPageMetrics] = useState<PageMetrics>({
-    dashboard: [
-      { id: '1', name: 'Gasto Total', key: 'spend', enabled: true, order: 1 },
-      { id: '2', name: 'ROAS', key: 'roas', enabled: true, order: 2 },
-      { id: '3', name: 'Alcance', key: 'reach', enabled: true, order: 3 },
-      { id: '4', name: 'CTR', key: 'ctr', enabled: true, order: 4 },
-      { id: '5', name: 'CPC', key: 'cpc', enabled: false, order: 5 },
-      { id: '6', name: 'CPM', key: 'cpm', enabled: false, order: 6 }
-    ],
-    campaigns: [
-      { id: '7', name: 'Nome', key: 'name', enabled: true, order: 1 },
-      { id: '8', name: 'Status', key: 'status', enabled: true, order: 2 },
-      { id: '9', name: 'Orçamento', key: 'budget', enabled: true, order: 3 },
-      { id: '10', name: 'Gasto', key: 'spend', enabled: true, order: 4 },
-      { id: '11', name: 'ROAS', key: 'roas', enabled: true, order: 5 },
-      { id: '12', name: 'CTR', key: 'ctr', enabled: true, order: 6 },
-      { id: '13', name: 'CPC', key: 'cpc', enabled: true, order: 7 },
-      { id: '14', name: 'Conversões', key: 'conversions', enabled: true, order: 8 },
-      { id: '15', name: 'CPM', key: 'cpm', enabled: false, order: 9 },
-      { id: '16', name: 'Impressões', key: 'impressions', enabled: false, order: 10 },
-      { id: '17', name: 'Cliques', key: 'clicks', enabled: false, order: 11 }
-    ],
-    adsets: [
-      { id: '18', name: 'Nome', key: 'name', enabled: true, order: 1 },
-      { id: '19', name: 'Status', key: 'status', enabled: true, order: 2 },
-      { id: '20', name: 'Orçamento', key: 'budget', enabled: true, order: 3 },
-      { id: '21', name: 'Gasto', key: 'spend', enabled: true, order: 4 },
-      { id: '22', name: 'CTR', key: 'ctr', enabled: true, order: 5 },
-      { id: '23', name: 'CPC', key: 'cpc', enabled: true, order: 6 },
-      { id: '24', name: 'CPM', key: 'cpm', enabled: false, order: 7 }
-    ],
-    ads: [
-      { id: '25', name: 'Nome', key: 'name', enabled: true, order: 1 },
-      { id: '26', name: 'Status', key: 'status', enabled: true, order: 2 },
-      { id: '27', name: 'CTR', key: 'ctr', enabled: true, order: 3 },
-      { id: '28', name: 'CPC', key: 'cpc', enabled: true, order: 4 },
-      { id: '29', name: 'Impressões', key: 'impressions', enabled: true, order: 5 },
-      { id: '30', name: 'Cliques', key: 'clicks', enabled: false, order: 6 }
-    ]
-  });
-
-  const [selectedPage, setSelectedPage] = useState<keyof PageMetrics>('dashboard');
+  const { config, saveConfig, loading } = useMetricsConfig();
+  const [selectedPage, setSelectedPage] = useState<'dashboard' | 'campaigns' | 'adsets' | 'ads'>('campaigns');
   const { toast } = useToast();
 
-  const toggleMetric = (metricId: string) => {
-    setPageMetrics(prev => ({
-      ...prev,
-      [selectedPage]: prev[selectedPage].map(metric =>
-        metric.id === metricId 
-          ? { ...metric, enabled: !metric.enabled }
-          : metric
-      )
-    }));
+  // Criar lista de todas as métricas disponíveis organizadas por categoria
+  const getAllMetrics = () => {
+    const allMetrics: Metric[] = [];
+    
+    Object.entries(AVAILABLE_METRICS).forEach(([category, metrics]) => {
+      metrics.forEach(metric => {
+        allMetrics.push({
+          key: metric,
+          name: getMetricDisplayName(metric),
+          enabled: config[selectedPage].includes(metric),
+          category
+        });
+      });
+    });
+    
+    return allMetrics;
   };
 
-  const saveMetricsConfiguration = () => {
-    // Aqui você salvaria a configuração no localStorage ou backend
-    localStorage.setItem('metricsConfiguration', JSON.stringify(pageMetrics));
+  const toggleMetric = (metricKey: string) => {
+    const currentMetrics = config[selectedPage];
+    const newMetrics = currentMetrics.includes(metricKey)
+      ? currentMetrics.filter(m => m !== metricKey)
+      : [...currentMetrics, metricKey];
+
+    const newConfig = {
+      ...config,
+      [selectedPage]: newMetrics
+    };
+
+    saveConfig(newConfig);
+  };
+
+  const saveMetricsConfiguration = async () => {
+    const success = await saveConfig(config);
     
-    toast({
-      title: "Configuração salva",
-      description: "Personalização de métricas salva com sucesso.",
-    });
+    if (success) {
+      toast({
+        title: "Configuração salva",
+        description: "Personalização de métricas salva com sucesso.",
+      });
+    } else {
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar configuração de métricas.",
+        variant: "destructive",
+      });
+    }
   };
 
   const resetToDefault = () => {
-    // Reset para configuração padrão
-    setPageMetrics({
-      dashboard: [
-        { id: '1', name: 'Gasto Total', key: 'spend', enabled: true, order: 1 },
-        { id: '2', name: 'ROAS', key: 'roas', enabled: true, order: 2 },
-        { id: '3', name: 'Alcance', key: 'reach', enabled: true, order: 3 },
-        { id: '4', name: 'CTR', key: 'ctr', enabled: true, order: 4 },
-        { id: '5', name: 'CPC', key: 'cpc', enabled: false, order: 5 },
-        { id: '6', name: 'CPM', key: 'cpm', enabled: false, order: 6 }
-      ],
-      campaigns: [
-        { id: '7', name: 'Nome', key: 'name', enabled: true, order: 1 },
-        { id: '8', name: 'Status', key: 'status', enabled: true, order: 2 },
-        { id: '9', name: 'Orçamento', key: 'budget', enabled: true, order: 3 },
-        { id: '10', name: 'Gasto', key: 'spend', enabled: true, order: 4 },
-        { id: '11', name: 'ROAS', key: 'roas', enabled: true, order: 5 },
-        { id: '12', name: 'CTR', key: 'ctr', enabled: true, order: 6 },
-        { id: '13', name: 'CPC', key: 'cpc', enabled: true, order: 7 },
-        { id: '14', name: 'Conversões', key: 'conversions', enabled: true, order: 8 },
-        { id: '15', name: 'CPM', key: 'cpm', enabled: false, order: 9 },
-        { id: '16', name: 'Impressões', key: 'impressions', enabled: false, order: 10 },
-        { id: '17', name: 'Cliques', key: 'clicks', enabled: false, order: 11 }
-      ],
-      adsets: [
-        { id: '18', name: 'Nome', key: 'name', enabled: true, order: 1 },
-        { id: '19', name: 'Status', key: 'status', enabled: true, order: 2 },
-        { id: '20', name: 'Orçamento', key: 'budget', enabled: true, order: 3 },
-        { id: '21', name: 'Gasto', key: 'spend', enabled: true, order: 4 },
-        { id: '22', name: 'CTR', key: 'ctr', enabled: true, order: 5 },
-        { id: '23', name: 'CPC', key: 'cpc', enabled: true, order: 6 },
-        { id: '24', name: 'CPM', key: 'cpm', enabled: false, order: 7 }
-      ],
-      ads: [
-        { id: '25', name: 'Nome', key: 'name', enabled: true, order: 1 },
-        { id: '26', name: 'Status', key: 'status', enabled: true, order: 2 },
-        { id: '27', name: 'CTR', key: 'ctr', enabled: true, order: 3 },
-        { id: '28', name: 'CPC', key: 'cpc', enabled: true, order: 4 },
-        { id: '29', name: 'Impressões', key: 'impressions', enabled: true, order: 5 },
-        { id: '30', name: 'Cliques', key: 'clicks', enabled: false, order: 6 }
-      ]
-    });
+    const defaultConfig = {
+      dashboard: ['impressions', 'clicks', 'spend', 'ctr', 'cpc'],
+      campaigns: ['impressions', 'clicks', 'spend', 'ctr', 'cpc', 'reach'],
+      adsets: ['impressions', 'clicks', 'spend', 'ctr', 'cpc'],
+      ads: ['impressions', 'clicks', 'spend', 'ctr', 'cpc']
+    };
+    
+    saveConfig(defaultConfig);
     
     toast({
       title: "Configuração restaurada",
@@ -143,12 +92,56 @@ export function MetricsCustomization() {
     });
   };
 
+  const selectAllMetrics = () => {
+    const allMetricKeys = Object.values(AVAILABLE_METRICS).flat();
+    const newConfig = {
+      ...config,
+      [selectedPage]: allMetricKeys
+    };
+    saveConfig(newConfig);
+  };
+
+  const deselectAllMetrics = () => {
+    const newConfig = {
+      ...config,
+      [selectedPage]: []
+    };
+    saveConfig(newConfig);
+  };
+
   const pageOptions = [
-    { key: 'dashboard', label: 'Dashboard' },
-    { key: 'campaigns', label: 'Campanhas' },
-    { key: 'adsets', label: 'Conjuntos de Anúncios' },
-    { key: 'ads', label: 'Anúncios' }
+    { key: 'dashboard' as const, label: 'Dashboard' },
+    { key: 'campaigns' as const, label: 'Campanhas' },
+    { key: 'adsets' as const, label: 'Conjuntos de Anúncios' },
+    { key: 'ads' as const, label: 'Anúncios' }
   ];
+
+  const allMetrics = getAllMetrics();
+  const enabledCount = allMetrics.filter(m => m.enabled).length;
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-blue-600" />
+            <CardTitle>Personalização de Métricas</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+            <div className="space-y-2">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-12 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -161,7 +154,7 @@ export function MetricsCustomization() {
       <CardContent className="space-y-6">
         <div>
           <p className="text-sm text-slate-600 mb-4">
-            Escolha quais métricas exibir em cada página e a ordem em que devem aparecer.
+            Escolha quais métricas da Meta Ads API exibir em cada página. Todas as métricas disponíveis estão listadas abaixo.
           </p>
           
           {/* Seletor de Página */}
@@ -171,7 +164,7 @@ export function MetricsCustomization() {
                 key={option.key}
                 variant={selectedPage === option.key ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setSelectedPage(option.key as keyof PageMetrics)}
+                onClick={() => setSelectedPage(option.key)}
               >
                 {option.label}
               </Button>
@@ -179,47 +172,69 @@ export function MetricsCustomization() {
           </div>
         </div>
 
-        {/* Lista de Métricas */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="font-medium text-slate-700">
-              Métricas da página: {pageOptions.find(p => p.key === selectedPage)?.label}
-            </h4>
-            <div className="text-sm text-slate-500">
-              {pageMetrics[selectedPage].filter(m => m.enabled).length} de {pageMetrics[selectedPage].length} ativas
-            </div>
+        {/* Controles de Seleção */}
+        <div className="flex items-center justify-between">
+          <h4 className="font-medium text-slate-700">
+            Métricas da página: {pageOptions.find(p => p.key === selectedPage)?.label}
+          </h4>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={selectAllMetrics}>
+              Selecionar Todas
+            </Button>
+            <Button variant="outline" size="sm" onClick={deselectAllMetrics}>
+              Desmarcar Todas
+            </Button>
           </div>
-          
-          <div className="space-y-2 max-h-80 overflow-y-auto">
-            {pageMetrics[selectedPage]
-              .sort((a, b) => a.order - b.order)
-              .map((metric) => (
-                <div
-                  key={metric.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50"
-                >
-                  <div className="flex items-center gap-3">
-                    <GripVertical className="w-4 h-4 text-slate-400 cursor-move" />
-                    <div className="flex items-center gap-2">
-                      {metric.enabled ? (
-                        <Eye className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <EyeOff className="w-4 h-4 text-slate-400" />
-                      )}
-                      <Label className="font-medium">{metric.name}</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {metric.key}
-                      </Badge>
+        </div>
+
+        <div className="text-sm text-slate-500">
+          {enabledCount} de {allMetrics.length} métricas ativas
+        </div>
+
+        {/* Lista de Métricas por Categoria */}
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          {Object.entries(AVAILABLE_METRICS).map(([category, metrics]) => (
+            <div key={category} className="space-y-2">
+              <h5 className="font-medium text-slate-600 capitalize border-b pb-1">
+                {category === 'basic' ? 'Métricas Básicas' : 
+                 category === 'engagement' ? 'Engajamento' :
+                 category === 'video' ? 'Vídeo' :
+                 category === 'conversions' ? 'Conversões' :
+                 category === 'traffic' ? 'Tráfego' : category}
+              </h5>
+              {metrics.map((metricKey) => {
+                const metric = allMetrics.find(m => m.key === metricKey);
+                if (!metric) return null;
+                
+                return (
+                  <div
+                    key={metricKey}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <GripVertical className="w-4 h-4 text-slate-400" />
+                      <div className="flex items-center gap-2">
+                        {metric.enabled ? (
+                          <Eye className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <EyeOff className="w-4 h-4 text-slate-400" />
+                        )}
+                        <Label className="font-medium">{metric.name}</Label>
+                        <Badge variant="outline" className="text-xs">
+                          {metric.key}
+                        </Badge>
+                      </div>
                     </div>
+                    
+                    <Switch
+                      checked={metric.enabled}
+                      onCheckedChange={() => toggleMetric(metric.key)}
+                    />
                   </div>
-                  
-                  <Switch
-                    checked={metric.enabled}
-                    onCheckedChange={() => toggleMetric(metric.id)}
-                  />
-                </div>
-              ))}
-          </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
 
         {/* Ações */}

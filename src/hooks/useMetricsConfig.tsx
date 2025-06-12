@@ -40,8 +40,13 @@ export function useMetricsConfig() {
         if (typeof data.config === 'string') {
           parsedConfig = JSON.parse(data.config);
         } else if (typeof data.config === 'object' && data.config !== null) {
-          // Type assertion for the config object
-          parsedConfig = data.config as MetricsConfig;
+          // Safe type conversion with validation
+          parsedConfig = data.config as unknown as MetricsConfig;
+          
+          // Validate that the parsed config has all required properties
+          if (!parsedConfig.dashboard || !parsedConfig.campaigns || !parsedConfig.adsets || !parsedConfig.ads) {
+            parsedConfig = defaultConfig;
+          }
         } else {
           parsedConfig = defaultConfig;
         }
