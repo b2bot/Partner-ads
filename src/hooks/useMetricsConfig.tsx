@@ -30,14 +30,24 @@ export function useMetricsConfig() {
         .select('config')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching metrics config:', error);
         return defaultConfig;
       }
 
-      return data?.config || defaultConfig;
+      if (!data || !data.config) {
+        return defaultConfig;
+      }
+
+      // Ensure config is a proper MetricsConfig object
+      const parsedConfig = data.config as any;
+      if (typeof parsedConfig === 'object' && parsedConfig.dashboard && parsedConfig.campaigns && parsedConfig.adsets && parsedConfig.ads) {
+        return parsedConfig as MetricsConfig;
+      }
+
+      return defaultConfig;
     },
   });
 
@@ -45,11 +55,11 @@ export function useMetricsConfig() {
     mutationFn: async (newConfig: MetricsConfig) => {
       const { error } = await supabase
         .from('metrics_config')
-        .upsert([{ config: newConfig }], { onConflict: 'id' });
+        .upsert([{ config: newConfig as any }], { onConflict: 'id' });
 
       if (error) throw error;
       
-      await logActivity('metrics_config_updated', 'configuracoes', newConfig);
+      await logActivity('metrics_config_updated', 'configuracoes', newConfig as any);
       return newConfig;
     },
     onSuccess: (newConfig) => {
@@ -67,11 +77,13 @@ export function useMetricsConfig() {
   });
 
   const getVisibleMetrics = (page: keyof MetricsConfig) => {
-    return config[page] || defaultConfig[page];
+    if (!config || typeof config !== 'object') return defaultConfig[page];
+    return (config as MetricsConfig)[page] || defaultConfig[page];
   };
 
   const isMetricVisible = (page: keyof MetricsConfig, metric: string) => {
-    return getVisibleMetrics(page).includes(metric);
+    const visibleMetrics = getVisibleMetrics(page);
+    return Array.isArray(visibleMetrics) ? visibleMetrics.includes(metric) : false;
   };
 
   const updateConfig = (newConfig: MetricsConfig) => {
@@ -79,7 +91,7 @@ export function useMetricsConfig() {
   };
 
   return {
-    config,
+    config: config as MetricsConfig,
     isLoading,
     updateConfig,
     getVisibleMetrics,

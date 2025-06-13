@@ -13,8 +13,8 @@ import {
   RotateCcw,
   Save
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useMetricsConfig } from '@/hooks/useMetricsConfig';
+import { toast } from 'sonner';
+import { useMetricsConfig, MetricsConfig } from '@/hooks/useMetricsConfig';
 import { AVAILABLE_METRICS, getMetricDisplayName } from '@/lib/metaInsights';
 
 interface Metric {
@@ -25,19 +25,19 @@ interface Metric {
 }
 
 export function MetricsCustomization() {
-  const { config, saveConfig, loading } = useMetricsConfig();
+  const { config, updateConfig, isLoading } = useMetricsConfig();
   const [selectedPage, setSelectedPage] = useState<'dashboard' | 'campaigns' | 'adsets' | 'ads'>('campaigns');
-  const { toast } = useToast();
 
   const getAllMetrics = () => {
     const allMetrics: Metric[] = [];
     
     Object.entries(AVAILABLE_METRICS).forEach(([category, metrics]) => {
       metrics.forEach(metric => {
+        const currentConfig = config as MetricsConfig;
         allMetrics.push({
           key: metric,
           name: getMetricDisplayName(metric),
-          enabled: config[selectedPage].includes(metric),
+          enabled: currentConfig[selectedPage]?.includes(metric) || false,
           category
         });
       });
@@ -47,72 +47,59 @@ export function MetricsCustomization() {
   };
 
   const toggleMetric = (metricKey: string) => {
-    const currentMetrics = config[selectedPage];
+    const currentConfig = config as MetricsConfig;
+    const currentMetrics = currentConfig[selectedPage] || [];
     const newMetrics = currentMetrics.includes(metricKey)
       ? currentMetrics.filter(m => m !== metricKey)
       : [...currentMetrics, metricKey];
 
-    const newConfig = {
-      ...config,
+    const newConfig: MetricsConfig = {
+      ...currentConfig,
       [selectedPage]: newMetrics
     };
 
-    saveConfig(newConfig);
+    updateConfig(newConfig);
   };
 
   const saveMetricsConfiguration = async () => {
-    const success = await saveConfig(config);
+    toast.success('Configuração de métricas aplicada com sucesso!');
     
-    if (success) {
-      toast({
-        title: "✅ Configuração salva",
-        description: "Personalização de métricas aplicada com sucesso.",
-      });
-      
-      // Force refresh of tables by dispatching a custom event
-      window.dispatchEvent(new CustomEvent('metricsConfigChanged', { 
-        detail: { config, selectedPage } 
-      }));
-    } else {
-      toast({
-        title: "❌ Erro",
-        description: "Erro ao salvar configuração de métricas.",
-        variant: "destructive",
-      });
-    }
+    // Force refresh of tables by dispatching a custom event
+    window.dispatchEvent(new CustomEvent('metricsConfigChanged', { 
+      detail: { config, selectedPage } 
+    }));
   };
 
   const resetToDefault = () => {
-    const defaultConfig = {
+    const defaultConfig: MetricsConfig = {
       dashboard: ['impressions', 'clicks', 'spend', 'ctr', 'cpc'],
       campaigns: ['impressions', 'clicks', 'spend', 'ctr', 'cpc', 'reach'],
       adsets: ['impressions', 'clicks', 'spend', 'ctr', 'cpc'],
       ads: ['impressions', 'clicks', 'spend', 'ctr', 'cpc']
     };
     
-    saveConfig(defaultConfig);
+    updateConfig(defaultConfig);
     
-    toast({
-      title: "🔄 Configuração restaurada",
-      description: "Métricas restauradas para o padrão.",
-    });
+    toast.success('Configuração restaurada para o padrão.');
   };
 
   const selectAllMetrics = () => {
     const allMetricKeys = Object.values(AVAILABLE_METRICS).flat();
-    const newConfig = {
-      ...config,
+    const currentConfig = config as MetricsConfig;
+    const newConfig: MetricsConfig = {
+      ...currentConfig,
       [selectedPage]: allMetricKeys
     };
-    saveConfig(newConfig);
+    updateConfig(newConfig);
   };
 
   const deselectAllMetrics = () => {
-    const newConfig = {
-      ...config,
+    const currentConfig = config as MetricsConfig;
+    const newConfig: MetricsConfig = {
+      ...currentConfig,
       [selectedPage]: []
     };
-    saveConfig(newConfig);
+    updateConfig(newConfig);
   };
 
   const pageOptions = [
@@ -126,7 +113,7 @@ export function MetricsCustomization() {
   const enabledCount = allMetrics.filter(m => m.enabled).length;
   const categoryMetrics = Object.entries(AVAILABLE_METRICS);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -214,7 +201,8 @@ export function MetricsCustomization() {
                   </h5>
                   <div className="grid gap-2">
                     {metrics.map((metricKey) => {
-                      const isEnabled = config[selectedPage].includes(metricKey);
+                      const currentConfig = config as MetricsConfig;
+                      const isEnabled = currentConfig[selectedPage]?.includes(metricKey) || false;
                       
                       return (
                         <div

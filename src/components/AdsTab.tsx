@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useMetaData } from '@/hooks/useMetaData';
 import { useAdInsights } from '@/hooks/useInsights';
-import { useMetricsConfig } from '@/hooks/useMetricsConfig';
+import { useMetricsConfig, MetricsConfig } from '@/hooks/useMetricsConfig';
 import { useToast } from '@/hooks/use-toast';
 import { updateAd, Ad } from '@/lib/metaApi';
 import { getAdCreativeImage, formatMetricValue, getMetricDisplayName } from '@/lib/metaInsights';
@@ -208,6 +209,9 @@ export function AdsTab({ viewMode }: AdsTabProps) {
     return sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
   };
 
+  const metricsConfig = config as MetricsConfig;
+  const adMetrics = metricsConfig.ads || [];
+
   if (!credentials) {
     return (
       <div className="space-y-6">
@@ -278,32 +282,31 @@ export function AdsTab({ viewMode }: AdsTabProps) {
     );
   }
 
-  if (viewMode === 'table') {
-    return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Anúncios ({ads.length})</h2>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => refetch.ads()}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Atualizar
-            </Button>
-            <Button onClick={() => setShowCreateModal(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Anúncio
-            </Button>
-          </div>
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Anúncios ({ads.length})</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => refetch.ads()}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Atualizar
+          </Button>
+          <Button onClick={() => setShowCreateModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Anúncio
+          </Button>
         </div>
+      </div>
 
-        <AccountFilter />
+      <AccountFilter />
 
+      {viewMode === 'table' ? (
         <Card>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Ativo</TableHead>
-                  <TableHead>Imagem</TableHead>
                   <TableHead 
                     className="cursor-pointer hover:bg-slate-50"
                     onClick={() => handleSort('name')}
@@ -318,7 +321,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                     onClick={() => handleSort('adset_name')}
                   >
                     <div className="flex items-center gap-1">
-                      Conjunto de Anúncios
+                      Conjunto
                       {getSortIcon('adset_name')}
                     </div>
                   </TableHead>
@@ -331,7 +334,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                       {getSortIcon('status')}
                     </div>
                   </TableHead>
-                  {config.ads.map((metricKey) => (
+                  {adMetrics.map((metricKey) => (
                     <TableHead 
                       key={metricKey}
                       className="cursor-pointer hover:bg-slate-50"
@@ -352,7 +355,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                       {getSortIcon('created_time')}
                     </div>
                   </TableHead>
-                  <TableHead></TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -368,18 +371,6 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                           disabled={updatingAd === ad.id}
                         />
                       </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-12 w-12 p-0"
-                          onClick={() => loadAdImage(ad.id, ad.name)}
-                        >
-                          <div className="w-10 h-10 bg-slate-100 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-500">
-                            IMG
-                          </div>
-                        </Button>
-                      </TableCell>
                       <TableCell className="font-medium">{ad.name}</TableCell>
                       <TableCell className="text-sm text-slate-600">{getAdSetName(ad.adset_id)}</TableCell>
                       <TableCell>
@@ -387,7 +378,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                           {getStatusText(ad.status)}
                         </Badge>
                       </TableCell>
-                      {config.ads.map((metricKey) => (
+                      {adMetrics.map((metricKey) => (
                         <TableCell key={metricKey}>
                           {adInsights && adInsights[metricKey as keyof typeof adInsights] !== undefined
                             ? formatMetricValue(metricKey, adInsights[metricKey as keyof typeof adInsights])
@@ -412,9 +403,9 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                               <Edit className="w-4 h-4 mr-2" />
                               Editar
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => loadAdImage(ad.id, ad.name)}>
                               <Copy className="w-4 h-4 mr-2" />
-                              Duplicar
+                              Ver Criativo
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -426,84 +417,13 @@ export function AdsTab({ viewMode }: AdsTabProps) {
             </Table>
           </CardContent>
         </Card>
-
-        {/* Modal para visualizar imagem */}
-        <Dialog open={imageModal.isOpen} onOpenChange={(open) => setImageModal({ ...imageModal, isOpen: open })}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Criativo do Anúncio: {imageModal.adName}</DialogTitle>
-            </DialogHeader>
-            <div className="flex justify-center">
-              <img 
-                src={imageModal.imageUrl} 
-                alt={`Criativo do anúncio ${imageModal.adName}`}
-                className="max-w-full max-h-96 object-contain rounded-lg"
-                onError={(e) => {
-                  e.currentTarget.src = '/placeholder.svg';
-                }}
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <EditAdModal
-          ad={editingAd}
-          isOpen={!!editingAd}
-          onClose={() => setEditingAd(null)}
-          onSuccess={() => refetch.ads()}
-        />
-
-        <CreateAdModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => refetch.ads()}
-        />
-      </div>
-    );
-  }
-
-  // View mode cards (implementação similar)
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Anúncios ({ads.length})</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => refetch.ads()}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Atualizar
-          </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Anúncio
-          </Button>
-        </div>
-      </div>
-
-      <AccountFilter />
-
-      {ads.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-600 mb-2">
-              Nenhum anúncio encontrado
-            </h3>
-            <p className="text-slate-500 mb-4">
-              Você ainda não possui anúncios ativos nesta conta.
-            </p>
-            <Button onClick={() => setShowCreateModal(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Criar Primeiro Anúncio
-            </Button>
-          </CardContent>
-        </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {sortedAds.map((ad) => {
             const adInsights = getAdInsights(ad.id);
             
             return (
-              <Card key={ad.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-purple-500">
+              <Card key={ad.id} className="hover:shadow-lg transition-all duration-200">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
@@ -537,9 +457,9 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                           <Edit className="w-4 h-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => loadAdImage(ad.id, ad.name)}>
                           <Copy className="w-4 h-4 mr-2" />
-                          Duplicar
+                          Ver Criativo
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -547,23 +467,10 @@ export function AdsTab({ viewMode }: AdsTabProps) {
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
-                  {/* Imagem do criativo */}
-                  <div className="flex justify-center">
-                    <Button
-                      variant="ghost"
-                      className="h-24 w-24 p-0"
-                      onClick={() => loadAdImage(ad.id, ad.name)}
-                    >
-                      <div className="w-20 h-20 bg-slate-100 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-500">
-                        Ver Imagem
-                      </div>
-                    </Button>
-                  </div>
-
                   {/* Métricas */}
                   {adInsights && (
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      {config.ads.slice(0, 6).map((metricKey) => (
+                      {adMetrics.slice(0, 6).map((metricKey) => (
                         <div key={metricKey} className="text-center">
                           <span className="text-slate-500 block">{getMetricDisplayName(metricKey)}</span>
                           <div className="font-semibold">
@@ -590,20 +497,17 @@ export function AdsTab({ viewMode }: AdsTabProps) {
         </div>
       )}
 
-      {/* Modal para visualizar imagem */}
-      <Dialog open={imageModal.isOpen} onOpenChange={(open) => setImageModal({ ...imageModal, isOpen: open })}>
-        <DialogContent className="sm:max-w-[600px]">
+      {/* Image Modal */}
+      <Dialog open={imageModal.isOpen} onOpenChange={(open) => setImageModal(prev => ({ ...prev, isOpen: open }))}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Criativo do Anúncio: {imageModal.adName}</DialogTitle>
+            <DialogTitle>{imageModal.adName}</DialogTitle>
           </DialogHeader>
           <div className="flex justify-center">
             <img 
               src={imageModal.imageUrl} 
-              alt={`Criativo do anúncio ${imageModal.adName}`}
+              alt={imageModal.adName}
               className="max-w-full max-h-96 object-contain rounded-lg"
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder.svg';
-              }}
             />
           </div>
         </DialogContent>

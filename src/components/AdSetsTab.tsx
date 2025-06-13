@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,7 @@ import { EditAdSetModal } from './EditAdSetModal';
 import { CreateAdSetModal } from './CreateAdSetModal';
 import { useMetaData } from '@/hooks/useMetaData';
 import { useAdSetInsights } from '@/hooks/useInsights';
-import { useMetricsConfig } from '@/hooks/useMetricsConfig';
+import { useMetricsConfig, MetricsConfig } from '@/hooks/useMetricsConfig';
 import { updateAdSet, AdSet } from '@/lib/metaApi';
 import { getMetricDisplayName, formatMetricValue } from '@/lib/metaInsights';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -195,6 +196,9 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
     }).format(numValue);
   };
 
+  const metricsConfig = config as MetricsConfig;
+  const adsetMetrics = metricsConfig.adsets || [];
+
   if (!credentials) {
     return (
       <div className="space-y-6">
@@ -317,7 +321,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
                       {getSortIcon('status')}
                     </div>
                   </TableHead>
-                  {config.adsets.map((metricKey) => (
+                  {adsetMetrics.map((metricKey) => (
                     <TableHead 
                       key={metricKey}
                       className="cursor-pointer hover:bg-slate-50"
@@ -361,7 +365,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
                           {getStatusText(adSet.status)}
                         </Badge>
                       </TableCell>
-                      {config.adsets.map((metricKey) => (
+                      {adsetMetrics.map((metricKey) => (
                         <TableCell key={metricKey}>
                           {adSetInsights && adSetInsights[metricKey as keyof typeof adSetInsights] !== undefined
                             ? formatMetricValue(metricKey, adSetInsights[metricKey as keyof typeof adSetInsights])
@@ -497,7 +501,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
                   {/* Métricas */}
                   {adSetInsights && (
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      {config.adsets.slice(0, 6).map((metricKey) => (
+                      {adsetMetrics.slice(0, 6).map((metricKey) => (
                         <div key={metricKey} className="text-center">
                           <span className="text-slate-500 block">{getMetricDisplayName(metricKey)}</span>
                           <div className="font-semibold">

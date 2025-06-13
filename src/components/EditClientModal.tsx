@@ -14,6 +14,10 @@ interface Cliente {
   id: string;
   user_id: string;
   nome: string;
+  email?: string;
+  telefone?: string;
+  empresa?: string;
+  observacoes_internas?: string;
   tipo_acesso: 'api' | 'sheet';
   ativo: boolean;
   profiles: {
@@ -49,6 +53,10 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
 
   useEffect(() => {
     setNome(client.nome);
+    setEmail(client.email || '');
+    setTelefone(client.telefone || '');
+    setEmpresa(client.empresa || '');
+    setObservacoesInternas(client.observacoes_internas || '');
     setTipoAcesso(client.tipo_acesso);
     
     const metaAccounts = client.contas.filter(c => c.tipo === 'meta').map(c => ({
@@ -70,6 +78,10 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
   const updateClientMutation = useMutation({
     mutationFn: async (data: {
       nome: string;
+      email: string;
+      telefone: string;
+      empresa: string;
+      observacoesInternas: string;
       tipoAcesso: 'api' | 'sheet';
       contas: Array<{ id?: string; tipo: 'meta' | 'google'; identificador: string; nome: string }>;
     }) => {
@@ -78,6 +90,10 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
         .from('clientes')
         .update({
           nome: data.nome,
+          email: data.email,
+          telefone: data.telefone,
+          empresa: data.empresa,
+          observacoes_internas: data.observacoesInternas,
           tipo_acesso: data.tipoAcesso,
         })
         .eq('id', client.id);
@@ -165,6 +181,10 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
 
     updateClientMutation.mutate({
       nome: nome.trim(),
+      email: email.trim(),
+      telefone: telefone.trim(),
+      empresa: empresa.trim(),
+      observacoesInternas: observacoesInternas.trim(),
       tipoAcesso,
       contas: allContas,
     });

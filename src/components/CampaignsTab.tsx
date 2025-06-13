@@ -26,7 +26,7 @@ import { EditCampaignModal } from './EditCampaignModal';
 import { CreateCampaignModal } from './CreateCampaignModal';
 import { useMetaData } from '@/hooks/useMetaData';
 import { useCampaignInsights } from '@/hooks/useInsights';
-import { useMetricsConfig } from '@/hooks/useMetricsConfig';
+import { useMetricsConfig, MetricsConfig } from '@/hooks/useMetricsConfig';
 import { updateCampaign } from '@/lib/metaApi';
 import { getMetricDisplayName, formatMetricValue } from '@/lib/metaInsights';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -157,6 +157,9 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
+  const metricsConfig = config as MetricsConfig;
+  const campaignMetrics = metricsConfig.campaigns || [];
+
   if (loading.campaigns || insightsLoading) {
     return (
       <div className="space-y-6">
@@ -272,7 +275,7 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                     {/* Métricas */}
                     {campaignInsights && (
                       <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t">
-                        {config.campaigns.slice(0, 4).map((metricKey) => (
+                        {campaignMetrics.slice(0, 4).map((metricKey) => (
                           <div key={metricKey} className="text-center">
                             <span className="text-slate-500 block text-xs">{getMetricDisplayName(metricKey)}</span>
                             <div className="font-semibold">
@@ -367,7 +370,7 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                       {getSortIcon('daily_budget')}
                     </div>
                   </TableHead>
-                  {config.campaigns.map((metricKey) => (
+                  {campaignMetrics.map((metricKey) => (
                     <TableHead 
                       key={metricKey}
                       className="cursor-pointer hover:bg-slate-50"
@@ -407,7 +410,7 @@ export function CampaignsTab({ viewMode }: CampaignsTabProps) {
                       </TableCell>
                       <TableCell>{campaign.objective}</TableCell>
                       <TableCell>{formatCurrency(campaign.daily_budget)}</TableCell>
-                      {config.campaigns.map((metricKey) => (
+                      {campaignMetrics.map((metricKey) => (
                         <TableCell key={metricKey}>
                           {campaignInsights && campaignInsights[metricKey as keyof typeof campaignInsights] !== undefined
                             ? formatMetricValue(metricKey, campaignInsights[metricKey as keyof typeof campaignInsights])

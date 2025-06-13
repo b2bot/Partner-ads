@@ -6,7 +6,7 @@ import {
   getAdInsightsWithRateLimit 
 } from '@/lib/metaApiWithRateLimit';
 import { useMetaData } from './useMetaData';
-import { useMetricsConfig } from './useMetricsConfig';
+import { useMetricsConfig, MetricsConfig } from './useMetricsConfig';
 
 export function useCampaignInsights(dateRange?: { since: string; until: string }) {
   const { credentials, campaigns } = useMetaData();
@@ -18,7 +18,7 @@ export function useCampaignInsights(dateRange?: { since: string; until: string }
   };
 
   return useQuery({
-    queryKey: ['campaign-insights', campaigns.map(c => c.id), dateRange || defaultDateRange, config.campaigns],
+    queryKey: ['campaign-insights', campaigns.map(c => c.id), dateRange || defaultDateRange, (config as MetricsConfig).campaigns],
     queryFn: async () => {
       const insights = await Promise.all(
         campaigns.map(campaign => 
@@ -56,7 +56,7 @@ export function useAdSetInsights(dateRange?: { since: string; until: string }) {
   };
 
   return useQuery({
-    queryKey: ['adset-insights', adSets.map(a => a.id), dateRange || defaultDateRange, config.adsets],
+    queryKey: ['adset-insights', adSets.map(a => a.id), dateRange || defaultDateRange, (config as MetricsConfig).adsets],
     queryFn: async () => {
       const insights = await Promise.all(
         adSets.map(adSet =>
@@ -94,7 +94,7 @@ export function useAdInsights(dateRange?: { since: string; until: string }) {
   };
 
   return useQuery({
-    queryKey: ['ad-insights', ads.map(a => a.id), dateRange || defaultDateRange, config.ads],
+    queryKey: ['ad-insights', ads.map(a => a.id), dateRange || defaultDateRange, (config as MetricsConfig).ads],
     queryFn: async () => {
       const insights = await Promise.all(
         ads.map(ad =>
