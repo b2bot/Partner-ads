@@ -55,6 +55,31 @@ export async function getAdAccountInsightsWithRateLimit(
   );
 }
 
+// Funções que estavam faltando para AdSets e Ads insights
+export async function getAdSetInsightsWithRateLimit(
+  accessToken: string,
+  adSetId: string,
+  dateRange: { since: string; until: string }
+) {
+  const cacheKey = `adset_insights_${adSetId}_${dateRange.since}_${dateRange.until}`;
+  return makeMetaApiCall(
+    () => metaApi.getAdSetInsights(accessToken, adSetId, dateRange),
+    cacheKey
+  );
+}
+
+export async function getAdInsightsWithRateLimit(
+  accessToken: string,
+  adId: string,
+  dateRange: { since: string; until: string }
+) {
+  const cacheKey = `ad_insights_${adId}_${dateRange.since}_${dateRange.until}`;
+  return makeMetaApiCall(
+    () => metaApi.getAdInsights(accessToken, adId, dateRange),
+    cacheKey
+  );
+}
+
 // Funções de modificação (não precisam de cache, mas precisam de rate limiting)
 export async function updateCampaignWithRateLimit(
   accessToken: string,
