@@ -18,8 +18,10 @@ interface UploadCreativeModalProps {
 }
 
 export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps) {
-  const [titulo, setTitulo] = useState('');
-  const [descricao, setDescricao] = useState('');
+  const [campanha, setCampanha] = useState('');
+  const [nomeCriativo, setNomeCriativo] = useState('');
+  const [tituloAnuncio, setTituloAnuncio] = useState('');
+  const [descricaoAnuncio, setDescricaoAnuncio] = useState('');
   const [clienteId, setClienteId] = useState('');
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [error, setError] = useState('');
@@ -42,8 +44,10 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
 
   const uploadCreativeMutation = useMutation({
     mutationFn: async (data: { 
-      titulo: string; 
-      descricao: string; 
+      campanha: string;
+      nomeCriativo: string;
+      tituloAnuncio: string;
+      descricaoAnuncio: string;
       clienteId: string; 
       arquivo: File 
     }) => {
@@ -66,10 +70,14 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
         .from('criativos')
         .insert({
           cliente_id: data.clienteId,
-          titulo: data.titulo,
-          descricao: data.descricao,
+          titulo: `${data.campanha} - ${data.nomeCriativo}`,
+          campanha: data.campanha,
+          nome_criativo: data.nomeCriativo,
+          titulo_anuncio: data.tituloAnuncio,
+          descricao_anuncio: data.descricaoAnuncio,
           arquivo_url: urlData.publicUrl,
           tipo_arquivo: data.arquivo.type,
+          status: 'pendente',
         });
 
       if (insertError) throw insertError;
@@ -87,8 +95,10 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
   });
 
   const resetForm = () => {
-    setTitulo('');
-    setDescricao('');
+    setCampanha('');
+    setNomeCriativo('');
+    setTituloAnuncio('');
+    setDescricaoAnuncio('');
     setClienteId('');
     setArquivo(null);
     setError('');
@@ -98,8 +108,8 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
     e.preventDefault();
     setError('');
 
-    if (!titulo.trim() || !clienteId || !arquivo) {
-      setError('Título, cliente e arquivo são obrigatórios.');
+    if (!campanha.trim() || !nomeCriativo.trim() || !clienteId || !arquivo) {
+      setError('Todos os campos obrigatórios devem ser preenchidos.');
       return;
     }
 
@@ -116,8 +126,10 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
     }
 
     uploadCreativeMutation.mutate({
-      titulo: titulo.trim(),
-      descricao: descricao.trim(),
+      campanha: campanha.trim(),
+      nomeCriativo: nomeCriativo.trim(),
+      tituloAnuncio: tituloAnuncio.trim(),
+      descricaoAnuncio: descricaoAnuncio.trim(),
       clienteId,
       arquivo,
     });
@@ -133,36 +145,14 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Upload de Criativo</DialogTitle>
+          <DialogTitle>Enviar Criativo para Cliente</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="titulo">Título do criativo</Label>
-            <Input
-              id="titulo"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Ex: Banner campanha verão 2024"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="descricao">Descrição (opcional)</Label>
-            <Textarea
-              id="descricao"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              placeholder="Descreva o criativo, briefing, objetivos..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cliente">Cliente</Label>
+            <Label htmlFor="cliente">Cliente *</Label>
             <Select value={clienteId} onValueChange={setClienteId}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o cliente" />
@@ -178,7 +168,50 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="arquivo">Arquivo</Label>
+            <Label htmlFor="campanha">Campanha *</Label>
+            <Input
+              id="campanha"
+              value={campanha}
+              onChange={(e) => setCampanha(e.target.value)}
+              placeholder="Nome da campanha"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="nomeCriativo">Nome do Criativo *</Label>
+            <Input
+              id="nomeCriativo"
+              value={nomeCriativo}
+              onChange={(e) => setNomeCriativo(e.target.value)}
+              placeholder="Nome identificador do criativo"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tituloAnuncio">Título do Anúncio</Label>
+            <Input
+              id="tituloAnuncio"
+              value={tituloAnuncio}
+              onChange={(e) => setTituloAnuncio(e.target.value)}
+              placeholder="Título que aparecerá no anúncio"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="descricaoAnuncio">Descrição do Anúncio</Label>
+            <Textarea
+              id="descricaoAnuncio"
+              value={descricaoAnuncio}
+              onChange={(e) => setDescricaoAnuncio(e.target.value)}
+              placeholder="Descrição que aparecerá no anúncio"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="arquivo">Arquivo *</Label>
             <div className="flex items-center gap-2">
               <Input
                 id="arquivo"

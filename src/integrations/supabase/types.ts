@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       chamados: {
         Row: {
+          aberto_por: string | null
           arquivo_url: string | null
           cliente_id: string
           created_at: string
@@ -19,10 +20,12 @@ export type Database = {
           respondido_por: string | null
           resposta: string | null
           status: Database["public"]["Enums"]["ticket_status"]
+          status_detalhado: string | null
           titulo: string
           updated_at: string
         }
         Insert: {
+          aberto_por?: string | null
           arquivo_url?: string | null
           cliente_id: string
           created_at?: string
@@ -31,10 +34,12 @@ export type Database = {
           respondido_por?: string | null
           resposta?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          status_detalhado?: string | null
           titulo: string
           updated_at?: string
         }
         Update: {
+          aberto_por?: string | null
           arquivo_url?: string | null
           cliente_id?: string
           created_at?: string
@@ -43,6 +48,7 @@ export type Database = {
           respondido_por?: string | null
           resposta?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          status_detalhado?: string | null
           titulo?: string
           updated_at?: string
         }
@@ -142,41 +148,53 @@ export type Database = {
       criativos: {
         Row: {
           arquivo_url: string
+          campanha: string | null
           cliente_id: string
           comentario_cliente: string | null
           created_at: string
           descricao: string | null
+          descricao_anuncio: string | null
           id: string
+          nome_criativo: string | null
           resposta: string | null
           status: Database["public"]["Enums"]["creative_status"]
           tipo_arquivo: string
           titulo: string
+          titulo_anuncio: string | null
           updated_at: string
         }
         Insert: {
           arquivo_url: string
+          campanha?: string | null
           cliente_id: string
           comentario_cliente?: string | null
           created_at?: string
           descricao?: string | null
+          descricao_anuncio?: string | null
           id?: string
+          nome_criativo?: string | null
           resposta?: string | null
           status?: Database["public"]["Enums"]["creative_status"]
           tipo_arquivo: string
           titulo: string
+          titulo_anuncio?: string | null
           updated_at?: string
         }
         Update: {
           arquivo_url?: string
+          campanha?: string | null
           cliente_id?: string
           comentario_cliente?: string | null
           created_at?: string
           descricao?: string | null
+          descricao_anuncio?: string | null
           id?: string
+          nome_criativo?: string | null
           resposta?: string | null
           status?: Database["public"]["Enums"]["creative_status"]
           tipo_arquivo?: string
           titulo?: string
+          titulo_anuncio?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -261,6 +279,27 @@ export type Database = {
           nome?: string
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      usuarios: {
+        Row: {
+          criado_em: string | null
+          id: string
+          nome: string | null
+          tipo: string
+        }
+        Insert: {
+          criado_em?: string | null
+          id: string
+          nome?: string | null
+          tipo?: string
+        }
+        Update: {
+          criado_em?: string | null
+          id?: string
+          nome?: string | null
+          tipo?: string
         }
         Relationships: []
       }

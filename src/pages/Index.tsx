@@ -26,41 +26,50 @@ const Index = () => {
       case 'dashboard':
         return <Dashboard />;
       case 'campaigns':
-        return <CampaignsTab viewMode={viewMode} />;
+        return isAdmin ? <CampaignsTab viewMode={viewMode} /> : <Dashboard />;
       case 'adsets':
-        return <AdSetsTab viewMode={viewMode} />;
+        return isAdmin ? <AdSetsTab viewMode={viewMode} /> : <Dashboard />;
       case 'ads':
-        return <AdsTab viewMode={viewMode} />;
+        return isAdmin ? <AdsTab viewMode={viewMode} /> : <Dashboard />;
       case 'whatsapp-reports':
-        return <WhatsAppReportsTab />;
+        return isAdmin ? <WhatsAppReportsTab /> : <Dashboard />;
       case 'metrics-objectives':
-        return <MetricsObjectivesTab />;
+        return isAdmin ? <MetricsObjectivesTab /> : <Dashboard />;
       case 'tickets':
         return <TicketsTab />;
       case 'creatives':
         return <CreativesTab />;
       case 'clients-management':
-        return <ClientsManagementTab />;
+        return isAdmin ? <ClientsManagementTab /> : <Dashboard />;
       case 'settings':
-        return <SettingsTab />;
+        return isAdmin ? <SettingsTab /> : <Dashboard />;
       default:
         return <Dashboard />;
     }
   };
+
+  const shouldShowHeader = isAdmin && ['campaigns', 'adsets', 'ads'].includes(activeTab);
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <div className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b bg-white/50 backdrop-blur-sm">
-            <Header 
-              activeTab={activeTab} 
-              viewMode={viewMode} 
-              setViewMode={setViewMode} 
-            />
-            <UserMenu />
-          </div>
+          {shouldShowHeader && (
+            <div className="flex items-center justify-between p-4 border-b bg-white/50 backdrop-blur-sm">
+              <Header 
+                activeTab={activeTab} 
+                viewMode={viewMode} 
+                setViewMode={setViewMode} 
+              />
+              <UserMenu />
+            </div>
+          )}
+          {!shouldShowHeader && (
+            <div className="flex items-center justify-end p-4 border-b bg-white/50 backdrop-blur-sm">
+              <UserMenu />
+            </div>
+          )}
           <main className="flex-1 p-6 overflow-auto">
             {renderContent()}
           </main>

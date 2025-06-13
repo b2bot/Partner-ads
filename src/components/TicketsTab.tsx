@@ -1,12 +1,13 @@
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserAccess } from '@/hooks/useUserAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MessageCircle, Clock, CheckCircle } from 'lucide-react';
+import { Plus, MessageCircle, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { CreateTicketModal } from '@/components/CreateTicketModal';
 import { TicketDetailModal } from '@/components/TicketDetailModal';
 
@@ -15,35 +16,51 @@ interface Ticket {
   titulo: string;
   mensagem: string;
   status: 'aberto' | 'em_andamento' | 'resolvido';
+  status_detalhado?: string;
   resposta?: string;
   arquivo_url?: string;
+  aberto_por?: string;
   created_at: string;
   updated_at: string;
+  clientes: {
+    nome: string;
+  };
 }
 
 export function TicketsTab() {
   const { isAdmin } = useAuth();
+  const { clienteData } = useUserAccess();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const queryClient = useQueryClient();
 
   const { data: tickets, isLoading } = useQuery({
     queryKey: ['tickets'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('chamados')
-        .select('*')
+        .select(`
+          *,
+          clientes:cliente_id (nome)
+        `)
         .order('created_at', { ascending: false });
+
+      // Para clientes, filtrar apenas seus chamados
+      if (!isAdmin && clienteData?.id) {
+        query = query.eq('cliente_id', clienteData.id);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data as Ticket[];
     },
+    enabled: isAdmin || !!clienteData?.id,
   });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'aberto':
-        return <MessageCircle className="h-4 w-4" />;
+        return <AlertCircle className="h-4 w-4" />;
       case 'em_andamento':
         return <Clock className="h-4 w-4" />;
       case 'resolvido':
@@ -66,17 +83,8 @@ export function TicketsTab() {
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'aberto':
-        return 'Aberto';
-      case 'em_andamento':
-        return 'Em Andamento';
-      case 'resolvido':
-        return 'Resolvido';
-      default:
-        return status;
-    }
+  const getStatusLabel = (ticket: Ticket) => {
+    return ticket.status_detalhado || ticket.status;
   };
 
   if (isLoading) {
@@ -108,12 +116,10 @@ export function TicketsTab() {
             }
           </p>
         </div>
-        {!isAdmin && (
-          <Button onClick={() => setCreateModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Chamado
-          </Button>
-        )}
+        <Button onClick={() => setCreateModalOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Novo Chamado
+        </Button>
       </div>
 
       <div className="grid gap-4">
@@ -141,11 +147,18 @@ export function TicketsTab() {
             >
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{ticket.titulo}</CardTitle>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">{ticket.titulo}</CardTitle>
+                    {isAdmin && (
+                      <p className="text-sm text-slate-500 mt-1">
+                        Cliente: {ticket.clientes?.nome}
+                      </p>
+                    )}
+                  </div>
                   <Badge className={getStatusColor(ticket.status)}>
                     <div className="flex items-center gap-1">
                       {getStatusIcon(ticket.status)}
-                      {getStatusLabel(ticket.status)}
+                      {getStatusLabel(ticket)}
                     </div>
                   </Badge>
                 </div>
@@ -153,9 +166,12 @@ export function TicketsTab() {
               <CardContent>
                 <p className="text-slate-600 mb-3 line-clamp-2">{ticket.mensagem}</p>
                 <div className="flex justify-between items-center text-sm text-slate-500">
-                  <span>
-                    Criado em: {new Date(ticket.created_at).toLocaleDateString('pt-BR')}
-                  </span>
+                  <div className="space-y-1">
+                    <p>Criado: {new Date(ticket.created_at).toLocaleDateString('pt-BR')}</p>
+                    {ticket.updated_at !== ticket.created_at && (
+                      <p>Atualizado: {new Date(ticket.updated_at).toLocaleDateString('pt-BR')}</p>
+                    )}
+                  </div>
                   {ticket.resposta && (
                     <span className="text-green-600 font-medium">
                       ✓ Respondido

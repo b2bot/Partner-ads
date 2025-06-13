@@ -24,15 +24,17 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'campaigns', label: 'Campanhas', icon: Target },
-    { id: 'adsets', label: 'Conjuntos de Anúncios', icon: BarChart3 },
-    { id: 'ads', label: 'Anúncios', icon: Zap },
-    { id: 'whatsapp-reports', label: 'Relatórios WhatsApp', icon: MessageSquare },
-    { id: 'metrics-objectives', label: 'Métricas e Objetivos', icon: BarChart3 },
+    ...(isAdmin ? [
+      { id: 'campaigns', label: 'Campanhas', icon: Target },
+      { id: 'adsets', label: 'Conjuntos de Anúncios', icon: BarChart3 },
+      { id: 'ads', label: 'Anúncios', icon: Zap },
+      { id: 'whatsapp-reports', label: 'Relatórios WhatsApp', icon: MessageSquare },
+      { id: 'metrics-objectives', label: 'Métricas e Objetivos', icon: BarChart3 },
+    ] : []),
     { id: 'tickets', label: isAdmin ? 'Gerenciar Chamados' : 'Meus Chamados', icon: MessageCircle },
     { id: 'creatives', label: isAdmin ? 'Gerenciar Criativos' : 'Meus Criativos', icon: Image },
     ...(isAdmin ? [{ id: 'clients-management', label: 'Gerenciar Clientes', icon: Users }] : []),
-    { id: 'settings', label: 'Configurações', icon: Settings },
+    ...(isAdmin ? [{ id: 'settings', label: 'Configurações', icon: Settings }] : []),
   ];
 
   return (

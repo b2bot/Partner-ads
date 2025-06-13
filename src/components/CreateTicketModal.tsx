@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 import { useUserAccess } from '@/hooks/useUserAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -20,25 +22,42 @@ interface CreateTicketModalProps {
 export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
   const [titulo, setTitulo] = useState('');
   const [mensagem, setMensagem] = useState('');
+  const [clienteId, setClienteId] = useState('');
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [error, setError] = useState('');
   
+  const { isAdmin, user } = useAuth();
   const { clienteData } = useUserAccess();
   const queryClient = useQueryClient();
 
-  const createTicketMutation = useMutation({
-    mutationFn: async (data: { titulo: string; mensagem: string; arquivo_url?: string }) => {
-      if (!clienteData?.id) {
-        throw new Error('Cliente não encontrado');
-      }
+  // Para admins, buscar lista de clientes
+  const { data: clientes } = useQuery({
+    queryKey: ['clientes-for-ticket'],
+    queryFn: async () => {
+      if (!isAdmin) return [];
+      
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('id, nome')
+        .eq('ativo', true)
+        .order('nome');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
 
+  const createTicketMutation = useMutation({
+    mutationFn: async (data: { titulo: string; mensagem: string; arquivo_url?: string; cliente_id: string }) => {
       const { error } = await supabase
         .from('chamados')
         .insert({
-          cliente_id: clienteData.id,
+          cliente_id: data.cliente_id,
           titulo: data.titulo,
           mensagem: data.mensagem,
           arquivo_url: data.arquivo_url,
+          aberto_por: isAdmin ? 'admin' : 'cliente',
         });
 
       if (error) throw error;
@@ -58,6 +77,7 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
   const resetForm = () => {
     setTitulo('');
     setMensagem('');
+    setClienteId('');
     setArquivo(null);
     setError('');
   };
@@ -69,6 +89,22 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
     if (!titulo.trim() || !mensagem.trim()) {
       setError('Título e mensagem são obrigatórios.');
       return;
+    }
+
+    // Definir cliente_id baseado no tipo de usuário
+    let finalClienteId = '';
+    if (isAdmin) {
+      if (!clienteId) {
+        setError('Selecione um cliente.');
+        return;
+      }
+      finalClienteId = clienteId;
+    } else {
+      if (!clienteData?.id) {
+        setError('Cliente não encontrado. Verifique seu perfil.');
+        return;
+      }
+      finalClienteId = clienteData.id;
     }
 
     let arquivo_url = undefined;
@@ -101,6 +137,7 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
       titulo: titulo.trim(),
       mensagem: mensagem.trim(),
       arquivo_url,
+      cliente_id: finalClienteId,
     });
   };
 
@@ -125,6 +162,24 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isAdmin && (
+            <div className="space-y-2">
+              <Label htmlFor="cliente">Cliente</Label>
+              <Select value={clienteId} onValueChange={setClienteId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clientes?.map((cliente) => (
+                    <SelectItem key={cliente.id} value={cliente.id}>
+                      {cliente.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="titulo">Título do chamado</Label>
             <Input
