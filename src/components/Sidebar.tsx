@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { ThemeToggle } from './ThemeToggle';
 
 interface SidebarProps {
   activeTab: string;
@@ -38,10 +39,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   ];
 
   return (
-    <div className="w-64 bg-white border-r border-slate-200 flex flex-col">
-      <div className="p-6 border-b border-slate-200">
-        <h2 className="text-xl font-bold text-slate-800">Meta Ads Pro</h2>
-        <p className="text-sm text-slate-600">Gerenciador de Campanhas</p>
+    <div className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col">
+      <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Meta Ads Pro</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400">Gerenciador de Campanhas</p>
       </div>
       
       <nav className="flex-1 p-4 space-y-2">
@@ -52,10 +53,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
               key={item.id}
               variant={activeTab === item.id ? 'default' : 'ghost'}
               className={cn(
-                "w-full justify-start text-left",
+                "w-full justify-start text-left text-sm",
                 activeTab === item.id 
                   ? "bg-blue-600 text-white hover:bg-blue-700" 
-                  : "text-slate-700 hover:bg-slate-100"
+                  : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
               )}
               onClick={() => setActiveTab(item.id)}
             >
@@ -65,6 +66,11 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           );
         })}
       </nav>
+
+      {/* Theme Toggle at bottom */}
+      <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+        <ThemeToggle />
+      </div>
     </div>
   );
 }

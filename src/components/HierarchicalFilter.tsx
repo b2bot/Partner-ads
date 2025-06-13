@@ -93,7 +93,7 @@ export function HierarchicalFilter({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">Todas as campanhas</SelectItem>
-                {campaigns?.map((campaign) => (
+                {campaigns && campaigns.map((campaign) => (
                   <SelectItem key={campaign.id} value={campaign.id}>
                     <div className="flex items-center justify-between w-full">
                       <span>{campaign.name}</span>
@@ -108,9 +108,9 @@ export function HierarchicalFilter({
                 ))}
               </SelectContent>
             </Select>
-            {internalCampaign && (
+            {internalCampaign && campaigns && (
               <Badge variant="outline" className="whitespace-nowrap">
-                {campaigns?.find(c => c.id === internalCampaign)?.name}
+                {campaigns.find(c => c.id === internalCampaign)?.name}
               </Badge>
             )}
           </div>
@@ -144,7 +144,12 @@ export function HierarchicalFilter({
                   </SelectItem>
                 ))}
               </SelectContent>
-            </div>
+            </Select>
+            {internalAdSet && (
+              <Badge variant="outline" className="whitespace-nowrap">
+                {getFilteredAdSets().find(a => a.id === internalAdSet)?.name}
+              </Badge>
+            )}
           </div>
         </div>
       )}

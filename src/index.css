@@ -52,6 +52,14 @@ html, body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.75rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -79,6 +87,14 @@ html, body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 94.1%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -129,13 +145,23 @@ html, body {
   @apply px-2 py-1 text-xs;
 }
 
-/* Responsive text sizing */
+/* Responsive text sizing - Reduced font sizes */
 .text-responsive {
-  @apply text-sm sm:text-base;
+  @apply text-xs sm:text-sm;
 }
 
 .text-responsive-sm {
-  @apply text-xs sm:text-sm;
+  @apply text-xs;
+}
+
+/* Filter text sizing - Smaller for filters */
+.filter-text {
+  @apply text-xs;
+}
+
+/* Account name in filters - Smaller font */
+.account-filter-text {
+  @apply text-xs font-medium text-slate-600 dark:text-slate-400;
 }
 
 /* Card grid responsive */
@@ -160,24 +186,6 @@ html, body {
 
 .dark .bg-white\/50 {
   @apply bg-slate-900/50;
-}
-
-/* Sidebar dark mode */
-.dark [data-sidebar] {
-  @apply bg-slate-900 border-slate-800;
-}
-
-.dark [data-sidebar] .sidebar-content {
-  @apply bg-slate-900;
-}
-
-/* Global dark mode for sidebar items */
-.dark .sidebar-item {
-  @apply text-slate-300 hover:text-white hover:bg-slate-800;
-}
-
-.dark .sidebar-item.active {
-  @apply bg-slate-800 text-white;
 }
 
 /* Table responsiveness */
@@ -251,7 +259,11 @@ html, body {
   overflow: hidden;
 }
 
-/* Dark mode for specific components */
-.dark .bg-gradient-to-br {
-  @apply from-slate-900 to-slate-800;
+/* Sidebar specific styles */
+.sidebar-item {
+  @apply text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800;
+}
+
+.sidebar-item.active {
+  @apply bg-blue-600 text-white dark:bg-blue-600 dark:text-white;
 }

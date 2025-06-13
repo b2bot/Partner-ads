@@ -4,15 +4,12 @@ import {
   Table, 
   LayoutGrid, 
   RefreshCw, 
-  Download,
-  Moon,
-  Sun
+  Download
 } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { DateRangeFilter } from './DateRangeFilter';
 import { GlobalSearch } from './GlobalSearch';
 import { QuickCreateButton } from './QuickCreateButton';
-import { useState, useEffect } from 'react';
 
 interface HeaderProps {
   activeTab: string;
@@ -21,27 +18,6 @@ interface HeaderProps {
 }
 
 export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    // Check if dark mode is enabled
-    const isDark = document.documentElement.classList.contains('dark');
-    setIsDarkMode(isDark);
-  }, []);
-
-  const toggleDarkMode = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
-
   const getTabTitle = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -58,6 +34,12 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
         return 'Métricas';
       case 'settings':
         return 'Configurações';
+      case 'tickets':
+        return 'Chamados';
+      case 'creatives':
+        return 'Criativos';
+      case 'clients-management':
+        return 'Gerenciar Clientes';
       default:
         return 'Meta Ads Pro';
     }
@@ -74,7 +56,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <SidebarTrigger className="lg:hidden" />
             <div className="min-w-0 flex-1">
-              <h1 className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+              <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate">
                 {getTabTitle()}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
@@ -94,26 +76,16 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
             
             <QuickCreateButton />
             
-            {/* Dark mode toggle */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={toggleDarkMode}
-              className="hidden sm:flex"
-            >
-              {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </Button>
-            
             {activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
               <>
                 <Button variant="outline" size="sm" className="hidden md:flex btn-compact">
                   <RefreshCw className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline">Atualizar</span>
+                  <span className="hidden lg:inline text-xs">Atualizar</span>
                 </Button>
                 
                 <Button variant="outline" size="sm" className="hidden md:flex btn-compact">
                   <Download className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline">Exportar</span>
+                  <span className="hidden lg:inline text-xs">Exportar</span>
                 </Button>
               </>
             )}
