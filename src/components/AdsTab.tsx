@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -100,7 +99,7 @@ export function AdsTab({ viewMode }: AdsTabProps) {
   };
 
   const getAdInsights = (adId: string) => {
-    return insights.find(insight => insight.id === adId);
+    return insights.find((insight: any) => insight?.id === adId);
   };
 
   const handleStatusToggle = async (adId: string, currentStatus: string) => {

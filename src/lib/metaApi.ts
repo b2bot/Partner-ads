@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface MetaCredentials {
@@ -205,6 +204,58 @@ export async function getCampaignInsights(
     return null;
   } catch (error) {
     console.error('Error fetching campaign insights:', error);
+    throw error;
+  }
+}
+
+export async function getAdSetInsights(
+  accessToken: string, 
+  adSetId: string, 
+  dateRange: { since: string; until: string }
+): Promise<any | null> {
+  try {
+    const fields = 'impressions,clicks,spend,cpm,cpc,ctr,reach,frequency,actions,cost_per_action_type';
+    const response = await fetch(
+      `${META_API_BASE}/${adSetId}/insights?fields=${fields}&time_range=${JSON.stringify(dateRange)}&access_token=${accessToken}`
+    );
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    
+    if (data.data && data.data.length > 0) {
+      return {
+        id: adSetId,
+        ...data.data[0]
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching ad set insights:', error);
+    throw error;
+  }
+}
+
+export async function getAdInsights(
+  accessToken: string, 
+  adId: string, 
+  dateRange: { since: string; until: string }
+): Promise<any | null> {
+  try {
+    const fields = 'impressions,clicks,spend,cpm,cpc,ctr,reach,frequency,actions,cost_per_action_type';
+    const response = await fetch(
+      `${META_API_BASE}/${adId}/insights?fields=${fields}&time_range=${JSON.stringify(dateRange)}&access_token=${accessToken}`
+    );
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    
+    if (data.data && data.data.length > 0) {
+      return {
+        id: adId,
+        ...data.data[0]
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching ad insights:', error);
     throw error;
   }
 }

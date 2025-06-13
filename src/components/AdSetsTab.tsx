@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -67,7 +66,7 @@ export function AdSetsTab({ viewMode }: AdSetsTabProps) {
   }, [selectedAdAccount, refetch]);
 
   const getAdSetInsights = (adSetId: string) => {
-    return insights.find(insight => insight.id === adSetId);
+    return insights.find((insight: any) => insight?.id === adSetId);
   };
 
   const getCampaignName = (campaignId: string) => {
