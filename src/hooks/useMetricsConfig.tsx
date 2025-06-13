@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -34,25 +33,33 @@ export function useMetricsConfig() {
           .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching metrics config:', error);
+          console.error('Erro ao buscar config de métricas:', error);
           return defaultConfig;
         }
 
-        if (!data || !data.config) {
+        if (!data || typeof data.config !== 'object') {
           return defaultConfig;
         }
 
-        // Ensure config is a proper MetricsConfig object
         const parsedConfig = data.config;
-        if (typeof parsedConfig === 'object' && parsedConfig && 
-            parsedConfig.dashboard && parsedConfig.campaigns && 
-            parsedConfig.adsets && parsedConfig.ads) {
+
+        if (
+          typeof parsedConfig === 'object' &&
+          parsedConfig.dashboard &&
+          parsedConfig.campaigns &&
+          parsedConfig.adsets &&
+          parsedConfig.ads &&
+          Array.isArray(parsedConfig.dashboard) &&
+          Array.isArray(parsedConfig.campaigns) &&
+          Array.isArray(parsedConfig.adsets) &&
+          Array.isArray(parsedConfig.ads)
+        ) {
           return parsedConfig as MetricsConfig;
         }
 
         return defaultConfig;
-      } catch (error) {
-        console.error('Error in metrics config query:', error);
+      } catch (err) {
+        console.error('Erro inesperado ao buscar métricas:', err);
         return defaultConfig;
       }
     },
@@ -66,12 +73,12 @@ export function useMetricsConfig() {
           .upsert([{ config: newConfig }], { onConflict: 'id' });
 
         if (error) throw error;
-        
+
         await logActivity('metrics_config_updated', 'configuracoes', newConfig);
         return newConfig;
-      } catch (error) {
-        console.error('Error updating metrics config:', error);
-        throw error;
+      } catch (err) {
+        console.error('Erro ao atualizar config de métricas:', err);
+        throw err;
       }
     },
     onSuccess: (newConfig) => {
@@ -82,21 +89,19 @@ export function useMetricsConfig() {
       queryClient.invalidateQueries({ queryKey: ['dashboard-data'] });
       toast.success('Configuração de métricas atualizada com sucesso!');
     },
-    onError: (error) => {
-      console.error('Error updating metrics config:', error);
+    onError: () => {
       toast.error('Erro ao atualizar configuração de métricas');
     },
   });
 
-  const getVisibleMetrics = (page: keyof MetricsConfig) => {
+  const getVisibleMetrics = (page: keyof MetricsConfig): string[] => {
     if (!config || typeof config !== 'object') return defaultConfig[page];
-    const metricsConfig = config as MetricsConfig;
-    return metricsConfig[page] || defaultConfig[page];
+    return config[page] || defaultConfig[page];
   };
 
-  const isMetricVisible = (page: keyof MetricsConfig, metric: string) => {
-    const visibleMetrics = getVisibleMetrics(page);
-    return Array.isArray(visibleMetrics) ? visibleMetrics.includes(metric) : false;
+  const isMetricVisible = (page: keyof MetricsConfig, metric: string): boolean => {
+    const visible = getVisibleMetrics(page);
+    return Array.isArray(visible) && visible.includes(metric);
   };
 
   const updateConfig = (newConfig: MetricsConfig) => {
@@ -106,9 +111,9 @@ export function useMetricsConfig() {
   return {
     config: config as MetricsConfig,
     isLoading,
+    isUpdating: updateConfigMutation.isPending,
     updateConfig,
     getVisibleMetrics,
-    isMetricVisible,
-    isUpdating: updateConfigMutation.isPending,
+    isMetricVisible
   };
 }
