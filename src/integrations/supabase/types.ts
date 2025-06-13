@@ -9,6 +9,186 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chamados: {
+        Row: {
+          arquivo_url: string | null
+          cliente_id: string
+          created_at: string
+          id: string
+          mensagem: string
+          respondido_por: string | null
+          resposta: string | null
+          status: Database["public"]["Enums"]["ticket_status"]
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          cliente_id: string
+          created_at?: string
+          id?: string
+          mensagem: string
+          respondido_por?: string | null
+          resposta?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          cliente_id?: string
+          created_at?: string
+          id?: string
+          mensagem?: string
+          respondido_por?: string | null
+          resposta?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chamados_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chamados_respondido_por_fkey"
+            columns: ["respondido_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clientes: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          nome: string
+          tipo_acesso: Database["public"]["Enums"]["access_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome: string
+          tipo_acesso?: Database["public"]["Enums"]["access_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome?: string
+          tipo_acesso?: Database["public"]["Enums"]["access_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clientes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contas: {
+        Row: {
+          ativo: boolean
+          cliente_id: string
+          created_at: string
+          id: string
+          identificador: string
+          nome: string
+          tipo: Database["public"]["Enums"]["account_type"]
+        }
+        Insert: {
+          ativo?: boolean
+          cliente_id: string
+          created_at?: string
+          id?: string
+          identificador: string
+          nome: string
+          tipo: Database["public"]["Enums"]["account_type"]
+        }
+        Update: {
+          ativo?: boolean
+          cliente_id?: string
+          created_at?: string
+          id?: string
+          identificador?: string
+          nome?: string
+          tipo?: Database["public"]["Enums"]["account_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criativos: {
+        Row: {
+          arquivo_url: string
+          cliente_id: string
+          comentario_cliente: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          resposta: string | null
+          status: Database["public"]["Enums"]["creative_status"]
+          tipo_arquivo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          arquivo_url: string
+          cliente_id: string
+          comentario_cliente?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          resposta?: string | null
+          status?: Database["public"]["Enums"]["creative_status"]
+          tipo_arquivo: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          arquivo_url?: string
+          cliente_id?: string
+          comentario_cliente?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          resposta?: string | null
+          status?: Database["public"]["Enums"]["creative_status"]
+          tipo_arquivo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criativos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meta_api_credentials: {
         Row: {
           access_token: string
@@ -54,15 +234,60 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          email: string
+          id: string
+          nome: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          email: string
+          id: string
+          nome: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          nome?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_cliente_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      access_type: "api" | "sheet"
+      account_type: "meta" | "google"
+      creative_status:
+        | "pendente"
+        | "aprovado"
+        | "reprovado"
+        | "ajuste_solicitado"
+      ticket_status: "aberto" | "em_andamento" | "resolvido"
+      user_role: "admin" | "cliente"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -177,6 +402,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      access_type: ["api", "sheet"],
+      account_type: ["meta", "google"],
+      creative_status: [
+        "pendente",
+        "aprovado",
+        "reprovado",
+        "ajuste_solicitado",
+      ],
+      ticket_status: ["aberto", "em_andamento", "resolvido"],
+      user_role: ["admin", "cliente"],
+    },
   },
 } as const

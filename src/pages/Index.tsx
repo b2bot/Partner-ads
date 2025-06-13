@@ -10,10 +10,13 @@ import { WhatsAppReportsTab } from '@/components/WhatsAppReportsTab';
 import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { UserMenu } from '@/components/UserMenu';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
+  const { isAdmin } = useAuth();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -41,11 +44,14 @@ const Index = () => {
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <div className="flex-1 flex flex-col">
-          <Header 
-            activeTab={activeTab} 
-            viewMode={viewMode} 
-            setViewMode={setViewMode} 
-          />
+          <div className="flex items-center justify-between p-4 border-b bg-white/50 backdrop-blur-sm">
+            <Header 
+              activeTab={activeTab} 
+              viewMode={viewMode} 
+              setViewMode={setViewMode} 
+            />
+            <UserMenu />
+          </div>
           <main className="flex-1 p-6 overflow-auto">
             {renderContent()}
           </main>
