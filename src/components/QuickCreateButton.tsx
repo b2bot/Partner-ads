@@ -46,20 +46,23 @@ export function QuickCreateButton() {
       {/* Modais */}
       {activeModal === 'campaign' && (
         <CreateCampaignModal
-          open={true}
+          isOpen={true}
           onClose={() => setActiveModal(null)}
+          onSuccess={() => setActiveModal(null)}
         />
       )}
       {activeModal === 'adset' && (
         <CreateAdSetModal
-          open={true}
+          isOpen={true}
           onClose={() => setActiveModal(null)}
+          onSuccess={() => setActiveModal(null)}
         />
       )}
       {activeModal === 'ad' && (
         <CreateAdModal
-          open={true}
+          isOpen={true}
           onClose={() => setActiveModal(null)}
+          onSuccess={() => setActiveModal(null)}
         />
       )}
       {activeModal === 'creative' && (
