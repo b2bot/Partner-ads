@@ -33,7 +33,7 @@ interface TicketDetailModalProps {
 export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalProps) {
   const { isAdmin, user } = useAuth();
   const [resposta, setResposta] = useState(ticket.resposta || '');
-  const [status, setStatus] = useState(ticket.status);
+  const [status, setStatus] = useState<'aberto' | 'em_andamento' | 'resolvido'>(ticket.status);
   const [error, setError] = useState('');
   
   const queryClient = useQueryClient();
@@ -120,6 +120,10 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
     }
   };
 
+  const handleStatusChange = (value: string) => {
+    setStatus(value as 'aberto' | 'em_andamento' | 'resolvido');
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -184,7 +188,7 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
             <form onSubmit={handleSubmit} className="space-y-4 border-t pt-4">
               <div className="space-y-2">
                 <Label htmlFor="status">Status do chamado</Label>
-                <Select value={status} onValueChange={setStatus}>
+                <Select value={status} onValueChange={handleStatusChange}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>

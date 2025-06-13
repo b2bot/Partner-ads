@@ -6,7 +6,9 @@ import {
   MessageSquare, 
   Settings,
   LayoutDashboard,
-  MessageCircle
+  MessageCircle,
+  Image,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -28,6 +30,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     { id: 'whatsapp-reports', label: 'Relatórios WhatsApp', icon: MessageSquare },
     { id: 'metrics-objectives', label: 'Métricas e Objetivos', icon: BarChart3 },
     { id: 'tickets', label: isAdmin ? 'Gerenciar Chamados' : 'Meus Chamados', icon: MessageCircle },
+    { id: 'creatives', label: isAdmin ? 'Gerenciar Criativos' : 'Meus Criativos', icon: Image },
+    ...(isAdmin ? [{ id: 'clients-management', label: 'Gerenciar Clientes', icon: Users }] : []),
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 

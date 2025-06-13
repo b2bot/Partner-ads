@@ -10,6 +10,8 @@ import { WhatsAppReportsTab } from '@/components/WhatsAppReportsTab';
 import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
 import { TicketsTab } from '@/components/TicketsTab';
+import { CreativesTab } from '@/components/CreativesTab';
+import { ClientsManagementTab } from '@/components/ClientsManagementTab';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { useAuth } from '@/hooks/useAuth';
@@ -35,6 +37,10 @@ const Index = () => {
         return <MetricsObjectivesTab />;
       case 'tickets':
         return <TicketsTab />;
+      case 'creatives':
+        return <CreativesTab />;
+      case 'clients-management':
+        return <ClientsManagementTab />;
       case 'settings':
         return <SettingsTab />;
       default:
