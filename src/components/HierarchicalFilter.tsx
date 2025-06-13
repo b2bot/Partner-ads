@@ -33,20 +33,30 @@ export function HierarchicalFilter({
     queryFn: getMetaCredentials,
   });
 
-  const { data: campaigns } = useQuery({
+  const { data: campaigns = [] } = useQuery({
     queryKey: ['campaigns', selectedAccount],
     queryFn: async () => {
       if (!credentials?.access_token || !selectedAccount) return [];
-      return await getCampaigns(credentials.access_token, selectedAccount);
+      try {
+        return await getCampaigns(credentials.access_token, selectedAccount);
+      } catch (error) {
+        console.error('Error fetching campaigns:', error);
+        return [];
+      }
     },
     enabled: !!credentials?.access_token && !!selectedAccount && level !== 'campaigns',
   });
 
-  const { data: adSets } = useQuery({
+  const { data: adSets = [] } = useQuery({
     queryKey: ['adsets', selectedAccount, internalCampaign],
     queryFn: async () => {
       if (!credentials?.access_token || !selectedAccount) return [];
-      return await getAdSets(credentials.access_token, selectedAccount);
+      try {
+        return await getAdSets(credentials.access_token, selectedAccount);
+      } catch (error) {
+        console.error('Error fetching adsets:', error);
+        return [];
+      }
     },
     enabled: !!credentials?.access_token && !!selectedAccount && !!internalCampaign && level === 'ads',
   });
@@ -70,7 +80,7 @@ export function HierarchicalFilter({
   };
 
   const getFilteredAdSets = () => {
-    if (!adSets || !internalCampaign) return [];
+    if (!adSets || !Array.isArray(adSets) || !internalCampaign) return [];
     return adSets.filter(adSet => adSet.campaign_id === internalCampaign);
   };
 

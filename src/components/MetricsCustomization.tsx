@@ -34,10 +34,11 @@ export function MetricsCustomization() {
     Object.entries(AVAILABLE_METRICS).forEach(([category, metrics]) => {
       metrics.forEach(metric => {
         const currentConfig = config as MetricsConfig;
+        const pageMetrics = currentConfig && currentConfig[selectedPage] ? currentConfig[selectedPage] : [];
         allMetrics.push({
           key: metric,
           name: getMetricDisplayName(metric),
-          enabled: currentConfig[selectedPage]?.includes(metric) || false,
+          enabled: Array.isArray(pageMetrics) ? pageMetrics.includes(metric) : false,
           category
         });
       });
@@ -47,11 +48,13 @@ export function MetricsCustomization() {
   };
 
   const toggleMetric = (metricKey: string) => {
+    if (!config) return;
+    
     const currentConfig = config as MetricsConfig;
     const currentMetrics = currentConfig[selectedPage] || [];
-    const newMetrics = currentMetrics.includes(metricKey)
+    const newMetrics = Array.isArray(currentMetrics) && currentMetrics.includes(metricKey)
       ? currentMetrics.filter(m => m !== metricKey)
-      : [...currentMetrics, metricKey];
+      : [...(Array.isArray(currentMetrics) ? currentMetrics : []), metricKey];
 
     const newConfig: MetricsConfig = {
       ...currentConfig,
@@ -84,6 +87,8 @@ export function MetricsCustomization() {
   };
 
   const selectAllMetrics = () => {
+    if (!config) return;
+    
     const allMetricKeys = Object.values(AVAILABLE_METRICS).flat();
     const currentConfig = config as MetricsConfig;
     const newConfig: MetricsConfig = {
@@ -94,6 +99,8 @@ export function MetricsCustomization() {
   };
 
   const deselectAllMetrics = () => {
+    if (!config) return;
+    
     const currentConfig = config as MetricsConfig;
     const newConfig: MetricsConfig = {
       ...currentConfig,
@@ -202,7 +209,8 @@ export function MetricsCustomization() {
                   <div className="grid gap-2">
                     {metrics.map((metricKey) => {
                       const currentConfig = config as MetricsConfig;
-                      const isEnabled = currentConfig[selectedPage]?.includes(metricKey) || false;
+                      const pageMetrics = currentConfig && currentConfig[selectedPage] ? currentConfig[selectedPage] : [];
+                      const isEnabled = Array.isArray(pageMetrics) ? pageMetrics.includes(metricKey) : false;
                       
                       return (
                         <div

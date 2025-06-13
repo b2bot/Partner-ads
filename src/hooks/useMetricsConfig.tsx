@@ -25,42 +25,54 @@ export function useMetricsConfig() {
   const { data: config = defaultConfig, isLoading } = useQuery({
     queryKey: ['metrics-config'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('metrics_config')
-        .select('config')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from('metrics_config')
+          .select('config')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching metrics config:', error);
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching metrics config:', error);
+          return defaultConfig;
+        }
+
+        if (!data || !data.config) {
+          return defaultConfig;
+        }
+
+        // Ensure config is a proper MetricsConfig object
+        const parsedConfig = data.config;
+        if (typeof parsedConfig === 'object' && parsedConfig && 
+            parsedConfig.dashboard && parsedConfig.campaigns && 
+            parsedConfig.adsets && parsedConfig.ads) {
+          return parsedConfig as MetricsConfig;
+        }
+
+        return defaultConfig;
+      } catch (error) {
+        console.error('Error in metrics config query:', error);
         return defaultConfig;
       }
-
-      if (!data || !data.config) {
-        return defaultConfig;
-      }
-
-      // Ensure config is a proper MetricsConfig object
-      const parsedConfig = data.config as any;
-      if (typeof parsedConfig === 'object' && parsedConfig.dashboard && parsedConfig.campaigns && parsedConfig.adsets && parsedConfig.ads) {
-        return parsedConfig as MetricsConfig;
-      }
-
-      return defaultConfig;
     },
   });
 
   const updateConfigMutation = useMutation({
     mutationFn: async (newConfig: MetricsConfig) => {
-      const { error } = await supabase
-        .from('metrics_config')
-        .upsert([{ config: newConfig as any }], { onConflict: 'id' });
+      try {
+        const { error } = await supabase
+          .from('metrics_config')
+          .upsert([{ config: newConfig }], { onConflict: 'id' });
 
-      if (error) throw error;
-      
-      await logActivity('metrics_config_updated', 'configuracoes', newConfig as any);
-      return newConfig;
+        if (error) throw error;
+        
+        await logActivity('metrics_config_updated', 'configuracoes', newConfig);
+        return newConfig;
+      } catch (error) {
+        console.error('Error updating metrics config:', error);
+        throw error;
+      }
     },
     onSuccess: (newConfig) => {
       queryClient.setQueryData(['metrics-config'], newConfig);
@@ -78,7 +90,8 @@ export function useMetricsConfig() {
 
   const getVisibleMetrics = (page: keyof MetricsConfig) => {
     if (!config || typeof config !== 'object') return defaultConfig[page];
-    return (config as MetricsConfig)[page] || defaultConfig[page];
+    const metricsConfig = config as MetricsConfig;
+    return metricsConfig[page] || defaultConfig[page];
   };
 
   const isMetricVisible = (page: keyof MetricsConfig, metric: string) => {

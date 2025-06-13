@@ -14,13 +14,17 @@ interface Cliente {
   id: string;
   user_id: string;
   nome: string;
+  email?: string;
+  telefone?: string;
+  empresa?: string;
+  observacoes_internas?: string;
   tipo_acesso: 'api' | 'sheet';
   ativo: boolean;
   created_at: string;
   profiles: {
     email: string;
     role: string;
-  };
+  } | null;
   contas: {
     id: string;
     tipo: 'meta' | 'google';
@@ -47,7 +51,12 @@ export function ClientsManagementTab() {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as Cliente[];
+      
+      // Transform data to match Cliente interface
+      return (data || []).map(item => ({
+        ...item,
+        profiles: item.profiles && !Array.isArray(item.profiles) ? item.profiles : null
+      })) as Cliente[];
     },
   });
 
@@ -114,8 +123,8 @@ export function ClientsManagementTab() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Gerenciar Clientes</h1>
-          <p className="text-slate-600 mt-2">
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Gerenciar Clientes</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">
             Cadastre e gerencie clientes, suas contas e permissões
           </p>
         </div>
@@ -126,14 +135,14 @@ export function ClientsManagementTab() {
       </div>
 
       <div className="grid gap-4">
-        {clientes?.length === 0 ? (
+        {!clientes || clientes.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Nenhum cliente cadastrado
               </h3>
-              <p className="text-gray-500 mb-4">
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
                 Comece criando seu primeiro cliente e configurando suas contas.
               </p>
               <Button onClick={() => setCreateModalOpen(true)}>
@@ -143,13 +152,15 @@ export function ClientsManagementTab() {
             </CardContent>
           </Card>
         ) : (
-          clientes?.map((cliente) => (
+          clientes.map((cliente) => (
             <Card key={cliente.id}>
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">{cliente.nome}</CardTitle>
-                    <p className="text-slate-600">{cliente.profiles.email}</p>
+                    <p className="text-slate-600 dark:text-slate-400">
+                      {cliente.profiles?.email || 'Email não disponível'}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge 
@@ -159,7 +170,7 @@ export function ClientsManagementTab() {
                       {cliente.ativo ? 'Ativo' : 'Inativo'}
                     </Badge>
                     <Badge variant="outline">
-                      {cliente.profiles.role === 'admin' ? 'Admin' : 'Cliente'}
+                      {cliente.profiles?.role === 'admin' ? 'Admin' : 'Cliente'}
                     </Badge>
                   </div>
                 </div>
@@ -167,17 +178,17 @@ export function ClientsManagementTab() {
               <CardContent>
                 <div className="space-y-3">
                   <div>
-                    <span className="text-sm font-medium text-gray-600">Tipo de acesso:</span>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tipo de acesso:</span>
                     <span className="ml-2 text-sm">
                       {cliente.tipo_acesso === 'api' ? 'API' : 'Google Sheets'}
                     </span>
                   </div>
                   
                   <div>
-                    <span className="text-sm font-medium text-gray-600">Contas vinculadas:</span>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Contas vinculadas:</span>
                     <div className="ml-2 mt-1">
-                      {cliente.contas.length === 0 ? (
-                        <span className="text-sm text-gray-500">Nenhuma conta vinculada</span>
+                      {!cliente.contas || cliente.contas.length === 0 ? (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">Nenhuma conta vinculada</span>
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {cliente.contas.map((conta) => (
