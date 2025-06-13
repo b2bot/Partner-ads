@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +20,7 @@ interface Cliente {
   tipo_acesso: 'api' | 'sheet';
   ativo: boolean;
   created_at: string;
-  profiles: {
+  profiles?: {
     email: string;
     role: string;
   } | null;
@@ -49,10 +48,9 @@ export function ClientsManagementTab() {
           contas (id, tipo, identificador, nome)
         `)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
-      
-      // Transform data to match Cliente interface
+
       return (data || []).map(item => ({
         ...item,
         profiles: item.profiles && !Array.isArray(item.profiles) ? item.profiles : null
@@ -62,11 +60,7 @@ export function ClientsManagementTab() {
 
   const deleteClientMutation = useMutation({
     mutationFn: async (clientId: string) => {
-      const { error } = await supabase
-        .from('clientes')
-        .delete()
-        .eq('id', clientId);
-      
+      const { error } = await supabase.from('clientes').delete().eq('id', clientId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -81,11 +75,7 @@ export function ClientsManagementTab() {
 
   const toggleClientStatus = useMutation({
     mutationFn: async ({ clientId, ativo }: { clientId: string; ativo: boolean }) => {
-      const { error } = await supabase
-        .from('clientes')
-        .update({ ativo })
-        .eq('id', clientId);
-      
+      const { error } = await supabase.from('clientes').update({ ativo }).eq('id', clientId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -163,9 +153,9 @@ export function ClientsManagementTab() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge 
-                      variant={cliente.ativo ? "default" : "secondary"}
-                      className={cliente.ativo ? "bg-green-100 text-green-800" : ""}
+                    <Badge
+                      variant={cliente.ativo ? 'default' : 'secondary'}
+                      className={cliente.ativo ? 'bg-green-100 text-green-800' : ''}
                     >
                       {cliente.ativo ? 'Ativo' : 'Inativo'}
                     </Badge>
@@ -183,7 +173,7 @@ export function ClientsManagementTab() {
                       {cliente.tipo_acesso === 'api' ? 'API' : 'Google Sheets'}
                     </span>
                   </div>
-                  
+
                   <div>
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Contas vinculadas:</span>
                     <div className="ml-2 mt-1">
@@ -202,21 +192,19 @@ export function ClientsManagementTab() {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingClient(cliente)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => setEditingClient(cliente)}>
                       <Edit className="h-4 w-4 mr-1" />
                       Editar
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => toggleClientStatus.mutate({
-                        clientId: cliente.id,
-                        ativo: !cliente.ativo
-                      })}
+                      onClick={() =>
+                        toggleClientStatus.mutate({
+                          clientId: cliente.id,
+                          ativo: !cliente.ativo,
+                        })
+                      }
                     >
                       {cliente.ativo ? 'Desativar' : 'Ativar'}
                     </Button>
@@ -237,10 +225,7 @@ export function ClientsManagementTab() {
       </div>
 
       {createModalOpen && (
-        <CreateClientModal
-          open={createModalOpen}
-          onClose={() => setCreateModalOpen(false)}
-        />
+        <CreateClientModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} />
       )}
 
       {editingClient && (
