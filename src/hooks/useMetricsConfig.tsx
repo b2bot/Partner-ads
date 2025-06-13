@@ -1,6 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useSystemLog } from '@/hooks/useSystemLog';
 
 export interface MetricsConfig {
   dashboard: string[];
@@ -17,69 +19,71 @@ const defaultConfig: MetricsConfig = {
 };
 
 export function useMetricsConfig() {
-  const [config, setConfig] = useState<MetricsConfig>(defaultConfig);
-  const [loading, setLoading] = useState(true);
+  const { logActivity } = useSystemLog();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
-  const loadConfig = async () => {
-    try {
+  const { data: config = defaultConfig, isLoading } = useQuery({
+    queryKey: ['metrics-config'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('metrics_config')
         .select('config')
+        .order('created_at', { ascending: false })
         .limit(1)
-        .maybeSingle();
+        .single();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error loading metrics config:', error);
-      } else if (data && data.config) {
-        // Safely parse the config data
-        let parsedConfig: MetricsConfig;
-        if (typeof data.config === 'string') {
-          parsedConfig = JSON.parse(data.config);
-        } else if (typeof data.config === 'object' && data.config !== null) {
-          // Safe type conversion with validation
-          parsedConfig = data.config as unknown as MetricsConfig;
-          
-          // Validate that the parsed config has all required properties
-          if (!parsedConfig.dashboard || !parsedConfig.campaigns || !parsedConfig.adsets || !parsedConfig.ads) {
-            parsedConfig = defaultConfig;
-          }
-        } else {
-          parsedConfig = defaultConfig;
-        }
-        setConfig(parsedConfig);
+        console.error('Error fetching metrics config:', error);
+        return defaultConfig;
       }
-    } catch (error) {
-      console.error('Error loading metrics config:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const saveConfig = async (newConfig: MetricsConfig) => {
-    try {
-      // Convert config to JSON string for storage
-      const configJson = JSON.stringify(newConfig);
-      
+      return data?.config || defaultConfig;
+    },
+  });
+
+  const updateConfigMutation = useMutation({
+    mutationFn: async (newConfig: MetricsConfig) => {
       const { error } = await supabase
         .from('metrics_config')
-        .upsert([{ config: configJson }], { onConflict: 'id' });
+        .upsert([{ config: newConfig }], { onConflict: 'id' });
 
       if (error) throw error;
-      setConfig(newConfig);
-      return true;
-    } catch (error) {
-      console.error('Error saving metrics config:', error);
-      return false;
-    }
+      
+      await logActivity('metrics_config_updated', 'configuracoes', newConfig);
+      return newConfig;
+    },
+    onSuccess: (newConfig) => {
+      queryClient.setQueryData(['metrics-config'], newConfig);
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      queryClient.invalidateQueries({ queryKey: ['adsets'] });
+      queryClient.invalidateQueries({ queryKey: ['ads'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-data'] });
+      toast.success('Configuração de métricas atualizada com sucesso!');
+    },
+    onError: (error) => {
+      console.error('Error updating metrics config:', error);
+      toast.error('Erro ao atualizar configuração de métricas');
+    },
+  });
+
+  const getVisibleMetrics = (page: keyof MetricsConfig) => {
+    return config[page] || defaultConfig[page];
+  };
+
+  const isMetricVisible = (page: keyof MetricsConfig, metric: string) => {
+    return getVisibleMetrics(page).includes(metric);
+  };
+
+  const updateConfig = (newConfig: MetricsConfig) => {
+    updateConfigMutation.mutate(newConfig);
   };
 
   return {
     config,
-    loading,
-    saveConfig
+    isLoading,
+    updateConfig,
+    getVisibleMetrics,
+    isMetricVisible,
+    isUpdating: updateConfigMutation.isPending,
   };
 }

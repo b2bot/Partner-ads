@@ -105,35 +105,105 @@ export type Database = {
           },
         ]
       }
+      chamados_historico: {
+        Row: {
+          acao: string
+          chamado_id: string
+          data_acao: string
+          detalhes: string | null
+          id: string
+          usuario_id: string | null
+          usuario_nome: string
+        }
+        Insert: {
+          acao: string
+          chamado_id: string
+          data_acao?: string
+          detalhes?: string | null
+          id?: string
+          usuario_id?: string | null
+          usuario_nome: string
+        }
+        Update: {
+          acao?: string
+          chamado_id?: string
+          data_acao?: string
+          detalhes?: string | null
+          id?: string
+          usuario_id?: string | null
+          usuario_nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chamados_historico_chamado_id_fkey"
+            columns: ["chamado_id"]
+            isOneToOne: false
+            referencedRelation: "chamados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chamados_historico_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           ativo: boolean
+          contas_meta: string[] | null
           created_at: string
+          email: string | null
+          empresa: string | null
           id: string
           nome: string
+          observacoes_internas: string | null
+          responsavel_conta: string | null
+          telefone: string | null
           tipo_acesso: Database["public"]["Enums"]["access_type"]
           updated_at: string
           user_id: string
         }
         Insert: {
           ativo?: boolean
+          contas_meta?: string[] | null
           created_at?: string
+          email?: string | null
+          empresa?: string | null
           id?: string
           nome: string
+          observacoes_internas?: string | null
+          responsavel_conta?: string | null
+          telefone?: string | null
           tipo_acesso?: Database["public"]["Enums"]["access_type"]
           updated_at?: string
           user_id: string
         }
         Update: {
           ativo?: boolean
+          contas_meta?: string[] | null
           created_at?: string
+          email?: string | null
+          empresa?: string | null
           id?: string
           nome?: string
+          observacoes_internas?: string | null
+          responsavel_conta?: string | null
+          telefone?: string | null
           tipo_acesso?: Database["public"]["Enums"]["access_type"]
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "clientes_responsavel_conta_fkey"
+            columns: ["responsavel_conta"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "clientes_user_id_fkey"
             columns: ["user_id"]
@@ -318,6 +388,50 @@ export type Database = {
         }
         Relationships: []
       }
+      system_activity_logs: {
+        Row: {
+          acao: string
+          created_at: string
+          detalhes: Json | null
+          id: string
+          ip_address: unknown | null
+          modulo: string
+          user_agent: string | null
+          usuario_id: string | null
+          usuario_nome: string
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          detalhes?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          modulo: string
+          user_agent?: string | null
+          usuario_id?: string | null
+          usuario_nome: string
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          detalhes?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          modulo?: string
+          user_agent?: string | null
+          usuario_id?: string | null
+          usuario_nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_activity_logs_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usuarios: {
         Row: {
           criado_em: string | null
@@ -351,6 +465,16 @@ export type Database = {
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      log_system_activity: {
+        Args: {
+          p_acao: string
+          p_modulo: string
+          p_detalhes?: Json
+          p_ip_address?: unknown
+          p_user_agent?: string
+        }
+        Returns: string
       }
     }
     Enums: {

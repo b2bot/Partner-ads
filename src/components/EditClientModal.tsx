@@ -36,6 +36,10 @@ interface EditClientModalProps {
 
 export function EditClientModal({ client, open, onClose }: EditClientModalProps) {
   const [nome, setNome] = useState(client.nome);
+  const [email, setEmail] = useState(client.email || '');
+  const [telefone, setTelefone] = useState(client.telefone || '');
+  const [empresa, setEmpresa] = useState(client.empresa || '');
+  const [observacoesInternas, setObservacoesInternas] = useState(client.observacoes_internas || '');
   const [tipoAcesso, setTipoAcesso] = useState<'api' | 'sheet'>(client.tipo_acesso);
   const [contasMeta, setContasMeta] = useState<Array<{ id?: string; identificador: string; nome: string }>>([]);
   const [contasGoogle, setContasGoogle] = useState<Array<{ id?: string; identificador: string; nome: string }>>([]);
@@ -174,24 +178,58 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email (não editável)</Label>
-            <Input
-              id="email"
-              value={client.profiles.email}
-              disabled
-              className="bg-gray-100"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email (não editável)</Label>
+              <Input
+                id="email"
+                value={client.profiles.email}
+                disabled
+                className="bg-gray-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="nome">Nome completo</Label>
+              <Input
+                id="nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Nome do cliente"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="telefone">Telefone de contato</Label>
+              <Input
+                id="telefone"
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                placeholder="(11) 99999-9999"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="empresa">Nome da empresa</Label>
+              <Input
+                id="empresa"
+                value={empresa}
+                onChange={(e) => setEmpresa(e.target.value)}
+                placeholder="Nome da empresa do cliente"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="nome">Nome completo</Label>
+            <Label htmlFor="observacoes">Observações internas</Label>
             <Input
-              id="nome"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder="Nome do cliente"
-              required
+              id="observacoes"
+              value={observacoesInternas}
+              onChange={(e) => setObservacoesInternas(e.target.value)}
+              placeholder="Observações internas sobre o cliente"
             />
           </div>
 
