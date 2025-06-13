@@ -1,33 +1,60 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useMetaData } from '@/hooks/useMetaData';
 import { useAuth } from '@/hooks/useAuth';
-import { Building2, Shield } from 'lucide-react';
+import { Building2, Shield, AlertCircle } from 'lucide-react';
 
 export function AccountFilter() {
-  const { adAccounts, selectedAdAccount, setSelectedAdAccount, selectedAdAccountName, loading } = useMetaData();
+  const { adAccounts, selectedAdAccount, setSelectedAdAccount, selectedAdAccountName, loading, errors } = useMetaData();
   const { isAdmin } = useAuth();
 
-  if (!adAccounts || adAccounts.length === 0) {
-    if (loading.adAccounts) {
-      return (
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-slate-400" />
-            <Label className="text-sm font-medium text-slate-500">Carregando contas...</Label>
-          </div>
-        </div>
-      );
-    }
-    
+  // Se há erro nas credenciais
+  if (errors.credentials) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Erro ao carregar credenciais da Meta API. Verifique as configurações.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  // Se há erro ao carregar contas
+  if (errors.adAccounts) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Erro ao carregar contas de anúncios: {errors.adAccounts.message}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (loading.credentials || loading.adAccounts) {
     return (
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Building2 className="w-4 h-4 text-slate-400" />
-          <Label className="text-sm font-medium text-slate-500">Nenhuma conta disponível</Label>
+          <Label className="text-sm font-medium text-slate-500">
+            {loading.credentials ? 'Carregando credenciais...' : 'Carregando contas...'}
+          </Label>
         </div>
       </div>
+    );
+  }
+
+  if (!adAccounts || adAccounts.length === 0) {
+    return (
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Nenhuma conta de anúncios encontrada. Verifique as configurações da API Meta e se o Access Token tem as permissões corretas.
+        </AlertDescription>
+      </Alert>
     );
   }
 
