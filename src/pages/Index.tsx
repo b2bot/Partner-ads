@@ -19,7 +19,16 @@ import { useAuth } from '@/hooks/useAuth';
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
-  const { isAdmin } = useAuth();
+  const { isAdmin, loading } = useAuth();
+
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -55,21 +64,39 @@ const Index = () => {
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <div className="flex-1 flex flex-col">
-          {shouldShowHeader && (
-            <div className="flex items-center justify-between p-4 border-b bg-white/50 backdrop-blur-sm">
-              <Header 
-                activeTab={activeTab} 
-                viewMode={viewMode} 
-                setViewMode={setViewMode} 
-              />
-              <UserMenu />
-            </div>
-          )}
-          {!shouldShowHeader && (
-            <div className="flex items-center justify-end p-4 border-b bg-white/50 backdrop-blur-sm">
-              <UserMenu />
-            </div>
-          )}
+          {/* Always show header with UserMenu - either with controls for admin campaigns/adsets/ads or just UserMenu for others */}
+          <div className="flex items-center justify-between p-4 border-b bg-white/50 backdrop-blur-sm">
+            {shouldShowHeader ? (
+              <>
+                <Header 
+                  activeTab={activeTab} 
+                  viewMode={viewMode} 
+                  setViewMode={setViewMode} 
+                />
+                <UserMenu />
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-4">
+                  <div>
+                    <h1 className="text-2xl font-bold text-slate-800">
+                      {activeTab === 'dashboard' && 'Dashboard'}
+                      {activeTab === 'tickets' && (isAdmin ? 'Gerenciar Chamados' : 'Meus Chamados')}
+                      {activeTab === 'creatives' && (isAdmin ? 'Gerenciar Criativos' : 'Meus Criativos')}
+                      {activeTab === 'clients-management' && 'Gerenciar Clientes'}
+                      {activeTab === 'settings' && 'Configurações'}
+                      {activeTab === 'whatsapp-reports' && 'Relatórios WhatsApp'}
+                      {activeTab === 'metrics-objectives' && 'Métricas e Objetivos'}
+                    </h1>
+                    <p className="text-sm text-slate-500">
+                      {isAdmin ? 'Área Administrativa' : 'Área do Cliente'}
+                    </p>
+                  </div>
+                </div>
+                <UserMenu />
+              </>
+            )}
+          </div>
           <main className="flex-1 p-6 overflow-auto">
             {renderContent()}
           </main>
