@@ -63,42 +63,49 @@ const Index = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <div className="flex-1 flex flex-col">
-          {/* Always show header with UserMenu - either with controls for admin campaigns/adsets/ads or just UserMenu for others */}
-          <div className="flex items-center justify-between p-4 border-b bg-white/50 backdrop-blur-sm">
-            {shouldShowHeader ? (
-              <>
-                <Header 
-                  activeTab={activeTab} 
-                  viewMode={viewMode} 
-                  setViewMode={setViewMode} 
-                />
-                <UserMenu />
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-4">
-                  <div>
-                    <h1 className="text-2xl font-bold text-slate-800">
-                      {activeTab === 'dashboard' && 'Dashboard'}
-                      {activeTab === 'tickets' && (isAdmin ? 'Gerenciar Chamados' : 'Meus Chamados')}
-                      {activeTab === 'creatives' && (isAdmin ? 'Gerenciar Criativos' : 'Meus Criativos')}
-                      {activeTab === 'clients-management' && 'Gerenciar Clientes'}
-                      {activeTab === 'settings' && 'Configurações'}
-                      {activeTab === 'whatsapp-reports' && 'Relatórios WhatsApp'}
-                      {activeTab === 'metrics-objectives' && 'Métricas e Objetivos'}
-                    </h1>
-                    <p className="text-sm text-slate-500">
-                      {isAdmin ? 'Área Administrativa' : 'Área do Cliente'}
-                    </p>
+        
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header sempre presente */}
+          <div className="border-b bg-white/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between p-4">
+              {shouldShowHeader ? (
+                <>
+                  <Header 
+                    activeTab={activeTab} 
+                    viewMode={viewMode} 
+                    setViewMode={setViewMode} 
+                  />
+                  <UserMenu />
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className="min-w-0">
+                      <h1 className="text-2xl font-bold text-slate-800 truncate">
+                        {activeTab === 'dashboard' && 'Dashboard'}
+                        {activeTab === 'tickets' && (isAdmin ? 'Gerenciar Chamados' : 'Meus Chamados')}
+                        {activeTab === 'creatives' && (isAdmin ? 'Gerenciar Criativos' : 'Meus Criativos')}
+                        {activeTab === 'clients-management' && 'Gerenciar Clientes'}
+                        {activeTab === 'settings' && 'Configurações'}
+                        {activeTab === 'whatsapp-reports' && 'Relatórios WhatsApp'}
+                        {activeTab === 'metrics-objectives' && 'Métricas e Objetivos'}
+                      </h1>
+                      <p className="text-sm text-slate-500 truncate">
+                        {isAdmin ? 'Área Administrativa' : 'Área do Cliente'}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <UserMenu />
-              </>
-            )}
+                  <UserMenu />
+                </>
+              )}
+            </div>
           </div>
-          <main className="flex-1 p-6 overflow-auto">
-            {renderContent()}
+
+          {/* Conteúdo principal */}
+          <main className="flex-1 p-4 lg:p-6 overflow-auto">
+            <div className="max-w-full">
+              {renderContent()}
+            </div>
           </main>
         </div>
       </div>

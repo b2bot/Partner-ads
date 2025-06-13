@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { DateRangeFilter } from './DateRangeFilter';
+import { GlobalSearch } from './GlobalSearch';
+import { QuickCreateButton } from './QuickCreateButton';
 
 interface HeaderProps {
   activeTab: string;
@@ -41,27 +43,36 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
   const showDateFilter = ['dashboard', 'campaigns', 'adsets', 'ads'].includes(activeTab);
 
   return (
-    <header className="bg-white/80 backdrop-blur-md border-b border-blue-100 p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 p-4">
+      <div className="flex items-center justify-between gap-4">
+        {/* Lado esquerdo - Título e Trigger */}
+        <div className="flex items-center gap-4 min-w-0">
           <SidebarTrigger className="lg:hidden" />
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">{getTabTitle()}</h1>
-            <p className="text-sm text-slate-500">Gerencie suas campanhas do Facebook Ads</p>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-slate-800 truncate">{getTabTitle()}</h1>
+            <p className="text-sm text-slate-500 truncate">Gerencie suas campanhas do Facebook Ads</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Centro - Busca Global (apenas para admins) */}
+        <div className="hidden lg:flex flex-1 justify-center max-w-md">
+          <GlobalSearch />
+        </div>
+
+        {/* Lado direito - Controles */}
+        <div className="flex items-center gap-3 flex-shrink-0">
           {showDateFilter && <DateRangeFilter />}
+          
+          <QuickCreateButton />
           
           {activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
             <>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="hidden sm:flex">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Atualizar
               </Button>
               
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="hidden sm:flex">
                 <Download className="w-4 h-4 mr-2" />
                 Exportar
               </Button>
@@ -89,6 +100,11 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Busca mobile */}
+      <div className="lg:hidden mt-4">
+        <GlobalSearch />
       </div>
     </header>
   );
