@@ -26,6 +26,7 @@ interface ActivityLogEntry {
   entity_type: 'campaign' | 'adset' | 'ad' | 'creative' | 'ticket' | 'client';
   entity_id: string;
   entity_name: string;
+  user_id: string | null;
   user_name: string;
   created_at: string;
   details?: any;
@@ -41,7 +42,10 @@ export function ActivityLog() {
         .order('created_at', { ascending: false })
         .limit(50);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching activity logs:', error);
+        throw error;
+      }
       return data as ActivityLogEntry[];
     },
     refetchInterval: 30000, // Refresh every 30 seconds
@@ -117,10 +121,10 @@ export function ActivityLog() {
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-slate-200 rounded-full skeleton"></div>
+                <div className="w-8 h-8 bg-slate-200 rounded-full animate-pulse"></div>
                 <div className="flex-1 space-y-1">
-                  <div className="h-4 bg-slate-200 rounded skeleton w-3/4"></div>
-                  <div className="h-3 bg-slate-200 rounded skeleton w-1/2"></div>
+                  <div className="h-4 bg-slate-200 rounded animate-pulse w-3/4"></div>
+                  <div className="h-3 bg-slate-200 rounded animate-pulse w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -150,7 +154,7 @@ export function ActivityLog() {
               logs.map((log) => (
                 <div
                   key={log.id}
-                  className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-smooth"
+                  className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   <div className="flex-shrink-0 mt-0.5">
                     {getActionIcon(log.action)}
