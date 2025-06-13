@@ -1,25 +1,21 @@
-
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
-  getMetaCredentials, 
-  getAdAccounts, 
-  getCampaigns, 
-  getAdSets, 
-  getAds,
-  getCampaignInsights,
-  AdAccount,
-  Campaign,
-  AdSet,
-  Ad,
-  CampaignInsights
-} from '@/lib/metaApi';
+  getMetaCredentials,
+  getAdAccountsWithRateLimit,
+  getCampaignsWithRateLimit,
+  getAdSetsWithRateLimit,
+  getAdsWithRateLimit,
+  getCampaignInsightsWithRateLimit
+} from '@/lib/metaApiWithRateLimit';
 import { useGlobalAdAccount } from './useGlobalAdAccount';
 import { useUserAccess } from './useUserAccess';
+import { useToast } from '@/hooks/use-toast';
 
 export function useMetaData() {
   const { selectedAdAccount, selectedAdAccountName, setSelectedAdAccount } = useGlobalAdAccount();
   const { getAccessibleMetaAccounts, isAdmin } = useUserAccess();
+  const { toast } = useToast();
   
   const { data: credentials, isLoading: credentialsLoading, error: credentialsError } = useQuery({
     queryKey: ['meta-credentials'],
@@ -41,18 +37,34 @@ export function useMetaData() {
         return [];
       }
       
-      console.log('Buscando contas de anúncios...');
+      console.log('Buscando contas de anúncios com rate limiting...');
       try {
-        const accounts = await getAdAccounts(credentials.access_token);
+        const accounts = await getAdAccountsWithRateLimit(credentials.access_token);
         console.log('Contas encontradas:', accounts.length);
         return accounts;
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro ao buscar contas:', error);
+        
+        // Exibir toast específico para rate limit
+        if (error.message?.includes('Rate limit') || error.message?.includes('Aguarde')) {
+          toast({
+            title: 'API Meta - Rate Limit',
+            description: error.message,
+            variant: 'destructive',
+          });
+        }
+        
         throw error;
       }
     },
     enabled: !!credentials?.access_token,
-    retry: 2,
+    retry: (failureCount, error: any) => {
+      // Não retry em case de rate limit
+      if (error.message?.includes('Rate limit') || error.message?.includes('Aguarde')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     retryDelay: 1000,
   });
 
@@ -66,25 +78,40 @@ export function useMetaData() {
 
   const { data: campaigns, isLoading: loadingCampaigns, refetch: refetchCampaigns } = useQuery({
     queryKey: ['campaigns', credentials?.access_token, selectedAdAccount],
-    queryFn: () => getCampaigns(credentials!.access_token, selectedAdAccount),
+    queryFn: () => getCampaignsWithRateLimit(credentials!.access_token, selectedAdAccount),
     enabled: !!credentials?.access_token && !!selectedAdAccount,
-    retry: 2,
+    retry: (failureCount, error: any) => {
+      if (error.message?.includes('Rate limit') || error.message?.includes('Aguarde')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     retryDelay: 1000,
   });
 
   const { data: adSets, isLoading: loadingAdSets, refetch: refetchAdSets } = useQuery({
     queryKey: ['adsets', credentials?.access_token, selectedAdAccount],
-    queryFn: () => getAdSets(credentials!.access_token, selectedAdAccount),
+    queryFn: () => getAdSetsWithRateLimit(credentials!.access_token, selectedAdAccount),
     enabled: !!credentials?.access_token && !!selectedAdAccount,
-    retry: 2,
+    retry: (failureCount, error: any) => {
+      if (error.message?.includes('Rate limit') || error.message?.includes('Aguarde')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     retryDelay: 1000,
   });
 
   const { data: ads, isLoading: loadingAds, refetch: refetchAds } = useQuery({
     queryKey: ['ads', credentials?.access_token, selectedAdAccount],
-    queryFn: () => getAds(credentials!.access_token, selectedAdAccount),
+    queryFn: () => getAdsWithRateLimit(credentials!.access_token, selectedAdAccount),
     enabled: !!credentials?.access_token && !!selectedAdAccount,
-    retry: 2,
+    retry: (failureCount, error: any) => {
+      if (error.message?.includes('Rate limit') || error.message?.includes('Aguarde')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     retryDelay: 1000,
   });
 
@@ -147,14 +174,20 @@ export function useMetaData() {
   };
 }
 
+// Hook para insights de campanha específica com rate limiting
 export function useCampaignInsights(campaignId: string, dateRange: { since: string; until: string }) {
   const { credentials } = useMetaData();
   
   return useQuery({
     queryKey: ['campaign-insights', campaignId, dateRange, credentials?.access_token],
-    queryFn: () => getCampaignInsights(credentials!.access_token, campaignId, dateRange),
+    queryFn: () => getCampaignInsightsWithRateLimit(credentials!.access_token, campaignId, dateRange),
     enabled: !!credentials?.access_token && !!campaignId,
-    retry: 2,
+    retry: (failureCount, error: any) => {
+      if (error.message?.includes('Rate limit') || error.message?.includes('Aguarde')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     retryDelay: 1000,
   });
 }
