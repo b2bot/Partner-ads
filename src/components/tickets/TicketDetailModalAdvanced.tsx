@@ -55,7 +55,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
   const [notaInterna, setNotaInterna] = useState(ticket.nota_interna || '');
   const [status, setStatus] = useState<'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido'>(ticket.status);
   const [error, setError] = useState('');
-  
   const queryClient = useQueryClient();
 
   // Buscar timeline do chamado (incluindo mensagens)
@@ -67,7 +66,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
         .select('*')
         .eq('chamado_id', ticket.id)
         .order('created_at', { ascending: true });
-      
       if (error) throw error;
       return data;
     },
@@ -88,25 +86,20 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
   const updateTicketMutation = useMutation({
     mutationFn: async (data: { resposta?: string; status?: string; nota_interna?: string }) => {
       const updateData: any = {};
-      
       if (data.resposta !== undefined) {
         updateData.resposta = data.resposta;
         updateData.respondido_por = user?.id;
       }
-      
       if (data.status !== undefined) {
         updateData.status = data.status;
       }
-
       if (data.nota_interna !== undefined) {
         updateData.nota_interna = data.nota_interna;
       }
-
       const { error } = await supabase
         .from('chamados')
         .update(updateData)
         .eq('id', ticket.id);
-
       if (error) throw error;
     },
     onSuccess: () => {
@@ -124,7 +117,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
     if (isAdmin) {
       updateTicketMutation.mutate({
         resposta: resposta.trim() || undefined,
@@ -154,8 +146,7 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
     }
   };
 
-  const getStatusOptions = () => {
-    return [
+  const getStatusOptions = () => [
       { value: 'novo', label: 'Novo' },
       { value: 'aguardando_equipe', label: 'Aguardando Equipe' },
       { value: 'aguardando_cliente', label: 'Aguardando Cliente' },
@@ -163,13 +154,9 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
       { value: 'em_andamento', label: 'Em Andamento' },
       { value: 'resolvido', label: 'Resolvido' }
     ];
-  };
 
   // Lógica de abas conforme perfil
   const defaultTab = isAdmin ? 'timeline' : 'timeline';
-
-  // Para clientes: Timeline | Detalhes | Enviar mensagem
-  // Para admins:   Timeline | Detalhes | Administração
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -186,7 +173,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
               size="lg"
             />
           </div>
-          
           <div className="mt-4">
             <TicketStepper status={ticket.status} categoria={ticket.categoria} />
           </div>
@@ -233,7 +219,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                       <p className="text-gray-800 whitespace-pre-wrap">{ticket.mensagem}</p>
                     </div>
                   </div>
-
                   {ticket.arquivo_url && (
                     <div>
                       <Label className="text-sm font-medium text-gray-600">Arquivo anexado:</Label>
@@ -249,7 +234,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                       </div>
                     </div>
                   )}
-
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <Label className="text-gray-600">Categoria:</Label>
@@ -268,7 +252,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                       <p className="mt-1">{formatDate(ticket.updated_at)}</p>
                     </div>
                   </div>
-
                   {ticket.resposta && (
                     <div>
                       <Label className="text-sm font-medium text-gray-600">Última resposta da equipe:</Label>
@@ -283,21 +266,27 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
 
             {/* NOVA ABA SOMENTE PARA CLIENTE */}
             {!isAdmin && (
-              <TabsContent value="clientreply" className="flex-1 overflow-hidden px-6">
-                <div className="h-full flex flex-col">
+              <TabsContent 
+                value="clientreply" 
+                className="flex-1 overflow-hidden px-0" 
+                style={{ height: '100%' }}
+              >
+                <div className="h-full min-h-0 flex flex-col px-6">
                   <h3 className="font-medium mb-3 flex items-center gap-2 flex-shrink-0">
                     <MessageCircle className="h-4 w-4" />
                     Enviar mensagem
                   </h3>
-                  <div className="flex-1 min-h-0">
-                    <ClientMessageForm 
-                      ticketId={ticket.id}
-                      onSuccess={() => {
-                        queryClient.invalidateQueries({ queryKey: ['ticket-timeline', ticket.id] });
-                        queryClient.invalidateQueries({ queryKey: ['tickets'] });
-                      }}
-                      className="max-w-xl mx-auto"
-                    />
+                  <div className="flex-1 min-h-0 flex flex-col">
+                    <div className="flex-1 flex flex-col">
+                      <ClientMessageForm
+                        ticketId={ticket.id}
+                        onSuccess={() => {
+                          queryClient.invalidateQueries({ queryKey: ['ticket-timeline', ticket.id] });
+                          queryClient.invalidateQueries({ queryKey: ['tickets'] });
+                        }}
+                        className="flex flex-col flex-1 h-full max-w-full w-full"
+                      />
+                    </div>
                   </div>
                 </div>
               </TabsContent>
@@ -326,7 +315,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                         </SelectContent>
                       </Select>
                     </div>
-
                     <div>
                       <Label htmlFor="resposta">Resposta ao cliente</Label>
                       <Textarea
@@ -338,7 +326,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                         className="mt-2"
                       />
                     </div>
-
                     <div>
                       <Label htmlFor="nota-interna" className="flex items-center gap-2">
                         <User className="h-4 w-4" />
@@ -356,7 +343,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                         Esta nota não será visível para o cliente
                       </p>
                     </div>
-
                     {error && (
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
@@ -369,7 +355,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
             )}
           </Tabs>
         </div>
-
         <div className="flex-shrink-0 px-6 py-4 border-t bg-gray-50">
           {isAdmin ? (
             <div className="flex gap-3">
@@ -394,5 +379,4 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
     </Dialog>
   );
 }
-
 // ... fim do arquivo
