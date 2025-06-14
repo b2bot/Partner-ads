@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TicketStatusBadge } from './TicketStatusBadge';
 import { TicketStepper } from './TicketStepper';
 import { TicketTimeline } from './TicketTimeline';
-import { Download, FileText, Clock, User, AlertCircle } from 'lucide-react';
+import { Download, FileText, Clock, User, AlertCircle, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Ticket {
@@ -30,6 +29,16 @@ interface Ticket {
   created_at: string;
   updated_at: string;
   clientes?: { nome: string };
+}
+
+interface TimelineEntry {
+  id: string;
+  tipo: string;
+  conteudo: string;
+  autor_nome: string;
+  autor_tipo: 'cliente' | 'admin' | 'sistema';
+  created_at: string;
+  metadata?: any;
 }
 
 interface TicketDetailModalAdvancedProps {
@@ -48,7 +57,7 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
   const queryClient = useQueryClient();
 
   // Buscar timeline do chamado
-  const { data: timeline } = useQuery({
+  const { data: timelineData } = useQuery({
     queryKey: ['ticket-timeline', ticket.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -62,6 +71,17 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
     },
     enabled: open,
   });
+
+  // Mapear dados para o tipo correto
+  const timeline: TimelineEntry[] = timelineData?.map(item => ({
+    id: item.id,
+    tipo: item.tipo,
+    conteudo: item.conteudo,
+    autor_nome: item.autor_nome,
+    autor_tipo: item.autor_tipo as 'cliente' | 'admin' | 'sistema',
+    created_at: item.created_at,
+    metadata: item.metadata
+  })) || [];
 
   const updateTicketMutation = useMutation({
     mutationFn: async (data: { resposta?: string; status?: string; nota_interna?: string }) => {

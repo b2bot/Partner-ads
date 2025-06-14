@@ -5,8 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, CalendarIcon, Download, Upload, Search, Filter, BarChart3 } from 'lucide-react';
+import { Calendar as CalendarIcon, Download, Upload, Search, Filter, BarChart3 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -57,6 +58,7 @@ export default function WhatsAppReportsTab() {
     }
   ];
 
+  // ... keep existing code (totalMetrics calculation)
   const totalMetrics = {
     totalMessages: reports.reduce((sum, r) => sum + r.totalMessages, 0),
     delivered: reports.reduce((sum, r) => sum + r.delivered, 0),
@@ -117,7 +119,7 @@ export default function WhatsAppReportsTab() {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={(d) => setDate(d)}
+                    onSelect={setDate}
                     initialFocus
                     className={cn("p-3 pointer-events-auto")}
                   />
