@@ -49,42 +49,54 @@ export type Database = {
         Row: {
           aberto_por: string | null
           arquivo_url: string | null
+          categoria: string | null
           cliente_id: string
           created_at: string
           id: string
           mensagem: string
+          nota_interna: string | null
+          prioridade: string | null
           respondido_por: string | null
           resposta: string | null
           status: Database["public"]["Enums"]["ticket_status"]
           status_detalhado: string | null
+          tempo_resposta_horas: number | null
           titulo: string
           updated_at: string
         }
         Insert: {
           aberto_por?: string | null
           arquivo_url?: string | null
+          categoria?: string | null
           cliente_id: string
           created_at?: string
           id?: string
           mensagem: string
+          nota_interna?: string | null
+          prioridade?: string | null
           respondido_por?: string | null
           resposta?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           status_detalhado?: string | null
+          tempo_resposta_horas?: number | null
           titulo: string
           updated_at?: string
         }
         Update: {
           aberto_por?: string | null
           arquivo_url?: string | null
+          categoria?: string | null
           cliente_id?: string
           created_at?: string
           id?: string
           mensagem?: string
+          nota_interna?: string | null
+          prioridade?: string | null
           respondido_por?: string | null
           resposta?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           status_detalhado?: string | null
+          tempo_resposta_horas?: number | null
           titulo?: string
           updated_at?: string
         }
@@ -101,6 +113,47 @@ export type Database = {
             columns: ["respondido_por"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chamados_anexos: {
+        Row: {
+          chamado_id: string | null
+          created_at: string | null
+          id: string
+          nome_arquivo: string
+          tamanho_arquivo: number | null
+          tipo_arquivo: string
+          uploaded_by: string | null
+          url_arquivo: string
+        }
+        Insert: {
+          chamado_id?: string | null
+          created_at?: string | null
+          id?: string
+          nome_arquivo: string
+          tamanho_arquivo?: number | null
+          tipo_arquivo: string
+          uploaded_by?: string | null
+          url_arquivo: string
+        }
+        Update: {
+          chamado_id?: string | null
+          created_at?: string | null
+          id?: string
+          nome_arquivo?: string
+          tamanho_arquivo?: number | null
+          tipo_arquivo?: string
+          uploaded_by?: string | null
+          url_arquivo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chamados_anexos_chamado_id_fkey"
+            columns: ["chamado_id"]
+            isOneToOne: false
+            referencedRelation: "chamados"
             referencedColumns: ["id"]
           },
         ]
@@ -146,6 +199,50 @@ export type Database = {
             columns: ["usuario_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chamados_timeline: {
+        Row: {
+          autor_id: string | null
+          autor_nome: string
+          autor_tipo: string
+          chamado_id: string | null
+          conteudo: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          tipo: string
+        }
+        Insert: {
+          autor_id?: string | null
+          autor_nome: string
+          autor_tipo?: string
+          chamado_id?: string | null
+          conteudo?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          tipo?: string
+        }
+        Update: {
+          autor_id?: string | null
+          autor_nome?: string
+          autor_tipo?: string
+          chamado_id?: string | null
+          conteudo?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chamados_timeline_chamado_id_fkey"
+            columns: ["chamado_id"]
+            isOneToOne: false
+            referencedRelation: "chamados"
             referencedColumns: ["id"]
           },
         ]
