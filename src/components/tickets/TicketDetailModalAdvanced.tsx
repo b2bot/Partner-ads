@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TicketStatusBadge } from './TicketStatusBadge';
@@ -166,6 +165,12 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
     ];
   };
 
+  // Lógica de abas conforme perfil
+  const defaultTab = isAdmin ? 'timeline' : 'timeline';
+
+  // Para clientes: Timeline | Detalhes | Enviar mensagem
+  // Para admins:   Timeline | Detalhes | Administração
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
@@ -188,10 +193,11 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
         </DialogHeader>
         
         <div className="flex-1 overflow-hidden">
-          <Tabs defaultValue="timeline" className="h-full flex flex-col">
-            <TabsList className="grid w-full grid-cols-3 mx-6 mb-4 flex-shrink-0">
+          <Tabs defaultValue={defaultTab} className="h-full flex flex-col">
+            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-3"} mx-6 mb-4 flex-shrink-0`}>
               <TabsTrigger value="timeline">Timeline</TabsTrigger>
               <TabsTrigger value="details">Detalhes</TabsTrigger>
+              {!isAdmin && <TabsTrigger value="clientreply">Enviar mensagem</TabsTrigger>}
               {isAdmin && <TabsTrigger value="admin">Administração</TabsTrigger>}
             </TabsList>
 
@@ -201,7 +207,7 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                   <Clock className="h-4 w-4" />
                   Histórico de Conversas
                 </h3>
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 min-h-0">
                   {timeline && timeline.length > 0 ? (
                     <ScrollArea className="h-full pr-4">
                       <TicketTimeline timeline={timeline} />
@@ -215,18 +221,6 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                     </div>
                   )}
                 </div>
-                
-                {/* Formulário de resposta para clientes */}
-                {!isAdmin && (
-                  <ClientMessageForm 
-                    ticketId={ticket.id}
-                    onSuccess={() => {
-                      queryClient.invalidateQueries({ queryKey: ['ticket-timeline', ticket.id] });
-                      queryClient.invalidateQueries({ queryKey: ['tickets'] });
-                    }}
-                    className="mt-4 -mx-6"
-                  />
-                )}
               </div>
             </TabsContent>
 
@@ -287,6 +281,29 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
               </ScrollArea>
             </TabsContent>
 
+            {/* NOVA ABA SOMENTE PARA CLIENTE */}
+            {!isAdmin && (
+              <TabsContent value="clientreply" className="flex-1 overflow-hidden px-6">
+                <div className="h-full flex flex-col">
+                  <h3 className="font-medium mb-3 flex items-center gap-2 flex-shrink-0">
+                    <MessageCircle className="h-4 w-4" />
+                    Enviar mensagem
+                  </h3>
+                  <div className="flex-1 min-h-0">
+                    <ClientMessageForm 
+                      ticketId={ticket.id}
+                      onSuccess={() => {
+                        queryClient.invalidateQueries({ queryKey: ['ticket-timeline', ticket.id] });
+                        queryClient.invalidateQueries({ queryKey: ['tickets'] });
+                      }}
+                      className="max-w-xl mx-auto"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+            )}
+
+            {/* Aba administração (apenas admin) */}
             {isAdmin && (
               <TabsContent value="admin" className="flex-1 overflow-hidden px-6">
                 <ScrollArea className="h-full pr-4">
@@ -377,3 +394,5 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
     </Dialog>
   );
 }
+
+// ... fim do arquivo
