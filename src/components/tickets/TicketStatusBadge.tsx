@@ -1,6 +1,6 @@
 
 import { Badge } from '@/components/ui/badge';
-import { Clock, AlertCircle, CheckCircle, User, Eye, Play } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle, User, Eye, Play, UserCheck } from 'lucide-react';
 
 interface TicketStatusBadgeProps {
   status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
@@ -20,7 +20,7 @@ export function TicketStatusBadge({ status, prioridade, size = 'md' }: TicketSta
       case 'aguardando_equipe':
         return {
           color: 'bg-red-100 text-red-800 border-red-200',
-          icon: Clock,
+          icon: UserCheck,
           label: 'Aguardando Equipe'
         };
       case 'aguardando_cliente':

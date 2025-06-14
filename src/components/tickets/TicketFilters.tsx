@@ -80,7 +80,10 @@ export function TicketFilters({ onFiltersChange, isAdmin, clientes = [] }: Ticke
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="aberto">Aberto</SelectItem>
+              <SelectItem value="novo">Novo</SelectItem>
+              <SelectItem value="aguardando_equipe">Aguardando Equipe</SelectItem>
+              <SelectItem value="aguardando_cliente">Aguardando Cliente</SelectItem>
+              <SelectItem value="em_analise">Em Análise</SelectItem>
               <SelectItem value="em_andamento">Em Andamento</SelectItem>
               <SelectItem value="resolvido">Resolvido</SelectItem>
             </SelectContent>

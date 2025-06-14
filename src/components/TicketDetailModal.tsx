@@ -10,14 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { MessageCircle, Clock, CheckCircle, Download } from 'lucide-react';
+import { MessageCircle, Clock, CheckCircle, Download, Eye, Play, UserCheck, User } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Ticket {
   id: string;
   titulo: string;
   mensagem: string;
-  status: 'aberto' | 'em_andamento' | 'resolvido';
+  status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
   resposta?: string;
   arquivo_url?: string;
   created_at: string;
@@ -33,7 +33,7 @@ interface TicketDetailModalProps {
 export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalProps) {
   const { isAdmin, user } = useAuth();
   const [resposta, setResposta] = useState(ticket.resposta || '');
-  const [status, setStatus] = useState<'aberto' | 'em_andamento' | 'resolvido'>(ticket.status);
+  const [status, setStatus] = useState<'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido'>(ticket.status);
   const [error, setError] = useState('');
   
   const queryClient = useQueryClient();
@@ -71,10 +71,16 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'aberto':
+      case 'novo':
         return <MessageCircle className="h-4 w-4" />;
+      case 'aguardando_equipe':
+        return <UserCheck className="h-4 w-4" />;
+      case 'aguardando_cliente':
+        return <User className="h-4 w-4" />;
+      case 'em_analise':
+        return <Eye className="h-4 w-4" />;
       case 'em_andamento':
-        return <Clock className="h-4 w-4" />;
+        return <Play className="h-4 w-4" />;
       case 'resolvido':
         return <CheckCircle className="h-4 w-4" />;
       default:
@@ -84,8 +90,14 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'aberto':
+      case 'novo':
+        return 'bg-purple-100 text-purple-800';
+      case 'aguardando_equipe':
         return 'bg-red-100 text-red-800';
+      case 'aguardando_cliente':
+        return 'bg-orange-100 text-orange-800';
+      case 'em_analise':
+        return 'bg-blue-100 text-blue-800';
       case 'em_andamento':
         return 'bg-yellow-100 text-yellow-800';
       case 'resolvido':
@@ -97,8 +109,14 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'aberto':
-        return 'Aberto';
+      case 'novo':
+        return 'Novo';
+      case 'aguardando_equipe':
+        return 'Aguardando Equipe';
+      case 'aguardando_cliente':
+        return 'Aguardando Cliente';
+      case 'em_analise':
+        return 'Em Análise';
       case 'em_andamento':
         return 'Em Andamento';
       case 'resolvido':
@@ -121,7 +139,7 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
   };
 
   const handleStatusChange = (value: string) => {
-    setStatus(value as 'aberto' | 'em_andamento' | 'resolvido');
+    setStatus(value as 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido');
   };
 
   return (
@@ -193,7 +211,10 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="aberto">Aberto</SelectItem>
+                    <SelectItem value="novo">Novo</SelectItem>
+                    <SelectItem value="aguardando_equipe">Aguardando Equipe</SelectItem>
+                    <SelectItem value="aguardando_cliente">Aguardando Cliente</SelectItem>
+                    <SelectItem value="em_analise">Em Análise</SelectItem>
                     <SelectItem value="em_andamento">Em Andamento</SelectItem>
                     <SelectItem value="resolvido">Resolvido</SelectItem>
                   </SelectContent>

@@ -1,11 +1,27 @@
 
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TicketStatusBadge } from './TicketStatusBadge';
 import { TicketStepper } from './TicketStepper';
-import { MessageCircle, Clock, Paperclip, User, Calendar } from 'lucide-react';
+import { MessageCircle, Clock, Paperclip, User, Calendar, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface TicketCardProps {
   ticket: {
@@ -26,6 +42,43 @@ interface TicketCardProps {
 }
 
 export function TicketCard({ ticket, isAdmin, onClick }: TicketCardProps) {
+  const { isAdmin: isAuthAdmin } = useAuth();
+  const queryClient = useQueryClient();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const deleteTicketMutation = useMutation({
+    mutationFn: async (ticketId: string) => {
+      // Primeiro, deletar mensagens relacionadas
+      await supabase
+        .from('chamados_mensagens')
+        .delete()
+        .eq('chamado_id', ticketId);
+
+      // Depois, deletar o timeline
+      await supabase
+        .from('chamados_timeline')
+        .delete()
+        .eq('chamado_id', ticketId);
+
+      // Por fim, deletar o chamado
+      const { error } = await supabase
+        .from('chamados')
+        .delete()
+        .eq('id', ticketId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      toast.success('Chamado excluído com sucesso!');
+      setDeleteDialogOpen(false);
+    },
+    onError: (error) => {
+      console.error('Erro ao excluir chamado:', error);
+      toast.error('Erro ao excluir chamado. Tente novamente.');
+    },
+  });
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -48,6 +101,15 @@ export function TicketCard({ ticket, isAdmin, onClick }: TicketCardProps) {
 
   const getInitials = (nome: string) => {
     return nome.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    deleteTicketMutation.mutate(ticket.id);
   };
 
   return (
@@ -89,6 +151,41 @@ export function TicketCard({ ticket, isAdmin, onClick }: TicketCardProps) {
               </div>
             </div>
           </div>
+
+          {isAuthAdmin && (
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  onClick={handleDeleteClick}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tem certeza que deseja excluir este chamado? Esta ação não pode ser desfeita.
+                    <br /><br />
+                    <strong>Chamado:</strong> {ticket.titulo}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    className="bg-red-600 hover:bg-red-700"
+                    disabled={deleteTicketMutation.isPending}
+                  >
+                    {deleteTicketMutation.isPending ? 'Excluindo...' : 'Excluir'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
 
         <TicketStepper status={ticket.status} categoria={ticket.categoria} />

@@ -6,7 +6,7 @@ import { useUserAccess } from '@/hooks/useUserAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Headphones, TrendingUp, Clock, CheckCircle, User, Eye } from 'lucide-react';
+import { Plus, Headphones, TrendingUp, Clock, CheckCircle, User, Eye, UserCheck, Play } from 'lucide-react';
 import { TicketFilters } from './tickets/TicketFilters';
 import { TicketCard } from './tickets/TicketCard';
 import { CreateTicketModalAdvanced } from './tickets/CreateTicketModalAdvanced';
@@ -186,11 +186,11 @@ export function TicketsTabAdvanced() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Aguardando</p>
+                <p className="text-sm font-medium text-gray-600">Aguard. Equipe</p>
                 <p className="text-2xl font-bold text-red-600">{stats.aguardandoEquipe}</p>
               </div>
               <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <Clock className="h-5 w-5 text-red-600" />
+                <UserCheck className="h-5 w-5 text-red-600" />
               </div>
             </div>
           </CardContent>
@@ -218,7 +218,7 @@ export function TicketsTabAdvanced() {
                 <p className="text-2xl font-bold text-yellow-600">{stats.emAndamento}</p>
               </div>
               <div className="h-10 w-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <Clock className="h-5 w-5 text-yellow-600" />
+                <Play className="h-5 w-5 text-yellow-600" />
               </div>
             </div>
           </CardContent>
