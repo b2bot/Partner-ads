@@ -48,18 +48,18 @@ export function AdsTab() {
       filtered = filtered.filter(ad => ad.account_id === filters.account);
     }
 
-    if (filters.campaign) {
+    if (filters.campaign && filters.campaign !== 'all') {
       const adSet = adSets?.find(adset => adset.campaign_id === filters.campaign);
       if (adSet) {
         filtered = filtered.filter(ad => ad.adset_id === adSet.id);
       }
     }
 
-    if (filters.adset) {
+    if (filters.adset && filters.adset !== 'all') {
       filtered = filtered.filter(ad => ad.adset_id === filters.adset);
     }
 
-    if (filters.status) {
+    if (filters.status && filters.status !== 'all') {
       filtered = filtered.filter(ad => ad.status === filters.status);
     }
 

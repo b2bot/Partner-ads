@@ -44,7 +44,7 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
   const [telefone, setTelefone] = useState(client.telefone || '');
   const [empresa, setEmpresa] = useState(client.empresa || '');
   const [observacoesInternas, setObservacoesInternas] = useState(client.observacoes_internas || '');
-  const [tipoAcesso, setTipoAcesso] = useState<'api' | 'sheet'>(client.tipo_acesso);
+  const [tipoAcesso, setTipoAcesso] = useState<'api' | 'sheet' | 'placeholder'>(client.tipo_acesso || 'placeholder');
   const [contasMeta, setContasMeta] = useState<Array<{ id?: string; identificador: string; nome: string }>>([]);
   const [contasGoogle, setContasGoogle] = useState<Array<{ id?: string; identificador: string; nome: string }>>([]);
   const [error, setError] = useState('');
@@ -174,6 +174,11 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
       return;
     }
 
+    if (tipoAcesso === 'placeholder') {
+      setError('Tipo de acesso é obrigatório.');
+      return;
+    }
+
     const allContas = [
       ...contasMeta.filter(c => c.identificador && c.nome).map(c => ({ ...c, tipo: 'meta' as const })),
       ...contasGoogle.filter(c => c.identificador && c.nome).map(c => ({ ...c, tipo: 'google' as const })),
@@ -185,7 +190,7 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
       telefone: telefone.trim(),
       empresa: empresa.trim(),
       observacoesInternas: observacoesInternas.trim(),
-      tipoAcesso,
+      tipoAcesso: tipoAcesso as 'api' | 'sheet',
       contas: allContas,
     });
   };
@@ -255,11 +260,12 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
 
           <div className="space-y-2">
             <Label htmlFor="tipoAcesso">Tipo de acesso aos dados</Label>
-            <Select value={tipoAcesso} onValueChange={(value: 'api' | 'sheet') => setTipoAcesso(value)}>
+            <Select value={tipoAcesso} onValueChange={(value: 'api' | 'sheet' | 'placeholder') => setTipoAcesso(value)}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Selecione o tipo de acesso" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="placeholder" disabled>Selecione o tipo de acesso</SelectItem>
                 <SelectItem value="api">API</SelectItem>
                 <SelectItem value="sheet">Google Sheets</SelectItem>
               </SelectContent>

@@ -49,7 +49,7 @@ export function CampaignsTab() {
       filtered = filtered.filter(campaign => campaign.account_id === filters.account);
     }
 
-    if (filters.status) {
+    if (filters.status && filters.status !== 'all') {
       filtered = filtered.filter(campaign => campaign.status === filters.status);
     }
 

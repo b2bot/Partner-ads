@@ -23,9 +23,9 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
   const [filters, setFilters] = useState({
     search: '',
     account: inheritedFilters.account || selectedAdAccount || '',
-    campaign: inheritedFilters.campaign || '',
-    adset: inheritedFilters.adset || '',
-    status: '',
+    campaign: inheritedFilters.campaign || 'all',
+    adset: inheritedFilters.adset || 'all',
+    status: 'all',
     dateRange: 'last_7_days',
   });
 
@@ -46,12 +46,12 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
       
       // Clear dependent filters when parent changes
       if (key === 'account') {
-        newFilters.campaign = '';
-        newFilters.adset = '';
+        newFilters.campaign = 'all';
+        newFilters.adset = 'all';
         // Update global account selection
         setSelectedAdAccount(value);
       } else if (key === 'campaign') {
-        newFilters.adset = '';
+        newFilters.adset = 'all';
       }
       
       return newFilters;
@@ -62,9 +62,9 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
     setFilters({
       search: '',
       account: selectedAdAccount || '',
-      campaign: '',
-      adset: '',
-      status: '',
+      campaign: 'all',
+      adset: 'all',
+      status: 'all',
       dateRange: 'last_7_days',
     });
   };
@@ -79,7 +79,7 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
     if (filters.account) {
       filtered = filtered.filter(adset => adset.account_id === filters.account);
     }
-    if (filters.campaign) {
+    if (filters.campaign && filters.campaign !== 'all') {
       filtered = filtered.filter(adset => adset.campaign_id === filters.campaign);
     }
     return filtered;
@@ -130,10 +130,10 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
                 </label>
                 <Select value={filters.campaign} onValueChange={(value) => handleFilterChange('campaign', value)}>
                   <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Todas as campanhas" />
+                    <SelectValue placeholder="Selecione uma campanha" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas as campanhas</SelectItem>
+                    <SelectItem value="all" disabled>Todas as campanhas</SelectItem>
                     {getFilteredCampaigns().map((campaign) => (
                       <SelectItem key={campaign.id} value={campaign.id}>
                         <span className="truncate">{campaign.name}</span>
@@ -153,10 +153,10 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
                 </label>
                 <Select value={filters.adset} onValueChange={(value) => handleFilterChange('adset', value)}>
                   <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Todos os conjuntos" />
+                    <SelectValue placeholder="Selecione um conjunto" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos os conjuntos</SelectItem>
+                    <SelectItem value="all" disabled>Todos os conjuntos</SelectItem>
                     {getFilteredAdSets().map((adset) => (
                       <SelectItem key={adset.id} value={adset.id}>
                         <span className="truncate">{adset.name}</span>
@@ -174,10 +174,10 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
               </label>
               <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
                 <SelectTrigger className="text-sm">
-                  <SelectValue placeholder="Todos os status" />
+                  <SelectValue placeholder="Selecione um status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="all" disabled>Todos os status</SelectItem>
                   <SelectItem value="ACTIVE">Ativo</SelectItem>
                   <SelectItem value="PAUSED">Pausado</SelectItem>
                   <SelectItem value="ARCHIVED">Arquivado</SelectItem>

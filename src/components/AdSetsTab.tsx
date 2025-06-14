@@ -48,11 +48,11 @@ export function AdSetsTab() {
       filtered = filtered.filter(adset => adset.account_id === filters.account);
     }
 
-    if (filters.campaign) {
+    if (filters.campaign && filters.campaign !== 'all') {
       filtered = filtered.filter(adset => adset.campaign_id === filters.campaign);
     }
 
-    if (filters.status) {
+    if (filters.status && filters.status !== 'all') {
       filtered = filtered.filter(adset => adset.status === filters.status);
     }
 

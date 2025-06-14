@@ -22,7 +22,7 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    status: '',
+    status: 'placeholder',
     daily_budget: '',
     lifetime_budget: ''
   });
@@ -31,7 +31,7 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
     if (campaign) {
       setFormData({
         name: campaign.name || '',
-        status: campaign.status || '',
+        status: campaign.status || 'ACTIVE',
         daily_budget: campaign.daily_budget ? (parseInt(campaign.daily_budget) / 100).toString() : '',
         lifetime_budget: campaign.lifetime_budget ? (parseInt(campaign.lifetime_budget) / 100).toString() : ''
       });
@@ -97,9 +97,10 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
             <Label htmlFor="status">Status</Label>
             <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Selecione um status" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="placeholder" disabled>Selecione um status</SelectItem>
                 <SelectItem value="ACTIVE">Ativa</SelectItem>
                 <SelectItem value="PAUSED">Pausada</SelectItem>
                 <SelectItem value="DELETED">Excluída</SelectItem>

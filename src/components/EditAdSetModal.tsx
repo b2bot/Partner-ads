@@ -22,7 +22,7 @@ export function EditAdSetModal({ adSet, isOpen, onClose, onSuccess }: EditAdSetM
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    status: '',
+    status: 'placeholder',
     daily_budget: '',
     lifetime_budget: ''
   });
@@ -31,7 +31,7 @@ export function EditAdSetModal({ adSet, isOpen, onClose, onSuccess }: EditAdSetM
     if (adSet) {
       setFormData({
         name: adSet.name || '',
-        status: adSet.status || '',
+        status: adSet.status || 'ACTIVE',
         daily_budget: adSet.daily_budget ? (parseInt(adSet.daily_budget) / 100).toString() : '',
         lifetime_budget: adSet.lifetime_budget ? (parseInt(adSet.lifetime_budget) / 100).toString() : ''
       });
@@ -97,9 +97,10 @@ export function EditAdSetModal({ adSet, isOpen, onClose, onSuccess }: EditAdSetM
             <Label htmlFor="status">Status</Label>
             <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Selecione um status" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="placeholder" disabled>Selecione um status</SelectItem>
                 <SelectItem value="ACTIVE">Ativo</SelectItem>
                 <SelectItem value="PAUSED">Pausado</SelectItem>
                 <SelectItem value="DELETED">Excluído</SelectItem>
