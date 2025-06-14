@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -15,6 +16,56 @@ const defaultConfig: MetricsConfig = {
   campaigns: ['impressions', 'clicks', 'spend', 'ctr', 'cpc', 'reach'],
   adsets: ['impressions', 'clicks', 'spend', 'ctr', 'cpc'],
   ads: ['impressions', 'clicks', 'spend', 'ctr', 'cpc']
+};
+
+// Métricas disponíveis expandidas
+export const AVAILABLE_METRICS = {
+  performance: [
+    'impressions',
+    'reach', 
+    'clicks',
+    'unique_clicks',
+    'spend',
+    'frequency'
+  ],
+  conversion: [
+    'conversions',
+    'results',
+    'cost_per_result',
+    'purchases',
+    'leads'
+  ],
+  rates: [
+    'ctr',
+    'unique_ctr',
+    'conversion_rate'
+  ],
+  costs: [
+    'cpc',
+    'cost_per_unique_click',
+    'cpm',
+    'cost_per_conversion',
+    'cost_per_purchase'
+  ],
+  engagement: [
+    'post_engagement',
+    'page_engagement', 
+    'post_reactions',
+    'comment',
+    'share',
+    'like'
+  ],
+  video: [
+    'video_views',
+    'video_view_rate',
+    'cost_per_video_view',
+    'video_play_actions'
+  ],
+  traffic: [
+    'link_clicks',
+    'outbound_clicks',
+    'cost_per_outbound_click'
+  ]
 };
 
 export function useMetricsConfig() {

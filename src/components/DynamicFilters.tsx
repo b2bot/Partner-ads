@@ -78,23 +78,23 @@ export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
   const typeLabel = type === 'campaigns' ? 'campanhas' : type === 'adsets' ? 'conjuntos' : 'anúncios';
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Main Filters */}
       <Card className="border-slate-200 dark:border-slate-700">
-        <CardContent className="p-4 space-y-4">
+        <CardContent className="p-3 space-y-3">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-slate-400" />
             <Input
               placeholder={`Buscar ${typeLabel}...`}
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="pl-10 text-sm"
+              className="pl-8 text-xs h-8"
             />
           </div>
 
           {/* Specific Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             {/* Campaign Filter (for adsets and ads) */}
             {(type === 'adsets' || type === 'ads') && (
               <div className="space-y-1">
@@ -103,14 +103,14 @@ export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
                   Filtrar por Campanha
                 </label>
                 <Select value={filters.campaign} onValueChange={(value) => handleFilterChange('campaign', value)}>
-                  <SelectTrigger className="text-sm">
+                  <SelectTrigger className="text-xs h-8">
                     <SelectValue placeholder="Todas as campanhas" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas as campanhas</SelectItem>
                     {getFilteredCampaigns().map((campaign) => (
                       <SelectItem key={campaign.id} value={campaign.id}>
-                        <span className="truncate">{campaign.name}</span>
+                        <span className="truncate text-xs">{campaign.name}</span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -126,14 +126,14 @@ export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
                   Filtrar por Conjunto
                 </label>
                 <Select value={filters.adset} onValueChange={(value) => handleFilterChange('adset', value)}>
-                  <SelectTrigger className="text-sm">
+                  <SelectTrigger className="text-xs h-8">
                     <SelectValue placeholder="Todos os conjuntos" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos os conjuntos</SelectItem>
                     {getFilteredAdSets().map((adset) => (
                       <SelectItem key={adset.id} value={adset.id}>
-                        <span className="truncate">{adset.name}</span>
+                        <span className="truncate text-xs">{adset.name}</span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -147,7 +147,7 @@ export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
                 Status
               </label>
               <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
-                <SelectTrigger className="text-sm">
+                <SelectTrigger className="text-xs h-8">
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,7 +166,7 @@ export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
               variant="outline"
               size="sm"
               onClick={clearFilters}
-              className="text-xs"
+              className="text-xs h-7 px-2"
             >
               <X className="h-3 w-3 mr-1" />
               Limpar

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 const META_API_BASE = 'https://graph.facebook.com/v18.0';
@@ -263,31 +262,25 @@ export async function getAdCreativeImage(
   }
 }
 
-// Função para formatar valores de métricas
-export const formatMetricValue = (key: string, value: any): string => {
-  if (value === null || value === undefined) return '-';
+// Função para formatar valores de métricas - VERSÃO EXPANDIDA
+export const formatMetricValue = (data: any, key: string): string => {
+  if (!data || data[key] === null || data[key] === undefined) return '-';
   
+  const value = data[key];
   const numValue = typeof value === 'string' ? parseFloat(value) : value;
   
   if (isNaN(numValue)) return '-';
   
   switch (key) {
+    // Valores monetários
     case 'spend':
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(numValue);
-    
-    case 'ctr':
-    case 'unique_ctr':
-    case 'video_view_rate':
-    case 'canvas_avg_view_percent':
-      return `${numValue.toFixed(2)}%`;
-    
     case 'cpc':
     case 'cost_per_unique_click':
     case 'cpm':
     case 'cost_per_video_view':
+    case 'cost_per_result':
+    case 'cost_per_conversion':
+    case 'cost_per_purchase':
     case 'cost_per_inline_link_click':
     case 'cost_per_inline_post_engagement':
     case 'cost_per_outbound_click':
@@ -297,16 +290,52 @@ export const formatMetricValue = (key: string, value: any): string => {
         currency: 'BRL',
       }).format(numValue);
     
+    // Percentuais
+    case 'ctr':
+    case 'unique_ctr':
+    case 'video_view_rate':
+    case 'conversion_rate':
+    case 'canvas_avg_view_percent':
+      return `${numValue.toFixed(2)}%`;
+    
+    // Números decimais
     case 'frequency':
     case 'canvas_avg_view_time':
       return numValue.toFixed(2);
+    
+    // Números inteiros grandes (com separadores)
+    case 'impressions':
+    case 'reach':
+    case 'clicks':
+    case 'unique_clicks':
+    case 'conversions':
+    case 'results':
+    case 'purchases':
+    case 'leads':
+    case 'post_engagement':
+    case 'page_engagement':
+    case 'post_reactions':
+    case 'comment':
+    case 'share':
+    case 'like':
+    case 'photo_view':
+    case 'video_views':
+    case 'video_play_actions':
+    case 'link_clicks':
+    case 'outbound_clicks':
+    case 'unique_outbound_clicks':
+    case 'website_clicks':
+    case 'unique_inline_link_clicks':
+    case 'inline_link_clicks':
+    case 'inline_post_engagement':
+      return new Intl.NumberFormat('pt-BR').format(Math.round(numValue));
     
     default:
       return new Intl.NumberFormat('pt-BR').format(Math.round(numValue));
   }
 };
 
-// Função para obter nome amigável da métrica
+// Função para obter nome amigável da métrica - VERSÃO EXPANDIDA
 export const getMetricDisplayName = (key: string): string => {
   const displayNames: { [key: string]: string } = {
     impressions: 'Impressões',
@@ -314,14 +343,20 @@ export const getMetricDisplayName = (key: string): string => {
     clicks: 'Cliques',
     unique_clicks: 'Cliques Únicos',
     spend: 'Valor Gasto',
+    frequency: 'Frequência',
+    conversions: 'Conversões',
+    results: 'Resultados',
+    cost_per_result: 'Custo por Resultado',
+    purchases: 'Compras',
+    leads: 'Leads',
     ctr: 'CTR',
     unique_ctr: 'CTR Único',
+    conversion_rate: 'Taxa de Conversão',
     cpc: 'CPC',
     cost_per_unique_click: 'Custo por Clique Único',
     cpm: 'CPM',
-    frequency: 'Frequência',
-    conversions: 'Conversões',
-    purchases: 'Compras',
+    cost_per_conversion: 'Custo por Conversão',
+    cost_per_purchase: 'Custo por Compra',
     post_engagement: 'Engajamento da Publicação',
     page_engagement: 'Engajamento da Página',
     post_reactions: 'Reações da Publicação',
@@ -332,7 +367,7 @@ export const getMetricDisplayName = (key: string): string => {
     video_views: 'Visualizações de Vídeo',
     video_view_rate: 'Taxa de Visualização de Vídeo',
     cost_per_video_view: 'Custo por Visualização de Vídeo',
-    video_play: 'Reproduções de Vídeo',
+    video_play_actions: 'Reproduções de Vídeo',
     canvas_avg_view_time: 'Tempo Médio de Visualização',
     canvas_avg_view_percent: 'Porcentagem Média de Visualização',
     website_clicks: 'Cliques no Site',

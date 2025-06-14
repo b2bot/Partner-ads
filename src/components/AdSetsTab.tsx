@@ -129,24 +129,43 @@ export function AdSetsTab() {
     }
   };
 
+  const getMetricDisplayName = (metric: string) => {
+    switch (metric) {
+      case 'impressions':
+        return 'Impressões';
+      case 'clicks':
+        return 'Cliques';
+      case 'ctr':
+        return 'CTR';
+      case 'spend':
+        return 'Gastos';
+      case 'conversions':
+        return 'Conversões';
+      default:
+        return metric;
+    }
+  };
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Conjuntos de Anúncios</h1>
-          <p className="text-slate-600 mt-2">Gerencie seus conjuntos de anúncios do Facebook Ads</p>
+          <h1 className="text-2xl font-bold text-slate-800">Conjuntos de Anúncios</h1>
+          <p className="text-slate-600 mt-1 text-sm">Gerencie seus conjuntos de anúncios do Facebook Ads</p>
         </div>
         <div className="flex gap-2">
           <DateRangeFilter onDateChange={setDateRange} />
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setShowMetricsConfig(!showMetricsConfig)}
+            className="text-xs h-8"
           >
-            <Filter className="h-4 w-4 mr-2" />
+            <Filter className="h-3 w-3 mr-1" />
             Métricas
           </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setShowCreateModal(true)} size="sm" className="text-xs h-8">
+            <Plus className="h-3 w-3 mr-1" />
             Novo Conjunto
           </Button>
         </div>
@@ -168,20 +187,20 @@ export function AdSetsTab() {
       <Card>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+            <TableRow className="text-xs">
+              <TableHead onClick={() => handleSort('name')} className="cursor-pointer text-xs h-8">
                 Nome
               </TableHead>
-              <TableHead onClick={() => handleSort('status')} className="cursor-pointer">
+              <TableHead onClick={() => handleSort('status')} className="cursor-pointer text-xs h-8">
                 Status
               </TableHead>
-              <TableHead onClick={() => handleSort('campaign_name')} className="cursor-pointer">
+              <TableHead onClick={() => handleSort('campaign_name')} className="cursor-pointer text-xs h-8">
                 Campanha
               </TableHead>
               {getVisibleMetrics('adsets').map(metric => (
-                <TableHead key={metric}>{metric}</TableHead>
+                <TableHead key={metric} className="text-xs h-8">{getMetricDisplayName(metric)}</TableHead>
               ))}
-              <TableHead className="text-right">Ações</TableHead>
+              <TableHead className="text-right text-xs h-8">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -189,25 +208,25 @@ export function AdSetsTab() {
               const adSetData = adSetInsights.find(insight => insight.id === adSet.id);
 
               return (
-                <TableRow key={adSet.id}>
-                  <TableCell className="font-medium">{adSet.name}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(adSet.status)}>
+                <TableRow key={adSet.id} className="text-xs h-10">
+                  <TableCell className="font-medium text-xs p-2">{adSet.name}</TableCell>
+                  <TableCell className="p-2">
+                    <Badge className={getStatusColor(adSet.status) + " text-xs"}>
                       {adSet.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs p-2">
                     {(() => {
                       const campaign = campaigns?.find(c => c.id === adSet.campaign_id);
                       return campaign?.name || '-';
                     })()}
                   </TableCell>
                   {getVisibleMetrics('adsets').map(metric => (
-                    <TableCell key={metric}>
+                    <TableCell key={metric} className="text-xs p-2">
                       {formatMetricValue(adSetData, metric)}
                     </TableCell>
                   ))}
-                  <TableCell className="text-right">
+                  <TableCell className="text-right p-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

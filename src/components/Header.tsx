@@ -7,9 +7,7 @@ import {
   Download
 } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { DateRangeFilter } from './DateRangeFilter';
 import { GlobalSearch } from './GlobalSearch';
-import { QuickCreateButton } from './QuickCreateButton';
 
 interface HeaderProps {
   activeTab: string;
@@ -46,17 +44,16 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
   };
 
   const showViewModeControls = ['campaigns', 'adsets', 'ads'].includes(activeTab);
-  const showDateFilter = ['dashboard', 'campaigns', 'adsets', 'ads'].includes(activeTab);
 
   return (
     <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
-      <div className="container-responsive py-3">
+      <div className="container-responsive py-2">
         <div className="flex items-center justify-between gap-4">
           {/* Left side - Title and Trigger */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <SidebarTrigger className="lg:hidden" />
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate">
+              <h1 className="text-base font-semibold text-slate-800 dark:text-slate-200 truncate">
                 {getTabTitle()}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
@@ -72,20 +69,16 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
 
           {/* Right side - Controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {showDateFilter && <DateRangeFilter />}
-            
-            <QuickCreateButton />
-            
             {activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
               <>
-                <Button variant="outline" size="sm" className="hidden md:flex btn-compact">
+                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-8 px-3">
                   <RefreshCw className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline text-xs">Atualizar</span>
+                  <span className="hidden lg:inline">Atualizar</span>
                 </Button>
                 
-                <Button variant="outline" size="sm" className="hidden md:flex btn-compact">
+                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-8 px-3">
                   <Download className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline text-xs">Exportar</span>
+                  <span className="hidden lg:inline">Exportar</span>
                 </Button>
               </>
             )}
@@ -96,7 +89,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
                   variant={viewMode === 'cards' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('cards')}
-                  className="h-7 w-7 p-0"
+                  className="h-6 w-6 p-0"
                 >
                   <LayoutGrid className="w-3 h-3" />
                 </Button>
@@ -104,7 +97,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('table')}
-                  className="h-7 w-7 p-0"
+                  className="h-6 w-6 p-0"
                 >
                   <Table className="w-3 h-3" />
                 </Button>
@@ -114,7 +107,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
         </div>
 
         {/* Mobile search */}
-        <div className="lg:hidden mt-3">
+        <div className="lg:hidden mt-2">
           <GlobalSearch />
         </div>
       </div>

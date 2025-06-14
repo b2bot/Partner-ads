@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useMetaData } from '@/hooks/useMetaData';
 import { useCampaignInsights } from '@/hooks/useInsights';
 import { useMetricsConfig } from '@/hooks/useMetricsConfig';
-import { formatMetricValue } from '@/lib/metaInsights';
+import { formatMetricValue, getMetricDisplayName } from '@/lib/metaInsights';
 import { toast } from 'sonner';
 import { updateCampaignWithRateLimit } from '@/lib/metaApiWithRateLimit';
 import { CreateCampaignModal } from '@/components/CreateCampaignModal';
@@ -104,23 +103,25 @@ export function CampaignsTab() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Campanhas</h1>
-          <p className="text-slate-600 mt-2">Gerencie suas campanhas do Facebook Ads</p>
+          <h1 className="text-2xl font-bold text-slate-800">Campanhas</h1>
+          <p className="text-slate-600 mt-1 text-sm">Gerencie suas campanhas do Facebook Ads</p>
         </div>
         <div className="flex gap-2">
           <DateRangeFilter onDateChange={setDateRange} />
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setShowMetricsConfig(!showMetricsConfig)}
+            className="text-xs h-8"
           >
-            <Filter className="h-4 w-4 mr-2" />
+            <Filter className="h-3 w-3 mr-1" />
             Métricas
           </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setShowCreateModal(true)} size="sm" className="text-xs h-8">
+            <Plus className="h-3 w-3 mr-1" />
             Nova Campanha
           </Button>
         </div>
@@ -142,17 +143,17 @@ export function CampaignsTab() {
       <Card>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+            <TableRow className="text-xs">
+              <TableHead onClick={() => handleSort('name')} className="cursor-pointer text-xs h-8">
                 Nome
               </TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Objetivo</TableHead>
+              <TableHead className="text-xs h-8">Status</TableHead>
+              <TableHead className="text-xs h-8">Objetivo</TableHead>
               {getVisibleMetrics('campaigns').map(metric => (
-                <TableHead key={metric}>{metric}</TableHead>
+                <TableHead key={metric} className="text-xs h-8">{getMetricDisplayName(metric)}</TableHead>
               ))}
-              <TableHead>Criada em</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+              <TableHead className="text-xs h-8">Criada em</TableHead>
+              <TableHead className="text-right text-xs h-8">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -160,21 +161,21 @@ export function CampaignsTab() {
               const campaignData = campaignInsights.find(item => item?.id === campaign.id);
               
               return (
-                <TableRow key={campaign.id}>
-                  <TableCell className="font-medium">{campaign.name}</TableCell>
-                  <TableCell>
-                    <Badge variant={campaign.status === 'ACTIVE' ? 'outline' : 'secondary'}>
+                <TableRow key={campaign.id} className="text-xs h-10">
+                  <TableCell className="font-medium text-xs p-2">{campaign.name}</TableCell>
+                  <TableCell className="p-2">
+                    <Badge variant={campaign.status === 'ACTIVE' ? 'outline' : 'secondary'} className="text-xs">
                       {campaign.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{campaign.objective}</TableCell>
+                  <TableCell className="text-xs p-2">{campaign.objective}</TableCell>
                   {getVisibleMetrics('campaigns').map(metric => (
-                    <TableCell key={metric}>
+                    <TableCell key={metric} className="text-xs p-2">
                       {formatMetricValue(campaignData, metric)}
                     </TableCell>
                   ))}
-                  <TableCell>{new Date(campaign.created_time).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-xs p-2">{new Date(campaign.created_time).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-right p-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
