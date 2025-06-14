@@ -67,7 +67,7 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md mx-auto shadow-lg border border-slate-200">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-slate-800">
             Meta Ads Pro Manager

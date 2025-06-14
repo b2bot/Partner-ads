@@ -117,7 +117,7 @@ export default function WhatsAppReportsTab() {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={(d) => setDate(d)}
                     initialFocus
                     className={cn("p-3 pointer-events-auto")}
                   />
