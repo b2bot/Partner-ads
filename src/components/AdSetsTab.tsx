@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,11 +16,12 @@ import { EditAdSetModal } from '@/components/EditAdSetModal';
 import { MetricsCustomization } from '@/components/MetricsCustomization';
 import { DynamicFilters } from '@/components/DynamicFilters';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
+import { SelectedAccountDisplay } from '@/components/SelectedAccountDisplay';
 import { useDateRange } from '@/hooks/useDateRange';
 import type { AdSet } from '@/lib/metaApi';
 
 export function AdSetsTab() {
-  const { adSets, loading, credentials, campaigns, refetch } = useMetaData();
+  const { adSets, loading, credentials, campaigns, refetch, selectedAdAccount } = useMetaData();
   const { config, getVisibleMetrics } = useMetricsConfig();
   const { dateRange, setDateRange, getApiDateRange } = useDateRange();
   
@@ -37,15 +37,16 @@ export function AdSetsTab() {
   const filteredAdSets = useMemo(() => {
     let filtered = adSets || [];
 
+    // Filtrar por conta selecionada
+    if (selectedAdAccount) {
+      filtered = filtered.filter(adset => adset.account_id === selectedAdAccount);
+    }
+
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filtered = filtered.filter(adset =>
         adset.name.toLowerCase().includes(searchTerm)
       );
-    }
-
-    if (filters.account) {
-      filtered = filtered.filter(adset => adset.account_id === filters.account);
     }
 
     if (filters.campaign && filters.campaign !== 'all') {
@@ -57,7 +58,7 @@ export function AdSetsTab() {
     }
 
     return filtered;
-  }, [adSets, filters]);
+  }, [adSets, filters, selectedAdAccount]);
 
   const sortedAdSets = useMemo(() => {
     if (!sortConfig) return filteredAdSets;
@@ -150,6 +151,8 @@ export function AdSetsTab() {
           </Button>
         </div>
       </div>
+
+      <SelectedAccountDisplay />
 
       <DynamicFilters
         type="adsets"

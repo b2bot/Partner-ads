@@ -18,11 +18,12 @@ import { EditCampaignModal } from '@/components/EditCampaignModal';
 import { MetricsCustomization } from '@/components/MetricsCustomization';
 import { DynamicFilters } from '@/components/DynamicFilters';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
+import { SelectedAccountDisplay } from '@/components/SelectedAccountDisplay';
 import { useDateRange } from '@/hooks/useDateRange';
 import type { Campaign } from '@/lib/metaApi';
 
 export function CampaignsTab() {
-  const { campaigns, loading, credentials, refetch } = useMetaData();
+  const { campaigns, loading, credentials, refetch, selectedAdAccount } = useMetaData();
   const { config, getVisibleMetrics } = useMetricsConfig();
   const { dateRange, setDateRange, getApiDateRange } = useDateRange();
   
@@ -38,6 +39,11 @@ export function CampaignsTab() {
   const filteredCampaigns = useMemo(() => {
     let filtered = campaigns || [];
 
+    // Filtrar por conta selecionada
+    if (selectedAdAccount) {
+      filtered = filtered.filter(campaign => campaign.account_id === selectedAdAccount);
+    }
+
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filtered = filtered.filter(campaign =>
@@ -45,16 +51,12 @@ export function CampaignsTab() {
       );
     }
 
-    if (filters.account) {
-      filtered = filtered.filter(campaign => campaign.account_id === filters.account);
-    }
-
     if (filters.status && filters.status !== 'all') {
       filtered = filtered.filter(campaign => campaign.status === filters.status);
     }
 
     return filtered;
-  }, [campaigns, filters]);
+  }, [campaigns, filters, selectedAdAccount]);
 
   const sortedCampaigns = useMemo(() => {
     if (!sortConfig) return filteredCampaigns;
@@ -123,6 +125,8 @@ export function CampaignsTab() {
           </Button>
         </div>
       </div>
+
+      <SelectedAccountDisplay />
 
       <DynamicFilters
         type="campaigns"

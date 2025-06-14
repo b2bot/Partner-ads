@@ -1,7 +1,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MetaApiManagement } from '@/components/MetaApiManagement';
-import { MetricsCustomization } from '@/components/MetricsCustomization';
+import { DataManagement } from '@/components/DataManagement';
 
 export function SettingsTab() {
   return (
@@ -16,15 +16,15 @@ export function SettingsTab() {
       <Tabs defaultValue="api" className="space-y-4">
         <TabsList>
           <TabsTrigger value="api">Gestão da API Meta</TabsTrigger>
-          <TabsTrigger value="metrics">Personalização de Métricas</TabsTrigger>
+          <TabsTrigger value="data">Gestão de Dados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="api">
           <MetaApiManagement />
         </TabsContent>
 
-        <TabsContent value="metrics">
-          <MetricsCustomization onClose={() => {}} />
+        <TabsContent value="data">
+          <DataManagement />
         </TabsContent>
       </Tabs>
     </div>

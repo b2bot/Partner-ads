@@ -4,37 +4,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, Filter, X, Megaphone, Target, Users } from 'lucide-react';
+import { Search, X, Megaphone, Target, Users } from 'lucide-react';
 import { useMetaData } from '@/hooks/useMetaData';
-import { CollapsibleAccountFilter } from './CollapsibleAccountFilter';
 
 interface DynamicFiltersProps {
   type: 'campaigns' | 'adsets' | 'ads';
   onFiltersChange: (filters: any) => void;
-  inheritedFilters?: {
-    account?: string;
-    campaign?: string;
-    adset?: string;
-  };
 }
 
-export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }: DynamicFiltersProps) {
-  const { campaigns, adSets, ads, selectedAdAccount, setSelectedAdAccount } = useMetaData();
+export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
+  const { campaigns, adSets, selectedAdAccount } = useMetaData();
   const [filters, setFilters] = useState({
     search: '',
-    account: inheritedFilters.account || selectedAdAccount || '',
-    campaign: inheritedFilters.campaign || 'all',
-    adset: inheritedFilters.adset || 'all',
+    campaign: 'all',
+    adset: 'all',
     status: 'all',
     dateRange: 'last_7_days',
   });
-
-  useEffect(() => {
-    // Update account filter when global account changes
-    if (selectedAdAccount && !inheritedFilters.account) {
-      setFilters(prev => ({ ...prev, account: selectedAdAccount }));
-    }
-  }, [selectedAdAccount, inheritedFilters.account]);
 
   useEffect(() => {
     onFiltersChange(filters);
@@ -45,12 +31,7 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
       const newFilters = { ...prev, [key]: value };
       
       // Clear dependent filters when parent changes
-      if (key === 'account') {
-        newFilters.campaign = 'all';
-        newFilters.adset = 'all';
-        // Update global account selection
-        setSelectedAdAccount(value);
-      } else if (key === 'campaign') {
+      if (key === 'campaign') {
         newFilters.adset = 'all';
       }
       
@@ -61,7 +42,6 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
   const clearFilters = () => {
     setFilters({
       search: '',
-      account: selectedAdAccount || '',
       campaign: 'all',
       adset: 'all',
       status: 'all',
@@ -70,14 +50,14 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
   };
 
   const getFilteredCampaigns = () => {
-    if (!filters.account) return campaigns;
-    return campaigns.filter(campaign => campaign.account_id === filters.account);
+    if (!selectedAdAccount) return campaigns;
+    return campaigns.filter(campaign => campaign.account_id === selectedAdAccount);
   };
 
   const getFilteredAdSets = () => {
     let filtered = adSets;
-    if (filters.account) {
-      filtered = filtered.filter(adset => adset.account_id === filters.account);
+    if (selectedAdAccount) {
+      filtered = filtered.filter(adset => adset.account_id === selectedAdAccount);
     }
     if (filters.campaign && filters.campaign !== 'all') {
       filtered = filtered.filter(adset => adset.campaign_id === filters.campaign);
@@ -90,7 +70,7 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
       case 'campaigns': return Megaphone;
       case 'adsets': return Target;
       case 'ads': return Users;
-      default: return Filter;
+      default: return Search;
     }
   };
 
@@ -99,12 +79,6 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
 
   return (
     <div className="space-y-4">
-      {/* Account Filter (Collapsible) */}
-      <CollapsibleAccountFilter 
-        selectedAccount={filters.account}
-        onAccountChange={(accountId) => handleFilterChange('account', accountId)}
-      />
-
       {/* Main Filters */}
       <Card className="border-slate-200 dark:border-slate-700">
         <CardContent className="p-4 space-y-4">
@@ -126,14 +100,14 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
                   <Megaphone className="w-3 h-3" />
-                  Campanha
+                  Filtrar por Campanha
                 </label>
                 <Select value={filters.campaign} onValueChange={(value) => handleFilterChange('campaign', value)}>
                   <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Selecione uma campanha" />
+                    <SelectValue placeholder="Todas as campanhas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all" disabled>Todas as campanhas</SelectItem>
+                    <SelectItem value="all">Todas as campanhas</SelectItem>
                     {getFilteredCampaigns().map((campaign) => (
                       <SelectItem key={campaign.id} value={campaign.id}>
                         <span className="truncate">{campaign.name}</span>
@@ -149,14 +123,14 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
                   <Target className="w-3 h-3" />
-                  Conjunto
+                  Filtrar por Conjunto
                 </label>
                 <Select value={filters.adset} onValueChange={(value) => handleFilterChange('adset', value)}>
                   <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Selecione um conjunto" />
+                    <SelectValue placeholder="Todos os conjuntos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all" disabled>Todos os conjuntos</SelectItem>
+                    <SelectItem value="all">Todos os conjuntos</SelectItem>
                     {getFilteredAdSets().map((adset) => (
                       <SelectItem key={adset.id} value={adset.id}>
                         <span className="truncate">{adset.name}</span>
@@ -174,10 +148,10 @@ export function DynamicFilters({ type, onFiltersChange, inheritedFilters = {} }:
               </label>
               <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
                 <SelectTrigger className="text-sm">
-                  <SelectValue placeholder="Selecione um status" />
+                  <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all" disabled>Todos os status</SelectItem>
+                  <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="ACTIVE">Ativo</SelectItem>
                   <SelectItem value="PAUSED">Pausado</SelectItem>
                   <SelectItem value="ARCHIVED">Arquivado</SelectItem>

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,11 +16,12 @@ import { EditAdModal } from '@/components/EditAdModal';
 import { MetricsCustomization } from '@/components/MetricsCustomization';
 import { DynamicFilters } from '@/components/DynamicFilters';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
+import { SelectedAccountDisplay } from '@/components/SelectedAccountDisplay';
 import { useDateRange } from '@/hooks/useDateRange';
 import type { Ad } from '@/lib/metaApi';
 
 export function AdsTab() {
-  const { ads, loading, credentials, campaigns, adSets, refetch } = useMetaData();
+  const { ads, loading, credentials, campaigns, adSets, refetch, selectedAdAccount } = useMetaData();
   const { config, getVisibleMetrics } = useMetricsConfig();
   const { dateRange, setDateRange, getApiDateRange } = useDateRange();
   
@@ -37,6 +37,11 @@ export function AdsTab() {
   const filteredAds = useMemo(() => {
     let filtered = ads || [];
 
+    // Filtrar por conta selecionada
+    if (selectedAdAccount) {
+      filtered = filtered.filter(ad => ad.account_id === selectedAdAccount);
+    }
+
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filtered = filtered.filter(ad =>
@@ -44,15 +49,10 @@ export function AdsTab() {
       );
     }
 
-    if (filters.account) {
-      filtered = filtered.filter(ad => ad.account_id === filters.account);
-    }
-
     if (filters.campaign && filters.campaign !== 'all') {
-      const adSet = adSets?.find(adset => adset.campaign_id === filters.campaign);
-      if (adSet) {
-        filtered = filtered.filter(ad => ad.adset_id === adSet.id);
-      }
+      const filteredAdSets = adSets?.filter(adset => adset.campaign_id === filters.campaign);
+      const adSetIds = filteredAdSets?.map(adset => adset.id) || [];
+      filtered = filtered.filter(ad => adSetIds.includes(ad.adset_id));
     }
 
     if (filters.adset && filters.adset !== 'all') {
@@ -64,7 +64,7 @@ export function AdsTab() {
     }
 
     return filtered;
-  }, [ads, filters, adSets]);
+  }, [ads, filters, adSets, selectedAdAccount]);
 
   const sortedAds = useMemo(() => {
     if (!sortConfig) return filteredAds;
@@ -152,6 +152,8 @@ export function AdsTab() {
           </Button>
         </div>
       </div>
+
+      <SelectedAccountDisplay />
 
       <DynamicFilters
         type="ads"
