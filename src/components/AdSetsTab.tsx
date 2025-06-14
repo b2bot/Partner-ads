@@ -23,9 +23,10 @@ interface AdSet {
   name: string;
   status: string;
   campaign_id: string;
-  campaign_name?: string;
   account_id: string;
   created_time: string;
+  targeting?: any;
+  updated_time?: string;
 }
 
 export function AdSetsTab() {
@@ -101,7 +102,9 @@ export function AdSetsTab() {
     try {
       await updateAdSetWithRateLimit(credentials.access_token, adSetId, { status: newStatus });
       toast.success('Status do conjunto de anúncios atualizado com sucesso!');
-      refetch();
+      if (refetch && typeof refetch.adSets === 'function') {
+        refetch.adSets(); // Corrige o erro "not callable"
+      }
     } catch (error: any) {
       console.error('Erro ao atualizar status do conjunto de anúncios:', error);
       toast.error(`Erro ao atualizar status: ${error.message || 'Erro desconhecido'}`);
@@ -163,10 +166,7 @@ export function AdSetsTab() {
       />
 
       {showMetricsConfig && (
-        <MetricsCustomization
-          type="adsets"
-          onClose={() => setShowMetricsConfig(false)}
-        />
+        <MetricsCustomization onClose={() => setShowMetricsConfig(false)} />
       )}
 
       <Card>
@@ -200,7 +200,12 @@ export function AdSetsTab() {
                       {adSet.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{adSet.campaign_name}</TableCell>
+                  <TableCell>
+                    {(() => {
+                      const campaign = campaigns?.find(c => c.id === adSet.campaign_id);
+                      return campaign?.name || '-';
+                    })()}
+                  </TableCell>
                   {getVisibleMetrics('adsets').map(metric => (
                     <TableCell key={metric}>
                       {formatMetricValue(adSetData, metric)}
@@ -248,14 +253,12 @@ export function AdSetsTab() {
         </Table>
       </Card>
 
-      <CreateAdSetModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
+      {showCreateModal && (
+        <CreateAdSetModal onClose={() => setShowCreateModal(false)} />
+      )}
 
       {editingAdSet && (
         <EditAdSetModal
-          open={!!editingAdSet}
           onClose={() => setEditingAdSet(null)}
           adSet={editingAdSet}
         />

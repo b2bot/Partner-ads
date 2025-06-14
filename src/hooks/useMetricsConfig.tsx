@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -21,7 +22,7 @@ export function useMetricsConfig() {
   const { logActivity } = useSystemLog();
   const queryClient = useQueryClient();
 
-  const { data: config = defaultConfig, isLoading } = useQuery({
+  const { data: configData, isLoading } = useQuery({
     queryKey: ['metrics-config'],
     queryFn: async () => {
       try {
@@ -37,27 +38,18 @@ export function useMetricsConfig() {
           return defaultConfig;
         }
 
+        // Garantir formato correto e parse seguro
         if (!data || typeof data.config !== 'object') {
           return defaultConfig;
         }
-
-        const parsedConfig = data.config;
-
-        if (
-          typeof parsedConfig === 'object' &&
-          parsedConfig.dashboard &&
-          parsedConfig.campaigns &&
-          parsedConfig.adsets &&
-          parsedConfig.ads &&
-          Array.isArray(parsedConfig.dashboard) &&
-          Array.isArray(parsedConfig.campaigns) &&
-          Array.isArray(parsedConfig.adsets) &&
-          Array.isArray(parsedConfig.ads)
-        ) {
-          return parsedConfig as MetricsConfig;
-        }
-
-        return defaultConfig;
+        // Garante que config tenha todas as chaves esperadas
+        const parsedConfig = data.config as Partial<MetricsConfig>;
+        return {
+          dashboard: Array.isArray(parsedConfig.dashboard) ? parsedConfig.dashboard : defaultConfig.dashboard,
+          campaigns: Array.isArray(parsedConfig.campaigns) ? parsedConfig.campaigns : defaultConfig.campaigns,
+          adsets: Array.isArray(parsedConfig.adsets) ? parsedConfig.adsets : defaultConfig.adsets,
+          ads: Array.isArray(parsedConfig.ads) ? parsedConfig.ads : defaultConfig.ads,
+        } as MetricsConfig;
       } catch (err) {
         console.error('Erro inesperado ao buscar métricas:', err);
         return defaultConfig;
@@ -95,8 +87,8 @@ export function useMetricsConfig() {
   });
 
   const getVisibleMetrics = (page: keyof MetricsConfig): string[] => {
-    if (!config || typeof config !== 'object') return defaultConfig[page];
-    return config[page] || defaultConfig[page];
+    if (!configData || typeof configData !== 'object') return defaultConfig[page];
+    return (configData as MetricsConfig)[page] || defaultConfig[page];
   };
 
   const isMetricVisible = (page: keyof MetricsConfig, metric: string): boolean => {
@@ -109,7 +101,7 @@ export function useMetricsConfig() {
   };
 
   return {
-    config: config as MetricsConfig,
+    config: configData as MetricsConfig,
     isLoading,
     isUpdating: updateConfigMutation.isPending,
     updateConfig,

@@ -26,6 +26,7 @@ interface Campaign {
   objective: string;
   created_time: string;
   account_id: string;
+  updated_time?: string;
 }
 
 export function CampaignsTab() {
@@ -212,14 +213,12 @@ export function CampaignsTab() {
         </Table>
       </Card>
 
-      <CreateCampaignModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
+      {showCreateModal && (
+        <CreateCampaignModal onClose={() => setShowCreateModal(false)} />
+      )}
 
       {editingCampaign && (
         <EditCampaignModal
-          open={true}
           onClose={() => setEditingCampaign(null)}
           campaign={editingCampaign}
         />

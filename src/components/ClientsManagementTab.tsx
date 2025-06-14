@@ -51,9 +51,12 @@ export function ClientsManagementTab() {
 
       if (error) throw error;
 
+      // Certifique-se que profiles é objeto válido
       return (data || []).map(item => ({
         ...item,
-        profiles: item.profiles && !Array.isArray(item.profiles) ? item.profiles : null
+        profiles: (item.profiles && typeof item.profiles === 'object' && !Array.isArray(item.profiles) && (item.profiles.email || item.profiles.email === '') && (item.profiles.role || item.profiles.role === '')) 
+          ? item.profiles 
+          : null,
       })) as Cliente[];
     },
   });

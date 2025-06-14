@@ -38,6 +38,25 @@ export function Dashboard() {
     return spendValue / conversionsValue;
   };
 
+  // Funções utilitárias
+  const formatNumber = (value: any) => {
+    if (typeof value === 'number') {
+      return value.toLocaleString('pt-BR');
+    }
+    if (typeof value === 'string' && !isNaN(Number(value))) {
+      return Number(value).toLocaleString('pt-BR');
+    }
+    return value || '0';
+  };
+
+  const formatCurrency = (value: any) => {
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return (num || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  };
+
+  // Campanhas ativas, evitando undefined
+  const activeCampaigns = campaigns?.filter((c) => c.status === 'ACTIVE') || [];
+
   if (loading.campaigns || !selectedAdAccount) {
     return (
       <div className="p-6">

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
@@ -57,11 +56,11 @@ const Index = () => {
           </div>
         );
       case 'campaigns':
-        return isAdmin ? <CampaignsTab viewMode={viewMode} /> : <Dashboard />;
+        return isAdmin ? <CampaignsTab /> : <Dashboard />;
       case 'adsets':
-        return isAdmin ? <AdSetsTab viewMode={viewMode} /> : <Dashboard />;
+        return isAdmin ? <AdSetsTab /> : <Dashboard />;
       case 'ads':
-        return isAdmin ? <AdsTab viewMode={viewMode} /> : <Dashboard />;
+        return isAdmin ? <AdsTab /> : <Dashboard />;
       case 'whatsapp-reports':
         return isAdmin ? <WhatsAppReportsTab /> : <Dashboard />;
       case 'metrics-objectives':

@@ -23,11 +23,10 @@ interface Ad {
   name: string;
   status: string;
   adset_id: string;
-  adset_name?: string;
-  campaign_id?: string;
-  campaign_name?: string;
   account_id: string;
   created_time: string;
+  creative?: any;
+  updated_time?: string;
 }
 
 export function AdsTab() {
@@ -184,8 +183,8 @@ export function AdsTab() {
                 Status
                 {sortConfig?.key === 'status' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
               </TableHead>
-              <TableHead>Conjunto</TableHead>
-              <TableHead>Campanha</TableHead>
+              <TableHead>Conjunto (ID)</TableHead>
+              <TableHead>Campanha (ID)</TableHead>
               {config?.ads?.map((metric) => (
                 <TableHead key={metric}>{metric}</TableHead>
               ))}
@@ -204,8 +203,8 @@ export function AdsTab() {
                       {ad.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{ad.adset_name}</TableCell>
-                  <TableCell>{ad.campaign_name}</TableCell>
+                  <TableCell>{ad.adset_id}</TableCell>
+                  <TableCell>{ad.campaign_id || '-'}</TableCell>
                   {config?.ads?.map((metric) => (
                     <TableCell key={metric}>
                       {formatMetricValue(adInsightsData, metric)}
@@ -245,8 +244,12 @@ export function AdsTab() {
         </Table>
       </Card>
 
-      <CreateAdModal open={showCreateModal} onClose={() => setShowCreateModal(false)} />
-      <EditAdModal ad={editingAd} open={!!editingAd} onClose={() => setEditingAd(null)} />
+      {showCreateModal && (
+        <CreateAdModal onClose={() => setShowCreateModal(false)} />
+      )}
+      {editingAd && (
+        <EditAdModal ad={editingAd} onClose={() => setEditingAd(null)} />
+      )}
     </div>
   );
 }
