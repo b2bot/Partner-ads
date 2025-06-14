@@ -1,5 +1,4 @@
 
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { User, Bot, Settings } from 'lucide-react';
@@ -55,50 +54,48 @@ export function TicketTimeline({ timeline, className }: TicketTimelineProps) {
   };
 
   return (
-    <ScrollArea className={`h-96 pr-4 ${className}`}>
-      <div className="space-y-4">
-        {timeline.map((entry, index) => (
-          <div key={entry.id} className="flex gap-3">
-            <Avatar className="h-8 w-8 flex-shrink-0">
-              <AvatarFallback className={`
-                text-xs
-                ${entry.autor_tipo === 'admin' ? 'bg-blue-500 text-white' : ''}
-                ${entry.autor_tipo === 'sistema' ? 'bg-gray-500 text-white' : ''}
-                ${entry.autor_tipo === 'cliente' ? 'bg-green-500 text-white' : ''}
-              `}>
-                {getAuthorAvatar(entry.autor_tipo, entry.autor_nome)}
-              </AvatarFallback>
-            </Avatar>
+    <div className={`space-y-4 pb-4 ${className}`}>
+      {timeline.map((entry, index) => (
+        <div key={entry.id} className="flex gap-3">
+          <Avatar className="h-8 w-8 flex-shrink-0">
+            <AvatarFallback className={`
+              text-xs
+              ${entry.autor_tipo === 'admin' ? 'bg-blue-500 text-white' : ''}
+              ${entry.autor_tipo === 'sistema' ? 'bg-gray-500 text-white' : ''}
+              ${entry.autor_tipo === 'cliente' ? 'bg-green-500 text-white' : ''}
+            `}>
+              {getAuthorAvatar(entry.autor_tipo, entry.autor_nome)}
+            </AvatarFallback>
+          </Avatar>
 
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{entry.autor_nome}</span>
-                <Badge variant="outline" className="text-xs">
-                  {entry.autor_tipo === 'admin' ? 'Equipe' : 
-                   entry.autor_tipo === 'sistema' ? 'Sistema' : 'Cliente'}
-                </Badge>
-                <span className="text-xs text-gray-500">
-                  {formatDate(entry.created_at)}
-                </span>
-              </div>
+          <div className="flex-1 space-y-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium">{entry.autor_nome}</span>
+              <Badge variant="outline" className="text-xs">
+                {entry.autor_tipo === 'admin' ? 'Equipe' : 
+                 entry.autor_tipo === 'sistema' ? 'Sistema' : 'Cliente'}
+              </Badge>
+              <span className="text-xs text-gray-500">
+                {formatDate(entry.created_at)}
+              </span>
+            </div>
 
-              <div className={`
-                p-3 rounded-lg border text-sm whitespace-pre-wrap
-                ${getMessageStyle(entry.autor_tipo)}
-              `}>
-                {entry.tipo === 'status_change' ? (
-                  <div className="flex items-center gap-2 text-amber-600">
-                    <Settings className="h-4 w-4" />
-                    {entry.conteudo}
-                  </div>
-                ) : (
-                  entry.conteudo
-                )}
-              </div>
+            <div className={`
+              p-3 rounded-lg border text-sm whitespace-pre-wrap break-words
+              ${getMessageStyle(entry.autor_tipo)}
+            `}>
+              {entry.tipo === 'status_change' ? (
+                <div className="flex items-center gap-2 text-amber-600">
+                  <Settings className="h-4 w-4" />
+                  {entry.conteudo}
+                </div>
+              ) : (
+                entry.conteudo
+              )}
             </div>
           </div>
-        ))}
-      </div>
-    </ScrollArea>
+        </div>
+      ))}
+    </div>
   );
 }
