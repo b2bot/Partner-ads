@@ -168,7 +168,6 @@ export function AdsTab() {
 
       {showMetricsConfig && (
         <MetricsCustomization
-          type="ads"
           onClose={() => setShowMetricsConfig(false)}
         />
       )}
@@ -248,13 +247,12 @@ export function AdsTab() {
         </Table>
       </Card>
 
-      {showCreateModal && (
-        <CreateAdModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => setShowCreateModal(false)}
-        />
-      )}
+      <CreateAdModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => setShowCreateModal(false)}
+      />
+
       {editingAd && (
         <EditAdModal ad={editingAd} onClose={() => setEditingAd(null)} />
       )}

@@ -166,7 +166,9 @@ export function AdSetsTab() {
       />
 
       {showMetricsConfig && (
-        <MetricsCustomization onClose={() => setShowMetricsConfig(false)} />
+        <MetricsCustomization
+          onClose={() => setShowMetricsConfig(false)}
+        />
       )}
 
       <Card>
@@ -192,11 +194,11 @@ export function AdSetsTab() {
             {sortedAdSets.map(adSet => {
               const adSetData = adSetInsights.find(insight => insight.id === adSet.id);
 
-              // Garantir que targeting e updated_time existam
+              // Garantir que targeting e updated_time existam para tipagem correta
               const safeAdSet = {
                 ...adSet,
                 targeting: adSet.targeting ?? {},
-                updated_time: adSet.updated_time ?? ""
+                updated_time: adSet.updated_time ?? "",
               };
 
               return (
