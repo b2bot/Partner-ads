@@ -203,6 +203,42 @@ export type Database = {
           },
         ]
       }
+      chamados_mensagens: {
+        Row: {
+          arquivo_url: string | null
+          autor_id: string | null
+          autor_nome: string
+          autor_tipo: string
+          chamado_id: string
+          conteudo: string
+          created_at: string
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          arquivo_url?: string | null
+          autor_id?: string | null
+          autor_nome: string
+          autor_tipo?: string
+          chamado_id: string
+          conteudo: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          arquivo_url?: string | null
+          autor_id?: string | null
+          autor_nome?: string
+          autor_tipo?: string
+          chamado_id?: string
+          conteudo?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       chamados_timeline: {
         Row: {
           autor_id: string | null
@@ -582,7 +618,13 @@ export type Database = {
         | "aprovado"
         | "reprovado"
         | "ajuste_solicitado"
-      ticket_status: "aberto" | "em_andamento" | "resolvido"
+      ticket_status:
+        | "novo"
+        | "aguardando_equipe"
+        | "aguardando_cliente"
+        | "em_analise"
+        | "em_andamento"
+        | "resolvido"
       user_role: "admin" | "cliente"
     }
     CompositeTypes: {
@@ -707,7 +749,14 @@ export const Constants = {
         "reprovado",
         "ajuste_solicitado",
       ],
-      ticket_status: ["aberto", "em_andamento", "resolvido"],
+      ticket_status: [
+        "novo",
+        "aguardando_equipe",
+        "aguardando_cliente",
+        "em_analise",
+        "em_andamento",
+        "resolvido",
+      ],
       user_role: ["admin", "cliente"],
     },
   },

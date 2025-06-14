@@ -6,7 +6,7 @@ import { useUserAccess } from '@/hooks/useUserAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Headphones, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { Plus, Headphones, TrendingUp, Clock, CheckCircle, User, Eye } from 'lucide-react';
 import { TicketFilters } from './tickets/TicketFilters';
 import { TicketCard } from './tickets/TicketCard';
 import { CreateTicketModalAdvanced } from './tickets/CreateTicketModalAdvanced';
@@ -16,7 +16,7 @@ interface Ticket {
   id: string;
   titulo: string;
   mensagem: string;
-  status: 'aberto' | 'em_andamento' | 'resolvido';
+  status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
   categoria?: string;
   prioridade?: string;
   status_detalhado?: string;
@@ -101,10 +101,13 @@ export function TicketsTabAdvanced() {
   // Estatísticas para dashboard resumo
   const stats = tickets ? {
     total: tickets.length,
-    abertos: tickets.filter(t => t.status === 'aberto').length,
+    novo: tickets.filter(t => t.status === 'novo').length,
+    aguardandoEquipe: tickets.filter(t => t.status === 'aguardando_equipe').length,
+    aguardandoCliente: tickets.filter(t => t.status === 'aguardando_cliente').length,
+    emAnalise: tickets.filter(t => t.status === 'em_analise').length,
     emAndamento: tickets.filter(t => t.status === 'em_andamento').length,
     resolvidos: tickets.filter(t => t.status === 'resolvido').length,
-  } : { total: 0, abertos: 0, emAndamento: 0, resolvidos: 0 };
+  } : { total: 0, novo: 0, aguardandoEquipe: 0, aguardandoCliente: 0, emAnalise: 0, emAndamento: 0, resolvidos: 0 };
 
   if (isLoading) {
     return (
@@ -150,12 +153,12 @@ export function TicketsTabAdvanced() {
       </div>
 
       {/* Dashboard de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total de Chamados</p>
+                <p className="text-sm font-medium text-gray-600">Total</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
               </div>
               <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -169,11 +172,11 @@ export function TicketsTabAdvanced() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Abertos</p>
-                <p className="text-2xl font-bold text-red-600">{stats.abertos}</p>
+                <p className="text-sm font-medium text-gray-600">Novos</p>
+                <p className="text-2xl font-bold text-purple-600">{stats.novo}</p>
               </div>
-              <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-red-600" />
+              <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-purple-600" />
               </div>
             </div>
           </CardContent>
@@ -183,7 +186,35 @@ export function TicketsTabAdvanced() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Em Andamento</p>
+                <p className="text-sm font-medium text-gray-600">Aguardando</p>
+                <p className="text-2xl font-bold text-red-600">{stats.aguardandoEquipe}</p>
+              </div>
+              <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <Clock className="h-5 w-5 text-red-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Em Análise</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.emAnalise}</p>
+              </div>
+              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Eye className="h-5 w-5 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Andamento</p>
                 <p className="text-2xl font-bold text-yellow-600">{stats.emAndamento}</p>
               </div>
               <div className="h-10 w-10 bg-yellow-100 rounded-lg flex items-center justify-center">

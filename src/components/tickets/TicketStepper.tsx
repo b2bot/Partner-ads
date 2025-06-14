@@ -1,8 +1,8 @@
 
-import { CheckCircle, Clock, AlertCircle, User, FileCheck } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, User, Eye, Play } from 'lucide-react';
 
 interface TicketStepperProps {
-  status: 'aberto' | 'em_andamento' | 'resolvido';
+  status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
   categoria?: string;
   className?: string;
 }
@@ -10,16 +10,19 @@ interface TicketStepperProps {
 export function TicketStepper({ status, categoria, className }: TicketStepperProps) {
   const steps = [
     { id: 'novo', label: 'Novo', icon: AlertCircle },
-    { id: 'analise', label: 'Em Análise', icon: Clock },
-    { id: 'andamento', label: 'Em Andamento', icon: User },
-    { id: 'aguardando', label: 'Aguardando Cliente', icon: Clock },
-    { id: 'concluido', label: 'Concluído', icon: CheckCircle }
+    { id: 'aguardando_equipe', label: 'Aguardando Equipe', icon: Clock },
+    { id: 'em_analise', label: 'Em Análise', icon: Eye },
+    { id: 'em_andamento', label: 'Em Andamento', icon: Play },
+    { id: 'resolvido', label: 'Resolvido', icon: CheckCircle }
   ];
 
   const getCurrentStep = () => {
     switch (status) {
-      case 'aberto': return 0;
-      case 'em_andamento': return 2;
+      case 'novo': return 0;
+      case 'aguardando_equipe': return 1;
+      case 'aguardando_cliente': return 1; // Mesmo nível que aguardando_equipe
+      case 'em_analise': return 2;
+      case 'em_andamento': return 3;
       case 'resolvido': return 4;
       default: return 0;
     }

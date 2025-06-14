@@ -15,6 +15,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { TicketStatusBadge } from './TicketStatusBadge';
 import { TicketStepper } from './TicketStepper';
 import { TicketTimeline } from './TicketTimeline';
+import { ClientMessageForm } from './ClientMessageForm';
 import { Download, FileText, Clock, User, AlertCircle, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -22,7 +23,7 @@ interface Ticket {
   id: string;
   titulo: string;
   mensagem: string;
-  status: 'aberto' | 'em_andamento' | 'resolvido';
+  status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
   categoria?: string;
   prioridade?: string;
   resposta?: string;
@@ -53,12 +54,12 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
   const { isAdmin, user } = useAuth();
   const [resposta, setResposta] = useState(ticket.resposta || '');
   const [notaInterna, setNotaInterna] = useState(ticket.nota_interna || '');
-  const [status, setStatus] = useState<'aberto' | 'em_andamento' | 'resolvido'>(ticket.status);
+  const [status, setStatus] = useState<'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido'>(ticket.status);
   const [error, setError] = useState('');
   
   const queryClient = useQueryClient();
 
-  // Buscar timeline do chamado
+  // Buscar timeline do chamado (incluindo mensagens)
   const { data: timelineData } = useQuery({
     queryKey: ['ticket-timeline', ticket.id],
     queryFn: async () => {
@@ -78,7 +79,7 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
   const timeline: TimelineEntry[] = timelineData?.map(item => ({
     id: item.id,
     tipo: item.tipo,
-    conteudo: item.conteudo,
+    conteudo: item.conteudo || '',
     autor_nome: item.autor_nome,
     autor_tipo: item.autor_tipo as 'cliente' | 'admin' | 'sistema',
     created_at: item.created_at,
@@ -154,6 +155,17 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
     }
   };
 
+  const getStatusOptions = () => {
+    return [
+      { value: 'novo', label: 'Novo' },
+      { value: 'aguardando_equipe', label: 'Aguardando Equipe' },
+      { value: 'aguardando_cliente', label: 'Aguardando Cliente' },
+      { value: 'em_analise', label: 'Em Análise' },
+      { value: 'em_andamento', label: 'Em Andamento' },
+      { value: 'resolvido', label: 'Resolvido' }
+    ];
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
@@ -203,6 +215,18 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                     </div>
                   )}
                 </div>
+                
+                {/* Formulário de resposta para clientes */}
+                {!isAdmin && (
+                  <ClientMessageForm 
+                    ticketId={ticket.id}
+                    onSuccess={() => {
+                      queryClient.invalidateQueries({ queryKey: ['ticket-timeline', ticket.id] });
+                      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+                    }}
+                    className="mt-4 -mx-6"
+                  />
+                )}
               </div>
             </TabsContent>
 
@@ -277,9 +301,11 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="aberto">Aberto</SelectItem>
-                          <SelectItem value="em_andamento">Em Andamento</SelectItem>
-                          <SelectItem value="resolvido">Resolvido</SelectItem>
+                          {getStatusOptions().map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>

@@ -12,7 +12,7 @@ interface TicketCardProps {
     id: string;
     titulo: string;
     mensagem: string;
-    status: 'aberto' | 'em_andamento' | 'resolvido';
+    status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
     categoria?: string;
     prioridade?: string;
     created_at: string;

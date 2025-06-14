@@ -1,9 +1,9 @@
 
 import { Badge } from '@/components/ui/badge';
-import { Clock, AlertCircle, CheckCircle, Pause, Play } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle, User, Eye, Play } from 'lucide-react';
 
 interface TicketStatusBadgeProps {
-  status: 'aberto' | 'em_andamento' | 'resolvido';
+  status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
   prioridade?: 'baixa' | 'media' | 'alta' | 'urgente';
   size?: 'sm' | 'md' | 'lg';
 }
@@ -11,16 +11,34 @@ interface TicketStatusBadgeProps {
 export function TicketStatusBadge({ status, prioridade, size = 'md' }: TicketStatusBadgeProps) {
   const getStatusConfig = () => {
     switch (status) {
-      case 'aberto':
+      case 'novo':
+        return {
+          color: 'bg-purple-100 text-purple-800 border-purple-200',
+          icon: AlertCircle,
+          label: 'Novo'
+        };
+      case 'aguardando_equipe':
         return {
           color: 'bg-red-100 text-red-800 border-red-200',
-          icon: AlertCircle,
-          label: 'Aberto'
+          icon: Clock,
+          label: 'Aguardando Equipe'
+        };
+      case 'aguardando_cliente':
+        return {
+          color: 'bg-orange-100 text-orange-800 border-orange-200',
+          icon: User,
+          label: 'Aguardando Cliente'
+        };
+      case 'em_analise':
+        return {
+          color: 'bg-blue-100 text-blue-800 border-blue-200',
+          icon: Eye,
+          label: 'Em Análise'
         };
       case 'em_andamento':
         return {
           color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-          icon: Clock,
+          icon: Play,
           label: 'Em Andamento'
         };
       case 'resolvido':
