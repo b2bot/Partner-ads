@@ -92,12 +92,12 @@ export function CreativesTab() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/4 mb-3"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded"></div>
+              <div key={i} className="h-48 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
@@ -106,13 +106,13 @@ export function CreativesTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">
+          <h1 className="text-xl font-bold text-slate-800">
             {isAdmin ? 'Gerenciar Criativos' : 'Meus Criativos'}
           </h1>
-          <p className="text-slate-600 mt-2">
+          <p className="text-xs text-slate-600 mt-1">
             {isAdmin 
               ? 'Envie criativos para aprovação dos clientes'
               : 'Revise e aprove os criativos enviados pela equipe'
@@ -120,23 +120,23 @@ export function CreativesTab() {
           </p>
         </div>
         {isAdmin && (
-          <Button onClick={() => setUploadModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setUploadModalOpen(true)} size="sm" className="h-7 text-xs px-2">
+            <Plus className="h-3 w-3 mr-1" />
             Enviar Criativo
           </Button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {creatives?.length === 0 ? (
           <div className="col-span-full">
             <Card>
-              <CardContent className="p-8 text-center">
-                <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <CardContent className="p-6 text-center">
+                <ImageIcon className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                <h3 className="text-sm font-medium text-gray-900 mb-1">
                   {isAdmin ? 'Nenhum criativo encontrado' : 'Você ainda não tem criativos'}
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-xs text-gray-500">
                   {isAdmin 
                     ? 'Comece enviando criativos para seus clientes aprovarem.'
                     : 'Quando a equipe enviar criativos, eles aparecerão aqui para sua aprovação.'
@@ -163,7 +163,7 @@ export function CreativesTab() {
                   />
                 )}
                 <div className="absolute top-2 right-2">
-                  <Badge className={getStatusColor(creative.status)}>
+                  <Badge className={`${getStatusColor(creative.status)} text-xs`}>
                     {getStatusLabel(creative.status)}
                   </Badge>
                 </div>
@@ -172,15 +172,15 @@ export function CreativesTab() {
               <CardHeader className="pb-2">
                 <div className="space-y-1">
                   {creative.campanha && (
-                    <p className="text-sm font-medium text-blue-600">
+                    <p className="text-xs font-medium text-blue-600">
                       {creative.campanha}
                     </p>
                   )}
-                  <CardTitle className="text-base">
+                  <CardTitle className="text-sm">
                     {creative.nome_criativo || creative.titulo}
                   </CardTitle>
                   {isAdmin && (
-                    <p className="text-sm text-slate-500">
+                    <p className="text-xs text-slate-500">
                       Cliente: {creative.clientes?.nome}
                     </p>
                   )}
@@ -190,7 +190,7 @@ export function CreativesTab() {
               <CardContent className="pt-0">
                 <div className="space-y-2">
                   {creative.titulo_anuncio && (
-                    <p className="text-sm text-slate-600 line-clamp-2">
+                    <p className="text-xs text-slate-600 line-clamp-2">
                       <strong>Título:</strong> {creative.titulo_anuncio}
                     </p>
                   )}
@@ -202,6 +202,7 @@ export function CreativesTab() {
                       variant="outline"
                       size="sm"
                       onClick={() => setSelectedCreative(creative)}
+                      className="h-6 text-xs px-2"
                     >
                       <Eye className="h-3 w-3 mr-1" />
                       Ver Detalhes

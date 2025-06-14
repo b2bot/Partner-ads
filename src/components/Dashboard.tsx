@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -73,23 +74,23 @@ export function Dashboard() {
 
   if (loading.campaigns || !selectedAdAccount) {
     return (
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-          <div className="flex gap-4">
+      <div className="p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-lg font-semibold text-slate-800">Dashboard</h1>
+          <div className="flex gap-2">
             <AccountFilter />
             <DateRangeFilter onDateChange={setDateRange} />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="pb-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
               </CardHeader>
               <CardContent>
-                <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/2 mb-1"></div>
+                <div className="h-2 bg-gray-200 rounded w-full"></div>
               </CardContent>
             </Card>
           ))}
@@ -99,25 +100,25 @@ export function Dashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-        <div className="flex gap-4">
+        <h1 className="text-lg font-semibold text-slate-800">Dashboard</h1>
+        <div className="flex gap-2">
           <AccountFilter />
           <DateRangeFilter onDateChange={setDateRange} />
         </div>
       </div>
 
       {/* Métricas da Conta */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Impressões</CardTitle>
-            <Eye className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-xs font-medium text-slate-600">Impressões</CardTitle>
+            <Eye className="h-3 w-3 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-lg font-bold text-slate-900">
               {formatNumber(insights.data?.impressions || 0)}
             </div>
             <p className="text-xs text-slate-500">Total das campanhas ativas</p>
@@ -126,11 +127,11 @@ export function Dashboard() {
 
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Cliques</CardTitle>
-            <MousePointer className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-xs font-medium text-slate-600">Cliques</CardTitle>
+            <MousePointer className="h-3 w-3 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-lg font-bold text-slate-900">
               {formatNumber(insights.data?.clicks || 0)}
             </div>
             <p className="text-xs text-slate-500">Total das campanhas ativas</p>
@@ -139,11 +140,11 @@ export function Dashboard() {
 
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Valor Gasto</CardTitle>
-            <DollarSign className="h-4 w-4 text-red-600" />
+            <CardTitle className="text-xs font-medium text-slate-600">Valor Gasto</CardTitle>
+            <DollarSign className="h-3 w-3 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-lg font-bold text-slate-900">
               {formatCurrency(insights.data?.spend || 0)}
             </div>
             <p className="text-xs text-slate-500">Total das campanhas ativas</p>
@@ -152,11 +153,11 @@ export function Dashboard() {
 
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">CTR</CardTitle>
-            <Target className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-xs font-medium text-slate-600">CTR</CardTitle>
+            <Target className="h-3 w-3 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-lg font-bold text-slate-900">
               {insights.data?.ctr ? `${parseFloat(insights.data.ctr.toString()).toFixed(2)}%` : '0.00%'}
             </div>
             <p className="text-xs text-slate-500">Taxa de cliques média</p>
@@ -166,7 +167,7 @@ export function Dashboard() {
 
       {/* Controles de Visualização */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-slate-800">
+        <h2 className="text-base font-semibold text-slate-800">
           Campanhas Ativas ({activeCampaigns.length})
         </h2>
         <div className="flex gap-2">
@@ -174,6 +175,7 @@ export function Dashboard() {
             variant={viewMode === 'cards' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setViewMode('cards')}
+            className="h-7 text-xs px-2"
           >
             Cards
           </Button>
@@ -181,6 +183,7 @@ export function Dashboard() {
             variant={viewMode === 'table' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setViewMode('table')}
+            className="h-7 text-xs px-2"
           >
             Tabela
           </Button>
@@ -189,23 +192,23 @@ export function Dashboard() {
 
       {/* Visualização de Campanhas Ativas */}
       {viewMode === 'cards' ? (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {activeCampaigns.map((campaign) => {
             const campaignData = getCampaignInsightsData(campaign.id);
             const costPerConversion = campaignData ? calculateCostPerConversion(campaignData.spend, campaignData.conversions) : 0;
             
             return (
               <div key={campaign.id} className="space-y-2">
-                <h3 className="text-lg font-semibold text-slate-800">{campaign.name}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <h3 className="text-sm font-semibold text-slate-800">{campaign.name}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                   {/* Card 1: Custo Total */}
                   <Card className="hover-lift">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="h-4 w-4 text-red-600" />
-                        <span className="text-sm font-medium text-slate-600">Custo Total</span>
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-1 mb-1">
+                        <DollarSign className="h-3 w-3 text-red-600" />
+                        <span className="text-xs font-medium text-slate-600">Custo Total</span>
                       </div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-base font-bold text-slate-900">
                         {campaignData ? formatCurrency(campaignData.spend || 0) : 'R$ 0,00'}
                       </div>
                     </CardContent>
@@ -213,12 +216,12 @@ export function Dashboard() {
 
                   {/* Card 2: Impressões */}
                   <Card className="hover-lift">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Eye className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-slate-600">Impressões</span>
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Eye className="h-3 w-3 text-blue-600" />
+                        <span className="text-xs font-medium text-slate-600">Impressões</span>
                       </div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-base font-bold text-slate-900">
                         {campaignData ? formatNumber(campaignData.impressions || 0) : '0'}
                       </div>
                     </CardContent>
@@ -226,12 +229,12 @@ export function Dashboard() {
 
                   {/* Card 3: Cliques */}
                   <Card className="hover-lift">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <MousePointer className="h-4 w-4 text-green-600" />
-                        <span className="text-sm font-medium text-slate-600">Cliques</span>
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-1 mb-1">
+                        <MousePointer className="h-3 w-3 text-green-600" />
+                        <span className="text-xs font-medium text-slate-600">Cliques</span>
                       </div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-base font-bold text-slate-900">
                         {campaignData ? formatNumber(campaignData.clicks || 0) : '0'}
                       </div>
                     </CardContent>
@@ -239,12 +242,12 @@ export function Dashboard() {
 
                   {/* Card 4: Conversões */}
                   <Card className="hover-lift">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Target className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm font-medium text-slate-600">Conversões</span>
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Target className="h-3 w-3 text-purple-600" />
+                        <span className="text-xs font-medium text-slate-600">Conversões</span>
                       </div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-base font-bold text-slate-900">
                         {campaignData ? formatNumber(campaignData.conversions || 0) : '0'}
                       </div>
                     </CardContent>
@@ -252,12 +255,12 @@ export function Dashboard() {
 
                   {/* Card 5: Custo por Conversão */}
                   <Card className="hover-lift">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="h-4 w-4 text-orange-600" />
-                        <span className="text-sm font-medium text-slate-600">Custo/Conversão</span>
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-1 mb-1">
+                        <TrendingUp className="h-3 w-3 text-orange-600" />
+                        <span className="text-xs font-medium text-slate-600">Custo/Conversão</span>
                       </div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-base font-bold text-slate-900">
                         {formatCurrency(costPerConversion)}
                       </div>
                     </CardContent>
@@ -272,15 +275,15 @@ export function Dashboard() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome da Campanha</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Objetivo</TableHead>
-                <TableHead>Custo Total</TableHead>
-                <TableHead>Impressões</TableHead>
-                <TableHead>Cliques</TableHead>
-                <TableHead>Conversões</TableHead>
-                <TableHead>Custo/Conversão</TableHead>
-                <TableHead>Criada em</TableHead>
+                <TableHead className="text-xs">Nome da Campanha</TableHead>
+                <TableHead className="text-xs">Status</TableHead>
+                <TableHead className="text-xs">Objetivo</TableHead>
+                <TableHead className="text-xs">Custo Total</TableHead>
+                <TableHead className="text-xs">Impressões</TableHead>
+                <TableHead className="text-xs">Cliques</TableHead>
+                <TableHead className="text-xs">Conversões</TableHead>
+                <TableHead className="text-xs">Custo/Conversão</TableHead>
+                <TableHead className="text-xs">Criada em</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -290,19 +293,19 @@ export function Dashboard() {
                 
                 return (
                   <TableRow key={campaign.id}>
-                    <TableCell className="font-medium">{campaign.name}</TableCell>
+                    <TableCell className="font-medium text-xs">{campaign.name}</TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(campaign.status)}>
+                      <Badge className={`${getStatusColor(campaign.status)} text-xs`}>
                         Ativa
                       </Badge>
                     </TableCell>
-                    <TableCell>{campaign.objective}</TableCell>
-                    <TableCell>{campaignData ? formatCurrency(campaignData.spend || 0) : 'R$ 0,00'}</TableCell>
-                    <TableCell>{campaignData ? formatNumber(campaignData.impressions || 0) : '0'}</TableCell>
-                    <TableCell>{campaignData ? formatNumber(campaignData.clicks || 0) : '0'}</TableCell>
-                    <TableCell>{campaignData ? formatNumber(campaignData.conversions || 0) : '0'}</TableCell>
-                    <TableCell>{formatCurrency(costPerConversion)}</TableCell>
-                    <TableCell>{new Date(campaign.created_time).toLocaleDateString('pt-BR')}</TableCell>
+                    <TableCell className="text-xs">{campaign.objective}</TableCell>
+                    <TableCell className="text-xs">{campaignData ? formatCurrency(campaignData.spend || 0) : 'R$ 0,00'}</TableCell>
+                    <TableCell className="text-xs">{campaignData ? formatNumber(campaignData.impressions || 0) : '0'}</TableCell>
+                    <TableCell className="text-xs">{campaignData ? formatNumber(campaignData.clicks || 0) : '0'}</TableCell>
+                    <TableCell className="text-xs">{campaignData ? formatNumber(campaignData.conversions || 0) : '0'}</TableCell>
+                    <TableCell className="text-xs">{formatCurrency(costPerConversion)}</TableCell>
+                    <TableCell className="text-xs">{new Date(campaign.created_time).toLocaleDateString('pt-BR')}</TableCell>
                   </TableRow>
                 );
               })}
@@ -313,10 +316,10 @@ export function Dashboard() {
 
       {activeCampaigns.length === 0 && (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Target className="h-12 w-12 text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-600 mb-2">Nenhuma campanha ativa</h3>
-            <p className="text-slate-500 text-center">
+          <CardContent className="flex flex-col items-center justify-center py-8">
+            <Target className="h-8 w-8 text-slate-300 mb-3" />
+            <h3 className="text-sm font-semibold text-slate-600 mb-1">Nenhuma campanha ativa</h3>
+            <p className="text-xs text-slate-500 text-center">
               Ative campanhas existentes ou crie novas para ver métricas
             </p>
           </CardContent>

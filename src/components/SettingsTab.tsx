@@ -5,18 +5,18 @@ import { DataManagement } from '@/components/DataManagement';
 
 export function SettingsTab() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Configurações</h1>
-        <p className="text-slate-600 mt-2">
+        <h1 className="text-xl font-bold text-slate-800">Configurações</h1>
+        <p className="text-xs text-slate-600 mt-1">
           Gerencie as configurações da plataforma e integrações
         </p>
       </div>
 
       <Tabs defaultValue="api" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="api">Gestão da API Meta</TabsTrigger>
-          <TabsTrigger value="data">Gestão de Dados</TabsTrigger>
+        <TabsList className="text-xs">
+          <TabsTrigger value="api" className="text-xs">Gestão da API Meta</TabsTrigger>
+          <TabsTrigger value="data" className="text-xs">Gestão de Dados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="api">
