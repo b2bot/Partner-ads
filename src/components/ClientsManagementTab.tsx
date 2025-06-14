@@ -51,11 +51,11 @@ export function ClientsManagementTab() {
 
       if (error) throw error;
 
-      // Certifique-se que profiles é objeto válido
-      return (data || []).map(item => ({
+      // Corrigir checagem para evitar 'never' para o tipo profiles (deve aceitar objeto OU null)
+      return (data || []).map((item: any) => ({
         ...item,
-        profiles: (item.profiles && typeof item.profiles === 'object' && !Array.isArray(item.profiles) && (item.profiles.email || item.profiles.email === '') && (item.profiles.role || item.profiles.role === '')) 
-          ? item.profiles 
+        profiles: item.profiles && typeof item.profiles === 'object' && !Array.isArray(item.profiles)
+          ? item.profiles
           : null,
       })) as Cliente[];
     },

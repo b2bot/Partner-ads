@@ -163,7 +163,8 @@ export function CampaignsTab() {
           <TableBody>
             {sortedCampaigns.map(campaign => {
               const campaignData = campaignInsights.find(item => item?.id === campaign.id);
-
+              // default para updated_time obrigatório
+              const safeCampaign = { ...campaign, updated_time: campaign.updated_time ?? "" };
               return (
                 <TableRow key={campaign.id}>
                   <TableCell className="font-medium">{campaign.name}</TableCell>
@@ -188,7 +189,7 @@ export function CampaignsTab() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingCampaign(campaign)}>
+                        <DropdownMenuItem onClick={() => setEditingCampaign(safeCampaign)}>
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
@@ -214,7 +215,11 @@ export function CampaignsTab() {
       </Card>
 
       {showCreateModal && (
-        <CreateCampaignModal onClose={() => setShowCreateModal(false)} />
+        <CreateCampaignModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => setShowCreateModal(false)}
+        />
       )}
 
       {editingCampaign && (

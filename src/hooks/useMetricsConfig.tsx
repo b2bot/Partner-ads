@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -60,9 +59,10 @@ export function useMetricsConfig() {
   const updateConfigMutation = useMutation({
     mutationFn: async (newConfig: MetricsConfig) => {
       try {
+        // Serializa newConfig para JSON
         const { error } = await supabase
           .from('metrics_config')
-          .upsert([{ config: newConfig }], { onConflict: 'id' });
+          .upsert([{ config: JSON.parse(JSON.stringify(newConfig)) }], { onConflict: 'id' });
 
         if (error) throw error;
 

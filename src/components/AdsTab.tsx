@@ -43,6 +43,7 @@ export function AdsTab() {
   // Hook para insights de ads com range de data
   const { data: adInsights = [], isLoading: insightsLoading } = useAdInsights(getApiDateRange());
 
+  // Corrigir acessos para campaign_id inexistente e garantir creative, updated_time
   const filteredAds = useMemo(() => {
     let filtered = ads || [];
 
@@ -57,8 +58,9 @@ export function AdsTab() {
       filtered = filtered.filter(ad => ad.account_id === filters.account);
     }
 
+    // Adicional: Buscar o campaign_id nos ads, com fallback para "-"
     if (filters.campaign) {
-      filtered = filtered.filter(ad => ad.campaign_id === filters.campaign);
+      filtered = filtered.filter(ad => (ad as any).campaign_id === filters.campaign);
     }
 
     if (filters.adset) {
@@ -194,6 +196,8 @@ export function AdsTab() {
           <TableBody>
             {sortedAds.map((ad) => {
               const adInsightsData = adInsights.find(insight => insight.id === ad.id);
+              // Adiciona defaults obrigatórios para creative/updated_time
+              const safeAd: any = { ...ad, creative: ad.creative ?? {}, updated_time: ad.updated_time ?? "", campaign_id: (ad as any).campaign_id ?? "-" };
 
               return (
                 <TableRow key={ad.id}>
@@ -203,8 +207,8 @@ export function AdsTab() {
                       {ad.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{ad.adset_id}</TableCell>
-                  <TableCell>{ad.campaign_id || '-'}</TableCell>
+                  <TableCell>{safeAd.adset_id}</TableCell>
+                  <TableCell>{safeAd.campaign_id}</TableCell>
                   {config?.ads?.map((metric) => (
                     <TableCell key={metric}>
                       {formatMetricValue(adInsightsData, metric)}
@@ -219,7 +223,7 @@ export function AdsTab() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingAd(ad)}>
+                        <DropdownMenuItem onClick={() => setEditingAd(safeAd)}>
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
@@ -245,7 +249,11 @@ export function AdsTab() {
       </Card>
 
       {showCreateModal && (
-        <CreateAdModal onClose={() => setShowCreateModal(false)} />
+        <CreateAdModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => setShowCreateModal(false)}
+        />
       )}
       {editingAd && (
         <EditAdModal ad={editingAd} onClose={() => setEditingAd(null)} />

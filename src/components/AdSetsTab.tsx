@@ -192,6 +192,13 @@ export function AdSetsTab() {
             {sortedAdSets.map(adSet => {
               const adSetData = adSetInsights.find(insight => insight.id === adSet.id);
 
+              // Garantir que targeting e updated_time existam
+              const safeAdSet = {
+                ...adSet,
+                targeting: adSet.targeting ?? {},
+                updated_time: adSet.updated_time ?? ""
+              };
+
               return (
                 <TableRow key={adSet.id}>
                   <TableCell className="font-medium">{adSet.name}</TableCell>
@@ -220,7 +227,7 @@ export function AdSetsTab() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingAdSet(adSet)}>
+                        <DropdownMenuItem onClick={() => setEditingAdSet(safeAdSet)}>
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
@@ -254,7 +261,11 @@ export function AdSetsTab() {
       </Card>
 
       {showCreateModal && (
-        <CreateAdSetModal onClose={() => setShowCreateModal(false)} />
+        <CreateAdSetModal 
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => setShowCreateModal(false)}
+        />
       )}
 
       {editingAdSet && (
