@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,16 +19,7 @@ import { MetricsCustomization } from '@/components/MetricsCustomization';
 import { DynamicFilters } from '@/components/DynamicFilters';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useDateRange } from '@/hooks/useDateRange';
-
-interface Campaign {
-  id: string;
-  name: string;
-  status: string;
-  objective: string;
-  created_time: string;
-  account_id: string;
-  updated_time?: string;
-}
+import type { Campaign } from '@/lib/metaApi';
 
 export function CampaignsTab() {
   const { campaigns, loading, credentials, refetch } = useMetaData();
@@ -139,7 +131,6 @@ export function CampaignsTab() {
 
       {showMetricsConfig && (
         <MetricsCustomization
-          type="campaigns"
           onClose={() => setShowMetricsConfig(false)}
         />
       )}
@@ -163,8 +154,7 @@ export function CampaignsTab() {
           <TableBody>
             {sortedCampaigns.map(campaign => {
               const campaignData = campaignInsights.find(item => item?.id === campaign.id);
-              // default para updated_time obrigatório
-              const safeCampaign = { ...campaign, updated_time: campaign.updated_time ?? "" };
+              
               return (
                 <TableRow key={campaign.id}>
                   <TableCell className="font-medium">{campaign.name}</TableCell>
@@ -189,7 +179,7 @@ export function CampaignsTab() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingCampaign(safeCampaign)}>
+                        <DropdownMenuItem onClick={() => setEditingCampaign(campaign)}>
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
@@ -214,13 +204,11 @@ export function CampaignsTab() {
         </Table>
       </Card>
 
-      {showCreateModal && (
-        <CreateCampaignModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => setShowCreateModal(false)}
-        />
-      )}
+      <CreateCampaignModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => setShowCreateModal(false)}
+      />
 
       {editingCampaign && (
         <EditCampaignModal

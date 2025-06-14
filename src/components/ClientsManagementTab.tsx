@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,7 +52,6 @@ export function ClientsManagementTab() {
 
       if (error) throw error;
 
-      // Corrigir checagem para evitar 'never' para o tipo profiles (deve aceitar objeto OU null)
       return (data || []).map((item: any) => ({
         ...item,
         profiles: item.profiles && typeof item.profiles === 'object' && !Array.isArray(item.profiles)

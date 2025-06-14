@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,17 +18,7 @@ import { MetricsCustomization } from '@/components/MetricsCustomization';
 import { DynamicFilters } from '@/components/DynamicFilters';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useDateRange } from '@/hooks/useDateRange';
-
-interface Ad {
-  id: string;
-  name: string;
-  status: string;
-  adset_id: string;
-  account_id: string;
-  created_time: string;
-  creative?: any;
-  updated_time?: string;
-}
+import type { Ad } from '@/lib/metaApi';
 
 export function AdsTab() {
   const { ads, loading, credentials, campaigns, adSets, refetch } = useMetaData();
@@ -43,7 +34,6 @@ export function AdsTab() {
   // Hook para insights de ads com range de data
   const { data: adInsights = [], isLoading: insightsLoading } = useAdInsights(getApiDateRange());
 
-  // Corrigir acessos para campaign_id inexistente e garantir creative, updated_time
   const filteredAds = useMemo(() => {
     let filtered = ads || [];
 
@@ -58,9 +48,11 @@ export function AdsTab() {
       filtered = filtered.filter(ad => ad.account_id === filters.account);
     }
 
-    // Adicional: Buscar o campaign_id nos ads, com fallback para "-"
     if (filters.campaign) {
-      filtered = filtered.filter(ad => (ad as any).campaign_id === filters.campaign);
+      const adSet = adSets?.find(adset => adset.campaign_id === filters.campaign);
+      if (adSet) {
+        filtered = filtered.filter(ad => ad.adset_id === adSet.id);
+      }
     }
 
     if (filters.adset) {
@@ -72,7 +64,7 @@ export function AdsTab() {
     }
 
     return filtered;
-  }, [ads, filters]);
+  }, [ads, filters, adSets]);
 
   const sortedAds = useMemo(() => {
     if (!sortConfig) return filteredAds;
@@ -185,7 +177,7 @@ export function AdsTab() {
                 {sortConfig?.key === 'status' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
               </TableHead>
               <TableHead>Conjunto (ID)</TableHead>
-              <TableHead>Campanha (ID)</TableHead>
+              <TableHead>Campanha</TableHead>
               {config?.ads?.map((metric) => (
                 <TableHead key={metric}>{metric}</TableHead>
               ))}
@@ -195,8 +187,8 @@ export function AdsTab() {
           <TableBody>
             {sortedAds.map((ad) => {
               const adInsightsData = adInsights.find(insight => insight.id === ad.id);
-              // Adiciona defaults obrigatórios para creative/updated_time
-              const safeAd: any = { ...ad, creative: ad.creative ?? {}, updated_time: ad.updated_time ?? "", campaign_id: (ad as any).campaign_id ?? "-" };
+              const adSet = adSets?.find(adset => adset.id === ad.adset_id);
+              const campaign = campaigns?.find(camp => camp.id === adSet?.campaign_id);
 
               return (
                 <TableRow key={ad.id}>
@@ -206,8 +198,8 @@ export function AdsTab() {
                       {ad.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{safeAd.adset_id}</TableCell>
-                  <TableCell>{safeAd.campaign_id}</TableCell>
+                  <TableCell>{ad.adset_id}</TableCell>
+                  <TableCell>{campaign?.name || '-'}</TableCell>
                   {config?.ads?.map((metric) => (
                     <TableCell key={metric}>
                       {formatMetricValue(adInsightsData, metric)}
@@ -222,7 +214,7 @@ export function AdsTab() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingAd(safeAd)}>
+                        <DropdownMenuItem onClick={() => setEditingAd(ad)}>
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>

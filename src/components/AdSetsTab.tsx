@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,17 +18,7 @@ import { MetricsCustomization } from '@/components/MetricsCustomization';
 import { DynamicFilters } from '@/components/DynamicFilters';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useDateRange } from '@/hooks/useDateRange';
-
-interface AdSet {
-  id: string;
-  name: string;
-  status: string;
-  campaign_id: string;
-  account_id: string;
-  created_time: string;
-  targeting?: any;
-  updated_time?: string;
-}
+import type { AdSet } from '@/lib/metaApi';
 
 export function AdSetsTab() {
   const { adSets, loading, credentials, campaigns, refetch } = useMetaData();
@@ -103,7 +94,7 @@ export function AdSetsTab() {
       await updateAdSetWithRateLimit(credentials.access_token, adSetId, { status: newStatus });
       toast.success('Status do conjunto de anúncios atualizado com sucesso!');
       if (refetch && typeof refetch.adSets === 'function') {
-        refetch.adSets(); // Corrige o erro "not callable"
+        refetch.adSets();
       }
     } catch (error: any) {
       console.error('Erro ao atualizar status do conjunto de anúncios:', error);
@@ -194,13 +185,6 @@ export function AdSetsTab() {
             {sortedAdSets.map(adSet => {
               const adSetData = adSetInsights.find(insight => insight.id === adSet.id);
 
-              // Garantir que targeting e updated_time existam para tipagem correta
-              const safeAdSet = {
-                ...adSet,
-                targeting: adSet.targeting ?? {},
-                updated_time: adSet.updated_time ?? "",
-              };
-
               return (
                 <TableRow key={adSet.id}>
                   <TableCell className="font-medium">{adSet.name}</TableCell>
@@ -229,7 +213,7 @@ export function AdSetsTab() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingAdSet(safeAdSet)}>
+                        <DropdownMenuItem onClick={() => setEditingAdSet(adSet)}>
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
@@ -262,13 +246,11 @@ export function AdSetsTab() {
         </Table>
       </Card>
 
-      {showCreateModal && (
-        <CreateAdSetModal 
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => setShowCreateModal(false)}
-        />
-      )}
+      <CreateAdSetModal 
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => setShowCreateModal(false)}
+      />
 
       {editingAdSet && (
         <EditAdSetModal
