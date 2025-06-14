@@ -1,8 +1,6 @@
 
 import { Button } from '@/components/ui/button';
 import { 
-  Table, 
-  LayoutGrid, 
   RefreshCw, 
   Download
 } from 'lucide-react';
@@ -43,8 +41,6 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
     }
   };
 
-  const showViewModeControls = ['campaigns', 'adsets', 'ads'].includes(activeTab);
-
   return (
     <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
       <div className="container-responsive py-2">
@@ -53,7 +49,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <SidebarTrigger className="lg:hidden" />
             <div className="min-w-0 flex-1">
-              <h1 className="text-base font-semibold text-slate-800 dark:text-slate-200 truncate">
+              <h1 className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
                 {getTabTitle()}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
@@ -71,37 +67,16 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
           <div className="flex items-center gap-2 flex-shrink-0">
             {activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
               <>
-                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-8 px-3">
+                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
                   <RefreshCw className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline">Atualizar</span>
+                  <span className="hidden lg:inline text-xs">Atualizar</span>
                 </Button>
                 
-                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-8 px-3">
+                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
                   <Download className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline">Exportar</span>
+                  <span className="hidden lg:inline text-xs">Exportar</span>
                 </Button>
               </>
-            )}
-
-            {showViewModeControls && (
-              <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-                <Button
-                  variant={viewMode === 'cards' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('cards')}
-                  className="h-6 w-6 p-0"
-                >
-                  <LayoutGrid className="w-3 h-3" />
-                </Button>
-                <Button
-                  variant={viewMode === 'table' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('table')}
-                  className="h-6 w-6 p-0"
-                >
-                  <Table className="w-3 h-3" />
-                </Button>
-              </div>
             )}
           </div>
         </div>

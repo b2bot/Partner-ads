@@ -1,10 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, X, Megaphone, Target, Users } from 'lucide-react';
+import { X, Megaphone, Target, Users } from 'lucide-react';
 import { useMetaData } from '@/hooks/useMetaData';
 
 interface DynamicFiltersProps {
@@ -15,11 +14,9 @@ interface DynamicFiltersProps {
 export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
   const { campaigns, adSets, selectedAdAccount } = useMetaData();
   const [filters, setFilters] = useState({
-    search: '',
     campaign: 'all',
     adset: 'all',
     status: 'all',
-    dateRange: 'last_7_days',
   });
 
   useEffect(() => {
@@ -41,11 +38,9 @@ export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
 
   const clearFilters = () => {
     setFilters({
-      search: '',
       campaign: 'all',
       adset: 'all',
       status: 'all',
-      dateRange: 'last_7_days',
     });
   };
 
@@ -70,110 +65,92 @@ export function DynamicFilters({ type, onFiltersChange }: DynamicFiltersProps) {
       case 'campaigns': return Megaphone;
       case 'adsets': return Target;
       case 'ads': return Users;
-      default: return Search;
+      default: return Megaphone;
     }
   };
 
   const Icon = getIcon();
-  const typeLabel = type === 'campaigns' ? 'campanhas' : type === 'adsets' ? 'conjuntos' : 'anúncios';
 
   return (
-    <div className="space-y-3">
-      {/* Main Filters */}
-      <Card className="border-slate-200 dark:border-slate-700">
-        <CardContent className="p-3 space-y-3">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-slate-400" />
-            <Input
-              placeholder={`Buscar ${typeLabel}...`}
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="pl-8 text-xs h-8"
-            />
-          </div>
-
-          {/* Specific Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            {/* Campaign Filter (for adsets and ads) */}
-            {(type === 'adsets' || type === 'ads') && (
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  <Megaphone className="w-3 h-3" />
-                  Filtrar por Campanha
-                </label>
-                <Select value={filters.campaign} onValueChange={(value) => handleFilterChange('campaign', value)}>
-                  <SelectTrigger className="text-xs h-8">
-                    <SelectValue placeholder="Todas as campanhas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas as campanhas</SelectItem>
-                    {getFilteredCampaigns().map((campaign) => (
-                      <SelectItem key={campaign.id} value={campaign.id}>
-                        <span className="truncate text-xs">{campaign.name}</span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* AdSet Filter (only for ads) */}
-            {type === 'ads' && (
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  <Target className="w-3 h-3" />
-                  Filtrar por Conjunto
-                </label>
-                <Select value={filters.adset} onValueChange={(value) => handleFilterChange('adset', value)}>
-                  <SelectTrigger className="text-xs h-8">
-                    <SelectValue placeholder="Todos os conjuntos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os conjuntos</SelectItem>
-                    {getFilteredAdSets().map((adset) => (
-                      <SelectItem key={adset.id} value={adset.id}>
-                        <span className="truncate text-xs">{adset.name}</span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* Status Filter */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                Status
+    <Card className="border-slate-200 dark:border-slate-700">
+      <CardContent className="p-3">
+        <div className="flex items-center gap-3">
+          {/* Campaign Filter (for adsets and ads) */}
+          {(type === 'adsets' || type === 'ads') && (
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1 whitespace-nowrap">
+                <Megaphone className="w-3 h-3" />
+                Campanha:
               </label>
-              <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
-                <SelectTrigger className="text-xs h-8">
-                  <SelectValue placeholder="Todos os status" />
+              <Select value={filters.campaign} onValueChange={(value) => handleFilterChange('campaign', value)}>
+                <SelectTrigger className="text-xs h-7 w-48">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os status</SelectItem>
-                  <SelectItem value="ACTIVE">Ativo</SelectItem>
-                  <SelectItem value="PAUSED">Pausado</SelectItem>
-                  <SelectItem value="ARCHIVED">Arquivado</SelectItem>
+                  <SelectItem value="all">Todas as campanhas</SelectItem>
+                  {getFilteredCampaigns().map((campaign) => (
+                    <SelectItem key={campaign.id} value={campaign.id}>
+                      <span className="truncate text-xs">{campaign.name}</span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+          )}
+
+          {/* AdSet Filter (only for ads) */}
+          {type === 'ads' && (
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1 whitespace-nowrap">
+                <Target className="w-3 h-3" />
+                Conjunto:
+              </label>
+              <Select value={filters.adset} onValueChange={(value) => handleFilterChange('adset', value)}>
+                <SelectTrigger className="text-xs h-7 w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os conjuntos</SelectItem>
+                  {getFilteredAdSets().map((adset) => (
+                    <SelectItem key={adset.id} value={adset.id}>
+                      <span className="truncate text-xs">{adset.name}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Status Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">
+              Status:
+            </label>
+            <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
+              <SelectTrigger className="text-xs h-7 w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="ACTIVE">Ativo</SelectItem>
+                <SelectItem value="PAUSED">Pausado</SelectItem>
+                <SelectItem value="ARCHIVED">Arquivado</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Clear filters button */}
-          <div className="flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearFilters}
-              className="text-xs h-7 px-2"
-            >
-              <X className="h-3 w-3 mr-1" />
-              Limpar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearFilters}
+            className="text-xs h-7 px-2 ml-auto"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Limpar
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

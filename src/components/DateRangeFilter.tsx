@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -38,6 +38,7 @@ export function DateRangeFilter({ onDateChange }: DateRangeFilterProps) {
         to: new Date()
       };
       setDateRange(newRange);
+      // Trigger the callback immediately
       onDateChange?.(newRange);
     }
   };
@@ -45,8 +46,14 @@ export function DateRangeFilter({ onDateChange }: DateRangeFilterProps) {
   const handleDateRangeSelect = (range: DateRange | undefined) => {
     setDateRange(range);
     setSelectedPreset('custom');
+    // Trigger the callback immediately
     onDateChange?.(range);
   };
+
+  // Trigger callback when component mounts with initial range
+  useEffect(() => {
+    onDateChange?.(dateRange);
+  }, []);
 
   const formatDateRange = () => {
     if (!dateRange?.from) return 'Selecione as datas';
@@ -66,23 +73,23 @@ export function DateRangeFilter({ onDateChange }: DateRangeFilterProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 text-xs font-normal">
-          <CalendarIcon className="w-3 h-3 mr-2" />
+        <Button variant="outline" size="sm" className="h-7 text-xs font-normal">
+          <CalendarIcon className="w-3 h-3 mr-1" />
           {formatDateRange()}
-          <ChevronDown className="w-3 h-3 ml-2" />
+          <ChevronDown className="w-3 h-3 ml-1" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <div className="flex">
           {/* Presets */}
-          <div className="border-r p-3 space-y-1">
-            <div className="text-xs font-medium text-slate-700 mb-2">Períodos</div>
+          <div className="border-r p-2 space-y-1">
+            <div className="text-xs font-medium text-slate-700 mb-1">Períodos</div>
             {presets.map((preset) => (
               <Button
                 key={preset.value}
                 variant={selectedPreset === preset.value ? "default" : "ghost"}
                 size="sm"
-                className="w-full justify-start h-7 text-xs"
+                className="w-full justify-start h-6 text-xs"
                 onClick={() => handlePresetSelect(preset)}
               >
                 {preset.label}
@@ -91,7 +98,7 @@ export function DateRangeFilter({ onDateChange }: DateRangeFilterProps) {
           </div>
           
           {/* Calendar */}
-          <div className="p-3">
+          <div className="p-2">
             <Calendar
               mode="range"
               selected={dateRange}

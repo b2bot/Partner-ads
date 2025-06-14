@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 
 export function useDateRange() {
@@ -21,6 +21,15 @@ export function useDateRange() {
       until: dateRange.to.toISOString().split('T')[0]
     };
   };
+
+  // Log para debug quando o range de data muda
+  useEffect(() => {
+    const apiRange = getApiDateRange();
+    console.log('Date range changed:', {
+      dateRange,
+      apiRange
+    });
+  }, [dateRange]);
 
   return {
     dateRange,

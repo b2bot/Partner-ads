@@ -1,14 +1,16 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Eye, Pause, Play, MoreHorizontal, Plus, Filter } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Edit, Eye, Pause, Play, MoreHorizontal, Plus, Filter, ArrowUpDown } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useMetaData } from '@/hooks/useMetaData';
 import { useAdInsights } from '@/hooks/useInsights';
 import { useMetricsConfig } from '@/hooks/useMetricsConfig';
-import { formatMetricValue } from '@/lib/metaInsights';
+import { formatMetricValue, getMetricDisplayName } from '@/lib/metaInsights';
 import { toast } from 'sonner';
 import { updateAdWithRateLimit } from '@/lib/metaApiWithRateLimit';
 import { CreateAdModal } from '@/components/CreateAdModal';
@@ -30,6 +32,7 @@ export function AdsTab() {
   const [showMetricsConfig, setShowMetricsConfig] = useState(false);
   const [filters, setFilters] = useState<any>({});
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+  const [selectedCreativeImage, setSelectedCreativeImage] = useState<string | null>(null);
 
   // Hook para insights de ads com range de data
   const { data: adInsights = [], isLoading: insightsLoading } = useAdInsights(getApiDateRange());
@@ -40,13 +43,6 @@ export function AdsTab() {
     // Filtrar por conta selecionada
     if (selectedAdAccount) {
       filtered = filtered.filter(ad => ad.account_id === selectedAdAccount);
-    }
-
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(ad =>
-        ad.name.toLowerCase().includes(searchTerm)
-      );
     }
 
     if (filters.campaign && filters.campaign !== 'all') {
@@ -70,26 +66,29 @@ export function AdsTab() {
     if (!sortConfig) return filteredAds;
 
     return [...filteredAds].sort((a, b) => {
-      const key = sortConfig.key as keyof Ad;
-      const direction = sortConfig.direction;
+      const direction = sortConfig.direction === 'asc' ? 1 : -1;
+      const key = sortConfig.key;
 
-      const valueA = a[key];
-      const valueB = b[key];
-
-      if (valueA === undefined || valueA === null) return direction === 'asc' ? -1 : 1;
-      if (valueB === undefined || valueB === null) return direction === 'asc' ? 1 : -1;
-
-      if (typeof valueA === 'number' && typeof valueB === 'number') {
-        return direction === 'asc' ? valueA - valueB : valueB - valueA;
+      // Handle metric sorting
+      if (getVisibleMetrics('ads').includes(key)) {
+        const dataA = adInsights.find(item => item?.id === a.id);
+        const dataB = adInsights.find(item => item?.id === b.id);
+        
+        const valueA = dataA?.[key] || 0;
+        const valueB = dataB?.[key] || 0;
+        
+        return (Number(valueA) - Number(valueB)) * direction;
       }
 
-      if (typeof valueA === 'string' && typeof valueB === 'string') {
-        return direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
-      }
+      // Handle ad property sorting
+      const valueA = (a as any)[key];
+      const valueB = (b as any)[key];
 
+      if (valueA < valueB) return -1 * direction;
+      if (valueA > valueB) return 1 * direction;
       return 0;
     });
-  }, [filteredAds, sortConfig]);
+  }, [filteredAds, sortConfig, adInsights, getVisibleMetrics]);
 
   const handleStatusUpdate = async (ad: Ad, newStatus: string) => {
     if (!credentials?.access_token) {
@@ -130,24 +129,31 @@ export function AdsTab() {
     }
   };
 
+  // Mock function to simulate creative image URL - replace with real implementation
+  const getCreativeImageUrl = (adId: string) => {
+    return `https://via.placeholder.com/400x300/e2e8f0/64748b?text=Criativo+${adId.slice(-4)}`;
+  };
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 space-y-3">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Anúncios</h1>
-          <p className="text-slate-600 mt-2">Gerencie seus anúncios do Facebook Ads</p>
+          <h1 className="text-lg font-bold text-slate-800">Anúncios</h1>
+          <p className="text-slate-600 text-xs">Gerencie seus anúncios do Facebook Ads</p>
         </div>
         <div className="flex gap-2">
           <DateRangeFilter onDateChange={setDateRange} />
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setShowMetricsConfig(!showMetricsConfig)}
+            className="text-xs h-7"
           >
-            <Filter className="h-4 w-4 mr-2" />
+            <Filter className="h-3 w-3 mr-1" />
             Métricas
           </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setShowCreateModal(true)} size="sm" className="text-xs h-7">
+            <Plus className="h-3 w-3 mr-1" />
             Novo Anúncio
           </Button>
         </div>
@@ -169,77 +175,124 @@ export function AdsTab() {
       <Card>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
-                Nome
-                {sortConfig?.key === 'name' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+            <TableRow className="text-xs">
+              <TableHead className="text-xs h-7 w-12">Criativo</TableHead>
+              <TableHead 
+                onClick={() => handleSort('name')} 
+                className="cursor-pointer text-xs h-7 hover:bg-slate-50"
+              >
+                <div className="flex items-center gap-1">
+                  Nome
+                  <ArrowUpDown className="h-3 w-3" />
+                </div>
               </TableHead>
-              <TableHead onClick={() => handleSort('status')} className="cursor-pointer">
-                Status
-                {sortConfig?.key === 'status' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
-              </TableHead>
-              <TableHead>Conjunto (ID)</TableHead>
-              <TableHead>Campanha</TableHead>
-              {config?.ads?.map((metric) => (
-                <TableHead key={metric}>{metric}</TableHead>
+              <TableHead className="text-xs h-7">Status</TableHead>
+              <TableHead className="text-xs h-7">Conjunto</TableHead>
+              <TableHead className="text-xs h-7">Campanha</TableHead>
+              {getVisibleMetrics('ads').map(metric => (
+                <TableHead 
+                  key={metric} 
+                  onClick={() => handleSort(metric)}
+                  className="cursor-pointer text-xs h-7 hover:bg-slate-50"
+                >
+                  <div className="flex items-center gap-1">
+                    {getMetricDisplayName(metric)}
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
               ))}
-              <TableHead className="text-right">Ações</TableHead>
+              <TableHead className="text-right text-xs h-7">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedAds.map((ad) => {
-              const adInsightsData = adInsights.find(insight => insight.id === ad.id);
-              const adSet = adSets?.find(adset => adset.id === ad.adset_id);
-              const campaign = campaigns?.find(camp => camp.id === adSet?.campaign_id);
+            {insightsLoading ? (
+              <TableRow>
+                <TableCell colSpan={getVisibleMetrics('ads').length + 6} className="text-center text-xs py-4">
+                  Carregando métricas...
+                </TableCell>
+              </TableRow>
+            ) : (
+              sortedAds.map((ad) => {
+                const adInsightsData = adInsights.find(insight => insight.id === ad.id);
+                const adSet = adSets?.find(adset => adset.id === ad.adset_id);
+                const campaign = campaigns?.find(camp => camp.id === adSet?.campaign_id);
+                const creativeImageUrl = getCreativeImageUrl(ad.id);
 
-              return (
-                <TableRow key={ad.id}>
-                  <TableCell className="font-medium">{ad.name}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(ad.status)}>
-                      {ad.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{ad.adset_id}</TableCell>
-                  <TableCell>{campaign?.name || '-'}</TableCell>
-                  {config?.ads?.map((metric) => (
-                    <TableCell key={metric}>
-                      {formatMetricValue(adInsightsData, metric)}
+                return (
+                  <TableRow key={ad.id} className="text-xs h-8">
+                    <TableCell className="p-1">
+                      <img 
+                        src={creativeImageUrl}
+                        alt="Criativo"
+                        className="w-8 h-6 object-cover rounded cursor-pointer hover:opacity-80"
+                        onClick={() => setSelectedCreativeImage(creativeImageUrl)}
+                      />
                     </TableCell>
-                  ))}
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Abrir menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingAd(ad)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
-                        {ad.status === 'ACTIVE' ? (
-                          <DropdownMenuItem onClick={() => handleStatusUpdate(ad, 'PAUSED')}>
-                            <Pause className="h-4 w-4 mr-2" />
-                            Pausar
+                    <TableCell className="font-medium text-xs p-1">{ad.name}</TableCell>
+                    <TableCell className="p-1">
+                      <Badge className={getStatusColor(ad.status) + " text-xs px-1 py-0"}>
+                        {ad.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs p-1">{adSet?.name || '-'}</TableCell>
+                    <TableCell className="text-xs p-1">{campaign?.name || '-'}</TableCell>
+                    {getVisibleMetrics('ads').map((metric) => (
+                      <TableCell key={metric} className="text-xs p-1">
+                        {formatMetricValue(adInsightsData, metric)}
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-right p-1">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-6 w-6 p-0">
+                            <span className="sr-only">Abrir menu</span>
+                            <MoreHorizontal className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditingAd(ad)}>
+                            <Edit className="h-3 w-3 mr-2" />
+                            Editar
                           </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem onClick={() => handleStatusUpdate(ad, 'ACTIVE')}>
-                            <Play className="h-4 w-4 mr-2" />
-                            Ativar
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                          {ad.status === 'ACTIVE' ? (
+                            <DropdownMenuItem onClick={() => handleStatusUpdate(ad, 'PAUSED')}>
+                              <Pause className="h-3 w-3 mr-2" />
+                              Pausar
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => handleStatusUpdate(ad, 'ACTIVE')}>
+                              <Play className="h-3 w-3 mr-2" />
+                              Ativar
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </Card>
+
+      {/* Modal para exibir imagem do criativo */}
+      <Dialog open={!!selectedCreativeImage} onOpenChange={() => setSelectedCreativeImage(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Visualização do Criativo</DialogTitle>
+          </DialogHeader>
+          {selectedCreativeImage && (
+            <div className="flex justify-center">
+              <img 
+                src={selectedCreativeImage} 
+                alt="Criativo ampliado"
+                className="max-w-full max-h-96 object-contain rounded"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <CreateAdModal
         isOpen={showCreateModal}
