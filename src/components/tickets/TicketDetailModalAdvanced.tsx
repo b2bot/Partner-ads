@@ -266,27 +266,21 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
 
             {/* NOVA ABA SOMENTE PARA CLIENTE */}
             {!isAdmin && (
-              <TabsContent 
-                value="clientreply" 
-                className="flex-1 overflow-hidden px-0" 
-                style={{ height: '100%' }}
-              >
-                <div className="h-full min-h-0 flex flex-col px-6">
+              <TabsContent value="clientreply" className="flex-1 overflow-hidden px-6 pb-6">
+                <div className="h-full flex flex-col">
                   <h3 className="font-medium mb-3 flex items-center gap-2 flex-shrink-0">
                     <MessageCircle className="h-4 w-4" />
                     Enviar mensagem
                   </h3>
-                  <div className="flex-1 min-h-0 flex flex-col">
-                    <div className="flex-1 flex flex-col">
-                      <ClientMessageForm
-                        ticketId={ticket.id}
-                        onSuccess={() => {
-                          queryClient.invalidateQueries({ queryKey: ['ticket-timeline', ticket.id] });
-                          queryClient.invalidateQueries({ queryKey: ['tickets'] });
-                        }}
-                        className="flex flex-col flex-1 h-full max-w-full w-full"
-                      />
-                    </div>
+                  <div className="flex-1 min-h-0">
+                    <ClientMessageForm
+                      ticketId={ticket.id}
+                      onSuccess={() => {
+                        queryClient.invalidateQueries({ queryKey: ['ticket-timeline', ticket.id] });
+                        queryClient.invalidateQueries({ queryKey: ['tickets'] });
+                      }}
+                      className="h-full"
+                    />
                   </div>
                 </div>
               </TabsContent>
@@ -379,4 +373,3 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
     </Dialog>
   );
 }
-// ... fim do arquivo

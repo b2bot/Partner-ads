@@ -58,6 +58,7 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
           mensagem: data.mensagem,
           arquivo_url: data.arquivo_url,
           aberto_por: isAdmin ? 'admin' : 'cliente',
+          // Removido o campo 'status' - usar o valor padrão do banco
         });
 
       if (error) throw error;
@@ -156,97 +157,101 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Novo Chamado</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {isAdmin && (
+        <div className="flex-1 overflow-y-auto px-1">
+          <form onSubmit={handleSubmit} className="space-y-4 py-2">
+            {isAdmin && (
+              <div className="space-y-2">
+                <Label htmlFor="cliente">Cliente</Label>
+                <Select value={clienteId} onValueChange={setClienteId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientes?.map((cliente) => (
+                      <SelectItem key={cliente.id} value={cliente.id}>
+                        {cliente.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="cliente">Cliente</Label>
-              <Select value={clienteId} onValueChange={setClienteId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clientes?.map((cliente) => (
-                    <SelectItem key={cliente.id} value={cliente.id}>
-                      {cliente.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="titulo">Título do chamado</Label>
-            <Input
-              id="titulo"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Ex: Problema com relatórios de campanha"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="mensagem">Descrição detalhada</Label>
-            <Textarea
-              id="mensagem"
-              value={mensagem}
-              onChange={(e) => setMensagem(e.target.value)}
-              placeholder="Descreva o problema ou solicitação em detalhes..."
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="arquivo">Anexar arquivo (opcional)</Label>
-            <div className="flex items-center gap-2">
+              <Label htmlFor="titulo">Título do chamado</Label>
               <Input
-                id="arquivo"
-                type="file"
-                onChange={handleFileChange}
-                accept="image/*,.pdf,.doc,.docx,.txt"
-                className="hidden"
+                id="titulo"
+                value={titulo}
+                onChange={(e) => setTitulo(e.target.value)}
+                placeholder="Ex: Problema com relatórios de campanha"
+                required
               />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => document.getElementById('arquivo')?.click()}
-                className="w-full"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                {arquivo ? arquivo.name : 'Selecionar arquivo'}
-              </Button>
             </div>
-            <p className="text-xs text-slate-500">
-              Formatos aceitos: imagens, PDF, DOC, TXT (máx. 5MB)
-            </p>
-          </div>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="mensagem">Descrição detalhada</Label>
+              <Textarea
+                id="mensagem"
+                value={mensagem}
+                onChange={(e) => setMensagem(e.target.value)}
+                placeholder="Descreva o problema ou solicitação em detalhes..."
+                rows={4}
+                required
+              />
+            </div>
 
-          <div className="flex gap-2 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="arquivo">Anexar arquivo (opcional)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="arquivo"
+                  type="file"
+                  onChange={handleFileChange}
+                  accept="image/*,.pdf,.doc,.docx,.txt"
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('arquivo')?.click()}
+                  className="w-full"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {arquivo ? arquivo.name : 'Selecionar arquivo'}
+                </Button>
+              </div>
+              <p className="text-xs text-slate-500">
+                Formatos aceitos: imagens, PDF, DOC, TXT (máx. 5MB)
+              </p>
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+          </form>
+        </div>
+
+        <div className="flex-shrink-0 border-t bg-gray-50 px-6 py-4 mt-4">
+          <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancelar
             </Button>
             <Button 
-              type="submit" 
+              onClick={handleSubmit}
               disabled={createTicketMutation.isPending}
               className="flex-1"
             >
               {createTicketMutation.isPending ? 'Criando...' : 'Criar Chamado'}
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

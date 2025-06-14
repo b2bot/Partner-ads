@@ -67,6 +67,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
           categoria: data.categoria,
           prioridade: data.prioridade,
           aberto_por: isAdmin ? 'admin' : 'cliente',
+          // Removido o campo 'status' - usar o valor padrão do banco
         });
 
       if (error) throw error;
@@ -153,157 +154,161 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5" />
             Novo Chamado de Suporte
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {isAdmin && (
-            <div className="space-y-2">
-              <Label htmlFor="cliente">Cliente *</Label>
-              <Select value={clienteId} onValueChange={setClienteId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clientes?.map((cliente) => (
-                    <SelectItem key={cliente.id} value={cliente.id}>
-                      {cliente.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="categoria">Categoria</Label>
-              <Select value={categoria} onValueChange={setCategoria}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="campanhas">📊 Campanhas</SelectItem>
-                  <SelectItem value="hospedagem">🌐 Hospedagem</SelectItem>
-                  <SelectItem value="emails">📧 E-mails</SelectItem>
-                  <SelectItem value="crm">👥 CRM</SelectItem>
-                  <SelectItem value="outros">📋 Outros</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="prioridade">Prioridade</Label>
-              <Select value={prioridade} onValueChange={setPrioridade}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="baixa">🟢 Baixa</SelectItem>
-                  <SelectItem value="media">🟡 Média</SelectItem>
-                  <SelectItem value="alta">🟠 Alta</SelectItem>
-                  <SelectItem value="urgente">🔴 Urgente</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="titulo">Título do chamado *</Label>
-            <Input
-              id="titulo"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Ex: Problema com relatórios de campanha"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="mensagem">Descrição detalhada *</Label>
-            <Textarea
-              id="mensagem"
-              value={mensagem}
-              onChange={(e) => setMensagem(e.target.value)}
-              placeholder="Descreva o problema ou solicitação em detalhes..."
-              rows={5}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Anexos (opcional)</Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-              <input
-                type="file"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-                id="file-upload"
-                accept="image/*,.pdf,.doc,.docx,.txt,.zip"
-              />
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-600">
-                  Clique para selecionar arquivos ou arraste e solte aqui
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Máximo 10MB por arquivo
-                </p>
-              </label>
-            </div>
-
-            {arquivos.length > 0 && (
+        <div className="flex-1 overflow-y-auto px-1">
+          <form onSubmit={handleSubmit} className="space-y-6 py-2">
+            {isAdmin && (
               <div className="space-y-2">
-                <Label className="text-sm">Arquivos selecionados:</Label>
-                {arquivos.map((arquivo, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <div className="flex items-center gap-2">
-                      <File className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">{arquivo.name}</span>
-                      <span className="text-xs text-gray-500">
-                        ({(arquivo.size / 1024 / 1024).toFixed(2)} MB)
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFile(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+                <Label htmlFor="cliente">Cliente *</Label>
+                <Select value={clienteId} onValueChange={setClienteId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientes?.map((cliente) => (
+                      <SelectItem key={cliente.id} value={cliente.id}>
+                        {cliente.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
-          </div>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="categoria">Categoria</Label>
+                <Select value={categoria} onValueChange={setCategoria}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="campanhas">📊 Campanhas</SelectItem>
+                    <SelectItem value="hospedagem">🌐 Hospedagem</SelectItem>
+                    <SelectItem value="emails">📧 E-mails</SelectItem>
+                    <SelectItem value="crm">👥 CRM</SelectItem>
+                    <SelectItem value="outros">📋 Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="flex gap-3 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="prioridade">Prioridade</Label>
+                <Select value={prioridade} onValueChange={setPrioridade}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixa">🟢 Baixa</SelectItem>
+                    <SelectItem value="media">🟡 Média</SelectItem>
+                    <SelectItem value="alta">🟠 Alta</SelectItem>
+                    <SelectItem value="urgente">🔴 Urgente</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="titulo">Título do chamado *</Label>
+              <Input
+                id="titulo"
+                value={titulo}
+                onChange={(e) => setTitulo(e.target.value)}
+                placeholder="Ex: Problema com relatórios de campanha"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="mensagem">Descrição detalhada *</Label>
+              <Textarea
+                id="mensagem"
+                value={mensagem}
+                onChange={(e) => setMensagem(e.target.value)}
+                placeholder="Descreva o problema ou solicitação em detalhes..."
+                rows={5}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Anexos (opcional)</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                  accept="image/*,.pdf,.doc,.docx,.txt,.zip"
+                />
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-600">
+                    Clique para selecionar arquivos ou arraste e solte aqui
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Máximo 10MB por arquivo
+                  </p>
+                </label>
+              </div>
+
+              {arquivos.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-sm">Arquivos selecionados:</Label>
+                  {arquivos.map((arquivo, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div className="flex items-center gap-2">
+                        <File className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm">{arquivo.name}</span>
+                        <span className="text-xs text-gray-500">
+                          ({(arquivo.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFile(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+          </form>
+        </div>
+
+        <div className="flex-shrink-0 border-t bg-gray-50 px-6 py-4 mt-4">
+          <div className="flex gap-3">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancelar
             </Button>
             <Button 
-              type="submit" 
+              onClick={handleSubmit}
               disabled={createTicketMutation.isPending}
               className="flex-1"
             >
               {createTicketMutation.isPending ? 'Criando...' : 'Criar Chamado'}
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

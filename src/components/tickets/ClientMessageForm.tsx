@@ -115,9 +115,9 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
   };
 
   return (
-    <div className={`border-t bg-gray-50 p-4 ${className}`}>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div>
+    <div className={`flex flex-col h-full ${className}`}>
+      <form onSubmit={handleSubmit} className="flex flex-col h-full space-y-4 p-4">
+        <div className="flex-1">
           <Label htmlFor="message" className="text-sm font-medium">
             Sua resposta
           </Label>
@@ -126,8 +126,8 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Digite sua mensagem..."
-            rows={3}
-            className="mt-1"
+            rows={8}
+            className="mt-2 resize-none h-full min-h-[200px]"
             disabled={sendMessageMutation.isPending}
           />
         </div>
