@@ -99,12 +99,12 @@ export function ClientsManagementTab() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-4">
+          <div className="h-5 bg-gray-200 rounded w-1/4 mb-3"></div>
+          <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
@@ -113,33 +113,33 @@ export function ClientsManagementTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Gerenciar Clientes</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">Gerenciar Clientes</h1>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             Cadastre e gerencie clientes, suas contas e permissões
           </p>
         </div>
-        <Button onClick={() => setCreateModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+        <Button onClick={() => setCreateModalOpen(true)} size="sm" className="h-7 text-xs px-2">
+          <Plus className="h-3 w-3 mr-1" />
           Novo Cliente
         </Button>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {!clientes || clientes.length === 0 ? (
           <Card>
-            <CardContent className="p-8 text-center">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            <CardContent className="p-6 text-center">
+              <Users className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
                 Nenhum cliente cadastrado
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                 Comece criando seu primeiro cliente e configurando suas contas.
               </p>
-              <Button onClick={() => setCreateModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button onClick={() => setCreateModalOpen(true)} size="sm" className="h-7 text-xs px-2">
+                <Plus className="h-3 w-3 mr-1" />
                 Criar Primeiro Cliente
               </Button>
             </CardContent>
@@ -147,41 +147,41 @@ export function ClientsManagementTab() {
         ) : (
           clientes.map((cliente) => (
             <Card key={cliente.id}>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">{cliente.nome}</CardTitle>
-                    <p className="text-slate-600 dark:text-slate-400">
+                    <CardTitle className="text-sm">{cliente.nome}</CardTitle>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
                       {cliente.profiles?.email || 'Email não disponível'}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge
                       variant={cliente.ativo ? 'default' : 'secondary'}
-                      className={cliente.ativo ? 'bg-green-100 text-green-800' : ''}
+                      className={`text-xs ${cliente.ativo ? 'bg-green-100 text-green-800' : ''}`}
                     >
                       {cliente.ativo ? 'Ativo' : 'Inativo'}
                     </Badge>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="text-xs">
                       {cliente.profiles?.role === 'admin' ? 'Admin' : 'Cliente'}
                     </Badge>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div>
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tipo de acesso:</span>
-                    <span className="ml-2 text-sm">
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Tipo de acesso:</span>
+                    <span className="ml-2 text-xs">
                       {cliente.tipo_acesso === 'api' ? 'API' : 'Google Sheets'}
                     </span>
                   </div>
 
                   <div>
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Contas vinculadas:</span>
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Contas vinculadas:</span>
                     <div className="ml-2 mt-1">
                       {!cliente.contas || cliente.contas.length === 0 ? (
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Nenhuma conta vinculada</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Nenhuma conta vinculada</span>
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {cliente.contas.map((conta) => (
@@ -195,8 +195,8 @@ export function ClientsManagementTab() {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" onClick={() => setEditingClient(cliente)}>
-                      <Edit className="h-4 w-4 mr-1" />
+                    <Button variant="outline" size="sm" onClick={() => setEditingClient(cliente)} className="h-6 text-xs px-2">
+                      <Edit className="h-3 w-3 mr-1" />
                       Editar
                     </Button>
                     <Button
@@ -208,6 +208,7 @@ export function ClientsManagementTab() {
                           ativo: !cliente.ativo,
                         })
                       }
+                      className="h-6 text-xs px-2"
                     >
                       {cliente.ativo ? 'Desativar' : 'Ativar'}
                     </Button>
@@ -215,8 +216,9 @@ export function ClientsManagementTab() {
                       variant="destructive"
                       size="sm"
                       onClick={() => handleDeleteClient(cliente.id)}
+                      className="h-6 text-xs px-2"
                     >
-                      <Trash2 className="h-4 w-4 mr-1" />
+                      <Trash2 className="h-3 w-3 mr-1" />
                       Remover
                     </Button>
                   </div>

@@ -92,15 +92,16 @@ export function MetricsObjectivesTab() {
     const metric = selectedTemplate.metrics[metricKey];
     
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <Label className="font-medium">{label}</Label>
+          <Label className="text-sm font-medium">{label}</Label>
           <Button 
             variant="ghost" 
             size="sm"
             onClick={() => setShowInstructions(true)}
+            className="h-6 w-6 p-0"
           >
-            <Info className="w-4 h-4" />
+            <Info className="w-3 h-3" />
           </Button>
         </div>
         
@@ -111,7 +112,7 @@ export function MetricsObjectivesTab() {
             <span className="text-red-600">Ruim</span>
           </div>
           
-          <div className="relative h-2 bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 rounded-full mb-4">
+          <div className="relative h-2 bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 rounded-full mb-3">
             <div 
               className="absolute top-0 w-1 h-2 bg-gray-800 rounded"
               style={{ left: `${(metric.good[1] / 100) * 100}%` }}
@@ -148,14 +149,14 @@ export function MetricsObjectivesTab() {
     <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Instruções</DialogTitle>
+          <DialogTitle className="text-sm">Instruções</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="flex items-start gap-3">
-            <Target className="w-5 h-5 text-blue-600 mt-0.5" />
+            <Target className="w-4 h-4 text-blue-600 mt-0.5" />
             <div>
-              <h3 className="font-medium text-slate-800 mb-1">Como funcionam os Templates de Objetivos</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="text-sm font-medium text-slate-800 mb-1">Como funcionam os Templates de Objetivos</h3>
+              <p className="text-xs text-slate-600">
                 Defina os intervalos ideais de desempenho para cada métrica com base nos seus objetivos. 
                 A tabela de campanhas usará essas configurações para aplicar cores automáticas e facilitar a análise visual.
               </p>
@@ -163,19 +164,19 @@ export function MetricsObjectivesTab() {
           </div>
           
           <div className="flex items-start gap-3">
-            <Settings className="w-5 h-5 text-blue-600 mt-0.5" />
+            <Settings className="w-4 h-4 text-blue-600 mt-0.5" />
             <div>
-              <h3 className="font-medium text-slate-800 mb-1">Criando e gerenciando Templates</h3>
-              <ol className="text-sm text-slate-600 space-y-1">
+              <h3 className="text-sm font-medium text-slate-800 mb-1">Criando e gerenciando Templates</h3>
+              <ol className="text-xs text-slate-600 space-y-1">
                 <li>1. Clique em "Novo Template" e dê um nome.</li>
                 <li>2. Ajuste os objetivos para cada métrica.</li>
                 <li>3. Clique no ícone de salvar ao lado do nome.</li>
               </ol>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-xs text-slate-600 mt-2">
                 Você pode criar quantos templates quiser e definir qual será o template utilizado como "Padrão" 
                 clicando nos três pontos ao lado do nome do template e selecionando "Definir como padrão".
               </p>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-xs text-slate-600 mt-2">
                 Sempre que quiser, você pode alternar entre os templates diretamente pela tabela de campanhas, 
                 adaptando a visualização conforme o objetivo de cada conta.
               </p>
@@ -220,11 +221,11 @@ export function MetricsObjectivesTab() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-4 max-w-6xl">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Objetivos</h2>
-          <p className="text-slate-600">
+          <h2 className="text-xl font-bold text-slate-800 mb-1">Objetivos</h2>
+          <p className="text-xs text-slate-600">
             Configure os intervalos de desempenho ideais para cada métrica das suas campanhas, alinhando-os aos seus objetivos. 
             A partir dessas configurações, a tabela de campanhas exibirá automaticamente as cores correspondentes para cada métrica, 
             facilitando a análise visual.
@@ -234,23 +235,25 @@ export function MetricsObjectivesTab() {
           variant="ghost" 
           size="sm"
           onClick={() => setShowInstructions(true)}
+          className="h-7 text-xs px-2"
         >
-          <Info className="w-4 h-4 mr-2" />
+          <Info className="w-3 h-3 mr-1" />
           Instruções
         </Button>
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
               Seus Templates
               <Button 
                 onClick={() => setShowNewTemplate(true)}
                 size="sm"
                 variant="outline"
+                className="h-6 text-xs px-2"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-3 h-3 mr-1" />
                 Novo Template
               </Button>
             </CardTitle>
@@ -258,47 +261,48 @@ export function MetricsObjectivesTab() {
         </CardHeader>
         <CardContent>
           {templates.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-slate-500 mb-4">
+            <div className="text-center py-6">
+              <p className="text-xs text-slate-500 mb-3">
                 Você ainda não tem templates. Crie um para salvar suas configurações de métricas.
               </p>
-              <Button onClick={() => setShowNewTemplate(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+              <Button onClick={() => setShowNewTemplate(true)} size="sm" className="h-7 text-xs px-2">
+                <Plus className="w-3 h-3 mr-1" />
                 Criar Primeiro Template
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {templates.map((template) => (
-                <div key={template.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
+                <div key={template.id} className="flex items-center justify-between p-2 border rounded-lg">
+                  <div className="flex items-center gap-2">
                     <Button
                       variant={selectedTemplate.id === template.id ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setSelectedTemplate(template)}
+                      className="h-6 text-xs px-2"
                     >
                       {template.name}
                     </Button>
                     {template.isDefault && (
-                      <Badge variant="secondary">Padrão</Badge>
+                      <Badge variant="secondary" className="text-xs">Padrão</Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Save className="w-4 h-4" />
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <Save className="w-3 h-3" />
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="w-4 h-4" />
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                          <MoreHorizontal className="w-3 h-3" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => setAsDefault(template.id)}>
+                        <DropdownMenuItem onClick={() => setAsDefault(template.id)} className="text-xs">
                           Definir como padrão
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Duplicar</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">Excluir</DropdownMenuItem>
+                        <DropdownMenuItem className="text-xs">Duplicar</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600 text-xs">Excluir</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -310,9 +314,9 @@ export function MetricsObjectivesTab() {
       </Card>
 
       {selectedTemplate && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
-            <CardContent className="p-6 space-y-6">
+            <CardContent className="p-4 space-y-4">
               <MetricSlider 
                 label="CPC (Todos)" 
                 metricKey="cpc" 
@@ -345,7 +349,7 @@ export function MetricsObjectivesTab() {
           </Card>
 
           <Card>
-            <CardContent className="p-6 space-y-6">
+            <CardContent className="p-4 space-y-4">
               <MetricSlider 
                 label="CPC (No link)" 
                 metricKey="cpc" 
@@ -383,26 +387,27 @@ export function MetricsObjectivesTab() {
       <Dialog open={showNewTemplate} onOpenChange={setShowNewTemplate}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo Template</DialogTitle>
+            <DialogTitle className="text-sm">Novo Template</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-slate-600">
+          <div className="space-y-3">
+            <p className="text-xs text-slate-600">
               Crie um novo template com suas configurações atuais de métricas.
             </p>
             <div className="space-y-2">
-              <Label htmlFor="templateName">Nome do Template</Label>
+              <Label htmlFor="templateName" className="text-xs">Nome do Template</Label>
               <Input
                 id="templateName"
                 placeholder="Template Objetivo teste"
                 value={newTemplateName}
                 onChange={(e) => setNewTemplateName(e.target.value)}
+                className="text-xs"
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowNewTemplate(false)}>
+              <Button variant="outline" onClick={() => setShowNewTemplate(false)} size="sm" className="h-7 text-xs px-2">
                 Cancelar
               </Button>
-              <Button onClick={createNewTemplate}>
+              <Button onClick={createNewTemplate} size="sm" className="h-7 text-xs px-2">
                 Salvar Template
               </Button>
             </div>

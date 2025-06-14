@@ -60,13 +60,13 @@ export function TicketsTab() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'aberto':
-        return <AlertCircle className="h-4 w-4" />;
+        return <AlertCircle className="h-3 w-3" />;
       case 'em_andamento':
-        return <Clock className="h-4 w-4" />;
+        return <Clock className="h-3 w-3" />;
       case 'resolvido':
-        return <CheckCircle className="h-4 w-4" />;
+        return <CheckCircle className="h-3 w-3" />;
       default:
-        return <MessageCircle className="h-4 w-4" />;
+        return <MessageCircle className="h-3 w-3" />;
     }
   };
 
@@ -89,12 +89,12 @@ export function TicketsTab() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-4">
+          <div className="h-5 bg-gray-200 rounded w-1/4 mb-3"></div>
+          <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
@@ -103,34 +103,34 @@ export function TicketsTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">
+          <h1 className="text-xl font-bold text-slate-800">
             {isAdmin ? 'Gerenciar Chamados' : 'Meus Chamados'}
           </h1>
-          <p className="text-slate-600 mt-2">
+          <p className="text-xs text-slate-600 mt-1">
             {isAdmin 
               ? 'Visualize e responda todos os chamados dos clientes'
               : 'Abra chamados para suporte técnico e acompanhe o status'
             }
           </p>
         </div>
-        <Button onClick={() => setCreateModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+        <Button onClick={() => setCreateModalOpen(true)} size="sm" className="h-7 text-xs px-2">
+          <Plus className="h-3 w-3 mr-1" />
           Novo Chamado
         </Button>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {tickets?.length === 0 ? (
           <Card>
-            <CardContent className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <CardContent className="p-6 text-center">
+              <MessageCircle className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-sm font-medium text-gray-900 mb-1">
                 {isAdmin ? 'Nenhum chamado encontrado' : 'Você ainda não tem chamados'}
               </h3>
-              <p className="text-gray-500">
+              <p className="text-xs text-gray-500">
                 {isAdmin 
                   ? 'Quando os clientes abrirem chamados, eles aparecerão aqui.'
                   : 'Clique em "Novo Chamado" para abrir seu primeiro chamado de suporte.'
@@ -145,17 +145,17 @@ export function TicketsTab() {
               className="cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => setSelectedTicket(ticket)}
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{ticket.titulo}</CardTitle>
+                    <CardTitle className="text-sm">{ticket.titulo}</CardTitle>
                     {isAdmin && (
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         Cliente: {ticket.clientes?.nome}
                       </p>
                     )}
                   </div>
-                  <Badge className={getStatusColor(ticket.status)}>
+                  <Badge className={`${getStatusColor(ticket.status)} text-xs`}>
                     <div className="flex items-center gap-1">
                       {getStatusIcon(ticket.status)}
                       {getStatusLabel(ticket)}
@@ -164,8 +164,8 @@ export function TicketsTab() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-600 mb-3 line-clamp-2">{ticket.mensagem}</p>
-                <div className="flex justify-between items-center text-sm text-slate-500">
+                <p className="text-xs text-slate-600 mb-2 line-clamp-2">{ticket.mensagem}</p>
+                <div className="flex justify-between items-center text-xs text-slate-500">
                   <div className="space-y-1">
                     <p>Criado: {new Date(ticket.created_at).toLocaleDateString('pt-BR')}</p>
                     {ticket.updated_at !== ticket.created_at && (
@@ -173,7 +173,7 @@ export function TicketsTab() {
                     )}
                   </div>
                   {ticket.resposta && (
-                    <span className="text-green-600 font-medium">
+                    <span className="text-green-600 font-medium text-xs">
                       ✓ Respondido
                     </span>
                   )}
