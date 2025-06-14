@@ -246,7 +246,15 @@ export function AdsTab() {
       />
 
       {editingAd && (
-        <EditAdModal ad={editingAd} onClose={() => setEditingAd(null)} />
+        <EditAdModal 
+          ad={editingAd} 
+          isOpen={!!editingAd}
+          onClose={() => setEditingAd(null)} 
+          onSuccess={() => {
+            setEditingAd(null);
+            refetch.ads();
+          }}
+        />
       )}
     </div>
   );

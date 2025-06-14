@@ -12,7 +12,7 @@ export default function ObjetivosMetricasPage() {
         </p>
       </div>
       
-      <MetricsCustomization />
+      <MetricsCustomization onClose={() => {}} />
     </div>
   );
 }

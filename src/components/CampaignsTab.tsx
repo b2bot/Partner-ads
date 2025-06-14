@@ -212,8 +212,13 @@ export function CampaignsTab() {
 
       {editingCampaign && (
         <EditCampaignModal
-          onClose={() => setEditingCampaign(null)}
           campaign={editingCampaign}
+          isOpen={!!editingCampaign}
+          onClose={() => setEditingCampaign(null)}
+          onSuccess={() => {
+            setEditingCampaign(null);
+            refetch.campaigns();
+          }}
         />
       )}
     </div>

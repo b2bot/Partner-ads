@@ -21,10 +21,10 @@ interface Cliente {
   tipo_acesso: 'api' | 'sheet';
   ativo: boolean;
   created_at: string;
-  profiles?: {
+  profiles: {
     email: string;
     role: string;
-  } | null;
+  };
   contas: {
     id: string;
     tipo: 'meta' | 'google';
@@ -56,7 +56,7 @@ export function ClientsManagementTab() {
         ...item,
         profiles: item.profiles && typeof item.profiles === 'object' && !Array.isArray(item.profiles)
           ? item.profiles
-          : null,
+          : { email: '', role: '' },
       })) as Cliente[];
     },
   });

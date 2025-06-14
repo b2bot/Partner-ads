@@ -24,7 +24,7 @@ export function SettingsTab() {
         </TabsContent>
 
         <TabsContent value="metrics">
-          <MetricsCustomization />
+          <MetricsCustomization onClose={() => {}} />
         </TabsContent>
       </Tabs>
     </div>

@@ -254,8 +254,15 @@ export function AdSetsTab() {
 
       {editingAdSet && (
         <EditAdSetModal
-          onClose={() => setEditingAdSet(null)}
           adSet={editingAdSet}
+          isOpen={!!editingAdSet}
+          onClose={() => setEditingAdSet(null)}
+          onSuccess={() => {
+            setEditingAdSet(null);
+            if (refetch && typeof refetch.adSets === 'function') {
+              refetch.adSets();
+            }
+          }}
         />
       )}
     </div>
