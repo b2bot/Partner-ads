@@ -20,5 +20,11 @@ export function useAccountInsights(dateRange?: { since: string; until: string })
     ),
     enabled: !!credentials?.access_token && !!selectedAdAccount,
     staleTime: 5 * 60 * 1000, // 5 minutos
+    retry: (failureCount, error: any) => {
+      if (error?.message?.includes('Rate limit') || error?.message?.includes('Aguarde')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 }

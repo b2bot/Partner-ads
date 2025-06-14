@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,57 +11,18 @@ import { AccountFilter } from '@/components/AccountFilter';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useMetricsConfig } from '@/hooks/useMetricsConfig';
 import { formatMetricValue } from '@/lib/metaInsights';
-import { DateRange } from 'react-day-picker';
+import { useDateRange } from '@/hooks/useDateRange';
 
 export function Dashboard() {
   const { campaigns, loading, selectedAdAccount } = useMetaData();
   const { config } = useMetricsConfig();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const { dateRange, setDateRange, getApiDateRange } = useDateRange();
   
-  const insights = useAccountInsights(
-    dateRange ? {
-      since: dateRange.from?.toISOString().split('T')[0] || '',
-      until: dateRange.to?.toISOString().split('T')[0] || ''
-    } : undefined
-  );
+  const insights = useAccountInsights(getApiDateRange());
 
   // Hook para insights de campanhas
-  const { data: campaignInsights = [], isLoading: campaignInsightsLoading } = useCampaignInsights(
-    dateRange ? {
-      since: dateRange.from?.toISOString().split('T')[0] || '',
-      until: dateRange.to?.toISOString().split('T')[0] || ''
-    } : undefined
-  );
-
-  const formatCurrency = (value: number | string) => {
-    const numValue = typeof value === 'string' ? parseFloat(value) : value;
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(numValue || 0);
-  };
-
-  const formatNumber = (value: number | string) => {
-    const numValue = typeof value === 'string' ? parseFloat(value) : value;
-    return new Intl.NumberFormat('pt-BR').format(numValue || 0);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return 'bg-green-100 text-green-800';
-      case 'PAUSED':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'DELETED':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // Filtrar apenas campanhas ativas
-  const activeCampaigns = campaigns.filter(campaign => campaign.status === 'ACTIVE');
+  const { data: campaignInsights = [], isLoading: campaignInsightsLoading } = useCampaignInsights(getApiDateRange());
 
   // Função para obter insights de uma campanha específica
   const getCampaignInsightsData = (campaignId: string) => {

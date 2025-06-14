@@ -339,37 +339,22 @@ export type Database = {
       }
       metrics_config: {
         Row: {
-          id: string;
-          config: {
-            dashboard: string[];
-            campaigns: string[];
-            adsets: string[];
-            ads: string[];
-         };
-         created_at: string;
-         updated_at: string;
+          config: Json
+          created_at: string
+          id: string
+          updated_at: string
         }
         Insert: {
-          id?: string;
-          config: {
-            dashboard: string[];
-            campaigns: string[];
-            adsets: string[];
-            ads: string[];
-         };
-         created_at?: string;
-         updated_at?: string;
+          config?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
         }
         Update: {
-          id?: string;
-          config?: {
-            dashboard: string[];
-            campaigns: string[];
-            adsets: string[];
-            ads: string[];
-         };
-         created_at?: string;
-         updated_at?: string;
+          config?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }
