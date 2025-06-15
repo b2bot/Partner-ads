@@ -133,9 +133,9 @@ export function useWhatsAppTemplates() {
         id: template.id,
         name: template.name,
         language: template.language,
-        category: template.category as 'MARKETING' | 'UTILITY' | 'AUTHENTICATION',
-        status: template.status as 'APPROVED' | 'PENDING' | 'REJECTED',
-        components: template.components,
+        category: (template.category as 'MARKETING' | 'UTILITY' | 'AUTHENTICATION') || 'UTILITY',
+        status: (template.status as 'APPROVED' | 'PENDING' | 'REJECTED') || 'APPROVED',
+        components: Array.isArray(template.components) ? template.components as any[] : [],
         variables: Array.isArray(template.variables) ? template.variables as string[] : [],
       }));
 
