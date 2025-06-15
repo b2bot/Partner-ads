@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -37,11 +36,15 @@ export function useWhatsAppConfig() {
         status: (data.status === 'connected' || data.status === 'disconnected' || data.status === 'error') ? data.status : 'disconnected',
         last_verified_at: data.last_verified_at ?? "",
       } : null);
-    } catch (error) {
-      console.error('Error fetching WhatsApp config:', error);
+    } catch (error: any) {
+      console.error('Error fetching WhatsApp config:', {
+        message: error.message,
+        details: error.details,
+        code: error.code,
+      });
       toast({
         title: "Erro",
-        description: "Erro ao carregar configuração do WhatsApp",
+        description: "Erro ao carregar configuração do WhatsApp. Verifique as permissões da tabela.",
         variant: "destructive",
       });
     } finally {

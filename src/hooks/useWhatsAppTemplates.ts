@@ -104,11 +104,14 @@ export function useWhatsAppTemplates() {
           { onConflict: 'name' }
         );
 
-    } catch (error) {
-      console.error('Error fetching WhatsApp templates:', error);
+    } catch (error: any) {
+      console.error('Error fetching WhatsApp templates:', { 
+        message: error.message,
+        business_account_id: config.business_account_id,
+      });
       toast({
         title: "Erro",
-        description: "Erro ao buscar templates do WhatsApp Business",
+        description: "Erro ao buscar templates do WhatsApp. Usando cache local.",
         variant: "destructive",
       });
       
@@ -142,6 +145,11 @@ export function useWhatsAppTemplates() {
       setTemplates(localTemplates);
     } catch (error) {
       console.error('Error fetching local templates:', error);
+      toast({
+        title: "Erro de Fallback",
+        description: "Não foi possível carregar templates do cache local.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -167,10 +175,13 @@ export function useWhatsAppTemplates() {
   };
 
   useEffect(() => {
+    setLoading(true);
     if (config?.business_account_id && config?.access_token) {
       fetchTemplatesFromWhatsApp();
     } else {
-      fetchLocalTemplates();
+      fetchLocalTemplates().finally(() => {
+        setLoading(false);
+      });
     }
   }, [config]);
 
