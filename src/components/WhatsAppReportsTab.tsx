@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Smartphone,
   Plus,
@@ -27,6 +27,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
+
 const client_name = 'João da Silva';
 const date_range = '01/06/2024 - 10/06/2024';
 const metrics_data = [];
@@ -72,182 +73,184 @@ export function WhatsAppReportsTab() {
 
     return (
       <Dialog open={showNewReportDialog} onOpenChange={setShowNewReportDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-0">
             <DialogTitle>Novo Relatório Automatizado</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                <div>
-                  <p className="text-sm text-yellow-700">
-                    WhatsApp não está conectado. O relatório será salvo, mas só será enviado quando o WhatsApp estiver conectado.
-                  </p>
+          <ScrollArea className="h-full max-h-[calc(90vh-120px)] px-6 pb-6">
+            <div className="space-y-4">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-yellow-700">
+                      WhatsApp não está conectado. O relatório será salvo, mas só será enviado quando o WhatsApp estiver conectado.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reportName">Nome do Relatório *</Label>
+                  <Input
+                    id="reportName"
+                    placeholder="Ex: Relatório Semanal Cliente X"
+                    value={newReport.name}
+                    onChange={(e) => setNewReport({...newReport, name: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="clientName">Nome do Cliente</Label>
+                  <Input
+                    id="clientName"
+                    placeholder="Ex: João Silva"
+                    value={newReport.clientName}
+                    onChange={(e) => setNewReport({...newReport, clientName: e.target.value})}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="reportName">Nome do Relatório *</Label>
+                <Label htmlFor="whatsappNumber">Número do WhatsApp *</Label>
                 <Input
-                  id="reportName"
-                  placeholder="Ex: Relatório Semanal Cliente X"
-                  value={newReport.name}
-                  onChange={(e) => setNewReport({...newReport, name: e.target.value})}
+                  id="whatsappNumber"
+                  placeholder="Ex: +55 (11) 99999-9999"
+                  value={newReport.phone}
+                  onChange={(e) => setNewReport({...newReport, phone: e.target.value})}
                 />
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" id="sendToGroup" />
+                  <Label htmlFor="sendToGroup" className="text-sm">Ou enviar para um grupo</Label>
+                </div>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="clientName">Nome do Cliente</Label>
-                <Input
-                  id="clientName"
-                  placeholder="Ex: João Silva"
-                  value={newReport.clientName}
-                  onChange={(e) => setNewReport({...newReport, clientName: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="whatsappNumber">Número do WhatsApp *</Label>
-              <Input
-                id="whatsappNumber"
-                placeholder="Ex: +55 (11) 99999-9999"
-                value={newReport.phone}
-                onChange={(e) => setNewReport({...newReport, phone: e.target.value})}
-              />
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="sendToGroup" />
-                <Label htmlFor="sendToGroup" className="text-sm">Ou enviar para um grupo</Label>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Conta Meta Ads *</Label>
-              <Select defaultValue="meta">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="meta">Meta Ads - Buscar Campos da Conta</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Frequência</Label>
-                <Select value={newReport.frequency} onValueChange={(value) => setNewReport({...newReport, frequency: value})}>
+                <Label>Conta Meta Ads *</Label>
+                <Select defaultValue="meta">
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Semanal">Semanal</SelectItem>
-                    <SelectItem value="Mensal">Mensal</SelectItem>
-                    <SelectItem value="Diário">Diário</SelectItem>
+                    <SelectItem value="meta">Meta Ads - Buscar Campos da Conta</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Frequência</Label>
+                  <Select value={newReport.frequency} onValueChange={(value) => setNewReport({...newReport, frequency: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Semanal">Semanal</SelectItem>
+                      <SelectItem value="Mensal">Mensal</SelectItem>
+                      <SelectItem value="Diário">Diário</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Dia da Semana</Label>
+                  <Select value={newReport.day} onValueChange={(value) => setNewReport({...newReport, day: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Segunda-feira">Segunda-feira</SelectItem>
+                      <SelectItem value="Terça-feira">Terça-feira</SelectItem>
+                      <SelectItem value="Quarta-feira">Quarta-feira</SelectItem>
+                      <SelectItem value="Quinta-feira">Quinta-feira</SelectItem>
+                      <SelectItem value="Sexta-feira">Sexta-feira</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Horário do Envio</Label>
+                  <Input
+                    type="time"
+                    value={newReport.time}
+                    onChange={(e) => setNewReport({...newReport, time: e.target.value})}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label>Dia da Semana</Label>
-                <Select value={newReport.day} onValueChange={(value) => setNewReport({...newReport, day: value})}>
+                <Label>Período dos Dados (dias)</Label>
+                <Select value={newReport.period} onValueChange={(value) => setNewReport({...newReport, period: value})}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Segunda-feira">Segunda-feira</SelectItem>
-                    <SelectItem value="Terça-feira">Terça-feira</SelectItem>
-                    <SelectItem value="Quarta-feira">Quarta-feira</SelectItem>
-                    <SelectItem value="Quinta-feira">Quinta-feira</SelectItem>
-                    <SelectItem value="Sexta-feira">Sexta-feira</SelectItem>
+                    <SelectItem value="1">1</SelectItem>
+                    <SelectItem value="7">7</SelectItem>
+                    <SelectItem value="30">30</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="space-y-2">
-                <Label>Horário do Envio</Label>
-                <Input
-                  type="time"
-                  value={newReport.time}
-                  onChange={(e) => setNewReport({...newReport, time: e.target.value})}
+                <Label>Template da Mensagem</Label>
+                <Textarea
+                  placeholder="Digite sua mensagem..."
+                  value={newReport.template}
+                  onChange={(e) => setNewReport({...newReport, template: e.target.value})}
+                  rows={5}
                 />
+                <div className="text-xs text-slate-500">
+                  Use: {'{{client_name}}'}, {'{{date_range}}'}, {'{{metrics_data}}'}
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-800 mb-2">Campos Disponíveis nas Contas Selecionadas</h4>
+                <div className="text-sm text-blue-700">
+                  <p><strong>Como usar:</strong></p>
+                  <ul className="list-disc ml-4 mt-1 space-y-1">
+                    <li>As "Métricas Principais" e "Outras métricas" serão sempre disponíveis</li>
+                    <li>Meta Ads: Chegar em "Meta Ads - Buscar Campos da Conta" para ter métricas específicas da conta Google Ads</li>
+                    <li><strong>Anúncios - Quantidade:</strong> Exibir número de anúncios que a ação foi realizada</li>
+                    <li><strong>Valores Monetários:</strong> Exibir em valor local (moeda) (ex: valor total de conversas)</li>
+                    <li><strong>Os dados do Google Ads não estarão disponíveis</strong></li>
+                    <li>Use o ícone para filtrar campos disponíveis</li>
+                    <li><strong>Os dados da conta Meta não estão baseados nos últimos 7 dias de campanhas ativas</strong></li>
+                    <li>Os dados do Google Ads não estarão baseados nos últimos 7 dias de campanhas ativas</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button variant="outline" onClick={() => setShowNewReportDialog(false)}>
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setReports([...reports, {
+                      id: reports.length + 1,
+                      name: newReport.name,
+                      clientName: newReport.clientName,
+                      phone: newReport.phone,
+                      frequency: newReport.frequency,
+                      day: newReport.day,
+                      time: newReport.time,
+                      active: true,
+                      metaAccount: 'Meta Ads - Buscar Campos da Conta'
+                    }]);
+                    setShowNewReportDialog(false);
+                    toast({
+                      title: "Relatório criado",
+                      description: "Relatório automatizado criado com sucesso.",
+                    });
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Criar Relatório
+                </Button>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label>Período dos Dados (dias)</Label>
-              <Select value={newReport.period} onValueChange={(value) => setNewReport({...newReport, period: value})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="7">7</SelectItem>
-                  <SelectItem value="30">30</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Template da Mensagem</Label>
-              <Textarea
-                placeholder="Digite sua mensagem..."
-                value={newReport.template}
-                onChange={(e) => setNewReport({...newReport, template: e.target.value})}
-                rows={5}
-              />
-              <div className="text-xs text-slate-500">
-                Use: {'{{client_name}}'}, {'{{date_range}}'}, {'{{metrics_data}}'}
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 mb-2">Campos Disponíveis nas Contas Selecionadas</h4>
-              <div className="text-sm text-blue-700">
-                <p><strong>Como usar:</strong></p>
-                <ul className="list-disc ml-4 mt-1">
-                  <li>As "Métricas Principais" e "Outras métricas" serão sempre disponíveis</li>
-                  <li>Meta Ads: Chegar em "Meta Ads - Buscar Campos da Conta" para ter métricas específicas da conta Google Ads</li>
-                  <li><strong>Anúncios - Quantidade:</strong> Exibir número de anúncios que a ação foi realizada</li>
-                  <li><strong>Valores Monetários:</strong> Exibir em valor local (moeda) (ex: valor total de conversas)</li>
-                  <li><strong>Os dados do Google Ads não estarão disponíveis</strong></li>
-                  <li>Use o ícone para filtrar campos disponíveis</li>
-                  <li><strong>Os dados da conta Meta não estão baseados nos últimos 7 dias de campanhas ativas</strong></li>
-                  <li>Os dados do Google Ads não estarão baseados nos últimos 7 dias de campanhas ativas</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowNewReportDialog(false)}>
-                Cancelar
-              </Button>
-              <Button 
-                onClick={() => {
-                  setReports([...reports, {
-                    id: reports.length + 1,
-                    name: newReport.name,
-                    clientName: newReport.clientName,
-                    phone: newReport.phone,
-                    frequency: newReport.frequency,
-                    day: newReport.day,
-                    time: newReport.time,
-                    active: true,
-                    metaAccount: 'Meta Ads - Buscar Campos da Conta'
-                  }]);
-                  setShowNewReportDialog(false);
-                  toast({
-                    title: "Relatório criado",
-                    description: "Relatório automatizado criado com sucesso.",
-                  });
-                }}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Criar Relatório
-              </Button>
-            </div>
-          </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     );
