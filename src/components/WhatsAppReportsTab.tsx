@@ -1,38 +1,22 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Smartphone,
-  Plus,
-  Settings,
-  Clock,
   MessageSquare,
-  QrCode,
-  AlertCircle,
-  CheckCircle
+  Plus,
+  Clock,
+  Send,
+  BarChart3,
+  Users,
+  Settings
 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useToast } from '@/hooks/use-toast';
-
-const client_name = 'João da Silva';
-const date_range = '01/06/2024 - 10/06/2024';
-const metrics_data = [];
+import { WhatsAppConnectionCard } from './whatsapp/WhatsAppConnectionCard';
+import { WhatsAppDashboard } from './whatsapp/WhatsAppDashboard';
+import { CampaignList } from './whatsapp/CampaignList';
 
 export function WhatsAppReportsTab() {
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isWhatsAppConnected, setIsWhatsAppConnected] = useState(false);
   const [reports, setReports] = useState([
     {
@@ -48,7 +32,16 @@ export function WhatsAppReportsTab() {
     }
   ]);
   const [showNewReportDialog, setShowNewReportDialog] = useState(false);
-  const { toast } = useToast();
+
+  const handleNewCampaign = () => {
+    console.log('Nova campanha');
+    // Implementar modal de nova campanha
+  };
+
+  const handleNewMessage = () => {
+    console.log('Nova mensagem');
+    // Implementar modal de nova mensagem
+  };
 
   const handleConnectWhatsApp = () => {
     // Simulação de conexão
@@ -257,155 +250,137 @@ export function WhatsAppReportsTab() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Relatórios via WhatsApp</h2>
-        <p className="text-slate-600">Conecte seu WhatsApp e envie relatórios automaticamente para seus clientes</p>
+    <div className="space-y-6 max-w-7xl">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">WhatsApp Business</h1>
+          <p className="text-sm text-slate-600 mt-1">
+            Automação e disparo de mensagens para clientes via WhatsApp Business API
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleNewMessage}>
+            <Send className="w-4 h-4 mr-1" />
+            Nova Mensagem
+          </Button>
+          <Button size="sm" onClick={handleNewCampaign}>
+            <Plus className="w-4 h-4 mr-1" />
+            Nova Campanha
+          </Button>
+        </div>
       </div>
 
       {/* Conexão WhatsApp */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Smartphone className="w-5 h-5 text-green-600" />
-            <CardTitle>Conexão WhatsApp</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="text-sm text-slate-600">
-                Conecte seu WhatsApp para começar a enviar relatórios automaticamente para seus clientes
-              </div>
-            </div>
+      <WhatsAppConnectionCard />
 
-            <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <Smartphone className="w-8 h-8 text-gray-400" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg">WhatsApp Desconectado</h3>
-                  <p className="text-sm text-slate-500">
-                    Conecte seu WhatsApp para começar a enviar relatórios automaticamente para seus clientes
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-500">Conexão segura e criptografada</span>
-                </div>
-              </div>
-            </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="dashboard" className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="campaigns" className="flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Campanhas
+          </TabsTrigger>
+          <TabsTrigger value="messages" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Mensagens
+          </TabsTrigger>
+          <TabsTrigger value="contacts" className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            Contatos
+          </TabsTrigger>
+        </TabsList>
 
-            <div className="flex justify-center">
-              <Button 
-                onClick={handleConnectWhatsApp}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <QrCode className="w-4 h-4 mr-2" />
-                Conectar WhatsApp
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Relatórios Automatizados */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <CardTitle>Relatórios Automatizados</CardTitle>
-            </div>
-            <Button 
-              onClick={() => setShowNewReportDialog(true)}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Relatório
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="text-sm text-slate-600">
-              Configure relatórios que são enviados automaticamente via WhatsApp
-            </div>
-
-            <div className="grid gap-4">
-              {reports.map((report) => (
-                <div key={report.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4 text-blue-600" />
-                      <h3 className="font-medium">{report.name}</h3>
-                      <Badge variant={report.active ? "default" : "secondary"}>
-                        {report.active ? "Ativo" : "Inativo"}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Switch checked={report.active} />
-                      <Button variant="ghost" size="sm">
-                        <Settings className="w-4 h-4" />
-                      </Button>
+        <TabsContent value="dashboard" className="space-y-6">
+          <WhatsAppDashboard />
+          
+          {/* Últimas Atividades */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Últimas Atividades</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div>
+                      <p className="text-sm font-medium">Relatório semanal enviado</p>
+                      <p className="text-xs text-gray-500">João Silva - há 2 horas</p>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="text-xs text-gray-500">Entregue</div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     <div>
-                      <span className="text-slate-500">Cliente:</span>
-                      <div className="font-medium">{report.clientName}</div>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">WhatsApp:</span>
-                      <div className="font-medium">{report.phone}</div>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Frequência:</span>
-                      <div className="font-medium">{report.frequency}</div>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Próximo envio:</span>
-                      <div className="font-medium">{report.day} - {report.time}</div>
+                      <p className="text-sm font-medium">Promoção mensal programada</p>
+                      <p className="text-xs text-gray-500">Campanha Marketing - há 3 horas</p>
                     </div>
                   </div>
-                </div>
-              ))}
-
-              {reports.length === 0 && (
-                <div className="text-center py-8">
-                  <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                  <h3 className="font-medium text-slate-600 mb-2">Nenhum relatório configurado</h3>
-                  <p className="text-sm text-slate-500 mb-4">
-                    Configure relatórios que são enviados automaticamente via WhatsApp
-                  </p>
-                  <Button 
-                    onClick={() => setShowNewReportDialog(true)}
-                    variant="outline"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Criar Primeiro Relatório
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {!isWhatsAppConnected && reports.length > 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-yellow-700">
-                      WhatsApp não está conectado. Os relatórios podem ser configurados, mas só serão enviados quando o WhatsApp estiver conectado.
-                    </p>
-                  </div>
+                  <div className="text-xs text-gray-500">Agendado</div>
                 </div>
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="campaigns" className="space-y-6">
+          <CampaignList onNewCampaign={handleNewCampaign} />
+        </TabsContent>
+
+        <TabsContent value="messages" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Histórico de Mensagens</CardTitle>
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4 mr-1" />
+                  Filtros
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="font-medium text-gray-600 mb-2">Nenhuma mensagem enviada</h3>
+                <p className="text-sm text-gray-500">
+                  As mensagens enviadas aparecerão aqui
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="contacts" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Contatos</CardTitle>
+                <Button variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Adicionar Contato
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="font-medium text-gray-600 mb-2">Nenhum contato cadastrado</h3>
+                <p className="text-sm text-gray-500">
+                  Adicione contatos para enviar mensagens
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <NewReportDialog />
     </div>
