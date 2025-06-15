@@ -22,6 +22,31 @@ export interface WhatsAppMessage {
   read_at?: string;
 }
 
+// Função utilitária para garantir que template_variables sempre seja um Record<string, string>
+function fixTemplateVariables(data: any): WhatsAppMessage {
+  let tplVars = data.template_variables;
+  if (!tplVars) {
+    tplVars = {};
+  } else if (typeof tplVars === 'string') {
+    try {
+      const parsed = JSON.parse(tplVars);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        tplVars = parsed;
+      } else {
+        tplVars = {};
+      }
+    } catch {
+      tplVars = {};
+    }
+  } else if (typeof tplVars !== 'object' || Array.isArray(tplVars)) {
+    tplVars = {};
+  }
+  return {
+    ...data,
+    template_variables: tplVars,
+  };
+}
+
 export interface SendMessageParams {
   phoneNumber: string;
   templateName: string;
@@ -69,7 +94,8 @@ export function useWhatsAppMessages() {
 
       if (error) throw error;
 
-      setMessages(data || []);
+      // Corrigir o tipo de template_variables para cada mensagem
+      setMessages((data || []).map(fixTemplateVariables));
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
@@ -100,8 +126,7 @@ export function useWhatsAppMessages() {
 
       if (error) throw error;
 
-      // Atualizar lista local
-      setMessages(prev => [data, ...prev]);
+      setMessages(prev => [fixTemplateVariables(data), ...prev]);
 
       toast({
         title: "Sucesso",
@@ -143,8 +168,7 @@ export function useWhatsAppMessages() {
 
       if (error) throw error;
 
-      // Atualizar lista local
-      setMessages(prev => [...(data || []), ...prev]);
+      setMessages(prev => ([...(Array.isArray(data) ? data.map(fixTemplateVariables) : []), ...prev]));
 
       toast({
         title: "Sucesso",
