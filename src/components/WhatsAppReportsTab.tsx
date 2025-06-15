@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +18,9 @@ import { NewMessageModal } from './whatsapp/NewMessageModal';
 import { NewCampaignModal } from './whatsapp/NewCampaignModal';
 import { NewContactModal } from './whatsapp/NewContactModal';
 import { MessageFiltersModal } from './whatsapp/MessageFiltersModal';
+import { ContactsTable } from './whatsapp/ContactsTable';
+import { MessagesTable } from './whatsapp/MessagesTable';
+import { WhatsAppContact } from '@/hooks/useWhatsAppContacts';
 
 export function WhatsAppReportsTab() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -26,6 +28,7 @@ export function WhatsAppReportsTab() {
   const [showNewCampaignModal, setShowNewCampaignModal] = useState(false);
   const [showNewContactModal, setShowNewContactModal] = useState(false);
   const [showMessageFiltersModal, setShowMessageFiltersModal] = useState(false);
+  const [editingContact, setEditingContact] = useState<WhatsAppContact | null>(null);
   const [campaignRefreshKey, setCampaignRefreshKey] = useState(0);
 
   const handleNewCampaign = () => {
@@ -53,6 +56,16 @@ export function WhatsAppReportsTab() {
     // Implementar lógica de filtros aqui
   };
 
+  const handleEditContact = (contact: WhatsAppContact) => {
+    setEditingContact(contact);
+    setShowNewContactModal(true);
+  };
+
+  const handleCloseContactModal = () => {
+    setShowNewContactModal(false);
+    setEditingContact(null);
+  };
+
   return (
     <div className="space-y-6 max-w-7xl">
       {/* Header */}
@@ -64,11 +77,11 @@ export function WhatsAppReportsTab() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleNewMessage}>
+          <Button variant="outline" size="sm" onClick={() => setShowNewMessageModal(true)}>
             <Send className="w-4 h-4 mr-1" />
             Nova Mensagem
           </Button>
-          <Button size="sm" onClick={handleNewCampaign}>
+          <Button size="sm" onClick={() => setShowNewCampaignModal(true)}>
             <Plus className="w-4 h-4 mr-1" />
             Nova Campanha
           </Button>
@@ -138,62 +151,22 @@ export function WhatsAppReportsTab() {
         <TabsContent value="campaigns" className="space-y-6">
           <CampaignList 
             key={campaignRefreshKey}
-            onNewCampaign={handleNewCampaign} 
+            onNewCampaign={() => setShowNewCampaignModal(true)} 
           />
         </TabsContent>
 
         <TabsContent value="messages" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Histórico de Mensagens</CardTitle>
-                <Button variant="outline" size="sm" onClick={handleMessageFilters}>
-                  <Settings className="w-4 h-4 mr-1" />
-                  Filtros
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-600 mb-2">Nenhuma mensagem enviada</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  As mensagens enviadas aparecerão aqui
-                </p>
-                <Button onClick={handleNewMessage} variant="outline">
-                  <Send className="w-4 h-4 mr-1" />
-                  Enviar Primeira Mensagem
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <MessagesTable 
+            onNewMessage={() => setShowNewMessageModal(true)}
+            onOpenFilters={() => setShowMessageFiltersModal(true)}
+          />
         </TabsContent>
 
         <TabsContent value="contacts" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Contatos</CardTitle>
-                <Button variant="outline" size="sm" onClick={handleNewContact}>
-                  <Plus className="w-4 h-4 mr-1" />
-                  Adicionar Contato
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-600 mb-2">Nenhum contato cadastrado</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  Adicione contatos para enviar mensagens
-                </p>
-                <Button onClick={handleNewContact} variant="outline">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Adicionar Primeiro Contato
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <ContactsTable 
+            onNewContact={() => setShowNewContactModal(true)}
+            onEditContact={handleEditContact}
+          />
         </TabsContent>
       </Tabs>
 
@@ -206,18 +179,19 @@ export function WhatsAppReportsTab() {
       <NewCampaignModal 
         open={showNewCampaignModal} 
         onClose={() => setShowNewCampaignModal(false)}
-        onSuccess={handleCampaignSuccess}
+        onSuccess={() => setCampaignRefreshKey(prev => prev + 1)}
       />
       
       <NewContactModal 
         open={showNewContactModal} 
-        onClose={() => setShowNewContactModal(false)} 
+        onClose={handleCloseContactModal}
+        editingContact={editingContact}
       />
       
       <MessageFiltersModal 
         open={showMessageFiltersModal} 
         onClose={() => setShowMessageFiltersModal(false)}
-        onApplyFilters={handleApplyMessageFilters}
+        onApplyFilters={(filters) => console.log('Applying filters:', filters)}
       />
     </div>
   );

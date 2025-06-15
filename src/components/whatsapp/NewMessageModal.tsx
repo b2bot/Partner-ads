@@ -2,12 +2,11 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useWhatsAppMessages } from '@/hooks/useWhatsAppMessages';
+import { useWhatsAppContacts, WhatsAppContact } from '@/hooks/useWhatsAppContacts';
 import { Send } from 'lucide-react';
 import { TemplateSelector } from './TemplateSelector';
+import { ContactSelector } from './ContactSelector';
 import { WhatsAppTemplate } from '@/hooks/useWhatsAppTemplates';
 
 interface NewMessageModalProps {
@@ -16,24 +15,23 @@ interface NewMessageModalProps {
 }
 
 export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
+  const { sendMessage, sendBulkMessages } = useWhatsAppMessages();
   const [loading, setLoading] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [selectedContacts, setSelectedContacts] = useState<WhatsAppContact[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<WhatsAppTemplate | null>(null);
   const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({});
-  const { toast } = useToast();
 
   const handleTemplateSelect = (template: WhatsAppTemplate | null, variables: Record<string, string>) => {
     setSelectedTemplate(template);
     setTemplateVariables(variables);
   };
 
+  const handleContactsSelect = (contacts: WhatsAppContact[]) => {
+    setSelectedContacts(contacts);
+  };
+
   const handleSend = async () => {
-    if (!phoneNumber || !selectedTemplate) {
-      toast({
-        title: "Erro",
-        description: "Número e template são obrigatórios",
-        variant: "destructive",
-      });
+    if (!selectedTemplate || selectedContacts.length === 0) {
       return;
     }
 
@@ -43,66 +41,56 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
     );
 
     if (missingVariables.length > 0) {
-      toast({
-        title: "Erro",
-        description: `Preencha todos os campos: ${missingVariables.join(', ')}`,
-        variant: "destructive",
-      });
       return;
     }
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('whatsapp_messages')
-        .insert({
-          phone_number: phoneNumber,
-          message_type: 'template',
-          template_name: selectedTemplate.name,
-          template_variables: templateVariables,
-          status: 'pending',
+      if (selectedContacts.length === 1) {
+        // Envio único
+        await sendMessage({
+          phoneNumber: selectedContacts[0].phone_number,
+          templateName: selectedTemplate.name,
+          templateVariables,
+          contactId: selectedContacts[0].id,
         });
+      } else {
+        // Envio em lote
+        await sendBulkMessages(
+          selectedContacts.map(c => c.phone_number),
+          selectedTemplate.name,
+          templateVariables
+        );
+      }
 
-      if (error) throw error;
-
-      toast({
-        title: "Sucesso",
-        description: "Mensagem agendada para envio",
-      });
-
-      setPhoneNumber('');
+      // Reset form
+      setSelectedContacts([]);
       setSelectedTemplate(null);
       setTemplateVariables({});
       onClose();
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao agendar mensagem",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
   };
 
+  const isFormValid = selectedTemplate && selectedContacts.length > 0 && 
+    selectedTemplate.variables.every(variable => templateVariables[variable]?.trim());
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova Mensagem WhatsApp</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="phone">Número do WhatsApp</Label>
-            <Input
-              id="phone"
-              placeholder="+55 (11) 99999-9999"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-          </div>
+        <div className="space-y-6">
+          <ContactSelector
+            onContactsSelect={handleContactsSelect}
+            selectedContacts={selectedContacts}
+            mode="multiple"
+          />
 
           <TemplateSelector
             onTemplateSelect={handleTemplateSelect}
@@ -114,9 +102,13 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
             <Button variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button onClick={handleSend} disabled={loading || !selectedTemplate}>
+            <Button 
+              onClick={handleSend} 
+              disabled={loading || !isFormValid}
+            >
               <Send className="w-4 h-4 mr-2" />
-              {loading ? 'Enviando...' : 'Enviar'}
+              {loading ? 'Enviando...' : 
+               selectedContacts.length > 1 ? `Enviar para ${selectedContacts.length} contatos` : 'Enviar'}
             </Button>
           </div>
         </div>

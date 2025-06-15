@@ -586,6 +586,56 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_campaign_executions: {
+        Row: {
+          campaign_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          execution_date: string
+          execution_details: Json | null
+          id: string
+          messages_delivered: number | null
+          messages_failed: number | null
+          messages_sent: number | null
+          status: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_date: string
+          execution_details?: Json | null
+          id?: string
+          messages_delivered?: number | null
+          messages_failed?: number | null
+          messages_sent?: number | null
+          status?: string
+        }
+        Update: {
+          campaign_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_date?: string
+          execution_details?: Json | null
+          id?: string
+          messages_delivered?: number | null
+          messages_failed?: number | null
+          messages_sent?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_campaign_executions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whatsapp_campaigns: {
         Row: {
           contacts: string[] | null
@@ -595,10 +645,13 @@ export type Database = {
           frequency: string
           id: string
           is_active: boolean | null
+          last_execution: string | null
           meta_account_id: string | null
           name: string
+          next_execution: string | null
           send_time: string
           template_id: string | null
+          timezone: string | null
           type: string
           updated_at: string | null
           variables_mapping: Json | null
@@ -611,10 +664,13 @@ export type Database = {
           frequency: string
           id?: string
           is_active?: boolean | null
+          last_execution?: string | null
           meta_account_id?: string | null
           name: string
+          next_execution?: string | null
           send_time: string
           template_id?: string | null
+          timezone?: string | null
           type: string
           updated_at?: string | null
           variables_mapping?: Json | null
@@ -627,10 +683,13 @@ export type Database = {
           frequency?: string
           id?: string
           is_active?: boolean | null
+          last_execution?: string | null
           meta_account_id?: string | null
           name?: string
+          next_execution?: string | null
           send_time?: string
           template_id?: string | null
+          timezone?: string | null
           type?: string
           updated_at?: string | null
           variables_mapping?: Json | null
@@ -685,9 +744,12 @@ export type Database = {
         Row: {
           client_id: string | null
           created_at: string | null
+          grupo: string | null
           id: string
           is_active: boolean | null
+          meta_account_id: string | null
           name: string
+          observacoes: string | null
           phone_number: string
           tags: string[] | null
           updated_at: string | null
@@ -695,9 +757,12 @@ export type Database = {
         Insert: {
           client_id?: string | null
           created_at?: string | null
+          grupo?: string | null
           id?: string
           is_active?: boolean | null
+          meta_account_id?: string | null
           name: string
+          observacoes?: string | null
           phone_number: string
           tags?: string[] | null
           updated_at?: string | null
@@ -705,9 +770,12 @@ export type Database = {
         Update: {
           client_id?: string | null
           created_at?: string | null
+          grupo?: string | null
           id?: string
           is_active?: boolean | null
+          meta_account_id?: string | null
           name?: string
+          observacoes?: string | null
           phone_number?: string
           tags?: string[] | null
           updated_at?: string | null
@@ -718,6 +786,47 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_message_logs: {
+        Row: {
+          created_at: string | null
+          error_details: Json | null
+          id: string
+          message_id: string | null
+          status: string
+          timestamp: string | null
+          webhook_data: Json | null
+          whatsapp_message_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_details?: Json | null
+          id?: string
+          message_id?: string | null
+          status?: string
+          timestamp?: string | null
+          webhook_data?: Json | null
+          whatsapp_message_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_details?: Json | null
+          id?: string
+          message_id?: string | null
+          status?: string
+          timestamp?: string | null
+          webhook_data?: Json | null
+          whatsapp_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_message_logs_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_messages"
             referencedColumns: ["id"]
           },
         ]

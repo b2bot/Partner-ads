@@ -4,126 +4,182 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { UserPlus } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { useWhatsAppContacts, WhatsAppContact } from '@/hooks/useWhatsAppContacts';
+import { Plus, X } from 'lucide-react';
 
 interface NewContactModalProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
+  editingContact?: WhatsAppContact | null;
 }
 
-export function NewContactModal({ open, onClose, onSuccess }: NewContactModalProps) {
+export function NewContactModal({ open, onClose, editingContact }: NewContactModalProps) {
+  const { createContact, updateContact } = useWhatsAppContacts();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    phoneNumber: '',
-    tags: '',
+    name: editingContact?.name || '',
+    phone_number: editingContact?.phone_number || '',
+    grupo: editingContact?.grupo || '',
+    observacoes: editingContact?.observacoes || '',
+    tags: editingContact?.tags || [],
   });
-  const { toast } = useToast();
+  const [newTag, setNewTag] = useState('');
 
-  const handleCreate = async () => {
-    if (!formData.name || !formData.phoneNumber) {
-      toast({
-        title: "Erro",
-        description: "Nome e número são obrigatórios",
-        variant: "destructive",
-      });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name.trim() || !formData.phone_number.trim()) {
       return;
     }
 
     setLoading(true);
     try {
-      const tagsArray = formData.tags
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0);
-
-      const { error } = await supabase
-        .from('whatsapp_contacts')
-        .insert({
-          name: formData.name,
-          phone_number: formData.phoneNumber,
-          tags: tagsArray,
-          is_active: true,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Sucesso",
-        description: "Contato adicionado com sucesso",
-      });
-
+      if (editingContact) {
+        await updateContact(editingContact.id, formData);
+      } else {
+        await createContact(formData);
+      }
+      
+      onClose();
       setFormData({
         name: '',
-        phoneNumber: '',
-        tags: '',
+        phone_number: '',
+        grupo: '',
+        observacoes: '',
+        tags: [],
       });
-      
-      onSuccess?.();
-      onClose();
     } catch (error) {
-      console.error('Error creating contact:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao adicionar contato",
-        variant: "destructive",
-      });
+      console.error('Error saving contact:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  const addTag = () => {
+    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, newTag.trim()]
+      }));
+      setNewTag('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Adicionar Contato</DialogTitle>
+          <DialogTitle>
+            {editingContact ? 'Editar Contato' : 'Novo Contato'}
+          </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nome *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Nome do contato"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="phone">Telefone *</Label>
+              <Input
+                id="phone"
+                value={formData.phone_number}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone_number: e.target.value }))}
+                placeholder="+55 (11) 99999-9999"
+                required
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="name">Nome</Label>
+            <Label htmlFor="grupo">Grupo</Label>
             <Input
-              id="name"
-              placeholder="Ex: João Silva"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              id="grupo"
+              value={formData.grupo}
+              onChange={(e) => setFormData(prev => ({ ...prev, grupo: e.target.value }))}
+              placeholder="Ex: Clientes Premium, Leads, etc."
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Número do WhatsApp</Label>
-            <Input
-              id="phone"
-              placeholder="+55 (11) 99999-9999"
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-            />
+            <Label>Tags</Label>
+            <div className="flex gap-2">
+              <Input
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Adicionar tag"
+                className="flex-1"
+              />
+              <Button type="button" onClick={addTag} variant="outline" size="sm">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {formData.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {formData.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 ml-1"
+                      onClick={() => removeTag(tag)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
-            <Input
-              id="tags"
-              placeholder="cliente, vip, importante"
-              value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+            <Label htmlFor="observacoes">Observações</Label>
+            <Textarea
+              id="observacoes"
+              value={formData.observacoes}
+              onChange={(e) => setFormData(prev => ({ ...prev, observacoes: e.target.value }))}
+              placeholder="Observações sobre o contato..."
+              rows={3}
             />
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button onClick={handleCreate} disabled={loading}>
-              <UserPlus className="w-4 h-4 mr-2" />
-              {loading ? 'Adicionando...' : 'Adicionar'}
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Salvando...' : editingContact ? 'Atualizar' : 'Criar'}
             </Button>
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
