@@ -7,8 +7,8 @@ export interface WhatsAppTemplate {
   id: string;
   name: string;
   language: string;
-  category: 'MARKETING' | 'UTILITY' | 'AUTHENTICATION';
-  status: 'APPROVED' | 'PENDING' | 'REJECTED';
+  category: 'MARKETING' | 'UTILITY' | 'AUTHENTICATION' | string;
+  status: 'APPROVED' | 'PENDING' | 'REJECTED' | string;
   header_type?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT';
   header_text?: string;
   body_text: string;
@@ -32,7 +32,26 @@ export function useWhatsAppTemplates() {
 
       if (error) throw error;
 
-      setTemplates(data || []);
+      // Normalizar os dados vindos do Supabase para corresponder à interface local
+      const normalizedTemplates: WhatsAppTemplate[] = (data || []).map(template => ({
+        id: template.id,
+        name: template.name,
+        language: template.language,
+        category: ['MARKETING', 'UTILITY', 'AUTHENTICATION'].includes(template.category) 
+          ? template.category as 'MARKETING' | 'UTILITY' | 'AUTHENTICATION'
+          : template.category,
+        status: ['APPROVED', 'PENDING', 'REJECTED'].includes(template.status)
+          ? template.status as 'APPROVED' | 'PENDING' | 'REJECTED'
+          : template.status,
+        header_type: template.header_type as 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | undefined,
+        header_text: template.header_text || undefined,
+        body_text: template.body_text,
+        footer_text: template.footer_text || undefined,
+        variables: Array.isArray(template.variables) ? template.variables as string[] : [],
+        components: template.components,
+      }));
+
+      setTemplates(normalizedTemplates);
     } catch (error) {
       console.error('Error fetching templates:', error);
       toast({

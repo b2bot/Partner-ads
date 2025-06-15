@@ -51,12 +51,19 @@ export function useWhatsAppConfig() {
 
   const updateConfig = async (configData: Partial<WhatsAppConfig>) => {
     try {
+      // Garantir que os campos obrigatórios estão presentes para upsert
+      const upsertData = {
+        phone_number_id: configData.phone_number_id || '',
+        access_token: configData.access_token || '',
+        business_account_id: configData.business_account_id,
+        status: configData.status,
+        last_verified_at: configData.last_verified_at,
+        ...(configData.id && { id: configData.id }),
+      };
+
       const { data, error } = await supabase
         .from('whatsapp_config')
-        .upsert({
-          ...configData,
-          updated_at: new Date().toISOString(),
-        })
+        .upsert(upsertData)
         .select()
         .single();
 
