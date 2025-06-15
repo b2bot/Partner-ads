@@ -4,42 +4,47 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Clock, Users, Settings, Play, Pause } from 'lucide-react';
+import { Plus, Clock, Users, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface Campaign {
+// Permitir string para tipo custom vindo do banco
+type Campaign = {
   id: string;
   name: string;
-  type: 'relatorio' | 'financeiro' | 'promocional' | 'suporte';
-  frequency: 'diario' | 'semanal' | 'mensal';
-  day_of_week?: number;
+  type: "relatorio" | "financeiro" | "promocional" | "suporte" | string,
+  frequency: "diario" | "semanal" | "mensal" | string,
+  day_of_week?: number | null,
   send_time: string;
   is_active: boolean;
   contacts: string[];
-  template_id?: string;
-  meta_account_id?: string;
-}
+  template_id?: string | null;
+  meta_account_id?: string | null;
+  variables_mapping?: any;
+  created_at?: string;
+  updated_at?: string;
+  data_period_days?: number;
+};
 
 interface CampaignListProps {
   onNewCampaign: () => void;
 }
 
-const typeLabels = {
+const typeLabels: Record<string, string> = {
   relatorio: 'Relatório',
   financeiro: 'Financeiro', 
   promocional: 'Promocional',
   suporte: 'Suporte',
 };
 
-const typeColors = {
+const typeColors: Record<string, string> = {
   relatorio: 'bg-blue-100 text-blue-800',
   financeiro: 'bg-green-100 text-green-800',
   promocional: 'bg-purple-100 text-purple-800',
   suporte: 'bg-orange-100 text-orange-800',
 };
 
-const frequencyLabels = {
+const frequencyLabels: Record<string, string> = {
   diario: 'Diário',
   semanal: 'Semanal',
   mensal: 'Mensal',
@@ -65,7 +70,27 @@ export function CampaignList({ onNewCampaign }: CampaignListProps) {
 
       if (error) throw error;
 
-      setCampaigns(data || []);
+      // Mapeamento para garantir o type correto sempre
+      const parsedCampaigns: Campaign[] = (data || []).map((c: any) => ({
+        ...c,
+        type: typeof c.type === "string"
+          ? (
+              c.type === "relatorio" ||
+              c.type === "financeiro" ||
+              c.type === "promocional" ||
+              c.type === "suporte"
+            ) ? c.type : (c.type || ""),
+        frequency: typeof c.frequency === "string"
+          ? (
+              c.frequency === "diario" ||
+              c.frequency === "semanal" ||
+              c.frequency === "mensal"
+            ) ? c.frequency : (c.frequency || ""),
+        day_of_week: typeof c.day_of_week === "number" ? c.day_of_week : null,
+        is_active: typeof c.is_active === "boolean" ? c.is_active : false,
+        contacts: Array.isArray(c.contacts) ? c.contacts : [],
+      }));
+      setCampaigns(parsedCampaigns);
     } catch (error) {
       console.error('Error fetching campaigns:', error);
       toast({
@@ -156,8 +181,8 @@ export function CampaignList({ onNewCampaign }: CampaignListProps) {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium">{campaign.name}</h3>
-                    <Badge className={typeColors[campaign.type]}>
-                      {typeLabels[campaign.type]}
+                    <Badge className={typeColors[campaign.type] ?? 'bg-gray-100 text-gray-800'}>
+                      {typeLabels[campaign.type] ?? campaign.type ?? 'Outro'}
                     </Badge>
                     <Badge variant={campaign.is_active ? "default" : "secondary"}>
                       {campaign.is_active ? "Ativo" : "Pausado"}
@@ -165,7 +190,7 @@ export function CampaignList({ onNewCampaign }: CampaignListProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
-                      checked={campaign.is_active}
+                      checked={!!campaign.is_active}
                       onCheckedChange={(checked) => toggleCampaign(campaign.id, checked)}
                     />
                     <Button variant="ghost" size="sm">
@@ -177,12 +202,12 @@ export function CampaignList({ onNewCampaign }: CampaignListProps) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <span className="text-gray-500">Frequência:</span>
-                    <div className="font-medium">{frequencyLabels[campaign.frequency]}</div>
+                    <div className="font-medium">{frequencyLabels[campaign.frequency] ?? campaign.frequency ?? '-'}</div>
                   </div>
-                  {campaign.day_of_week !== undefined && (
+                  {(campaign.day_of_week !== undefined && campaign.day_of_week !== null) && (
                     <div>
                       <span className="text-gray-500">Dia:</span>
-                      <div className="font-medium">{dayLabels[campaign.day_of_week]}</div>
+                      <div className="font-medium">{dayLabels[campaign.day_of_week] ?? campaign.day_of_week}</div>
                     </div>
                   )}
                   <div>

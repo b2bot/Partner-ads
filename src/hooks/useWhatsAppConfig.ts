@@ -8,7 +8,7 @@ export interface WhatsAppConfig {
   phone_number_id: string;
   access_token: string;
   business_account_id?: string;
-  status: 'connected' | 'disconnected' | 'error';
+  status: 'connected' | 'disconnected' | 'error' | string;
   last_verified_at?: string;
 }
 
@@ -28,7 +28,15 @@ export function useWhatsAppConfig() {
         throw error;
       }
 
-      setConfig(data);
+      // Força o fallback para tipagem local
+      setConfig(data ? {
+        id: data.id,
+        phone_number_id: data.phone_number_id,
+        access_token: data.access_token,
+        business_account_id: data.business_account_id ?? "",
+        status: (data.status === 'connected' || data.status === 'disconnected' || data.status === 'error') ? data.status : 'disconnected',
+        last_verified_at: data.last_verified_at ?? "",
+      } : null);
     } catch (error) {
       console.error('Error fetching WhatsApp config:', error);
       toast({
@@ -54,7 +62,14 @@ export function useWhatsAppConfig() {
 
       if (error) throw error;
 
-      setConfig(data);
+      setConfig(data ? {
+        id: data.id,
+        phone_number_id: data.phone_number_id,
+        access_token: data.access_token,
+        business_account_id: data.business_account_id ?? "",
+        status: (data.status === 'connected' || data.status === 'disconnected' || data.status === 'error') ? data.status : 'disconnected',
+        last_verified_at: data.last_verified_at ?? "",
+      } : null);
       toast({
         title: "Sucesso",
         description: "Configuração do WhatsApp atualizada",
@@ -73,9 +88,8 @@ export function useWhatsAppConfig() {
     if (!config) return false;
 
     try {
-      // Simulação de teste de conexão - aqui você implementaria a chamada real para a API
-      const isConnected = true; // Placeholder
-      
+      // Simulação de teste de conexão
+      const isConnected = true; // TODO: chamada real API WhatsApp
       await updateConfig({
         ...config,
         status: isConnected ? 'connected' : 'error',

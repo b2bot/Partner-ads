@@ -9,11 +9,24 @@ import {
   Send,
   BarChart3,
   Users,
-  Settings
+  Settings,
+  AlertCircle,
 } from 'lucide-react';
 import { WhatsAppConnectionCard } from './whatsapp/WhatsAppConnectionCard';
 import { WhatsAppDashboard } from './whatsapp/WhatsAppDashboard';
 import { CampaignList } from './whatsapp/CampaignList';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { toast } from "@/components/ui/use-toast"
 
 export function WhatsAppReportsTab() {
   const [activeTab, setActiveTab] = useState('dashboard');
