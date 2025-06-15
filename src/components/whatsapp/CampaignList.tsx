@@ -52,6 +52,25 @@ const frequencyLabels: Record<string, string> = {
 
 const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+// Função utilitária para normalizar dados da campanha
+const normalizeCampaign = (c: any): Campaign => {
+  const validTypes = ["relatorio", "financeiro", "promocional", "suporte"];
+  const validFrequencies = ["diario", "semanal", "mensal"];
+
+  return {
+    ...c,
+    type: typeof c.type === "string" && validTypes.includes(c.type) 
+      ? c.type 
+      : (c.type || ""),
+    frequency: typeof c.frequency === "string" && validFrequencies.includes(c.frequency)
+      ? c.frequency 
+      : (c.frequency || ""),
+    day_of_week: typeof c.day_of_week === "number" ? c.day_of_week : null,
+    is_active: typeof c.is_active === "boolean" ? c.is_active : false,
+    contacts: Array.isArray(c.contacts) ? c.contacts : [],
+  };
+};
+
 export function CampaignList({ onNewCampaign }: CampaignListProps) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,26 +89,8 @@ export function CampaignList({ onNewCampaign }: CampaignListProps) {
 
       if (error) throw error;
 
-      // Mapeamento para garantir o type correto sempre
-      const parsedCampaigns: Campaign[] = (data || []).map((c: any) => ({
-        ...c,
-        type: typeof c.type === "string"
-          ? (
-              c.type === "relatorio" ||
-              c.type === "financeiro" ||
-              c.type === "promocional" ||
-              c.type === "suporte"
-            ) ? c.type : (c.type || ""),
-        frequency: typeof c.frequency === "string"
-          ? (
-              c.frequency === "diario" ||
-              c.frequency === "semanal" ||
-              c.frequency === "mensal"
-            ) ? c.frequency : (c.frequency || ""),
-        day_of_week: typeof c.day_of_week === "number" ? c.day_of_week : null,
-        is_active: typeof c.is_active === "boolean" ? c.is_active : false,
-        contacts: Array.isArray(c.contacts) ? c.contacts : [],
-      }));
+      // Usar a função utilitária para normalizar os dados
+      const parsedCampaigns: Campaign[] = (data || []).map(normalizeCampaign);
       setCampaigns(parsedCampaigns);
     } catch (error) {
       console.error('Error fetching campaigns:', error);
