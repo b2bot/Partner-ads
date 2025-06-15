@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,256 +11,46 @@ import {
   BarChart3,
   Users,
   Settings,
-  AlertCircle,
 } from 'lucide-react';
 import { WhatsAppConnectionCard } from './whatsapp/WhatsAppConnectionCard';
 import { WhatsAppDashboard } from './whatsapp/WhatsAppDashboard';
 import { CampaignList } from './whatsapp/CampaignList';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { toast } from "@/components/ui/use-toast"
+import { NewMessageModal } from './whatsapp/NewMessageModal';
+import { NewCampaignModal } from './whatsapp/NewCampaignModal';
+import { NewContactModal } from './whatsapp/NewContactModal';
+import { MessageFiltersModal } from './whatsapp/MessageFiltersModal';
 
 export function WhatsAppReportsTab() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isWhatsAppConnected, setIsWhatsAppConnected] = useState(false);
-  const [reports, setReports] = useState([
-    {
-      id: 1,
-      name: 'Relatório Semanal Cliente X',
-      clientName: 'João Silva',
-      phone: '+55 (11) 99999-9999',
-      frequency: 'Semanal',
-      day: 'Segunda-feira',
-      time: '09:00',
-      active: true,
-      metaAccount: 'Meta Ads - Buscar Campos da Conta'
-    }
-  ]);
-  const [showNewReportDialog, setShowNewReportDialog] = useState(false);
+  const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+  const [showNewCampaignModal, setShowNewCampaignModal] = useState(false);
+  const [showNewContactModal, setShowNewContactModal] = useState(false);
+  const [showMessageFiltersModal, setShowMessageFiltersModal] = useState(false);
+  const [campaignRefreshKey, setCampaignRefreshKey] = useState(0);
 
   const handleNewCampaign = () => {
-    console.log('Nova campanha');
-    // Implementar modal de nova campanha
+    setShowNewCampaignModal(true);
   };
 
   const handleNewMessage = () => {
-    console.log('Nova mensagem');
-    // Implementar modal de nova mensagem
+    setShowNewMessageModal(true);
   };
 
-  const handleConnectWhatsApp = () => {
-    // Simulação de conexão
-    setIsWhatsAppConnected(true);
-    toast({
-      title: "WhatsApp conectado",
-      description: "Conexão estabelecida com sucesso.",
-    });
+  const handleNewContact = () => {
+    setShowNewContactModal(true);
   };
 
-  const NewReportDialog = () => {
-    const [newReport, setNewReport] = useState({
-      name: '',
-      clientName: '',
-      phone: '',
-      frequency: 'Semanal',
-      day: 'Segunda-feira',
-      time: '09:00',
-      period: '7',
-      template: 'Olá {{client_name}}!\n\nSegue o relatório das suas campanhas do período {{date_range}}:\n\n{{metrics_data}}\n\nQualquer dúvida, estou à disposição!'
-    });
+  const handleMessageFilters = () => {
+    setShowMessageFiltersModal(true);
+  };
 
-    return (
-      <Dialog open={showNewReportDialog} onOpenChange={setShowNewReportDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-          <DialogHeader className="p-6 pb-0">
-            <DialogTitle>Novo Relatório Automatizado</DialogTitle>
-          </DialogHeader>
-          
-          <ScrollArea className="h-full max-h-[calc(90vh-120px)] px-6 pb-6">
-            <div className="space-y-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-yellow-700">
-                      WhatsApp não está conectado. O relatório será salvo, mas só será enviado quando o WhatsApp estiver conectado.
-                    </p>
-                  </div>
-                </div>
-              </div>
+  const handleCampaignSuccess = () => {
+    setCampaignRefreshKey(prev => prev + 1);
+  };
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="reportName">Nome do Relatório *</Label>
-                  <Input
-                    id="reportName"
-                    placeholder="Ex: Relatório Semanal Cliente X"
-                    value={newReport.name}
-                    onChange={(e) => setNewReport({...newReport, name: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="clientName">Nome do Cliente</Label>
-                  <Input
-                    id="clientName"
-                    placeholder="Ex: João Silva"
-                    value={newReport.clientName}
-                    onChange={(e) => setNewReport({...newReport, clientName: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="whatsappNumber">Número do WhatsApp *</Label>
-                <Input
-                  id="whatsappNumber"
-                  placeholder="Ex: +55 (11) 99999-9999"
-                  value={newReport.phone}
-                  onChange={(e) => setNewReport({...newReport, phone: e.target.value})}
-                />
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" id="sendToGroup" />
-                  <Label htmlFor="sendToGroup" className="text-sm">Ou enviar para um grupo</Label>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Conta Meta Ads *</Label>
-                <Select defaultValue="meta">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="meta">Meta Ads - Buscar Campos da Conta</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Frequência</Label>
-                  <Select value={newReport.frequency} onValueChange={(value) => setNewReport({...newReport, frequency: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Semanal">Semanal</SelectItem>
-                      <SelectItem value="Mensal">Mensal</SelectItem>
-                      <SelectItem value="Diário">Diário</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Dia da Semana</Label>
-                  <Select value={newReport.day} onValueChange={(value) => setNewReport({...newReport, day: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Segunda-feira">Segunda-feira</SelectItem>
-                      <SelectItem value="Terça-feira">Terça-feira</SelectItem>
-                      <SelectItem value="Quarta-feira">Quarta-feira</SelectItem>
-                      <SelectItem value="Quinta-feira">Quinta-feira</SelectItem>
-                      <SelectItem value="Sexta-feira">Sexta-feira</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Horário do Envio</Label>
-                  <Input
-                    type="time"
-                    value={newReport.time}
-                    onChange={(e) => setNewReport({...newReport, time: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Período dos Dados (dias)</Label>
-                <Select value={newReport.period} onValueChange={(value) => setNewReport({...newReport, period: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="7">7</SelectItem>
-                    <SelectItem value="30">30</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Template da Mensagem</Label>
-                <Textarea
-                  placeholder="Digite sua mensagem..."
-                  value={newReport.template}
-                  onChange={(e) => setNewReport({...newReport, template: e.target.value})}
-                  rows={5}
-                />
-                <div className="text-xs text-slate-500">
-                  Use: {'{{client_name}}'}, {'{{date_range}}'}, {'{{metrics_data}}'}
-                </div>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-800 mb-2">Campos Disponíveis nas Contas Selecionadas</h4>
-                <div className="text-sm text-blue-700">
-                  <p><strong>Como usar:</strong></p>
-                  <ul className="list-disc ml-4 mt-1 space-y-1">
-                    <li>As "Métricas Principais" e "Outras métricas" serão sempre disponíveis</li>
-                    <li>Meta Ads: Chegar em "Meta Ads - Buscar Campos da Conta" para ter métricas específicas da conta Google Ads</li>
-                    <li><strong>Anúncios - Quantidade:</strong> Exibir número de anúncios que a ação foi realizada</li>
-                    <li><strong>Valores Monetários:</strong> Exibir em valor local (moeda) (ex: valor total de conversas)</li>
-                    <li><strong>Os dados do Google Ads não estarão disponíveis</strong></li>
-                    <li>Use o ícone para filtrar campos disponíveis</li>
-                    <li><strong>Os dados da conta Meta não estão baseados nos últimos 7 dias de campanhas ativas</strong></li>
-                    <li>Os dados do Google Ads não estarão baseados nos últimos 7 dias de campanhas ativas</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowNewReportDialog(false)}>
-                  Cancelar
-                </Button>
-                <Button 
-                  onClick={() => {
-                    setReports([...reports, {
-                      id: reports.length + 1,
-                      name: newReport.name,
-                      clientName: newReport.clientName,
-                      phone: newReport.phone,
-                      frequency: newReport.frequency,
-                      day: newReport.day,
-                      time: newReport.time,
-                      active: true,
-                      metaAccount: 'Meta Ads - Buscar Campos da Conta'
-                    }]);
-                    setShowNewReportDialog(false);
-                    toast({
-                      title: "Relatório criado",
-                      description: "Relatório automatizado criado com sucesso.",
-                    });
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  Criar Relatório
-                </Button>
-              </div>
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
-    );
+  const handleApplyMessageFilters = (filters: any) => {
+    console.log('Applying filters:', filters);
+    // Implementar lógica de filtros aqui
   };
 
   return (
@@ -345,7 +136,10 @@ export function WhatsAppReportsTab() {
         </TabsContent>
 
         <TabsContent value="campaigns" className="space-y-6">
-          <CampaignList onNewCampaign={handleNewCampaign} />
+          <CampaignList 
+            key={campaignRefreshKey}
+            onNewCampaign={handleNewCampaign} 
+          />
         </TabsContent>
 
         <TabsContent value="messages" className="space-y-6">
@@ -353,7 +147,7 @@ export function WhatsAppReportsTab() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Histórico de Mensagens</CardTitle>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={handleMessageFilters}>
                   <Settings className="w-4 h-4 mr-1" />
                   Filtros
                 </Button>
@@ -363,9 +157,13 @@ export function WhatsAppReportsTab() {
               <div className="text-center py-8">
                 <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="font-medium text-gray-600 mb-2">Nenhuma mensagem enviada</h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 mb-4">
                   As mensagens enviadas aparecerão aqui
                 </p>
+                <Button onClick={handleNewMessage} variant="outline">
+                  <Send className="w-4 h-4 mr-1" />
+                  Enviar Primeira Mensagem
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -376,7 +174,7 @@ export function WhatsAppReportsTab() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Contatos</CardTitle>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={handleNewContact}>
                   <Plus className="w-4 h-4 mr-1" />
                   Adicionar Contato
                 </Button>
@@ -386,16 +184,41 @@ export function WhatsAppReportsTab() {
               <div className="text-center py-8">
                 <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="font-medium text-gray-600 mb-2">Nenhum contato cadastrado</h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 mb-4">
                   Adicione contatos para enviar mensagens
                 </p>
+                <Button onClick={handleNewContact} variant="outline">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Adicionar Primeiro Contato
+                </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      <NewReportDialog />
+      {/* Modals */}
+      <NewMessageModal 
+        open={showNewMessageModal} 
+        onClose={() => setShowNewMessageModal(false)} 
+      />
+      
+      <NewCampaignModal 
+        open={showNewCampaignModal} 
+        onClose={() => setShowNewCampaignModal(false)}
+        onSuccess={handleCampaignSuccess}
+      />
+      
+      <NewContactModal 
+        open={showNewContactModal} 
+        onClose={() => setShowNewContactModal(false)} 
+      />
+      
+      <MessageFiltersModal 
+        open={showMessageFiltersModal} 
+        onClose={() => setShowMessageFiltersModal(false)}
+        onApplyFilters={handleApplyMessageFilters}
+      />
     </div>
   );
 }
