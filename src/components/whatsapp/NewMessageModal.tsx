@@ -4,11 +4,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Send } from 'lucide-react';
+import { TemplateSelector } from './TemplateSelector';
+import { WhatsAppTemplate } from '@/hooks/useWhatsAppTemplates';
 
 interface NewMessageModalProps {
   open: boolean;
@@ -17,19 +17,35 @@ interface NewMessageModalProps {
 
 export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    phoneNumber: '',
-    message: '',
-    messageType: 'text' as 'text' | 'template',
-    templateName: '',
-  });
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState<WhatsAppTemplate | null>(null);
+  const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
+  const handleTemplateSelect = (template: WhatsAppTemplate | null, variables: Record<string, string>) => {
+    setSelectedTemplate(template);
+    setTemplateVariables(variables);
+  };
+
   const handleSend = async () => {
-    if (!formData.phoneNumber || !formData.message) {
+    if (!phoneNumber || !selectedTemplate) {
       toast({
         title: "Erro",
-        description: "Número e mensagem são obrigatórios",
+        description: "Número e template são obrigatórios",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verificar se todas as variáveis foram preenchidas
+    const missingVariables = selectedTemplate.variables.filter(
+      variable => !templateVariables[variable]?.trim()
+    );
+
+    if (missingVariables.length > 0) {
+      toast({
+        title: "Erro",
+        description: `Preencha todos os campos: ${missingVariables.join(', ')}`,
         variant: "destructive",
       });
       return;
@@ -40,10 +56,10 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
       const { error } = await supabase
         .from('whatsapp_messages')
         .insert({
-          phone_number: formData.phoneNumber,
-          message_type: formData.messageType,
-          message_content: formData.message,
-          template_name: formData.messageType === 'template' ? formData.templateName : null,
+          phone_number: phoneNumber,
+          message_type: 'template',
+          template_name: selectedTemplate.name,
+          template_variables: templateVariables,
           status: 'pending',
         });
 
@@ -51,21 +67,18 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
 
       toast({
         title: "Sucesso",
-        description: "Mensagem enviada com sucesso",
+        description: "Mensagem agendada para envio",
       });
 
-      setFormData({
-        phoneNumber: '',
-        message: '',
-        messageType: 'text',
-        templateName: '',
-      });
+      setPhoneNumber('');
+      setSelectedTemplate(null);
+      setTemplateVariables({});
       onClose();
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
         title: "Erro",
-        description: "Erro ao enviar mensagem",
+        description: "Erro ao agendar mensagem",
         variant: "destructive",
       });
     } finally {
@@ -75,7 +88,7 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova Mensagem WhatsApp</DialogTitle>
         </DialogHeader>
@@ -86,55 +99,22 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
             <Input
               id="phone"
               placeholder="+55 (11) 99999-9999"
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Tipo de Mensagem</Label>
-            <Select 
-              value={formData.messageType} 
-              onValueChange={(value: 'text' | 'template') => setFormData({ ...formData, messageType: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="text">Texto Livre</SelectItem>
-                <SelectItem value="template">Template</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {formData.messageType === 'template' && (
-            <div className="space-y-2">
-              <Label htmlFor="template">Nome do Template</Label>
-              <Input
-                id="template"
-                placeholder="nome_do_template"
-                value={formData.templateName}
-                onChange={(e) => setFormData({ ...formData, templateName: e.target.value })}
-              />
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="message">Mensagem</Label>
-            <Textarea
-              id="message"
-              placeholder="Digite sua mensagem..."
-              rows={4}
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            />
-          </div>
+          <TemplateSelector
+            onTemplateSelect={handleTemplateSelect}
+            selectedTemplate={selectedTemplate?.name}
+            initialVariables={templateVariables}
+          />
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button onClick={handleSend} disabled={loading}>
+            <Button onClick={handleSend} disabled={loading || !selectedTemplate}>
               <Send className="w-4 h-4 mr-2" />
               {loading ? 'Enviando...' : 'Enviar'}
             </Button>

@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus } from 'lucide-react';
+import { TemplateSelector } from './TemplateSelector';
+import { WhatsAppTemplate } from '@/hooks/useWhatsAppTemplates';
 
 interface NewCampaignModalProps {
   open: boolean;
@@ -26,15 +27,21 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
     sendTime: '09:00',
     dataPeriodDays: 7,
     contacts: [] as string[],
-    message: '',
   });
+  const [selectedTemplate, setSelectedTemplate] = useState<WhatsAppTemplate | null>(null);
+  const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
+  const handleTemplateSelect = (template: WhatsAppTemplate | null, variables: Record<string, string>) => {
+    setSelectedTemplate(template);
+    setTemplateVariables(variables);
+  };
+
   const handleCreate = async () => {
-    if (!formData.name || !formData.message) {
+    if (!formData.name || !selectedTemplate) {
       toast({
         title: "Erro",
-        description: "Nome e mensagem são obrigatórios",
+        description: "Nome e template são obrigatórios",
         variant: "destructive",
       });
       return;
@@ -47,11 +54,13 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
         .insert({
           name: formData.name,
           type: formData.type,
+          template_id: selectedTemplate.id,
           frequency: formData.frequency,
           day_of_week: formData.dayOfWeek,
           send_time: formData.sendTime,
           data_period_days: formData.dataPeriodDays,
           contacts: formData.contacts,
+          variables_mapping: templateVariables,
           is_active: true,
         });
 
@@ -70,8 +79,9 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
         sendTime: '09:00',
         dataPeriodDays: 7,
         contacts: [],
-        message: '',
       });
+      setSelectedTemplate(null);
+      setTemplateVariables({});
       
       onSuccess?.();
       onClose();
@@ -91,7 +101,7 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova Campanha Automatizada</DialogTitle>
         </DialogHeader>
@@ -198,22 +208,17 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="message">Template da Mensagem</Label>
-            <Textarea
-              id="message"
-              placeholder="Digite o template da mensagem..."
-              rows={4}
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            />
-          </div>
+          <TemplateSelector
+            onTemplateSelect={handleTemplateSelect}
+            selectedTemplate={selectedTemplate?.name}
+            initialVariables={templateVariables}
+          />
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button onClick={handleCreate} disabled={loading}>
+            <Button onClick={handleCreate} disabled={loading || !selectedTemplate}>
               <Plus className="w-4 h-4 mr-2" />
               {loading ? 'Criando...' : 'Criar Campanha'}
             </Button>
