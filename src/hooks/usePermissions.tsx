@@ -74,7 +74,7 @@ export function usePermissions() {
 
   // Verificar se usuário tem uma permissão específica
   const hasPermission = (permission: PermissionType): boolean => {
-    if (profile?.is_root_admin) return true;
+    if (profile?.is_root_admin === true) return true;
     return userPermissions?.includes(permission) || false;
   };
 

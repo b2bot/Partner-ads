@@ -91,9 +91,9 @@ export function useAuth() {
   };
 
   // Verificação de admin melhorada incluindo root admin
-  const isAdmin = profile?.role === 'admin' || profile?.is_root_admin === true;
   const isRootAdmin = profile?.is_root_admin === true;
-  const isCliente = profile?.role === 'cliente' && !profile?.is_root_admin;
+  const isAdmin = profile?.role === 'admin' || isRootAdmin;
+  const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
   console.log('Auth state:', { 
     userId: user?.id, 

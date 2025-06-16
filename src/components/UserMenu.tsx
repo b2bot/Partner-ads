@@ -11,10 +11,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User, Shield } from 'lucide-react';
+import { LogOut, User, Crown } from 'lucide-react';
 
 export function UserMenu() {
-  const { profile, signOut, isAdmin } = useAuth();
+  const { profile, signOut, isRootAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleSignOut = async () => {
@@ -50,13 +50,13 @@ export function UserMenu() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none flex items-center gap-2">
               {profile.nome}
-              {isAdmin && <Shield className="h-3 w-3 text-amber-500" />}
+              {isRootAdmin && <Crown className="h-3 w-3 text-yellow-500" />}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {profile.email}
             </p>
             <p className="text-xs leading-none text-muted-foreground capitalize">
-              {profile.role}
+              {isRootAdmin ? 'Super Admin' : profile.role}
             </p>
           </div>
         </DropdownMenuLabel>
