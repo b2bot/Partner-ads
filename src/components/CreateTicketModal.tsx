@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -49,6 +50,7 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
 
   const createTicketMutation = useMutation({
     mutationFn: async (data: { titulo: string; mensagem: string; arquivo_url?: string; cliente_id: string }) => {
+      // Não definir status - deixar o banco usar o padrão ('novo')
       const { error } = await supabase
         .from('chamados')
         .insert({
@@ -57,7 +59,6 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
           mensagem: data.mensagem,
           arquivo_url: data.arquivo_url,
           aberto_por: isAdmin ? 'admin' : 'cliente'
-          // Não definir status - deixar o padrão do banco ('novo')
         });
 
       if (error) throw error;

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, File, X, AlertCircle } from 'lucide-react';
+import { Upload, X, File } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CreateTicketModalAdvancedProps {
@@ -21,18 +22,19 @@ interface CreateTicketModalAdvancedProps {
 export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAdvancedProps) {
   const [titulo, setTitulo] = useState('');
   const [mensagem, setMensagem] = useState('');
-  const [categoria, setCategoria] = useState('outros');
-  const [prioridade, setPrioridade] = useState('media');
+  const [categoria, setCategoria] = useState('');
+  const [prioridade, setPrioridade] = useState('');
   const [clienteId, setClienteId] = useState('');
-  const [arquivos, setArquivos] = useState<File[]>([]);
+  const [arquivo, setArquivo] = useState<File | null>(null);
   const [error, setError] = useState('');
   
   const { isAdmin, user } = useAuth();
   const { clienteData } = useUserAccess();
   const queryClient = useQueryClient();
 
+  // Para admins, buscar lista de clientes
   const { data: clientes } = useQuery({
-    queryKey: ['clientes-for-ticket'],
+    queryKey: ['clientes-for-ticket-advanced'],
     queryFn: async () => {
       if (!isAdmin) return [];
       
@@ -52,21 +54,22 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
     mutationFn: async (data: { 
       titulo: string; 
       mensagem: string; 
-      categoria: string; 
-      prioridade: string; 
-      cliente_id: string;
-      arquivos_urls?: string[];
+      categoria?: string;
+      prioridade?: string;
+      arquivo_url?: string; 
+      cliente_id: string 
     }) => {
+      // Não definir status - deixar o banco usar o padrão ('novo')
       const { error } = await supabase
         .from('chamados')
         .insert({
           cliente_id: data.cliente_id,
           titulo: data.titulo,
           mensagem: data.mensagem,
-          categoria: data.categoria,
-          prioridade: data.prioridade,
+          categoria: data.categoria || 'outros',
+          prioridade: data.prioridade || 'media',
+          arquivo_url: data.arquivo_url,
           aberto_por: isAdmin ? 'admin' : 'cliente'
-          // Não definir status - deixar o padrão do banco ('novo')
         });
 
       if (error) throw error;
@@ -86,26 +89,11 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
   const resetForm = () => {
     setTitulo('');
     setMensagem('');
-    setCategoria('outros');
-    setPrioridade('media');
+    setCategoria('');
+    setPrioridade('');
     setClienteId('');
-    setArquivos([]);
+    setArquivo(null);
     setError('');
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles = files.filter(file => file.size <= 10 * 1024 * 1024); // 10MB max
-    
-    if (validFiles.length !== files.length) {
-      toast.error('Alguns arquivos foram removidos por excederem 10MB');
-    }
-    
-    setArquivos(prev => [...prev, ...validFiles]);
-  };
-
-  const removeFile = (index: number) => {
-    setArquivos(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,6 +105,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
       return;
     }
 
+    // Definir cliente_id baseado no tipo de usuário
     let finalClienteId = '';
     if (isAdmin) {
       if (!clienteId) {
@@ -132,40 +121,70 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
       finalClienteId = clienteData.id;
     }
 
+    let arquivo_url = undefined;
+
+    // Upload do arquivo se fornecido
+    if (arquivo) {
+      try {
+        const fileExt = arquivo.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('tickets')
+          .upload(fileName, arquivo);
+
+        if (uploadError) {
+          console.error('Erro no upload:', uploadError);
+        } else {
+          const { data } = supabase.storage
+            .from('tickets')
+            .getPublicUrl(fileName);
+          arquivo_url = data.publicUrl;
+        }
+      } catch (error) {
+        console.error('Erro ao fazer upload do arquivo:', error);
+        setError('Erro ao fazer upload do arquivo. O chamado será criado sem o anexo.');
+      }
+    }
+
     createTicketMutation.mutate({
       titulo: titulo.trim(),
       mensagem: mensagem.trim(),
-      categoria,
-      prioridade,
+      categoria: categoria || undefined,
+      prioridade: prioridade || undefined,
+      arquivo_url,
       cliente_id: finalClienteId,
     });
   };
 
-  const getPrioridadeBadgeColor = (prio: string) => {
-    switch (prio) {
-      case 'urgente': return 'bg-red-100 text-red-800';
-      case 'alta': return 'bg-orange-100 text-orange-800';
-      case 'media': return 'bg-blue-100 text-blue-800';
-      case 'baixa': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Arquivo deve ter no máximo 5MB.');
+        return;
+      }
+      setArquivo(file);
+      setError('');
     }
+  };
+
+  const removeFile = () => {
+    setArquivo(null);
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col">
+      <DialogContent className="max-w-lg max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            Novo Chamado de Suporte
-          </DialogTitle>
+          <DialogTitle>Novo Chamado</DialogTitle>
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto px-1">
-          <form onSubmit={handleSubmit} className="space-y-6 py-2">
+          <form onSubmit={handleSubmit} className="space-y-4 py-2">
             {isAdmin && (
               <div className="space-y-2">
-                <Label htmlFor="cliente">Cliente *</Label>
+                <Label htmlFor="cliente">Cliente</Label>
                 <Select value={clienteId} onValueChange={setClienteId}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o cliente" />
@@ -181,12 +200,12 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="categoria">Categoria</Label>
                 <Select value={categoria} onValueChange={setCategoria}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Selecione a categoria" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="campanhas">📊 Campanhas</SelectItem>
@@ -202,7 +221,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
                 <Label htmlFor="prioridade">Prioridade</Label>
                 <Select value={prioridade} onValueChange={setPrioridade}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Selecione a prioridade" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="baixa">🟢 Baixa</SelectItem>
@@ -215,7 +234,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="titulo">Título do chamado *</Label>
+              <Label htmlFor="titulo">Título do chamado</Label>
               <Input
                 id="titulo"
                 value={titulo}
@@ -226,68 +245,58 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mensagem">Descrição detalhada *</Label>
+              <Label htmlFor="mensagem">Descrição detalhada</Label>
               <Textarea
                 id="mensagem"
                 value={mensagem}
                 onChange={(e) => setMensagem(e.target.value)}
                 placeholder="Descreva o problema ou solicitação em detalhes..."
-                rows={5}
+                rows={4}
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Anexos (opcional)</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-upload"
-                  accept="image/*,.pdf,.doc,.docx,.txt,.zip"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-600">
-                    Clique para selecionar arquivos ou arraste e solte aqui
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Máximo 10MB por arquivo
-                  </p>
-                </label>
-              </div>
-
-              {arquivos.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-sm">Arquivos selecionados:</Label>
-                  {arquivos.map((arquivo, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <div className="flex items-center gap-2">
-                        <File className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm">{arquivo.name}</span>
-                        <span className="text-xs text-gray-500">
-                          ({(arquivo.size / 1024 / 1024).toFixed(2)} MB)
-                        </span>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFile(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+            {arquivo && (
+              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <div className="flex items-center gap-2">
+                  <File className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm">{arquivo.name}</span>
+                  <span className="text-xs text-gray-500">
+                    ({(arquivo.size / 1024 / 1024).toFixed(2)} MB)
+                  </span>
                 </div>
-              )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeFile}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className="hidden"
+                id="file-input-advanced"
+                accept="image/*,.pdf,.doc,.docx,.txt"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById('file-input-advanced')?.click()}
+              >
+                <Upload className="h-4 w-4 mr-1" />
+                Anexar Arquivo
+              </Button>
             </div>
 
             {error && (
               <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -295,7 +304,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
         </div>
 
         <div className="flex-shrink-0 border-t bg-gray-50 px-6 py-4 mt-4">
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancelar
             </Button>
