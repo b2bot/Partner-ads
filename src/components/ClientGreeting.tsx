@@ -41,6 +41,8 @@ export function ClientGreeting() {
 
   if (!profile) return null;
 
+  console.log('ClientGreeting render - profile:', profile);
+
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm text-slate-600 dark:text-slate-400 hidden sm:block">

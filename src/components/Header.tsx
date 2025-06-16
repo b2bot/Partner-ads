@@ -45,6 +45,8 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
     }
   };
 
+  console.log('Header render - isCliente:', isCliente);
+
   return (
     <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
       <div className="container-responsive py-2">
@@ -57,7 +59,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
                 {getTabTitle()}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                Gerencie suas campanhas do Facebook Ads
+                {isCliente ? 'Área do Cliente' : 'Gerencie suas campanhas do Facebook Ads'}
               </p>
             </div>
           </div>
@@ -73,7 +75,9 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Client greeting and logout - Always show for clients */}
             {isCliente && (
-              <ClientGreeting />
+              <div className="flex items-center gap-2">
+                <ClientGreeting />
+              </div>
             )}
             
             {/* Admin controls - Only show for admins */}

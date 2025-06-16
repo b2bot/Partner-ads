@@ -33,6 +33,20 @@ const Index = () => {
     }
   }, []);
 
+  // Clear cache function
+  useEffect(() => {
+    // Force cache clear on load
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          caches.delete(name);
+        });
+      });
+    }
+  }, []);
+
+  console.log('Index render - Auth state:', { isAdmin, isCliente, loading });
+
   // Show loading state while checking auth
   if (loading) {
     return (
@@ -131,7 +145,9 @@ const Index = () => {
                     </div>
                   </div>
                   {/* Show appropriate menu based on user type */}
-                  {isCliente ? <ClientGreeting /> : <UserMenu />}
+                  <div className="flex items-center gap-2">
+                    {isCliente ? <ClientGreeting /> : <UserMenu />}
+                  </div>
                 </div>
               )}
               {showHeaderControls && (

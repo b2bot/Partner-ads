@@ -25,6 +25,13 @@ export function useAuth() {
       if (!user?.id) return null;
       
       console.log('Loading profile for user:', user.id);
+      console.log('User raw data:', user);
+      
+      // Verificar se é super admin pelo raw_user_meta_data
+      const isSuperAdmin = user.raw_user_meta_data?.is_super_admin === true || 
+                          user.is_super_admin === true;
+      
+      console.log('Is super admin from raw data:', isSuperAdmin);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -37,6 +44,27 @@ export function useAuth() {
         return null;
       }
       
+      // Se o usuário é super admin mas o profile não tem is_root_admin = true, atualizar
+      if (isSuperAdmin && !data.is_root_admin) {
+        console.log('Updating profile to set is_root_admin = true');
+        const { data: updatedData, error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            is_root_admin: true,
+            role: 'admin'
+          })
+          .eq('id', user.id)
+          .select()
+          .single();
+        
+        if (updateError) {
+          console.error('Error updating profile:', updateError);
+        } else {
+          console.log('Profile updated successfully:', updatedData);
+          return updatedData as UserProfile;
+        }
+      }
+      
       console.log('Profile loaded:', data);
       return data as UserProfile;
     },
@@ -47,6 +75,7 @@ export function useAuth() {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('Initial session:', session?.user?.id);
+      console.log('Initial user data:', session?.user);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -55,6 +84,7 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
+        console.log('Auth user data:', session?.user);
         setUser(session?.user ?? null);
         setLoading(false);
       }
@@ -91,7 +121,9 @@ export function useAuth() {
   };
 
   // Verificação de admin melhorada incluindo root admin
-  const isRootAdmin = profile?.is_root_admin === true;
+  const isRootAdmin = profile?.is_root_admin === true || 
+                      user?.raw_user_meta_data?.is_super_admin === true ||
+                      user?.is_super_admin === true;
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
@@ -101,7 +133,9 @@ export function useAuth() {
     isRootAdmin,
     isAdmin, 
     isCliente, 
-    loading: loading || profileLoading 
+    loading: loading || profileLoading,
+    userRawData: user?.raw_user_meta_data,
+    isSuperAdminFromRaw: user?.raw_user_meta_data?.is_super_admin || user?.is_super_admin
   });
 
   return {
