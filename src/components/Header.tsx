@@ -3,7 +3,7 @@ import React from 'react';
 import { Search, Bell, User, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface HeaderProps {
   activeTab: string;
@@ -13,14 +13,11 @@ interface HeaderProps {
 
 export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3">
+    <header className="bg-white border-b border-gray-200 px-6 py-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger />
-          <h1 className="text-xl font-semibold text-gray-900">
-            Lead Clinic Dashboard
-          </h1>
-        </div>
+        <h1 className="text-xl font-semibold text-gray-900">
+          Lead Clinic Dashboard
+        </h1>
         
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -49,6 +46,8 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
               </Button>
             </div>
           )}
+          
+          <ThemeToggle />
           
           <Button variant="ghost" size="sm">
             <Bell className="w-5 h-5" />
