@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,9 +27,11 @@ export function useAuth() {
       console.log('Loading profile for user:', user.id);
       console.log('User raw data:', user);
 
-      const userMeta = (user as any)?.user_metadata || {};
+      // Verificar se é super admin do metadata com proteção para null
+      const userMeta = user?.user_metadata || {};
       const isSuperAdmin = userMeta?.is_super_admin === true;
 
+      console.log('User metadata:', userMeta);
       console.log('Is super admin from metadata:', isSuperAdmin);
 
       const { data, error } = await supabase
@@ -42,6 +45,7 @@ export function useAuth() {
         return null;
       }
 
+      // Se é super admin mas não tem is_root_admin = true, atualizar
       if (isSuperAdmin && !data.is_root_admin) {
         console.log('Updating profile to set is_root_admin = true');
         const { data: updatedData, error: updateError } = await supabase
@@ -68,6 +72,9 @@ export function useAuth() {
   });
 
   useEffect(() => {
+    // Limpar cache do localStorage
+    localStorage.removeItem('supabase.auth.token');
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -115,7 +122,8 @@ export function useAuth() {
     return { error };
   };
 
-  const userMeta = (user as any)?.user_metadata || {};
+  // Verificar se é root admin com proteção para null/undefined
+  const userMeta = user?.user_metadata || {};
   const isRootAdmin = profile?.is_root_admin === true || userMeta?.is_super_admin === true;
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
@@ -129,6 +137,7 @@ export function useAuth() {
     loading: loading || profileLoading,
     userMeta,
     isSuperAdminFromMeta: userMeta?.is_super_admin,
+    profileIsRootAdmin: profile?.is_root_admin,
   });
 
   return {

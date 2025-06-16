@@ -16,7 +16,7 @@ interface HeaderProps {
 }
 
 export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
-  const { isCliente } = useAuth();
+  const { isCliente, isAdmin } = useAuth();
 
   const getTabTitle = () => {
     switch (activeTab) {
@@ -45,7 +45,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
     }
   };
 
-  console.log('Header render - isCliente:', isCliente);
+  console.log('Header render - isCliente:', isCliente, 'isAdmin:', isAdmin);
 
   return (
     <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
@@ -65,7 +65,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
           </div>
 
           {/* Center - Global Search (only for admin) */}
-          {!isCliente && (
+          {isAdmin && !isCliente && (
             <div className="hidden lg:flex flex-1 justify-center max-w-sm">
               <GlobalSearch />
             </div>
@@ -74,14 +74,10 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
           {/* Right side - Controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Client greeting and logout - Always show for clients */}
-            {isCliente && (
-              <div className="flex items-center gap-2">
-                <ClientGreeting />
-              </div>
-            )}
+            {isCliente && <ClientGreeting />}
             
             {/* Admin controls - Only show for admins */}
-            {!isCliente && activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
+            {isAdmin && !isCliente && activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
               <>
                 <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
                   <RefreshCw className="w-3 h-3 mr-1" />
@@ -98,7 +94,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
         </div>
 
         {/* Mobile search - Only for admin */}
-        {!isCliente && (
+        {isAdmin && !isCliente && (
           <div className="lg:hidden mt-2">
             <GlobalSearch />
           </div>

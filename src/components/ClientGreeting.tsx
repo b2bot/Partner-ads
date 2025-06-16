@@ -14,8 +14,14 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useState } from 'react';
 
 export function ClientGreeting() {
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, isCliente } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  // Se não é cliente ou não tem profile, não renderizar
+  if (!isCliente || !profile) {
+    console.log('ClientGreeting - não renderizando:', { isCliente, profile });
+    return null;
+  }
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -39,9 +45,7 @@ export function ClientGreeting() {
     setLoading(false);
   };
 
-  if (!profile) return null;
-
-  console.log('ClientGreeting render - profile:', profile);
+  console.log('ClientGreeting renderizando para cliente:', profile);
 
   return (
     <div className="flex items-center gap-3">

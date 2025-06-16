@@ -43,6 +43,8 @@ const Index = () => {
         });
       });
     }
+    // Limpar localStorage cache
+    localStorage.removeItem('react-query-cache');
   }, []);
 
   console.log('Index render - Auth state:', { isAdmin, isCliente, loading });
@@ -62,7 +64,7 @@ const Index = () => {
         return (
           <div className="space-y-6">
             <Dashboard />
-            {isAdmin && (
+            {isAdmin && !isCliente && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
                   <ActivityLog />
@@ -72,25 +74,25 @@ const Index = () => {
           </div>
         );
       case 'campaigns':
-        return isAdmin ? <CampaignsTab /> : <Dashboard />;
+        return isAdmin && !isCliente ? <CampaignsTab /> : <Dashboard />;
       case 'adsets':
-        return isAdmin ? <AdSetsTab /> : <Dashboard />;
+        return isAdmin && !isCliente ? <AdSetsTab /> : <Dashboard />;
       case 'ads':
-        return isAdmin ? <AdsTab /> : <Dashboard />;
+        return isAdmin && !isCliente ? <AdsTab /> : <Dashboard />;
       case 'whatsapp-reports':
-        return isAdmin ? <WhatsAppReportsTab /> : <Dashboard />;
+        return isAdmin && !isCliente ? <WhatsAppReportsTab /> : <Dashboard />;
       case 'metrics-objectives':
-        return isAdmin ? <MetricsObjectivesTab /> : <Dashboard />;
+        return isAdmin && !isCliente ? <MetricsObjectivesTab /> : <Dashboard />;
       case 'tickets':
         return <TicketsTab />;
       case 'creatives':
         return <CreativesTab />;
       case 'clients-management':
-        return isAdmin ? <ClientsManagementTab /> : <Dashboard />;
+        return isAdmin && !isCliente ? <ClientsManagementTab /> : <Dashboard />;
       case 'activity-log':
-        return isAdmin ? <ActivityLog /> : <Dashboard />;
+        return isAdmin && !isCliente ? <ActivityLog /> : <Dashboard />;
       case 'settings':
-        return isAdmin ? <SettingsTab /> : <Dashboard />;
+        return isAdmin && !isCliente ? <SettingsTab /> : <Dashboard />;
       default:
         return <Dashboard />;
     }
@@ -104,8 +106,8 @@ const Index = () => {
       'ads': 'Anúncios',
       'whatsapp-reports': 'Relatórios WhatsApp',
       'metrics-objectives': 'Personalização de Métricas',
-      'tickets': isAdmin ? 'Gerenciar Chamados' : 'Meus Chamados',
-      'creatives': isAdmin ? 'Gerenciar Criativos' : 'Meus Criativos',
+      'tickets': isAdmin && !isCliente ? 'Gerenciar Chamados' : 'Meus Chamados',
+      'creatives': isAdmin && !isCliente ? 'Gerenciar Criativos' : 'Meus Criativos',
       'clients-management': 'Gerenciar Clientes',
       'activity-log': 'Log de Atividades',
       'settings': 'Configurações'
@@ -113,7 +115,7 @@ const Index = () => {
     return titles[activeTab] || 'Meta Ads Pro';
   };
 
-  const showHeaderControls = isAdmin && ['campaigns', 'adsets', 'ads'].includes(activeTab);
+  const showHeaderControls = isAdmin && !isCliente && ['campaigns', 'adsets', 'ads'].includes(activeTab);
 
   return (
     <SidebarProvider>
@@ -140,7 +142,7 @@ const Index = () => {
                         {getPageTitle()}
                       </h1>
                       <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                        {isAdmin ? 'Área Administrativa' : 'Área do Cliente'}
+                        {isCliente ? 'Área do Cliente' : 'Área Administrativa'}
                       </p>
                     </div>
                   </div>
