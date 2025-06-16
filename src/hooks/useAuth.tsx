@@ -10,6 +10,9 @@ interface UserProfile {
   email: string;
   role: 'admin' | 'cliente';
   ativo: boolean;
+  is_root_admin?: boolean;
+  foto_url?: string;
+  status?: string;
 }
 
 export function useAuth() {
@@ -87,13 +90,15 @@ export function useAuth() {
     return { error };
   };
 
-  // Fix admin detection - ensure it's properly checking the profile role
-  const isAdmin = profile?.role === 'admin';
-  const isCliente = profile?.role === 'cliente';
+  // Verificação de admin melhorada incluindo root admin
+  const isAdmin = profile?.role === 'admin' || profile?.is_root_admin === true;
+  const isRootAdmin = profile?.is_root_admin === true;
+  const isCliente = profile?.role === 'cliente' && !profile?.is_root_admin;
 
   console.log('Auth state:', { 
     userId: user?.id, 
     profileRole: profile?.role, 
+    isRootAdmin,
     isAdmin, 
     isCliente, 
     loading: loading || profileLoading 
@@ -107,6 +112,7 @@ export function useAuth() {
     signUp,
     signOut,
     isAdmin,
+    isRootAdmin,
     isCliente,
   };
 }
