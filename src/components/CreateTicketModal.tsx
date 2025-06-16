@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -58,7 +57,7 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
           mensagem: data.mensagem,
           arquivo_url: data.arquivo_url,
           aberto_por: isAdmin ? 'admin' : 'cliente',
-          // Removido o campo 'status' - usar o valor padrão do banco
+          status: 'novo' // Usar o novo valor do enum
         });
 
       if (error) throw error;
