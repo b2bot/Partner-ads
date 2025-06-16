@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MetaApiManagement } from '@/components/MetaApiManagement';
 import { DataManagement } from '@/components/DataManagement';
 import { CollaboratorsManagement } from '@/components/CollaboratorsManagement';
+import { ClientsManagementTab } from '@/components/ClientsManagementTab';
 import { useAuth } from '@/hooks/useAuth';
 
 export function SettingsTab() {
@@ -12,8 +13,9 @@ export function SettingsTab() {
   const canManageApi = hasPermission('manage_api_settings');
   const canManageData = hasPermission('manage_user_settings');
   const canManageCollaborators = hasPermission('manage_collaborators') || profile?.is_root_admin;
+  const canManageClients = hasPermission('manage_collaborators') || profile?.is_root_admin; // Mesma permissão que colaboradores
 
-  if (!canManageApi && !canManageData && !canManageCollaborators) {
+  if (!canManageApi && !canManageData && !canManageCollaborators && !canManageClients) {
     return (
       <div className="text-center py-12">
         <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
@@ -25,7 +27,7 @@ export function SettingsTab() {
   }
 
   // Determinar a aba padrão baseada nas permissões
-  const defaultTab = canManageApi ? 'api' : canManageData ? 'data' : canManageCollaborators ? 'collaborators' : 'api';
+  const defaultTab = canManageApi ? 'api' : canManageData ? 'data' : canManageCollaborators ? 'collaborators' : canManageClients ? 'clients' : 'api';
 
   return (
     <div className="space-y-4">
@@ -47,6 +49,9 @@ export function SettingsTab() {
           {canManageCollaborators && (
             <TabsTrigger value="collaborators" className="text-xs">Colaboradores</TabsTrigger>
           )}
+          {canManageClients && (
+            <TabsTrigger value="clients" className="text-xs">Clientes</TabsTrigger>
+          )}
         </TabsList>
 
         {canManageApi && (
@@ -64,6 +69,12 @@ export function SettingsTab() {
         {canManageCollaborators && (
           <TabsContent value="collaborators">
             <CollaboratorsManagement />
+          </TabsContent>
+        )}
+
+        {canManageClients && (
+          <TabsContent value="clients">
+            <ClientsManagementTab />
           </TabsContent>
         )}
       </Tabs>

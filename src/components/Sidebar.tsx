@@ -1,32 +1,35 @@
 
+import { useState, useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   BarChart3, 
-  Target, 
-  Zap, 
-  MessageSquare, 
-  Settings,
-  LayoutDashboard,
-  MessageCircle,
-  Image,
+  Settings, 
+  MessageSquare,
+  Target,
+  Palette,
   Users,
-  Crown,
-  User,
+  FileText,
+  Activity,
+  Moon,
+  Sun,
   LogOut
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
-import { ThemeToggle } from './ThemeToggle';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useState } from 'react';
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SidebarProps {
   activeTab: string;
@@ -34,164 +37,259 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
-  const { isAdmin, isRootAdmin, hasPermission, profile, signOut } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { collapsed } = useSidebar();
+  const { hasPermission, isRootAdmin, isCliente, profile } = useAuth();
 
-  const handleSignOut = async () => {
-    setLoading(true);
-    await signOut();
-    setLoading(false);
+  useEffect(() => {
+    const theme = localStorage.getItem('theme');
+    setIsDarkMode(theme === 'dark');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = isDarkMode ? 'light' : 'dark';
+    setIsDarkMode(!isDarkMode);
+    localStorage.setItem('theme', newTheme);
+    
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      window.location.reload();
+    } catch (error) {
+      console.error('Erro no logout:', error);
+    }
   };
 
-  // Definir itens do menu baseado nas permissões
-  const menuItems = [
-    // Dashboard - sempre visível para admins com permissão
-    ...(hasPermission('access_dashboard') ? [{ 
+  const isItemActive = (itemTab: string) => activeTab === itemTab;
+
+  const mainMenuItems = [
+    { 
       id: 'dashboard', 
       label: 'Dashboard', 
-      icon: LayoutDashboard 
-    }] : []),
-    
-    // Campanhas Meta Ads
-    ...(hasPermission('access_paid_media') || hasPermission('create_campaigns_media') ? [
-      { id: 'campaigns', label: 'Campanhas', icon: Target },
-      { id: 'adsets', label: 'Conjuntos de Anúncios', icon: BarChart3 },
-      { id: 'ads', label: 'Anúncios', icon: Zap },
-    ] : []),
-    
-    // WhatsApp
-    ...(hasPermission('access_whatsapp') ? [
-      { id: 'whatsapp-reports', label: 'Relatórios WhatsApp', icon: MessageSquare },
-    ] : []),
-    
-    // Métricas
-    ...(hasPermission('view_metrics') ? [
-      { id: 'metrics-objectives', label: 'Métricas e Objetivos', icon: BarChart3 },
-    ] : []),
-    
-    // Chamados - todos podem ver seus próprios
+      icon: BarChart3,
+      permission: 'access_dashboard'
+    },
+  ];
+
+  const whatsappItems = [
+    { 
+      id: 'whatsapp-reports', 
+      label: 'Relatórios WhatsApp', 
+      icon: MessageSquare,
+      permission: 'access_whatsapp'
+    },
+  ];
+
+  const mediaItems = [
+    { 
+      id: 'campaigns', 
+      label: 'Campanhas', 
+      icon: Target,
+      permission: 'access_paid_media'
+    },
+    { 
+      id: 'adsets', 
+      label: 'Conjuntos de Anúncios', 
+      icon: Target,
+      permission: 'access_paid_media'
+    },
+    { 
+      id: 'ads', 
+      label: 'Anúncios', 
+      icon: Target,
+      permission: 'access_paid_media'
+    },
+  ];
+
+  const managementItems = [
     { 
       id: 'tickets', 
       label: hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados', 
-      icon: MessageCircle 
+      icon: FileText,
+      permission: 'access_calls'
     },
-    
-    // Criativos - todos podem ver seus próprios
     { 
       id: 'creatives', 
       label: hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos', 
-      icon: Image 
+      icon: Palette,
+      permission: 'access_creatives'
     },
-    
-    // Gestão de clientes - só admins
-    ...(hasPermission('manage_collaborators') ? [
-      { id: 'clients-management', label: 'Gerenciar Clientes', icon: Users }
-    ] : []),
-    
-    // Configurações - só admins
-    ...(hasPermission('manage_api_settings') || hasPermission('manage_user_settings') ? [
-      { id: 'settings', label: 'Configurações', icon: Settings }
-    ] : []),
+    { 
+      id: 'metrics-objectives', 
+      label: 'Métricas e Objetivos', 
+      icon: Target,
+      permission: 'view_metrics'
+    },
   ];
 
-  return (
-    <div className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col">
-      {/* Header */}
-      <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Meta Ads Pro</h2>
-        <p className="text-sm text-slate-600 dark:text-slate-400">Gerenciador de Campanhas</p>
-      </div>
-      
-      {/* Menu Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Button
-              key={item.id}
-              variant={activeTab === item.id ? 'default' : 'ghost'}
-              className={cn(
-                "w-full justify-start text-left text-sm",
-                activeTab === item.id 
-                  ? "bg-blue-600 text-white hover:bg-blue-700" 
-                  : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-              )}
-              onClick={() => setActiveTab(item.id)}
-            >
-              <Icon className="mr-3 h-4 w-4" />
-              {item.label}
-            </Button>
-          );
-        })}
-      </nav>
+  const systemItems = [
+    { 
+      id: 'activity-log', 
+      label: 'Log de Atividades', 
+      icon: Activity,
+      permission: 'view_system_logs'
+    },
+    { 
+      id: 'settings', 
+      label: 'Configurações', 
+      icon: Settings,
+      permission: null // Verificação especial para configurações
+    },
+  ];
 
-      {/* User Profile Section */}
-      {profile && (
-        <div className="p-4 border-t border-slate-200 dark:border-slate-700">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start p-2">
-                <Avatar className="h-8 w-8 mr-3">
-                  <AvatarFallback className="bg-blue-600 text-white text-xs">
-                    {getInitials(profile.nome)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col items-start min-w-0 flex-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm font-medium truncate">
-                      {profile.nome.split(' ')[0]}
-                    </span>
-                    {isRootAdmin && <Crown className="h-3 w-3 text-yellow-500" />}
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {isRootAdmin ? 'Root Admin' : profile.role}
-                  </span>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none flex items-center gap-2">
+  const canAccessSettings = hasPermission('manage_api_settings') || 
+                           hasPermission('manage_user_settings') || 
+                           hasPermission('manage_collaborators') || 
+                           isRootAdmin;
+
+  const renderMenuItems = (items: any[], showBadge = false) => {
+    return items
+      .filter(item => {
+        if (item.id === 'settings') {
+          return canAccessSettings;
+        }
+        return item.permission ? hasPermission(item.permission) : true;
+      })
+      .map((item) => (
+        <SidebarMenuItem key={item.id}>
+          <SidebarMenuButton 
+            onClick={() => setActiveTab(item.id)}
+            className={`${isItemActive(item.id) ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+          >
+            <item.icon className="h-4 w-4" />
+            {!collapsed && (
+              <>
+                <span className="text-xs">{item.label}</span>
+                {showBadge && item.id === 'tickets' && (
+                  <Badge variant="secondary" className="ml-auto text-xs">
+                    {Math.floor(Math.random() * 5) + 1}
+                  </Badge>
+                )}
+              </>
+            )}
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ));
+  };
+
+  return (
+    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible>
+      <SidebarTrigger className="m-2 self-end lg:hidden" />
+      
+      <SidebarContent>
+        <div className="px-4 py-4">
+          {!collapsed && (
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Meta Ads Pro</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {isCliente ? 'Área do Cliente' : 'Gerenciador de Campanhas'}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Principal</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {renderMenuItems(mainMenuItems)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {whatsappItems.some(item => hasPermission(item.permission)) && (
+          <SidebarGroup>
+            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>WhatsApp</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {renderMenuItems(whatsappItems)}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {mediaItems.some(item => hasPermission(item.permission)) && (
+          <SidebarGroup>
+            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Mídia Paga</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {renderMenuItems(mediaItems)}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        <SidebarGroup>
+          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Gestão</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {renderMenuItems(managementItems, true)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Sistema</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {renderMenuItems(systemItems)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <div className="p-2 space-y-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleTheme}
+            className="w-full justify-start text-xs"
+          >
+            {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {!collapsed && <span className="ml-2">{isDarkMode ? 'Modo Claro' : 'Modo Escuro'}</span>}
+          </Button>
+          
+          {profile && (
+            <div className={`p-2 ${collapsed ? 'text-center' : ''}`}>
+              {!collapsed ? (
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
                     {profile.nome}
-                    {isRootAdmin && <Crown className="h-3 w-3 text-yellow-500" />}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                     {profile.email}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground capitalize">
-                    {isRootAdmin ? '👑 Root Admin' : profile.role}
-                  </p>
+                  <Badge variant="outline" className="text-xs">
+                    {isRootAdmin ? 'Root Admin' : profile.role === 'admin' ? 'Admin' : 'Cliente'}
+                  </Badge>
                 </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem disabled>
-                <User className="mr-2 h-4 w-4" />
-                <span>Editar Perfil</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} disabled={loading}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>{loading ? 'Saindo...' : 'Sair'}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              ) : (
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+              )}
+            </div>
+          )}
           
-          {/* Theme Toggle */}
-          <div className="mt-2">
-            <ThemeToggle />
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="w-full justify-start text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+          >
+            <LogOut className="h-4 w-4" />
+            {!collapsed && <span className="ml-2">Sair</span>}
+          </Button>
         </div>
-      )}
-    </div>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

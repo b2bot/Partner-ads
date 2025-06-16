@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
@@ -10,7 +11,6 @@ import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
 import { TicketsTab } from '@/components/TicketsTab';
 import { CreativesTab } from '@/components/CreativesTab';
-import { ClientsManagementTab } from '@/components/ClientsManagementTab';
 import { ActivityLog } from '@/components/ActivityLog';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
@@ -134,13 +134,6 @@ const Index = () => {
         return <TicketsTab />;
       case 'creatives':
         return <CreativesTab />;
-      case 'clients-management':
-        return hasPermission('manage_collaborators') ? <ClientsManagementTab /> : (
-          <div className="text-center py-12">
-            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
-            <p className="text-slate-500 mt-2">Você não tem permissão para gerenciar clientes.</p>
-          </div>
-        );
       case 'activity-log':
         return hasPermission('view_system_logs') ? <ActivityLog /> : (
           <div className="text-center py-12">
@@ -149,7 +142,7 @@ const Index = () => {
           </div>
         );
       case 'settings':
-        return (hasPermission('manage_api_settings') || hasPermission('manage_user_settings')) ? <SettingsTab /> : (
+        return (hasPermission('manage_api_settings') || hasPermission('manage_user_settings') || hasPermission('manage_collaborators') || isRootAdmin) ? <SettingsTab /> : (
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
             <p className="text-slate-500 mt-2">Você não tem permissão para acessar Configurações.</p>
@@ -175,7 +168,6 @@ const Index = () => {
       'metrics-objectives': 'Personalização de Métricas',
       'tickets': hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados',
       'creatives': hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos',
-      'clients-management': 'Gerenciar Clientes',
       'activity-log': 'Log de Atividades',
       'settings': 'Configurações'
     };
