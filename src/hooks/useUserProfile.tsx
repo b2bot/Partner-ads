@@ -11,10 +11,11 @@ export function useUserProfile(user: User | null) {
 
       console.log('🔄 Loading profile for user:', user.id);
 
-      // Pega o metadata do Supabase
+      // Extrai os metadados do Supabase Auth
       const userMeta = user?.user_metadata || {};
       const isSuperAdmin = userMeta?.is_super_admin === true;
 
+      // Tenta buscar o perfil normalmente
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -28,10 +29,13 @@ export function useUserProfile(user: User | null) {
 
       console.log('✅ Profile loaded from DB:', data);
 
-      // Retorna com is_root_admin true se vier do metadata
+      // ⚠️ IMPORTANTE: não faz update automático aqui para evitar recursão
+      // Apenas retorna o perfil já adaptado com is_root_admin se for super admin via metadata
+
       return {
         ...data,
         is_root_admin: isSuperAdmin || data.is_root_admin === true,
+        role: isSuperAdmin ? 'admin' : data.role,
       } as UserProfile;
     },
     enabled: !!user?.id,
