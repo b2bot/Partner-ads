@@ -13,11 +13,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MessageCircle, CheckCircle, Download, Eye, Play, UserCheck, User } from 'lucide-react';
 import { toast } from 'sonner';
 
+type TicketStatus = 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
+
 interface Ticket {
   id: string;
   titulo: string;
   mensagem: string;
-  status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
+  status: TicketStatus;
   resposta?: string;
   arquivo_url?: string;
   created_at: string;
@@ -33,7 +35,7 @@ interface TicketDetailModalProps {
 export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalProps) {
   const { isAdmin, user } = useAuth();
   const [resposta, setResposta] = useState(ticket.resposta || '');
-  const [status, setStatus] = useState<'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido'>(ticket.status);
+  const [status, setStatus] = useState<TicketStatus>(ticket.status);
   const [error, setError] = useState('');
   
   const queryClient = useQueryClient();
@@ -139,7 +141,7 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
   };
 
   const handleStatusChange = (value: string) => {
-    setStatus(value as 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido');
+    setStatus(value as TicketStatus);
   };
 
   return (

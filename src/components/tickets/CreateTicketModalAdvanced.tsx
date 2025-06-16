@@ -76,7 +76,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
         prioridade: data.prioridade || 'media',
         arquivo_url: data.arquivo_url || null,
         aberto_por: isAdmin ? 'admin' : 'cliente',
-        // Não definir status - deixar o banco usar o padrão
+        // Não definir status - o banco usará o padrão 'novo'
       };
 
       console.log('Dados para inserção (advanced):', insertData);
