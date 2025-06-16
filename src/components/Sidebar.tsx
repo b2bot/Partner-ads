@@ -31,6 +31,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Permission } from '@/types/auth';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface SidebarProps {
   activeTab: string;
@@ -41,6 +42,12 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { state } = useSidebar();
   const { hasPermission, isRootAdmin, isCliente, profile } = useAuth();
+  
+  // Estados para controlar grupos colapsáveis
+  const [whatsappOpen, setWhatsappOpen] = useState(true);
+  const [mediaOpen, setMediaOpen] = useState(true);
+  const [managementOpen, setManagementOpen] = useState(true);
+  const [systemOpen, setSystemOpen] = useState(true);
 
   const collapsed = state === 'collapsed';
 
@@ -182,6 +189,42 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       ));
   };
 
+  const renderCollapsibleGroup = (
+    title: string,
+    items: any[],
+    isOpen: boolean,
+    setIsOpen: (open: boolean) => void,
+    showBadge = false
+  ) => {
+    const hasVisibleItems = items.some(item => {
+      if (item.id === 'settings') {
+        return canAccessSettings;
+      }
+      return item.permission ? hasPermission(item.permission) : true;
+    });
+
+    if (!hasVisibleItems) return null;
+
+    return (
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <SidebarGroup>
+          <CollapsibleTrigger asChild>
+            <SidebarGroupLabel className={`cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md p-2 ${collapsed ? "sr-only" : ""}`}>
+              {title}
+            </SidebarGroupLabel>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {renderMenuItems(items, showBadge)}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </CollapsibleContent>
+        </SidebarGroup>
+      </Collapsible>
+    );
+  };
+
   return (
     <SidebarContainer className={collapsed ? "w-16" : "w-64"} collapsible="icon">
       <SidebarTrigger className="m-2 self-end lg:hidden" />
@@ -207,45 +250,34 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {whatsappItems.some(item => hasPermission(item.permission)) && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>WhatsApp</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {renderMenuItems(whatsappItems)}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+        {renderCollapsibleGroup(
+          "WhatsApp",
+          whatsappItems,
+          whatsappOpen,
+          setWhatsappOpen
         )}
 
-        {mediaItems.some(item => hasPermission(item.permission)) && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Mídia Paga</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {renderMenuItems(mediaItems)}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+        {renderCollapsibleGroup(
+          "Mídia Paga",
+          mediaItems,
+          mediaOpen,
+          setMediaOpen
         )}
 
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Gestão</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {renderMenuItems(managementItems, true)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {renderCollapsibleGroup(
+          "Gestão",
+          managementItems,
+          managementOpen,
+          setManagementOpen,
+          true
+        )}
 
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Sistema</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {renderMenuItems(systemItems)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {renderCollapsibleGroup(
+          "Sistema",
+          systemItems,
+          systemOpen,
+          setSystemOpen
+        )}
       </SidebarContent>
 
       <SidebarFooter>
