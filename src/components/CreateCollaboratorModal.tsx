@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { usePermissions, PermissionType } from '@/hooks/usePermissions';
 
@@ -244,148 +245,150 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Novo Colaborador</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+        <ScrollArea className="max-h-[80vh] pr-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome completo *</Label>
+                <Input
+                  id="nome"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Nome do colaborador"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@exemplo.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="senha">Senha *</Label>
+                <Input
+                  id="senha"
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  minLength={6}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ativo">Ativo</SelectItem>
+                    <SelectItem value="inativo">Inativo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="nome">Nome completo *</Label>
+              <Label htmlFor="foto">URL da Foto</Label>
               <Input
-                id="nome"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Nome do colaborador"
-                required
+                id="foto"
+                value={fotoUrl}
+                onChange={(e) => setFotoUrl(e.target.value)}
+                placeholder="https://exemplo.com/foto.jpg"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@exemplo.com"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="senha">Senha *</Label>
-              <Input
-                id="senha"
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                minLength={6}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ativo">Ativo</SelectItem>
-                  <SelectItem value="inativo">Inativo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="foto">URL da Foto</Label>
-            <Input
-              id="foto"
-              value={fotoUrl}
-              onChange={(e) => setFotoUrl(e.target.value)}
-              placeholder="https://exemplo.com/foto.jpg"
-            />
-          </div>
-
-          {permissionTemplates && permissionTemplates.length > 0 && (
-            <div className="space-y-2">
-              <Label>Template de Permissões</Label>
-              <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um template (opcional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {permissionTemplates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
-                      {template.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Permissões Personalizadas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => (
-                <div key={groupName} className="space-y-2">
-                  <h4 className="font-medium text-sm text-slate-900 dark:text-slate-100">{groupName}</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {permissions.map((permission) => (
-                      <div key={permission} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={permission}
-                          checked={selectedPermissions.includes(permission as PermissionType)}
-                          onCheckedChange={(checked) => 
-                            handlePermissionChange(permission as PermissionType, checked as boolean)
-                          }
-                        />
-                        <Label 
-                          htmlFor={permission} 
-                          className={`text-sm ${
-                            PERMISSION_LABELS[permission as PermissionType]?.startsWith('⚠️') 
-                              ? 'text-amber-600 dark:text-amber-400 font-medium' 
-                              : ''
-                          }`}
-                        >
-                          {PERMISSION_LABELS[permission as PermissionType]}
-                        </Label>
-                      </div>
+            {permissionTemplates && permissionTemplates.length > 0 && (
+              <div className="space-y-2">
+                <Label>Template de Permissões</Label>
+                <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um template (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {permissionTemplates.map((template) => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.name}
+                      </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Permissões Personalizadas</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => (
+                  <div key={groupName} className="space-y-2">
+                    <h4 className="font-medium text-sm text-slate-900 dark:text-slate-100">{groupName}</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {permissions.map((permission) => (
+                        <div key={permission} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={permission}
+                            checked={selectedPermissions.includes(permission as PermissionType)}
+                            onCheckedChange={(checked) => 
+                              handlePermissionChange(permission as PermissionType, checked as boolean)
+                            }
+                          />
+                          <Label 
+                            htmlFor={permission} 
+                            className={`text-sm ${
+                              PERMISSION_LABELS[permission as PermissionType]?.startsWith('⚠️') 
+                                ? 'text-amber-600 dark:text-amber-400 font-medium' 
+                                : ''
+                            }`}
+                          >
+                            {PERMISSION_LABELS[permission as PermissionType]}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                ))}
+              </CardContent>
+            </Card>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          <div className="flex gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancelar
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={createCollaboratorMutation.isPending}
-              className="flex-1"
-            >
-              {createCollaboratorMutation.isPending ? 'Criando...' : 'Criar Colaborador'}
-            </Button>
-          </div>
-        </form>
+            <div className="flex gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                Cancelar
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={createCollaboratorMutation.isPending}
+                className="flex-1"
+              >
+                {createCollaboratorMutation.isPending ? 'Criando...' : 'Criar Colaborador'}
+              </Button>
+            </div>
+          </form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
