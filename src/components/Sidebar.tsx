@@ -15,19 +15,6 @@ import {
   Sun,
   LogOut
 } from 'lucide-react';
-import {
-  Sidebar as SidebarContainer,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarTrigger,
-  useSidebar,
-} from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Permission } from '@/types/auth';
@@ -39,10 +26,7 @@ interface SidebarProps {
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const { state } = useSidebar();
   const { hasPermission, isRootAdmin, isCliente, profile } = useAuth();
-
-  const collapsed = state === 'collapsed';
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');
@@ -161,138 +145,122 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         return item.permission ? hasPermission(item.permission) : true;
       })
       .map((item) => (
-        <SidebarMenuItem key={item.id}>
-          <SidebarMenuButton 
+        <div key={item.id} className="mb-1">
+          <button
             onClick={() => setActiveTab(item.id)}
-            className={`${isItemActive(item.id) ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+            className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
+              isItemActive(item.id) 
+                ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' 
+                : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+            }`}
           >
-            <item.icon className="h-4 w-4" />
-            {!collapsed && (
-              <>
-                <span className="text-xs">{item.label}</span>
-                {showBadge && item.id === 'tickets' && (
-                  <Badge variant="secondary" className="ml-auto text-xs">
-                    {Math.floor(Math.random() * 5) + 1}
-                  </Badge>
-                )}
-              </>
+            <item.icon className="h-4 w-4 flex-shrink-0" />
+            <span className="flex-1 text-left">{item.label}</span>
+            {showBadge && item.id === 'tickets' && (
+              <Badge variant="secondary" className="text-xs">
+                {Math.floor(Math.random() * 5) + 1}
+              </Badge>
             )}
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+          </button>
+        </div>
       ));
   };
 
   return (
-    <SidebarContainer className={collapsed ? "w-16" : "w-64"} collapsible="icon">
-      <SidebarTrigger className="m-2 self-end lg:hidden" />
-      
-      <SidebarContent>
-        <div className="px-4 py-4">
-          {!collapsed && (
-            <div className="mb-4">
-              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Meta Ads Pro</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {isCliente ? 'Área do Cliente' : 'Gerenciador de Campanhas'}
-              </p>
-            </div>
-          )}
+    <div className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col">
+      {/* Header */}
+      <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Meta Ads Pro</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          {isCliente ? 'Área do Cliente' : 'Gerenciador de Campanhas'}
+        </p>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex-1 p-4 space-y-6 overflow-y-auto">
+        {/* Principal */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
+            Principal
+          </h3>
+          {renderMenuItems(mainMenuItems)}
         </div>
 
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Principal</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {renderMenuItems(mainMenuItems)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
+        {/* WhatsApp */}
         {whatsappItems.some(item => hasPermission(item.permission)) && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>WhatsApp</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {renderMenuItems(whatsappItems)}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <div>
+            <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
+              WhatsApp
+            </h3>
+            {renderMenuItems(whatsappItems)}
+          </div>
         )}
 
+        {/* Mídia Paga */}
         {mediaItems.some(item => hasPermission(item.permission)) && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Mídia Paga</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {renderMenuItems(mediaItems)}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <div>
+            <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
+              Mídia Paga
+            </h3>
+            {renderMenuItems(mediaItems)}
+          </div>
         )}
 
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Gestão</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {renderMenuItems(managementItems, true)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Sistema</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {renderMenuItems(systemItems)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter>
-        <div className="p-2 space-y-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="w-full justify-start text-xs"
-          >
-            {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            {!collapsed && <span className="ml-2">{isDarkMode ? 'Modo Claro' : 'Modo Escuro'}</span>}
-          </Button>
-          
-          {profile && (
-            <div className={`p-2 ${collapsed ? 'text-center' : ''}`}>
-              {!collapsed ? (
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
-                    {profile.nome}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                    {profile.email}
-                  </p>
-                  <Badge variant="outline" className="text-xs">
-                    {isRootAdmin ? 'Root Admin' : profile.role === 'admin' ? 'Admin' : 'Cliente'}
-                  </Badge>
-                </div>
-              ) : (
-                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                </div>
-              )}
-            </div>
-          )}
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="w-full justify-start text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-          >
-            <LogOut className="h-4 w-4" />
-            {!collapsed && <span className="ml-2">Sair</span>}
-          </Button>
+        {/* Gestão */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
+            Gestão
+          </h3>
+          {renderMenuItems(managementItems, true)}
         </div>
-      </SidebarFooter>
-    </SidebarContainer>
+
+        {/* Sistema */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
+            Sistema
+          </h3>
+          {renderMenuItems(systemItems)}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleTheme}
+          className="w-full justify-start text-xs"
+        >
+          {isDarkMode ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
+          {isDarkMode ? 'Modo Claro' : 'Modo Escuro'}
+        </Button>
+        
+        {profile && (
+          <div className="p-2">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
+                {profile.nome}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                {profile.email}
+              </p>
+              <Badge variant="outline" className="text-xs">
+                {isRootAdmin ? 'Root Admin' : profile.role === 'admin' ? 'Admin' : 'Cliente'}
+              </Badge>
+            </div>
+          </div>
+        )}
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+          className="w-full justify-start text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Sair
+        </Button>
+      </div>
+    </div>
   );
 }
