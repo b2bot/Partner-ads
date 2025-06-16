@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,40 +22,40 @@ export function useAuth() {
     queryKey: ['user-profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      
+
       console.log('Loading profile for user:', user.id);
       console.log('User raw data:', user);
-      
-      // Verificar se é super admin pelo raw_user_meta_data
-      const isSuperAdmin = user.raw_user_meta_data?.is_super_admin === true || 
-                          user.is_super_admin === true;
-      
-      console.log('Is super admin from raw data:', isSuperAdmin);
-      
+
+      // Verificar se é super admin pelo user_metadata
+      const isSuperAdmin =
+        (user.user_metadata as any)?.is_super_admin === true;
+
+      console.log('Is super admin from metadata:', isSuperAdmin);
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
-      
+
       if (error) {
         console.error('Error loading profile:', error);
         return null;
       }
-      
+
       // Se o usuário é super admin mas o profile não tem is_root_admin = true, atualizar
       if (isSuperAdmin && !data.is_root_admin) {
         console.log('Updating profile to set is_root_admin = true');
         const { data: updatedData, error: updateError } = await supabase
           .from('profiles')
-          .update({ 
+          .update({
             is_root_admin: true,
-            role: 'admin'
+            role: 'admin',
           })
           .eq('id', user.id)
           .select()
           .single();
-        
+
         if (updateError) {
           console.error('Error updating profile:', updateError);
         } else {
@@ -64,7 +63,7 @@ export function useAuth() {
           return updatedData as UserProfile;
         }
       }
-      
+
       console.log('Profile loaded:', data);
       return data as UserProfile;
     },
@@ -101,7 +100,12 @@ export function useAuth() {
     return { data, error };
   };
 
-  const signUp = async (email: string, password: string, nome: string, role: 'admin' | 'cliente' = 'cliente') => {
+  const signUp = async (
+    email: string,
+    password: string,
+    nome: string,
+    role: 'admin' | 'cliente' = 'cliente'
+  ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -121,21 +125,22 @@ export function useAuth() {
   };
 
   // Verificação de admin melhorada incluindo root admin
-  const isRootAdmin = profile?.is_root_admin === true || 
-                      user?.raw_user_meta_data?.is_super_admin === true ||
-                      user?.is_super_admin === true;
+  const isRootAdmin =
+    profile?.is_root_admin === true ||
+    (user.user_metadata as any)?.is_super_admin === true;
+
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
-  console.log('Auth state:', { 
-    userId: user?.id, 
-    profileRole: profile?.role, 
+  console.log('Auth state:', {
+    userId: user?.id,
+    profileRole: profile?.role,
     isRootAdmin,
-    isAdmin, 
-    isCliente, 
+    isAdmin,
+    isCliente,
     loading: loading || profileLoading,
-    userRawData: user?.raw_user_meta_data,
-    isSuperAdminFromRaw: user?.raw_user_meta_data?.is_super_admin || user?.is_super_admin
+    userMeta: user?.user_metadata,
+    isSuperAdminFromMeta: (user.user_metadata as any)?.is_super_admin,
   });
 
   return {
