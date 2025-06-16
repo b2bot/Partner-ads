@@ -16,12 +16,13 @@ import { ActivityLog } from '@/components/ActivityLog';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
+import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
-  const { isAdmin, isCliente, hasPermission, loading } = useAuth();
+  const { isAdmin, isCliente, hasPermission, loading, user } = useAuth();
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -47,13 +48,27 @@ const Index = () => {
     localStorage.removeItem('react-query-cache');
   }, []);
 
-  console.log('Index render - Auth state:', { isAdmin, isCliente, loading, hasPermission });
+  console.log('Index render - Auth state:', { isAdmin, isCliente, loading, hasPermission, user });
 
   // Show loading state while checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        {user && <EmergencyLogout />}
+      </div>
+    );
+  }
+
+  // Se tem usuário mas não consegue acessar nada, mostrar interface de emergência
+  if (user && !hasPermission('access_dashboard') && !isCliente) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-slate-800">Sistema Bloqueado</h1>
+          <p className="text-slate-600">Usuário sem permissões. Faça logout e login novamente.</p>
+          <EmergencyLogout />
+        </div>
       </div>
     );
   }
@@ -173,6 +188,9 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+        {/* Botão de logout de emergência - sempre visível se há usuário */}
+        {user && <EmergencyLogout />}
+        
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         
         <div className="flex-1 flex flex-col min-w-0">
