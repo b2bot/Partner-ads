@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { GlobalSearch } from './GlobalSearch';
+import { ClientGreeting } from './ClientGreeting';
+import { useAuth } from '@/hooks/useAuth';
 
 interface HeaderProps {
   activeTab: string;
@@ -14,6 +16,8 @@ interface HeaderProps {
 }
 
 export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
+  const { isCliente } = useAuth();
+
   const getTabTitle = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -65,7 +69,12 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
 
           {/* Right side - Controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
+            {/* Client greeting and logout */}
+            {isCliente && (
+              <ClientGreeting />
+            )}
+            
+            {!isCliente && activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
               <>
                 <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
                   <RefreshCw className="w-3 h-3 mr-1" />
