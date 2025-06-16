@@ -172,7 +172,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       <div className="p-4 border-b border-slate-200 dark:border-slate-700">
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Partner Manager</h2>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          {isCliente ? 'Área do Cliente' : 'Área de Gestão'}
+          {isCliente ? 'Área do Cliente' : 'Área Administrativa'}
         </p>
       </div>
 
