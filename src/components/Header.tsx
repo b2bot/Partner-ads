@@ -1,9 +1,11 @@
 
-import React from 'react';
-import { Search, Bell, User, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { 
+  RefreshCw, 
+  Download
+} from 'lucide-react';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { GlobalSearch } from './GlobalSearch';
 
 interface HeaderProps {
   activeTab: string;
@@ -12,50 +14,76 @@ interface HeaderProps {
 }
 
 export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
+  const getTabTitle = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return 'Dashboard';
+      case 'campaigns':
+        return 'Campanhas';
+      case 'adsets':
+        return 'Conjuntos de Anúncios';
+      case 'ads':
+        return 'Anúncios';
+      case 'whatsapp-reports':
+        return 'Relatórios WhatsApp';
+      case 'metrics-objectives':
+        return 'Métricas';
+      case 'settings':
+        return 'Configurações';
+      case 'tickets':
+        return 'Chamados';
+      case 'creatives':
+        return 'Criativos';
+      case 'clients-management':
+        return 'Gerenciar Clientes';
+      default:
+        return 'Meta Ads Pro';
+    }
+  };
+
   return (
-    <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-6 py-3">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Dashboard
-        </h1>
-        
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Buscar..."
-              className="pl-10 w-64 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
-            />
-          </div>
-          
-          {(activeTab === 'campaigns' || activeTab === 'adsets' || activeTab === 'ads') && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant={viewMode === 'table' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('table')}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'cards' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('cards')}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
+    <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+      <div className="container-responsive py-2">
+        <div className="flex items-center justify-between gap-4">
+          {/* Left side - Title and Trigger */}
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <SidebarTrigger className="lg:hidden" />
+            <div className="min-w-0 flex-1">
+              <h1 className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+                {getTabTitle()}
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                Gerencie suas campanhas do Facebook Ads
+              </p>
             </div>
-          )}
-          
-          <ThemeToggle />
-          
-          <Button variant="ghost" size="sm">
-            <Bell className="w-5 h-5" />
-          </Button>
-          
-          <Button variant="ghost" size="sm">
-            <User className="w-5 h-5" />
-          </Button>
+          </div>
+
+          {/* Center - Global Search */}
+          <div className="hidden lg:flex flex-1 justify-center max-w-sm">
+            <GlobalSearch />
+          </div>
+
+          {/* Right side - Controls */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
+              <>
+                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  <span className="hidden lg:inline text-xs">Atualizar</span>
+                </Button>
+                
+                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
+                  <Download className="w-3 h-3 mr-1" />
+                  <span className="hidden lg:inline text-xs">Exportar</span>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile search */}
+        <div className="lg:hidden mt-2">
+          <GlobalSearch />
         </div>
       </div>
     </header>

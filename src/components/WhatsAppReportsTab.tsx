@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,8 +71,8 @@ export function WhatsAppReportsTab() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">WhatsApp Business</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-slate-800">WhatsApp Business</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Automação e disparo de mensagens para clientes via WhatsApp Business API
           </p>
         </div>
