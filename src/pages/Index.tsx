@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
@@ -22,7 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
-  const { isAdmin, isCliente, hasPermission, loading, user } = useAuth();
+  const { isAdmin, isRootAdmin, isCliente, hasPermission, loading, user } = useAuth();
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -48,7 +47,15 @@ const Index = () => {
     localStorage.removeItem('react-query-cache');
   }, []);
 
-  console.log('Index render - Auth state:', { isAdmin, isCliente, loading, hasPermission, user });
+  console.log('Index render - Auth state:', { 
+    isAdmin, 
+    isRootAdmin, 
+    isCliente, 
+    loading, 
+    hasPermission, 
+    user,
+    hasAccessDashboard: hasPermission('access_dashboard')
+  });
 
   // Show loading state while checking auth
   if (loading) {
@@ -60,13 +67,13 @@ const Index = () => {
     );
   }
 
-  // Se tem usuário mas não consegue acessar nada, mostrar interface de emergência
-  if (user && !hasPermission('access_dashboard') && !isCliente) {
+  // Se tem usuário mas não consegue acessar dashboard E não é cliente, mostrar interface de emergência
+  if (user && !hasPermission('access_dashboard') && !isCliente && !isRootAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-slate-800">Sistema Bloqueado</h1>
-          <p className="text-slate-600">Usuário sem permissões. Faça logout e login novamente.</p>
+          <p className="text-slate-600">Usuário sem permissões. Use o botão de emergência para resetar.</p>
           <EmergencyLogout />
         </div>
       </div>
@@ -76,14 +83,6 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        if (!hasPermission('access_dashboard')) {
-          return (
-            <div className="text-center py-12">
-              <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
-              <p className="text-slate-500 mt-2">Você não tem permissão para acessar o Dashboard.</p>
-            </div>
-          );
-        }
         return (
           <div className="space-y-6">
             <Dashboard />

@@ -40,21 +40,29 @@ export function useAuth() {
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
   const hasPermission = (permission: Permission): boolean => {
+    // Root admin sempre tem todas as permissões
+    if (isRootAdmin) return true;
+    
+    // Para outros usuários, verificar permissões específicas
     return checkPermission(userPermissions, permission, isRootAdmin);
   };
 
   const allPermissions = isRootAdmin ? ALL_PERMISSIONS : userPermissions;
 
-  console.log('🔐 Auth state:', {
+  // Debug mais detalhado
+  console.log('🔐 Auth state detailed:', {
     userId: user?.id,
+    userEmail: user?.email,
     profileRole: profile?.role,
+    profileIsRootAdmin: profile?.is_root_admin,
     isRootAdmin,
     isAdmin,
     isCliente,
     loading: loading || profileLoading || permissionsLoading,
-    permissions: allPermissions,
+    permissionsCount: allPermissions.length,
     hasAccessDashboard: hasPermission('access_dashboard'),
     hasManageCollaborators: hasPermission('manage_collaborators'),
+    profile: profile
   });
 
   return {
