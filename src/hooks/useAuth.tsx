@@ -26,9 +26,8 @@ export function useAuth() {
       console.log('Loading profile for user:', user.id);
       console.log('User raw data:', user);
 
-      // Verificar se é super admin pelo user_metadata
-      const isSuperAdmin =
-        (user.user_metadata as any)?.is_super_admin === true;
+      const userMeta = (user as any)?.user_metadata || {};
+      const isSuperAdmin = userMeta?.is_super_admin === true;
 
       console.log('Is super admin from metadata:', isSuperAdmin);
 
@@ -43,7 +42,6 @@ export function useAuth() {
         return null;
       }
 
-      // Se o usuário é super admin mas o profile não tem is_root_admin = true, atualizar
       if (isSuperAdmin && !data.is_root_admin) {
         console.log('Updating profile to set is_root_admin = true');
         const { data: updatedData, error: updateError } = await supabase
@@ -64,26 +62,19 @@ export function useAuth() {
         }
       }
 
-      console.log('Profile loaded:', data);
       return data as UserProfile;
     },
     enabled: !!user?.id,
   });
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session:', session?.user?.id);
-      console.log('Initial user data:', session?.user);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        console.log('Auth user data:', session?.user);
+      async (_event, session) => {
         setUser(session?.user ?? null);
         setLoading(false);
       }
@@ -124,11 +115,8 @@ export function useAuth() {
     return { error };
   };
 
-  // Verificação de admin melhorada incluindo root admin
-  const isRootAdmin =
-    profile?.is_root_admin === true ||
-    (user.user_metadata as any)?.is_super_admin === true;
-
+  const userMeta = (user as any)?.user_metadata || {};
+  const isRootAdmin = profile?.is_root_admin === true || userMeta?.is_super_admin === true;
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
@@ -139,8 +127,8 @@ export function useAuth() {
     isAdmin,
     isCliente,
     loading: loading || profileLoading,
-    userMeta: user?.user_metadata,
-    isSuperAdminFromMeta: (user.user_metadata as any)?.is_super_admin,
+    userMeta,
+    isSuperAdminFromMeta: userMeta?.is_super_admin,
   });
 
   return {
