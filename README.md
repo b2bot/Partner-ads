@@ -336,120 +336,209 @@ Mutations com onSuccess e onError + toast feedback
 |   |   vite-env.d.ts
 |   |   
 |   +---components
+|   |   |   AccountFilter.tsx
+|   |   |   ActivityLog.tsx
+|   |   |   AdSetsTab.tsx
+|   |   |   AdsTab.tsx
+|   |   |   AdvancedFilters.tsx
+|   |   |   ApiMonitoring.tsx
+|   |   |   AuthWrapper.tsx
+|   |   |   CampaignsTab.tsx
+|   |   |   ClientGreeting.tsx
+|   |   |   ClientsManagementTab.tsx
+|   |   |   CollaboratorsManagement.tsx
+|   |   |   CollapsibleAccountFilter.tsx
+|   |   |   CreateAdModal.tsx
+|   |   |   CreateAdSetModal.tsx
+|   |   |   CreateCampaignModal.tsx
+|   |   |   CreateClientModal.tsx
+|   |   |   CreateCollaboratorModal.tsx
+|   |   |   CreateTicketModal.tsx
+|   |   |   CreativeDetailModal.tsx
+|   |   |   CreativesTab.tsx
+|   |   |   Dashboard.tsx
+|   |   |   DataManagement.tsx
+|   |   |   DateRangeFilter.tsx
+|   |   |   DynamicFilters.tsx
+|   |   |   EditAdModal.tsx
+|   |   |   EditAdSetModal.tsx
+|   |   |   EditCampaignModal.tsx
+|   |   |   EditClientModal.tsx
+|   |   |   EditCollaboratorModal.tsx
+|   |   |   EmergencyLogout.tsx
+|   |   |   GlobalSearch.tsx
+|   |   |   Header.tsx
+|   |   |   HierarchicalFilter.tsx
+|   |   |   LoginForm.tsx
+|   |   |   MetaApiManagement.tsx
+|   |   |   MetaApiSettings.tsx
+|   |   |   MetricsCustomization.tsx
+|   |   |   MetricsObjectivesTab.tsx
+|   |   |   PermissionTemplatesManagement.tsx
 |   |   |   ProtectedRoute.tsx
+|   |   |   QuickCreateButton.tsx
+|   |   |   SelectedAccountDisplay.tsx
+|   |   |   SettingsTab.tsx
+|   |   |   Sidebar.tsx
+|   |   |   TableColumnConfig.tsx
+|   |   |   ThemeToggle.tsx
+|   |   |   TicketDetailModal.tsx
+|   |   |   TicketsTab.tsx
+|   |   |   TicketsTabAdvanced.tsx
+|   |   |   UploadCreativeModal.tsx
+|   |   |   UserMenu.tsx
+|   |   |   WhatsAppReportsTab.tsx
 |   |   |   
-|   |   +---admin
-|   |   |   |   AdminPanel.tsx
-|   |   |   |   
-|   |   |   \---__tests_
-|   |   |           AdminPanel.test.tsx
-|   |   |           
-|   |   +---dashboard
-|   |   |       AdLevel.tsx
-|   |   |       AdSetLevel.tsx
-|   |   |       CampaignCharts.tsx
-|   |   |       CampaignLevel.tsx
-|   |   |       CampaignTable.tsx
-|   |   |       DashboardFilters.tsx
-|   |   |       DashboardHeader.tsx
-|   |   |       FunnelVisualization.tsx
-|   |   |       MetricsGrid.tsx
-|   |   |       MetricsOverview.tsx
+|   |   +---collaborators
+|   |   |       AccessDenied.tsx
+|   |   |       CollaboratorRow.tsx
+|   |   |       CollaboratorsHeader.tsx
+|   |   |       CollaboratorsList.tsx
+|   |   |       CollaboratorsSearch.tsx
+|   |   |       LoadingSpinner.tsx
 |   |   |       
-|   |   +---filters
-|   |   |       AdvancedFilters.tsx
-|   |   |       DateRangePicker.tsx
-|   |   |       ItemLevelFilter.tsx
+|   |   +---tickets
+|   |   |       ClientMessageForm.tsx
+|   |   |       CreateTicketModalAdvanced.tsx
+|   |   |       TicketCard.tsx
+|   |   |       TicketDetailModalAdvanced.tsx
+|   |   |       TicketFilters.tsx
+|   |   |       TicketStatusBadge.tsx
+|   |   |       TicketStepper.tsx
+|   |   |       TicketTimeline.tsx
 |   |   |       
-|   |   +---navigation
-|   |   |       PlatformNavigation.tsx
-|   |   |       SectionTabs.tsx
+|   |   +---ui
+|   |   |       accordion.tsx
+|   |   |       alert-dialog.tsx
+|   |   |       alert.tsx
+|   |   |       aspect-ratio.tsx
+|   |   |       avatar.tsx
+|   |   |       badge.tsx
+|   |   |       breadcrumb.tsx
+|   |   |       button.tsx
+|   |   |       calendar.tsx
+|   |   |       card.tsx
+|   |   |       carousel.tsx
+|   |   |       chart.tsx
+|   |   |       checkbox.tsx
+|   |   |       collapsible.tsx
+|   |   |       command.tsx
+|   |   |       context-menu.tsx
+|   |   |       dialog.tsx
+|   |   |       drawer.tsx
+|   |   |       dropdown-menu.tsx
+|   |   |       form.tsx
+|   |   |       hover-card.tsx
+|   |   |       input-otp.tsx
+|   |   |       input.tsx
+|   |   |       label.tsx
+|   |   |       menubar.tsx
+|   |   |       navigation-menu.tsx
+|   |   |       pagination.tsx
+|   |   |       popover.tsx
+|   |   |       progress.tsx
+|   |   |       radio-group.tsx
+|   |   |       resizable.tsx
+|   |   |       scroll-area.tsx
+|   |   |       select.tsx
+|   |   |       separator.tsx
+|   |   |       sheet.tsx
+|   |   |       sidebar.tsx
+|   |   |       skeleton.tsx
+|   |   |       slider.tsx
+|   |   |       sonner.tsx
+|   |   |       switch.tsx
+|   |   |       table.tsx
+|   |   |       tabs.tsx
+|   |   |       textarea.tsx
+|   |   |       toast.tsx
+|   |   |       toaster.tsx
+|   |   |       toggle-group.tsx
+|   |   |       toggle.tsx
+|   |   |       tooltip.tsx
+|   |   |       use-toast.ts
 |   |   |       
-|   |   \---ui
-|   |           accordion.tsx
-|   |           alert-dialog.tsx
-|   |           alert.tsx
-|   |           aspect-ratio.tsx
-|   |           avatar.tsx
-|   |           badge.tsx
-|   |           breadcrumb.tsx
-|   |           button.tsx
-|   |           calendar.tsx
-|   |           card.tsx
-|   |           carousel.tsx
-|   |           chart.tsx
-|   |           checkbox.tsx
-|   |           collapsible.tsx
-|   |           command.tsx
-|   |           context-menu.tsx
-|   |           dialog.tsx
-|   |           drawer.tsx
-|   |           dropdown-menu.tsx
-|   |           form.tsx
-|   |           hover-card.tsx
-|   |           input-otp.tsx
-|   |           input.tsx
-|   |           label.tsx
-|   |           menubar.tsx
-|   |           navigation-menu.tsx
-|   |           pagination.tsx
-|   |           popover.tsx
-|   |           progress.tsx
-|   |           radio-group.tsx
-|   |           resizable.tsx
-|   |           scroll-area.tsx
-|   |           select.tsx
-|   |           separator.tsx
-|   |           sheet.tsx
-|   |           sidebar.tsx
-|   |           skeleton.tsx
-|   |           slider.tsx
-|   |           sonner.tsx
-|   |           switch.tsx
-|   |           table.tsx
-|   |           tabs.tsx
-|   |           textarea.tsx
-|   |           theme-toggle.tsx
-|   |           toast.tsx
-|   |           toaster.tsx
-|   |           toggle-group.tsx
-|   |           toggle.tsx
-|   |           tooltip.tsx
-|   |           use-toast.ts
+|   |   \---whatsapp
+|   |           CampaignList.tsx
+|   |           ContactSelector.tsx
+|   |           ContactsTable.tsx
+|   |           MessageFiltersModal.tsx
+|   |           MessagesTable.tsx
+|   |           NewCampaignModal.tsx
+|   |           NewContactModal.tsx
+|   |           NewMessageModal.tsx
+|   |           TemplateSelector.tsx
+|   |           WhatsAppConnectionCard.tsx
+|   |           WhatsAppDashboard.tsx
 |   |           
 |   +---hooks
 |   |       use-mobile.tsx
 |   |       use-toast.ts
-|   |       useAnalyticsData.ts
+|   |       useAccountInsights.tsx
+|   |       useActivityLog.tsx
 |   |       useAuth.tsx
-|   |       useClientManager.ts
-|   |       useDataSelector.ts
-|   |       useFilters.tsx
-|   |       useHierarchicalData.ts
-|   |       useHierarchicalNavigation.ts
-|   |       useMetaData.ts
-|   |       usePlatformNavigation.ts
-|   |       useSettings.tsx
-|   |       useSheetData.ts
-|   |       useTheme.tsx
+|   |       useAuthActions.tsx
+|   |       useCollaborators.tsx
+|   |       useDateRange.tsx
+|   |       useGlobalAdAccount.tsx
+|   |       useInsights.tsx
+|   |       useMetaData.tsx
+|   |       useMetricsConfig.tsx
+|   |       usePermissions.tsx
+|   |       useSystemLog.tsx
+|   |       useUserAccess.tsx
+|   |       useUserPermissions.tsx
+|   |       useUserProfile.tsx
+|   |       useWhatsAppConfig.ts
+|   |       useWhatsAppContacts.ts
+|   |       useWhatsAppMessages.ts
+|   |       useWhatsAppTemplates.ts
 |   |       
+|   +---integrations
+|   |   \---supabase
+|   |           client.ts
+|   |           types.ts
+|   |           
 |   +---lib
-|   |       analyticsApi.ts
-|   |       clients.ts
-|   |       integrations.ts
 |   |       metaApi.ts
-|   |       supabase.ts
+|   |       metaApiWithRateLimit.ts
+|   |       metaInsights.ts
+|   |       rateLimit.ts
 |   |       utils.ts
 |   |       
-|   \---pages
-|           Admin.tsx
-|           Index.tsx
-|           Login.tsx
-|           NotFound.tsx
-|           Register.tsx
+|   +---pages
+|   |       Index.tsx
+|   |       MetricsObjectivesTab.tsx
+|   |       NotFound.tsx
+|   |       objetivos-metricas.tsx
+|   |       WhatsAppReportsTab.tsx
+|   |       
+|   +---types
+|   |       auth.ts
+|   |       
+|   \---utils
+|           permissionUtils.ts
+|           seedActivityLogs.ts
 |           
-\---tests
-        adminPage.test.tsx
-        dataSelector.test.tsx
-        useSettings.test.tsx
-
+\---supabase/
+├── |   config.toml
+├── |   
+└── \---migrations/
+    ├── 20250613071447-8131066b-e700-4e37-be32-745036d7e8e6.sql
+    ├── 20250613072000_create_storage_buckets.sql
+    ├── 20250613124901-096449ce-64bc-435c-87de-d87a01dfbf84.sql
+    ├── 20250613190527-9cb15cc5-b5bc-442e-9ee5-fa29566dac42.sql
+    ├── 20250613201736-d0f77029-c2dd-4eac-a645-509965ade5c5.sql
+    ├── 20250614154950-c3750da7-f88d-423c-a5d5-a0d8f90d8a3a.sql
+    ├── 20250614224124-176e0d70-2d98-47b5-adff-d5a754a2f47a.sql
+    ├── 20250614233723-5f705efc-3d21-480f-be46-be3fcf4d1e1b.sql
+    ├── 20250615144518-272c2790-d849-4c4e-83c3-63e9bb3bb8a3.sql
+    ├── 20250615181741-e98ebf9f-6e85-4c92-8200-8e3eb181deb4.sql
+    ├── 20250615190541-cbc5dc16-3363-4d32-ae85-ca9f37bbbf30.sql
+    ├── 20250616103857-4719ac7e-4fb4-409b-8fa9-2f004bc05588.sql
+    ├── 20250616115306-3ff9f576-2c1a-4902-ad26-acc974f054dc.sql
+    ├── 20250616120000_fix_rls_policies.sql
+    ├── 20250616182336-b8a6d049-20a7-4cb8-a4d8-fb5f465c1574.sql
+    ├── 20250616183058-0b913d7d-7af5-4155-930f-6ac232dc0aca.sql
+    ├── 20250616191136-f2fc3e55-87af-420f-a580-ddad4efae45c.sql
+    └── 20250616191200_fix_tickets_system.sql
