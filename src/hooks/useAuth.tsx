@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,17 +14,17 @@ export function useAuth() {
   const { data: profile, isLoading: profileLoading } = useUserProfile(user);
   const { signIn, signUp, signOut } = useAuthActions();
 
-  // Verificar se é root admin com proteção para null/undefined
+  // Corrigido: buscar flag do Supabase corretamente
   const userMeta = user?.user_metadata || {};
-  const isRootAdmin = profile?.is_root_admin === true || userMeta?.is_super_admin === true;
-  
+  const isRootAdmin = profile?.is_root_admin === true || user?.is_super_admin === true;
+
   const { data: userPermissions = [], isLoading: permissionsLoading } = useUserPermissions(user, isRootAdmin);
 
   useEffect(() => {
-    // Limpar cache do localStorage
+    // Limpar cache
     localStorage.removeItem('supabase.auth.token');
     localStorage.removeItem('react-query-cache');
-    
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -44,12 +43,10 @@ export function useAuth() {
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
-  // Função para verificar se tem permissão específica
   const hasPermission = (permission: Permission): boolean => {
     return checkPermission(userPermissions, permission, isRootAdmin);
   };
 
-  // Se é root admin, incluir todas as permissões possíveis
   const allPermissions = isRootAdmin ? ALL_PERMISSIONS : userPermissions;
 
   console.log('Auth state:', {
@@ -60,7 +57,7 @@ export function useAuth() {
     isCliente,
     loading: loading || profileLoading || permissionsLoading,
     userMeta,
-    isSuperAdminFromMeta: userMeta?.is_super_admin,
+    isSuperAdminFromMeta: user?.is_super_admin,
     profileIsRootAdmin: profile?.is_root_admin,
     permissions: allPermissions,
     hasAccessDashboard: hasPermission('access_dashboard'),
