@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,9 +6,15 @@ import { Permission, ALL_PERMISSIONS } from '@/types/auth';
 
 export function useUserPermissions(user: User | null, isRootAdmin: boolean) {
   return useQuery({
-    queryKey: ['user-permissions', user?.id],
+    queryKey: ['user-permissions', user?.id, isRootAdmin],
     queryFn: async () => {
       if (!user?.id) return [];
+      
+      // Se é root admin, retorna todas as permissões
+      if (isRootAdmin) {
+        console.log('✅ Root admin - returning all permissions');
+        return ALL_PERMISSIONS;
+      }
 
       console.log('🔄 Loading permissions for user:', user.id);
 
@@ -25,7 +32,6 @@ export function useUserPermissions(user: User | null, isRootAdmin: boolean) {
       console.log('✅ User permissions loaded:', permissions);
       return permissions;
     },
-    enabled: !!user?.id && !isRootAdmin, // não precisa buscar se é root
-    initialData: isRootAdmin ? ALL_PERMISSIONS : [], // root recebe tudo
+    enabled: !!user?.id,
   });
 }

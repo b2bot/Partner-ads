@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,17 +15,12 @@ export function useAuth() {
   const { data: profile, isLoading: profileLoading } = useUserProfile(user);
   const { signIn, signUp, signOut } = useAuthActions();
 
-  // ✅ Aplicação correta da flag do metadata do Supabase
-  const userMeta = user?.user_metadata || {};
-  const isRootAdmin = profile?.is_root_admin === true || userMeta?.is_super_admin === true;
+  // Verificar se é root admin baseado no perfil do banco
+  const isRootAdmin = profile?.is_root_admin === true;
 
   const { data: userPermissions = [], isLoading: permissionsLoading } = useUserPermissions(user, isRootAdmin);
 
   useEffect(() => {
-    // Limpa cache local (opcional se já usa React Query)
-    localStorage.removeItem('supabase.auth.token');
-    localStorage.removeItem('react-query-cache');
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -56,9 +52,6 @@ export function useAuth() {
     isAdmin,
     isCliente,
     loading: loading || profileLoading || permissionsLoading,
-    userMeta,
-    isSuperAdminFromMeta: userMeta?.is_super_admin,
-    profileIsRootAdmin: profile?.is_root_admin,
     permissions: allPermissions,
     hasAccessDashboard: hasPermission('access_dashboard'),
     hasManageCollaborators: hasPermission('manage_collaborators'),

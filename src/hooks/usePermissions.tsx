@@ -3,47 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-
-export type PermissionType = 
-  | 'access_dashboard'
-  | 'access_whatsapp'
-  | 'create_campaigns'
-  | 'edit_campaigns'
-  | 'view_templates'
-  | 'send_messages'
-  | 'view_metrics'
-  | 'access_tasks'
-  | 'create_tasks'
-  | 'assign_tasks'
-  | 'finalize_tasks'
-  | 'edit_execution_time'
-  | 'access_calls'
-  | 'create_calls'
-  | 'finalize_calls'
-  | 'link_calls_to_tasks'
-  | 'access_creatives'
-  | 'create_edit_creatives'
-  | 'approve_creatives'
-  | 'view_change_history'
-  | 'access_paid_media'
-  | 'create_campaigns_media'
-  | 'view_metrics_media'
-  | 'access_reports'
-  | 'create_automatic_reports'
-  | 'manage_user_settings'
-  | 'manage_collaborators'
-  | 'manage_whatsapp_templates'
-  | 'manage_api_settings'
-  | 'manage_appearance_and_visual_identity'
-  | 'manage_external_integrations'
-  | 'manage_variables_and_pre_configurations'
-  | 'view_billing_settings'
-  | 'view_system_logs';
+import { Permission } from '@/types/auth';
 
 export interface UserPermission {
   id: string;
   user_id: string;
-  permission: PermissionType;
+  permission: Permission;
   granted_by: string;
   created_at: string;
 }
@@ -52,7 +17,7 @@ export interface PermissionTemplate {
   id: string;
   name: string;
   description?: string;
-  permissions: PermissionType[];
+  permissions: Permission[];
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -63,38 +28,38 @@ export interface PermissionLog {
   target_user_id: string;
   changed_by: string;
   action: string;
-  permission?: PermissionType;
+  permission?: Permission;
   details: any;
   created_at: string;
 }
 
 export function usePermissions() {
-  const { user, profile } = useAuth();
+  const { user, profile, hasPermission: authHasPermission } = useAuth();
   const queryClient = useQueryClient();
 
   // Verificar se usuário tem uma permissão específica
-  const hasPermission = (permission: PermissionType): boolean => {
-    if (profile?.is_root_admin === true) return true;
-    return userPermissions?.includes(permission) || false;
+  const hasPermission = (permission: Permission): boolean => {
+    return authHasPermission(permission);
   };
 
   // Obter permissões do usuário atual
   const { data: userPermissions } = useQuery({
-    queryKey: ['user-permissions', user?.id],
+    queryKey: ['user-permissions-list', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase.rpc('get_user_permissions', {
-        user_id: user.id
-      });
+      const { data, error } = await supabase
+        .from('user_permissions')
+        .select('permission')
+        .eq('user_id', user.id);
       
       if (error) throw error;
-      return data as PermissionType[];
+      return data.map(p => p.permission as Permission);
     },
     enabled: !!user?.id,
   });
 
-  // Listar todas as permissões de um usuário específico
+  // Listar todas as permissões de todos os usuários
   const { data: userPermissionsList } = useQuery({
     queryKey: ['all-user-permissions'],
     queryFn: async () => {
@@ -125,7 +90,7 @@ export function usePermissions() {
 
   // Mutation para conceder permissão
   const grantPermissionMutation = useMutation({
-    mutationFn: async ({ userId, permission }: { userId: string; permission: PermissionType }) => {
+    mutationFn: async ({ userId, permission }: { userId: string; permission: Permission }) => {
       const { error } = await supabase
         .from('user_permissions')
         .insert({
@@ -148,7 +113,7 @@ export function usePermissions() {
 
   // Mutation para revogar permissão
   const revokePermissionMutation = useMutation({
-    mutationFn: async ({ userId, permission }: { userId: string; permission: PermissionType }) => {
+    mutationFn: async ({ userId, permission }: { userId: string; permission: Permission }) => {
       const { error } = await supabase
         .from('user_permissions')
         .delete()
