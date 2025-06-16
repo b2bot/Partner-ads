@@ -30,19 +30,26 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
   const { clienteData } = useUserAccess();
   const queryClient = useQueryClient();
 
+  console.log('CreateTicketModal - isAdmin:', isAdmin, 'clienteData:', clienteData);
+
   // Para admins, buscar lista de clientes
   const { data: clientes } = useQuery({
     queryKey: ['clientes-for-ticket'],
     queryFn: async () => {
       if (!isAdmin) return [];
       
+      console.log('Buscando clientes para admin...');
       const { data, error } = await supabase
         .from('clientes')
         .select('id, nome')
         .eq('ativo', true)
         .order('nome');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar clientes:', error);
+        throw error;
+      }
+      console.log('Clientes encontrados:', data);
       return data;
     },
     enabled: isAdmin,
@@ -50,28 +57,44 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
 
   const createTicketMutation = useMutation({
     mutationFn: async (data: { titulo: string; mensagem: string; arquivo_url?: string; cliente_id: string }) => {
-      // Não definir status - deixar o banco usar o padrão ('novo')
-      const { error } = await supabase
-        .from('chamados')
-        .insert({
-          cliente_id: data.cliente_id,
-          titulo: data.titulo,
-          mensagem: data.mensagem,
-          arquivo_url: data.arquivo_url,
-          aberto_por: isAdmin ? 'admin' : 'cliente'
-        });
+      console.log('Criando chamado com dados:', data);
+      
+      const insertData = {
+        cliente_id: data.cliente_id,
+        titulo: data.titulo,
+        mensagem: data.mensagem,
+        arquivo_url: data.arquivo_url || null,
+        aberto_por: isAdmin ? 'admin' : 'cliente',
+        // Não definir status - deixar o banco usar o padrão
+      };
 
-      if (error) throw error;
+      console.log('Dados para inserção:', insertData);
+
+      const { data: result, error } = await supabase
+        .from('chamados')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao inserir chamado:', error);
+        throw error;
+      }
+
+      console.log('Chamado criado com sucesso:', result);
+      return result;
     },
     onSuccess: () => {
+      console.log('Sucesso na criação do chamado');
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       toast.success('Chamado criado com sucesso!');
       onClose();
       resetForm();
     },
     onError: (error) => {
-      console.error('Erro ao criar chamado:', error);
-      setError('Erro ao criar chamado. Tente novamente.');
+      console.error('Erro na mutation:', error);
+      setError(`Erro ao criar chamado: ${error.message}`);
+      toast.error('Erro ao criar chamado');
     },
   });
 
@@ -86,6 +109,8 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    console.log('Iniciando criação de chamado...');
 
     if (!titulo.trim() || !mensagem.trim()) {
       setError('Título e mensagem são obrigatórios.');
@@ -108,11 +133,14 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
       finalClienteId = clienteData.id;
     }
 
+    console.log('Cliente ID final:', finalClienteId);
+
     let arquivo_url = undefined;
 
     // Upload do arquivo se fornecido
     if (arquivo) {
       try {
+        console.log('Fazendo upload do arquivo:', arquivo.name);
         const fileExt = arquivo.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         
@@ -127,6 +155,7 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
             .from('tickets')
             .getPublicUrl(fileName);
           arquivo_url = data.publicUrl;
+          console.log('Arquivo enviado com sucesso:', arquivo_url);
         }
       } catch (error) {
         console.error('Erro ao fazer upload do arquivo:', error);

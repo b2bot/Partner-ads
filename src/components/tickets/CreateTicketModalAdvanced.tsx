@@ -32,19 +32,26 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
   const { clienteData } = useUserAccess();
   const queryClient = useQueryClient();
 
+  console.log('CreateTicketModalAdvanced - isAdmin:', isAdmin, 'clienteData:', clienteData);
+
   // Para admins, buscar lista de clientes
   const { data: clientes } = useQuery({
     queryKey: ['clientes-for-ticket-advanced'],
     queryFn: async () => {
       if (!isAdmin) return [];
       
+      console.log('Buscando clientes para admin (advanced)...');
       const { data, error } = await supabase
         .from('clientes')
         .select('id, nome')
         .eq('ativo', true)
         .order('nome');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar clientes:', error);
+        throw error;
+      }
+      console.log('Clientes encontrados (advanced):', data);
       return data;
     },
     enabled: isAdmin,
@@ -59,30 +66,46 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
       arquivo_url?: string; 
       cliente_id: string 
     }) => {
-      // Não definir status - deixar o banco usar o padrão ('novo')
-      const { error } = await supabase
-        .from('chamados')
-        .insert({
-          cliente_id: data.cliente_id,
-          titulo: data.titulo,
-          mensagem: data.mensagem,
-          categoria: data.categoria || 'outros',
-          prioridade: data.prioridade || 'media',
-          arquivo_url: data.arquivo_url,
-          aberto_por: isAdmin ? 'admin' : 'cliente'
-        });
+      console.log('Criando chamado avançado com dados:', data);
+      
+      const insertData = {
+        cliente_id: data.cliente_id,
+        titulo: data.titulo,
+        mensagem: data.mensagem,
+        categoria: data.categoria || 'outros',
+        prioridade: data.prioridade || 'media',
+        arquivo_url: data.arquivo_url || null,
+        aberto_por: isAdmin ? 'admin' : 'cliente',
+        // Não definir status - deixar o banco usar o padrão
+      };
 
-      if (error) throw error;
+      console.log('Dados para inserção (advanced):', insertData);
+
+      const { data: result, error } = await supabase
+        .from('chamados')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao inserir chamado avançado:', error);
+        throw error;
+      }
+
+      console.log('Chamado avançado criado com sucesso:', result);
+      return result;
     },
     onSuccess: () => {
+      console.log('Sucesso na criação do chamado avançado');
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       toast.success('Chamado criado com sucesso!');
       onClose();
       resetForm();
     },
     onError: (error) => {
-      console.error('Erro ao criar chamado:', error);
-      setError('Erro ao criar chamado. Tente novamente.');
+      console.error('Erro na mutation avançada:', error);
+      setError(`Erro ao criar chamado: ${error.message}`);
+      toast.error('Erro ao criar chamado');
     },
   });
 
@@ -99,6 +122,8 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    console.log('Iniciando criação de chamado avançado...');
 
     if (!titulo.trim() || !mensagem.trim()) {
       setError('Título e mensagem são obrigatórios.');
@@ -121,11 +146,14 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
       finalClienteId = clienteData.id;
     }
 
+    console.log('Cliente ID final (advanced):', finalClienteId);
+
     let arquivo_url = undefined;
 
     // Upload do arquivo se fornecido
     if (arquivo) {
       try {
+        console.log('Fazendo upload do arquivo (advanced):', arquivo.name);
         const fileExt = arquivo.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         
@@ -134,15 +162,16 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
           .upload(fileName, arquivo);
 
         if (uploadError) {
-          console.error('Erro no upload:', uploadError);
+          console.error('Erro no upload (advanced):', uploadError);
         } else {
           const { data } = supabase.storage
             .from('tickets')
             .getPublicUrl(fileName);
           arquivo_url = data.publicUrl;
+          console.log('Arquivo enviado com sucesso (advanced):', arquivo_url);
         }
       } catch (error) {
-        console.error('Erro ao fazer upload do arquivo:', error);
+        console.error('Erro ao fazer upload do arquivo (advanced):', error);
         setError('Erro ao fazer upload do arquivo. O chamado será criado sem o anexo.');
       }
     }

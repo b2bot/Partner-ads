@@ -12,11 +12,14 @@ import { TicketCard } from './tickets/TicketCard';
 import { CreateTicketModalAdvanced } from './tickets/CreateTicketModalAdvanced';
 import { TicketDetailModalAdvanced } from './tickets/TicketDetailModalAdvanced';
 
+// Definir tipos de status corretos
+type TicketStatus = 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
+
 interface Ticket {
   id: string;
   titulo: string;
   mensagem: string;
-  status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
+  status: TicketStatus;
   categoria?: string;
   prioridade?: string;
   status_detalhado?: string;
@@ -38,9 +41,13 @@ export function TicketsTabAdvanced() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [filters, setFilters] = useState<any>({});
 
-  const { data: tickets, isLoading } = useQuery({
+  console.log('TicketsTabAdvanced - isAdmin:', isAdmin, 'clienteData:', clienteData);
+
+  const { data: tickets, isLoading, error } = useQuery({
     queryKey: ['tickets', filters],
     queryFn: async () => {
+      console.log('Buscando tickets com filtros:', filters);
+      
       let query = supabase
         .from('chamados')
         .select(`
@@ -70,14 +77,16 @@ export function TicketsTabAdvanced() {
         query = query.eq('cliente_id', filters.cliente_id);
       }
 
-      // Para clientes, filtrar apenas seus chamados
-      if (!isAdmin && clienteData?.id) {
-        query = query.eq('cliente_id', clienteData.id);
-      }
-      
+      // Para clientes, filtrar apenas seus chamados (isso é feito pela RLS agora)
+      console.log('Executando query...');
       const { data, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar tickets:', error);
+        throw error;
+      }
+      
+      console.log('Tickets encontrados:', data);
       return data as Ticket[];
     },
     enabled: isAdmin || !!clienteData?.id,
@@ -86,13 +95,20 @@ export function TicketsTabAdvanced() {
   const { data: clientes } = useQuery({
     queryKey: ['clientes-list'],
     queryFn: async () => {
+      if (!isAdmin) return [];
+      
+      console.log('Buscando lista de clientes...');
       const { data, error } = await supabase
         .from('clientes')
         .select('id, nome')
         .eq('ativo', true)
         .order('nome');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar clientes:', error);
+        throw error;
+      }
+      console.log('Lista de clientes:', data);
       return data;
     },
     enabled: isAdmin,
@@ -109,7 +125,26 @@ export function TicketsTabAdvanced() {
     resolvidos: tickets.filter(t => t.status === 'resolvido').length,
   } : { total: 0, novo: 0, aguardandoEquipe: 0, aguardandoCliente: 0, emAnalise: 0, emAndamento: 0, resolvidos: 0 };
 
+  if (error) {
+    console.error('Erro na TicketsTabAdvanced:', error);
+    return (
+      <div className="space-y-6">
+        <div className="text-center p-8">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Erro ao carregar chamados</h2>
+          <p className="text-gray-600">{error.message}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-4"
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
+    console.log('Carregando tickets...');
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
@@ -129,6 +164,8 @@ export function TicketsTabAdvanced() {
       </div>
     );
   }
+
+  console.log('Renderizando TicketsTabAdvanced com', tickets?.length, 'tickets');
 
   return (
     <div className="space-y-6">
