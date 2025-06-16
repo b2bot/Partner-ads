@@ -23,7 +23,7 @@ const Index = () => {
 
   return (
     <AuthWrapper>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
         <div className="flex-1 flex flex-col">
           <Header 

@@ -13,10 +13,10 @@ interface HeaderProps {
 
 export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-3">
+    <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-6 py-3">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">
-          Lead Clinic Dashboard
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+          Dashboard
         </h1>
         
         <div className="flex items-center gap-4">
@@ -24,7 +24,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Buscar..."
-              className="pl-10 w-64"
+              className="pl-10 w-64 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
             />
           </div>
           

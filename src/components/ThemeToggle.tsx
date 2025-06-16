@@ -39,7 +39,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
       variant="ghost" 
       size={collapsed ? "sm" : "default"}
       onClick={toggleTheme}
-      className={`w-full ${collapsed ? 'justify-center px-2' : 'justify-start'} text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800`}
+      className={`w-full ${collapsed ? 'justify-center px-2' : 'justify-start'} text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800`}
     >
       {isDarkMode ? (
         <Sun className={`h-4 w-4 ${!collapsed ? 'mr-2' : ''}`} />

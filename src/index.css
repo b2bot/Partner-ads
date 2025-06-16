@@ -267,3 +267,20 @@ html, body {
 .sidebar-item.active {
   @apply bg-blue-600 text-white dark:bg-blue-600 dark:text-white;
 }
+
+/* Dark mode card improvements */
+.dark .bg-white {
+  @apply bg-slate-900;
+}
+
+.dark .text-gray-900 {
+  @apply text-white;
+}
+
+.dark .text-gray-600 {
+  @apply text-gray-300;
+}
+
+.dark .border-gray-200 {
+  @apply border-slate-700;
+}
