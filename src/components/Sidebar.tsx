@@ -16,7 +16,7 @@ import {
   LogOut
 } from 'lucide-react';
 import {
-  Sidebar,
+  Sidebar as SidebarContainer,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { Permission } from '@/types/auth';
 
 interface SidebarProps {
   activeTab: string;
@@ -38,8 +39,10 @@ interface SidebarProps {
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const { hasPermission, isRootAdmin, isCliente, profile } = useAuth();
+
+  const collapsed = state === 'collapsed';
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');
@@ -74,7 +77,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       id: 'dashboard', 
       label: 'Dashboard', 
       icon: BarChart3,
-      permission: 'access_dashboard'
+      permission: 'access_dashboard' as Permission
     },
   ];
 
@@ -83,7 +86,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       id: 'whatsapp-reports', 
       label: 'Relatórios WhatsApp', 
       icon: MessageSquare,
-      permission: 'access_whatsapp'
+      permission: 'access_whatsapp' as Permission
     },
   ];
 
@@ -92,19 +95,19 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       id: 'campaigns', 
       label: 'Campanhas', 
       icon: Target,
-      permission: 'access_paid_media'
+      permission: 'access_paid_media' as Permission
     },
     { 
       id: 'adsets', 
       label: 'Conjuntos de Anúncios', 
       icon: Target,
-      permission: 'access_paid_media'
+      permission: 'access_paid_media' as Permission
     },
     { 
       id: 'ads', 
       label: 'Anúncios', 
       icon: Target,
-      permission: 'access_paid_media'
+      permission: 'access_paid_media' as Permission
     },
   ];
 
@@ -113,19 +116,19 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       id: 'tickets', 
       label: hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados', 
       icon: FileText,
-      permission: 'access_calls'
+      permission: 'access_calls' as Permission
     },
     { 
       id: 'creatives', 
       label: hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos', 
       icon: Palette,
-      permission: 'access_creatives'
+      permission: 'access_creatives' as Permission
     },
     { 
       id: 'metrics-objectives', 
       label: 'Métricas e Objetivos', 
       icon: Target,
-      permission: 'view_metrics'
+      permission: 'view_metrics' as Permission
     },
   ];
 
@@ -134,7 +137,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       id: 'activity-log', 
       label: 'Log de Atividades', 
       icon: Activity,
-      permission: 'view_system_logs'
+      permission: 'view_system_logs' as Permission
     },
     { 
       id: 'settings', 
@@ -180,7 +183,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   };
 
   return (
-    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible>
+    <SidebarContainer className={collapsed ? "w-16" : "w-64"} collapsible="icon">
       <SidebarTrigger className="m-2 self-end lg:hidden" />
       
       <SidebarContent>
@@ -290,6 +293,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           </Button>
         </div>
       </SidebarFooter>
-    </Sidebar>
+    </SidebarContainer>
   );
 }
