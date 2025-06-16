@@ -14,14 +14,14 @@ export function useAuth() {
   const { data: profile, isLoading: profileLoading } = useUserProfile(user);
   const { signIn, signUp, signOut } = useAuthActions();
 
-  // Corrigido: buscar flag do Supabase corretamente
+  // ✅ Aplicação correta da flag do metadata do Supabase
   const userMeta = user?.user_metadata || {};
-  const isRootAdmin = profile?.is_root_admin === true || user?.is_super_admin === true;
+  const isRootAdmin = profile?.is_root_admin === true || userMeta?.is_super_admin === true;
 
   const { data: userPermissions = [], isLoading: permissionsLoading } = useUserPermissions(user, isRootAdmin);
 
   useEffect(() => {
-    // Limpar cache
+    // Limpa cache local (opcional se já usa React Query)
     localStorage.removeItem('supabase.auth.token');
     localStorage.removeItem('react-query-cache');
 
@@ -49,7 +49,7 @@ export function useAuth() {
 
   const allPermissions = isRootAdmin ? ALL_PERMISSIONS : userPermissions;
 
-  console.log('Auth state:', {
+  console.log('🔐 Auth state:', {
     userId: user?.id,
     profileRole: profile?.role,
     isRootAdmin,
@@ -57,7 +57,7 @@ export function useAuth() {
     isCliente,
     loading: loading || profileLoading || permissionsLoading,
     userMeta,
-    isSuperAdminFromMeta: user?.is_super_admin,
+    isSuperAdminFromMeta: userMeta?.is_super_admin,
     profileIsRootAdmin: profile?.is_root_admin,
     permissions: allPermissions,
     hasAccessDashboard: hasPermission('access_dashboard'),
