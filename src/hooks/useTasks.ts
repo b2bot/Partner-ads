@@ -88,7 +88,7 @@ export function useTasks() {
         .order('created_at', { ascending: false });
 
       if (filters.status) {
-        query = query.eq('status', filters.status as any);
+        query = query.eq('status', filters.status);
       }
 
       if (filters.projeto_id) {
@@ -158,10 +158,20 @@ export function useTasks() {
 
       if (error) throw error;
 
-      // Transform the data to match our interface
+      // Transform the data to match our interface, ensuring proper type conversion
       const transformedData = data?.map(item => ({
-        ...item,
-        fases_padrao: Array.isArray(item.fases_padrao) ? item.fases_padrao : []
+        id: item.id,
+        nome: item.nome,
+        descricao: item.descricao || undefined,
+        tipo: item.tipo as 'desenvolvimento' | 'design' | 'marketing' | 'suporte' | 'revisao' | 'outros',
+        prioridade: item.prioridade as 'baixa' | 'media' | 'alta' | 'urgente',
+        fases_padrao: Array.isArray(item.fases_padrao) 
+          ? (item.fases_padrao as string[])
+          : ['backlog', 'execucao', 'revisao', 'finalizada'],
+        tempo_estimado: item.tempo_estimado || undefined,
+        tags: item.tags || [],
+        ativo: item.ativo,
+        created_at: item.created_at
       })) || [];
 
       setTemplates(transformedData);
@@ -353,9 +363,19 @@ export function useTasks() {
 
       if (error) throw error;
 
-      const transformedData = {
-        ...data,
-        fases_padrao: Array.isArray(data.fases_padrao) ? data.fases_padrao : []
+      const transformedData: TaskTemplate = {
+        id: data.id,
+        nome: data.nome,
+        descricao: data.descricao || undefined,
+        tipo: data.tipo as 'desenvolvimento' | 'design' | 'marketing' | 'suporte' | 'revisao' | 'outros',
+        prioridade: data.prioridade as 'baixa' | 'media' | 'alta' | 'urgente',
+        fases_padrao: Array.isArray(data.fases_padrao) 
+          ? (data.fases_padrao as string[])
+          : ['backlog', 'execucao', 'revisao', 'finalizada'],
+        tempo_estimado: data.tempo_estimado || undefined,
+        tags: data.tags || [],
+        ativo: data.ativo,
+        created_at: data.created_at
       };
 
       setTemplates(prev => [transformedData, ...prev]);
