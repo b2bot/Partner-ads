@@ -153,7 +153,7 @@ export function useAuth() {
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
-  // Função para verificar se tem permissão específica
+  // Função para verificar se tem permissão específica - aceita qualquer string
   const hasPermission = (permission: string): boolean => {
     // Root admin tem todas as permissões
     if (isRootAdmin) return true;
