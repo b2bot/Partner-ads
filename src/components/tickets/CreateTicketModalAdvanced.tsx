@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -66,8 +65,8 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
           mensagem: data.mensagem,
           categoria: data.categoria,
           prioridade: data.prioridade,
-          aberto_por: isAdmin ? 'admin' : 'cliente',
-          // Removido o campo 'status' - usar o valor padrão do banco
+          aberto_por: isAdmin ? 'admin' : 'cliente'
+          // Não definir status - deixar o padrão do banco ('novo')
         });
 
       if (error) throw error;

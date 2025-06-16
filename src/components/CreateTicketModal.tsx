@@ -56,8 +56,8 @@ export function CreateTicketModal({ open, onClose }: CreateTicketModalProps) {
           titulo: data.titulo,
           mensagem: data.mensagem,
           arquivo_url: data.arquivo_url,
-          aberto_por: isAdmin ? 'admin' : 'cliente',
-          status: 'novo' // Usar o novo valor do enum
+          aberto_por: isAdmin ? 'admin' : 'cliente'
+          // Não definir status - deixar o padrão do banco ('novo')
         });
 
       if (error) throw error;
