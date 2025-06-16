@@ -21,7 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
-  const { isAdmin, isCliente, loading } = useAuth();
+  const { isAdmin, isCliente, hasPermission, loading } = useAuth();
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -47,7 +47,7 @@ const Index = () => {
     localStorage.removeItem('react-query-cache');
   }, []);
 
-  console.log('Index render - Auth state:', { isAdmin, isCliente, loading });
+  console.log('Index render - Auth state:', { isAdmin, isCliente, loading, hasPermission });
 
   // Show loading state while checking auth
   if (loading) {
@@ -61,10 +61,18 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
+        if (!hasPermission('access_dashboard')) {
+          return (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+              <p className="text-slate-500 mt-2">Você não tem permissão para acessar o Dashboard.</p>
+            </div>
+          );
+        }
         return (
           <div className="space-y-6">
             <Dashboard />
-            {isAdmin && !isCliente && (
+            {hasPermission('view_system_logs') && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
                   <ActivityLog />
@@ -74,27 +82,72 @@ const Index = () => {
           </div>
         );
       case 'campaigns':
-        return isAdmin && !isCliente ? <CampaignsTab /> : <Dashboard />;
+        return hasPermission('access_paid_media') ? <CampaignsTab /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para acessar Campanhas.</p>
+          </div>
+        );
       case 'adsets':
-        return isAdmin && !isCliente ? <AdSetsTab /> : <Dashboard />;
+        return hasPermission('access_paid_media') ? <AdSetsTab /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para acessar Conjuntos de Anúncios.</p>
+          </div>
+        );
       case 'ads':
-        return isAdmin && !isCliente ? <AdsTab /> : <Dashboard />;
+        return hasPermission('access_paid_media') ? <AdsTab /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para acessar Anúncios.</p>
+          </div>
+        );
       case 'whatsapp-reports':
-        return isAdmin && !isCliente ? <WhatsAppReportsTab /> : <Dashboard />;
+        return hasPermission('access_whatsapp') ? <WhatsAppReportsTab /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para acessar Relatórios WhatsApp.</p>
+          </div>
+        );
       case 'metrics-objectives':
-        return isAdmin && !isCliente ? <MetricsObjectivesTab /> : <Dashboard />;
+        return hasPermission('view_metrics') ? <MetricsObjectivesTab /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para acessar Métricas.</p>
+          </div>
+        );
       case 'tickets':
         return <TicketsTab />;
       case 'creatives':
         return <CreativesTab />;
       case 'clients-management':
-        return isAdmin && !isCliente ? <ClientsManagementTab /> : <Dashboard />;
+        return hasPermission('manage_collaborators') ? <ClientsManagementTab /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para gerenciar clientes.</p>
+          </div>
+        );
       case 'activity-log':
-        return isAdmin && !isCliente ? <ActivityLog /> : <Dashboard />;
+        return hasPermission('view_system_logs') ? <ActivityLog /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para ver logs do sistema.</p>
+          </div>
+        );
       case 'settings':
-        return isAdmin && !isCliente ? <SettingsTab /> : <Dashboard />;
+        return (hasPermission('manage_api_settings') || hasPermission('manage_user_settings')) ? <SettingsTab /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+            <p className="text-slate-500 mt-2">Você não tem permissão para acessar Configurações.</p>
+          </div>
+        );
       default:
-        return <Dashboard />;
+        return hasPermission('access_dashboard') ? <Dashboard /> : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-slate-600">Bem-vindo!</h2>
+            <p className="text-slate-500 mt-2">Entre em contato com o administrador para obter acesso.</p>
+          </div>
+        );
     }
   };
 
@@ -106,8 +159,8 @@ const Index = () => {
       'ads': 'Anúncios',
       'whatsapp-reports': 'Relatórios WhatsApp',
       'metrics-objectives': 'Personalização de Métricas',
-      'tickets': isAdmin && !isCliente ? 'Gerenciar Chamados' : 'Meus Chamados',
-      'creatives': isAdmin && !isCliente ? 'Gerenciar Criativos' : 'Meus Criativos',
+      'tickets': hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados',
+      'creatives': hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos',
       'clients-management': 'Gerenciar Clientes',
       'activity-log': 'Log de Atividades',
       'settings': 'Configurações'

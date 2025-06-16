@@ -3,15 +3,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MetaApiManagement } from '@/components/MetaApiManagement';
 import { DataManagement } from '@/components/DataManagement';
 import { CollaboratorsManagement } from '@/components/CollaboratorsManagement';
-import { usePermissions } from '@/hooks/usePermissions';
 import { useAuth } from '@/hooks/useAuth';
 
 export function SettingsTab() {
-  const { hasPermission } = usePermissions();
-  const { profile } = useAuth();
+  const { hasPermission, profile } = useAuth();
 
-  // Verificar se tem acesso a colaboradores
+  // Verificar permissões específicas
+  const canManageApi = hasPermission('manage_api_settings');
+  const canManageData = hasPermission('manage_user_settings');
   const canManageCollaborators = hasPermission('manage_collaborators') || profile?.is_root_admin;
+
+  if (!canManageApi && !canManageData && !canManageCollaborators) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
+        <p className="text-slate-500 mt-2">
+          Você não tem permissão para acessar as configurações do sistema.
+        </p>
+      </div>
+    );
+  }
+
+  // Determinar a aba padrão baseada nas permissões
+  const defaultTab = canManageApi ? 'api' : canManageData ? 'data' : canManageCollaborators ? 'collaborators' : 'api';
 
   return (
     <div className="space-y-4">
@@ -22,22 +36,30 @@ export function SettingsTab() {
         </p>
       </div>
 
-      <Tabs defaultValue="api" className="space-y-4">
+      <Tabs defaultValue={defaultTab} className="space-y-4">
         <TabsList className="text-xs">
-          <TabsTrigger value="api" className="text-xs">Gestão da API Meta</TabsTrigger>
-          <TabsTrigger value="data" className="text-xs">Gestão de Dados</TabsTrigger>
+          {canManageApi && (
+            <TabsTrigger value="api" className="text-xs">Gestão da API Meta</TabsTrigger>
+          )}
+          {canManageData && (
+            <TabsTrigger value="data" className="text-xs">Gestão de Dados</TabsTrigger>
+          )}
           {canManageCollaborators && (
             <TabsTrigger value="collaborators" className="text-xs">Colaboradores</TabsTrigger>
           )}
         </TabsList>
 
-        <TabsContent value="api">
-          <MetaApiManagement />
-        </TabsContent>
+        {canManageApi && (
+          <TabsContent value="api">
+            <MetaApiManagement />
+          </TabsContent>
+        )}
 
-        <TabsContent value="data">
-          <DataManagement />
-        </TabsContent>
+        {canManageData && (
+          <TabsContent value="data">
+            <DataManagement />
+          </TabsContent>
+        )}
 
         {canManageCollaborators && (
           <TabsContent value="collaborators">

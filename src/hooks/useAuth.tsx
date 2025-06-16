@@ -25,7 +25,6 @@ export function useAuth() {
       if (!user?.id) return null;
 
       console.log('Loading profile for user:', user.id);
-      console.log('User raw data:', user);
 
       // Verificar se é super admin do metadata com proteção para null
       const userMeta = user?.user_metadata || {};
@@ -71,9 +70,35 @@ export function useAuth() {
     enabled: !!user?.id,
   });
 
+  // Buscar permissões do usuário
+  const { data: userPermissions = [], isLoading: permissionsLoading } = useQuery({
+    queryKey: ['user-permissions', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
+      console.log('Loading permissions for user:', user.id);
+
+      const { data, error } = await supabase
+        .from('user_permissions')
+        .select('permission')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error loading user permissions:', error);
+        return [];
+      }
+
+      const permissions = data.map(p => p.permission);
+      console.log('User permissions loaded:', permissions);
+      return permissions;
+    },
+    enabled: !!user?.id,
+  });
+
   useEffect(() => {
     // Limpar cache do localStorage
     localStorage.removeItem('supabase.auth.token');
+    localStorage.removeItem('react-query-cache');
     
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -128,27 +153,79 @@ export function useAuth() {
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
   const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
+  // Função para verificar se tem permissão específica
+  const hasPermission = (permission: string): boolean => {
+    // Root admin tem todas as permissões
+    if (isRootAdmin) return true;
+    
+    // Verificar se tem a permissão específica
+    return userPermissions.includes(permission);
+  };
+
+  // Se é root admin, incluir todas as permissões possíveis
+  const allPermissions = isRootAdmin ? [
+    'access_dashboard',
+    'access_whatsapp',
+    'create_campaigns',
+    'edit_campaigns',
+    'view_templates',
+    'send_messages',
+    'view_metrics',
+    'access_tasks',
+    'create_tasks',
+    'assign_tasks',
+    'finalize_tasks',
+    'edit_execution_time',
+    'access_calls',
+    'create_calls',
+    'finalize_calls',
+    'link_calls_to_tasks',
+    'access_creatives',
+    'create_edit_creatives',
+    'approve_creatives',
+    'view_change_history',
+    'access_paid_media',
+    'create_campaigns_media',
+    'view_metrics_media',
+    'access_reports',
+    'create_automatic_reports',
+    'manage_user_settings',
+    'manage_collaborators',
+    'manage_whatsapp_templates',
+    'manage_api_settings',
+    'manage_appearance_and_visual_identity',
+    'manage_external_integrations',
+    'manage_variables_and_pre_configurations',
+    'view_billing_settings',
+    'view_system_logs'
+  ] : userPermissions;
+
   console.log('Auth state:', {
     userId: user?.id,
     profileRole: profile?.role,
     isRootAdmin,
     isAdmin,
     isCliente,
-    loading: loading || profileLoading,
+    loading: loading || profileLoading || permissionsLoading,
     userMeta,
     isSuperAdminFromMeta: userMeta?.is_super_admin,
     profileIsRootAdmin: profile?.is_root_admin,
+    permissions: allPermissions,
+    hasAccessDashboard: hasPermission('access_dashboard'),
+    hasManageCollaborators: hasPermission('manage_collaborators'),
   });
 
   return {
     user,
     profile,
-    loading: loading || profileLoading,
+    loading: loading || profileLoading || permissionsLoading,
     signIn,
     signUp,
     signOut,
     isAdmin,
     isRootAdmin,
     isCliente,
+    permissions: allPermissions,
+    hasPermission,
   };
 }
