@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -88,7 +87,7 @@ export function useTasks() {
         .order('created_at', { ascending: false });
 
       if (filters.status) {
-        query = query.eq('status', filters.status);
+        query = query.eq('status', filters.status as 'backlog' | 'execucao' | 'revisao' | 'aguardando' | 'finalizada' | 'cancelada');
       }
 
       if (filters.projeto_id) {
