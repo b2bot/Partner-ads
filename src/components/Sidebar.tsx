@@ -170,9 +170,9 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     <div className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Meta Ads Pro</h2>
+        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Partner Manager</h2>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          {isCliente ? 'Área do Cliente' : 'Gerenciador de Campanhas'}
+          {isCliente ? 'Área do Cliente' : 'Área de Gestão'}
         </p>
       </div>
 
