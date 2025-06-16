@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Search, Filter, LayoutGrid, List, Clock, User } from 'lucide-react';
-import { useTasks } from '@/hooks/useTasks';
+import { useTasks, Task } from '@/hooks/useTasks';
 import { TaskKanban } from './TaskKanban';
 import { TaskModal } from './TaskModal';
 import { ProjectModal } from './ProjectModal';
@@ -27,7 +27,7 @@ export function TasksTab() {
     getTasksByStatus 
   } = useTasks();
 
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
@@ -39,12 +39,12 @@ export function TasksTab() {
 
   const tasksByStatus = getTasksByStatus();
 
-  const handleTaskClick = (task: any) => {
+  const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
     setShowTaskModal(true);
   };
 
-  const handleTaskSave = async (taskData: any) => {
+  const handleTaskSave = async (taskData: Partial<Task>) => {
     if (selectedTask) {
       await updateTask(selectedTask.id, taskData);
     } else {
@@ -54,7 +54,8 @@ export function TasksTab() {
   };
 
   const handleStatusChange = async (taskId: string, newStatus: string) => {
-    await updateTask(taskId, { status: newStatus });
+    const validStatus = newStatus as 'backlog' | 'execucao' | 'revisao' | 'aguardando' | 'finalizada' | 'cancelada';
+    await updateTask(taskId, { status: validStatus });
   };
 
   const filteredTasks = tasks.filter(task => {
@@ -74,7 +75,7 @@ export function TasksTab() {
   const getFilteredTasksByStatus = () => {
     const filtered = getTasksByStatus();
     Object.keys(filtered).forEach(status => {
-      filtered[status] = filtered[status].filter(task => 
+      filtered[status as keyof typeof filtered] = filtered[status as keyof typeof filtered].filter(task => 
         filteredTasks.some(ft => ft.id === task.id)
       );
     });

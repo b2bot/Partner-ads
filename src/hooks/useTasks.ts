@@ -88,7 +88,7 @@ export function useTasks() {
         .order('created_at', { ascending: false });
 
       if (filters.status) {
-        query = query.eq('status', filters.status);
+        query = query.eq('status', filters.status as any);
       }
 
       if (filters.projeto_id) {
@@ -158,7 +158,13 @@ export function useTasks() {
 
       if (error) throw error;
 
-      setTemplates(data || []);
+      // Transform the data to match our interface
+      const transformedData = data?.map(item => ({
+        ...item,
+        fases_padrao: Array.isArray(item.fases_padrao) ? item.fases_padrao : []
+      })) || [];
+
+      setTemplates(transformedData);
     } catch (error) {
       console.error('Error fetching templates:', error);
       toast({
@@ -174,8 +180,29 @@ export function useTasks() {
       const { data, error } = await supabase
         .from('tarefas')
         .insert({
-          ...taskData,
+          titulo: taskData.titulo || '',
+          descricao: taskData.descricao,
+          tipo: taskData.tipo || 'outros',
+          prioridade: taskData.prioridade || 'media',
+          status: taskData.status || 'backlog',
+          projeto_id: taskData.projeto_id,
+          template_id: taskData.template_id,
+          chamado_id: taskData.chamado_id,
+          criativo_id: taskData.criativo_id,
+          cliente_id: taskData.cliente_id,
           criado_por: user?.id,
+          responsavel_id: taskData.responsavel_id,
+          aprovador_id: taskData.aprovador_id,
+          tempo_estimado: taskData.tempo_estimado,
+          tempo_gasto: taskData.tempo_gasto || 0,
+          data_inicio: taskData.data_inicio,
+          data_prazo: taskData.data_prazo,
+          data_conclusao: taskData.data_conclusao,
+          tags: taskData.tags || [],
+          arquivos_urls: taskData.arquivos_urls || [],
+          observacoes: taskData.observacoes,
+          motivo_status: taskData.motivo_status,
+          resumo_conclusao: taskData.resumo_conclusao,
         })
         .select(`
           *,
@@ -209,7 +236,30 @@ export function useTasks() {
     try {
       const { data, error } = await supabase
         .from('tarefas')
-        .update(updates)
+        .update({
+          titulo: updates.titulo,
+          descricao: updates.descricao,
+          tipo: updates.tipo,
+          prioridade: updates.prioridade,
+          status: updates.status,
+          projeto_id: updates.projeto_id,
+          template_id: updates.template_id,
+          chamado_id: updates.chamado_id,
+          criativo_id: updates.criativo_id,
+          cliente_id: updates.cliente_id,
+          responsavel_id: updates.responsavel_id,
+          aprovador_id: updates.aprovador_id,
+          tempo_estimado: updates.tempo_estimado,
+          tempo_gasto: updates.tempo_gasto,
+          data_inicio: updates.data_inicio,
+          data_prazo: updates.data_prazo,
+          data_conclusao: updates.data_conclusao,
+          tags: updates.tags,
+          arquivos_urls: updates.arquivos_urls,
+          observacoes: updates.observacoes,
+          motivo_status: updates.motivo_status,
+          resumo_conclusao: updates.resumo_conclusao,
+        })
         .eq('id', id)
         .select(`
           *,
@@ -241,9 +291,19 @@ export function useTasks() {
 
   const createProject = async (projectData: Partial<Project>) => {
     try {
+      if (!projectData.nome) {
+        throw new Error('Nome do projeto é obrigatório');
+      }
+
       const { data, error } = await supabase
         .from('projetos')
-        .insert(projectData)
+        .insert({
+          nome: projectData.nome,
+          descricao: projectData.descricao,
+          cliente_id: projectData.cliente_id,
+          cor: projectData.cor || '#3b82f6',
+          ativo: true,
+        })
         .select(`
           *,
           cliente:clientes(id, nome)
@@ -272,21 +332,39 @@ export function useTasks() {
 
   const createTemplate = async (templateData: Partial<TaskTemplate>) => {
     try {
+      if (!templateData.nome) {
+        throw new Error('Nome do template é obrigatório');
+      }
+
       const { data, error } = await supabase
         .from('task_templates')
-        .insert(templateData)
+        .insert({
+          nome: templateData.nome,
+          descricao: templateData.descricao,
+          tipo: templateData.tipo || 'outros',
+          prioridade: templateData.prioridade || 'media',
+          fases_padrao: templateData.fases_padrao || ['backlog', 'execucao', 'revisao', 'finalizada'],
+          tempo_estimado: templateData.tempo_estimado,
+          tags: templateData.tags || [],
+          ativo: true,
+        })
         .select()
         .single();
 
       if (error) throw error;
 
-      setTemplates(prev => [data, ...prev]);
+      const transformedData = {
+        ...data,
+        fases_padrao: Array.isArray(data.fases_padrao) ? data.fases_padrao : []
+      };
+
+      setTemplates(prev => [transformedData, ...prev]);
       toast({
         title: "Sucesso",
         description: "Template criado com sucesso",
       });
 
-      return data;
+      return transformedData;
     } catch (error) {
       console.error('Error creating template:', error);
       toast({

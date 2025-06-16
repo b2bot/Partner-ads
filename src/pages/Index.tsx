@@ -19,11 +19,16 @@ import { useState } from "react";
 const Index = () => {
   const { isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
   return (
     <AuthWrapper>
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header 
+          activeTab={activeTab}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
         <div className="flex">
           <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
           <main className="flex-1 p-6">

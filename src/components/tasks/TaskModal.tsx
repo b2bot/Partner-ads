@@ -8,13 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { X, Plus, Clock, User, Tag as TagIcon } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { Task, Project, TaskTemplate } from '@/hooks/useTasks';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TaskModalProps {
-  task?: Task;
+  task?: Task | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (taskData: Partial<Task>) => void;
@@ -29,13 +29,14 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
     tipo: 'outros',
     prioridade: 'media',
     status: 'backlog',
-    tempo_estimado: undefined,
     tags: [],
-    observacoes: '',
+    arquivos_urls: [],
+    tempo_gasto: 0,
   });
 
   const [newTag, setNewTag] = useState('');
 
+  // Buscar usuários para responsável
   const { data: users } = useQuery({
     queryKey: ['users-for-tasks'],
     queryFn: async () => {
@@ -50,6 +51,7 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
     },
   });
 
+  // Buscar clientes
   const { data: clients } = useQuery({
     queryKey: ['clients-for-tasks'],
     queryFn: async () => {
@@ -66,7 +68,28 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
 
   useEffect(() => {
     if (task) {
-      setFormData(task);
+      setFormData({
+        titulo: task.titulo || '',
+        descricao: task.descricao || '',
+        tipo: task.tipo || 'outros',
+        prioridade: task.prioridade || 'media',
+        status: task.status || 'backlog',
+        projeto_id: task.projeto_id,
+        template_id: task.template_id,
+        chamado_id: task.chamado_id,
+        criativo_id: task.criativo_id,
+        cliente_id: task.cliente_id,
+        responsavel_id: task.responsavel_id,
+        aprovador_id: task.aprovador_id,
+        tempo_estimado: task.tempo_estimado,
+        tempo_gasto: task.tempo_gasto || 0,
+        data_prazo: task.data_prazo,
+        tags: task.tags || [],
+        arquivos_urls: task.arquivos_urls || [],
+        observacoes: task.observacoes,
+        motivo_status: task.motivo_status,
+        resumo_conclusao: task.resumo_conclusao,
+      });
     } else {
       setFormData({
         titulo: '',
@@ -74,12 +97,12 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
         tipo: 'outros',
         prioridade: 'media',
         status: 'backlog',
-        tempo_estimado: undefined,
         tags: [],
-        observacoes: '',
+        arquivos_urls: [],
+        tempo_gasto: 0,
       });
     }
-  }, [task, isOpen]);
+  }, [task]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,13 +115,11 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
     if (template) {
       setFormData(prev => ({
         ...prev,
-        titulo: template.nome,
-        descricao: template.descricao,
+        template_id: templateId,
         tipo: template.tipo,
         prioridade: template.prioridade,
         tempo_estimado: template.tempo_estimado,
-        tags: [...template.tags],
-        template_id: templateId,
+        tags: [...(prev.tags || []), ...template.tags],
       }));
     }
   };
@@ -124,18 +145,36 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {task ? 'Editar Tarefa' : 'Nova Tarefa'}
-          </DialogTitle>
+          <DialogTitle>{task ? 'Editar Tarefa' : 'Nova Tarefa'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!task && templates.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="titulo">Título *</Label>
+              <Input
+                id="titulo"
+                value={formData.titulo}
+                onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Textarea
+                id="descricao"
+                value={formData.descricao}
+                onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+                rows={3}
+              />
+            </div>
+
             <div className="space-y-2">
-              <Label>Usar Template</Label>
+              <Label htmlFor="template">Template (Opcional)</Label>
               <Select onValueChange={handleTemplateSelect}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecionar template (opcional)" />
+                  <SelectValue placeholder="Selecionar template" />
                 </SelectTrigger>
                 <SelectContent>
                   {templates.map(template => (
@@ -146,17 +185,30 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
                 </SelectContent>
               </Select>
             </div>
-          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="titulo">Título *</Label>
-              <Input
-                id="titulo"
-                value={formData.titulo}
-                onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
-                required
-              />
+              <Label htmlFor="projeto">Projeto</Label>
+              <Select 
+                value={formData.projeto_id || ''} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, projeto_id: value || undefined }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecionar projeto" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map(project => (
+                    <SelectItem key={project.id} value={project.id}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: project.cor }}
+                        />
+                        {project.nome}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -178,19 +230,7 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="descricao">Descrição</Label>
-            <Textarea
-              id="descricao"
-              value={formData.descricao}
-              onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="prioridade">Prioridade</Label>
               <Select 
@@ -230,47 +270,7 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tempo_estimado">Tempo Estimado (horas)</Label>
-              <Input
-                id="tempo_estimado"
-                type="number"
-                value={formData.tempo_estimado || ''}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  tempo_estimado: e.target.value ? parseInt(e.target.value) : undefined 
-                }))}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="projeto_id">Projeto</Label>
-              <Select 
-                value={formData.projeto_id || ''} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, projeto_id: value || undefined }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar projeto" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map(project => (
-                    <SelectItem key={project.id} value={project.id}>
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: project.cor }}
-                        />
-                        {project.nome}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="responsavel_id">Responsável</Label>
+              <Label htmlFor="responsavel">Responsável</Label>
               <Select 
                 value={formData.responsavel_id || ''} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, responsavel_id: value || undefined }))}
@@ -289,7 +289,7 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cliente_id">Cliente</Label>
+              <Label htmlFor="cliente">Cliente</Label>
               <Select 
                 value={formData.cliente_id || ''} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, cliente_id: value || undefined }))}
@@ -306,19 +306,33 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          {formData.status === 'aguardando' && (
             <div className="space-y-2">
-              <Label htmlFor="motivo_status">Motivo da Espera</Label>
+              <Label htmlFor="tempo_estimado">Tempo Estimado (horas)</Label>
               <Input
-                id="motivo_status"
-                value={formData.motivo_status || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, motivo_status: e.target.value }))}
-                placeholder="Descreva o motivo da espera..."
+                id="tempo_estimado"
+                type="number"
+                value={formData.tempo_estimado || ''}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  tempo_estimado: e.target.value ? parseInt(e.target.value) : undefined 
+                }))}
               />
             </div>
-          )}
+
+            <div className="space-y-2">
+              <Label htmlFor="data_prazo">Data Prazo</Label>
+              <Input
+                id="data_prazo"
+                type="datetime-local"
+                value={formData.data_prazo ? new Date(formData.data_prazo).toISOString().slice(0, 16) : ''}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  data_prazo: e.target.value ? new Date(e.target.value).toISOString() : undefined 
+                }))}
+              />
+            </div>
+          </div>
 
           <div className="space-y-2">
             <Label>Tags</Label>
@@ -348,13 +362,38 @@ export function TaskModal({ task, isOpen, onClose, onSave, projects, templates }
             )}
           </div>
 
+          {formData.status === 'aguardando' && (
+            <div className="space-y-2">
+              <Label htmlFor="motivo_status">Motivo da Espera</Label>
+              <Textarea
+                id="motivo_status"
+                value={formData.motivo_status || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, motivo_status: e.target.value }))}
+                rows={2}
+              />
+            </div>
+          )}
+
+          {formData.status === 'finalizada' && (
+            <div className="space-y-2">
+              <Label htmlFor="resumo_conclusao">Resumo da Conclusão *</Label>
+              <Textarea
+                id="resumo_conclusao"
+                value={formData.resumo_conclusao || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, resumo_conclusao: e.target.value }))}
+                rows={3}
+                required={formData.status === 'finalizada'}
+              />
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="observacoes">Observações</Label>
             <Textarea
               id="observacoes"
-              value={formData.observacoes}
+              value={formData.observacoes || ''}
               onChange={(e) => setFormData(prev => ({ ...prev, observacoes: e.target.value }))}
-              rows={2}
+              rows={3}
             />
           </div>
 
