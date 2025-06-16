@@ -62,18 +62,21 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
             </div>
           </div>
 
-          {/* Center - Global Search */}
-          <div className="hidden lg:flex flex-1 justify-center max-w-sm">
-            <GlobalSearch />
-          </div>
+          {/* Center - Global Search (only for admin) */}
+          {!isCliente && (
+            <div className="hidden lg:flex flex-1 justify-center max-w-sm">
+              <GlobalSearch />
+            </div>
+          )}
 
           {/* Right side - Controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Client greeting and logout */}
+            {/* Client greeting and logout - Always show for clients */}
             {isCliente && (
               <ClientGreeting />
             )}
             
+            {/* Admin controls - Only show for admins */}
             {!isCliente && activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
               <>
                 <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
@@ -90,10 +93,12 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
           </div>
         </div>
 
-        {/* Mobile search */}
-        <div className="lg:hidden mt-2">
-          <GlobalSearch />
-        </div>
+        {/* Mobile search - Only for admin */}
+        {!isCliente && (
+          <div className="lg:hidden mt-2">
+            <GlobalSearch />
+          </div>
+        )}
       </div>
     </header>
   );

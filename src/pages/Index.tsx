@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
@@ -14,12 +15,13 @@ import { ClientsManagementTab } from '@/components/ClientsManagementTab';
 import { ActivityLog } from '@/components/ActivityLog';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
+import { ClientGreeting } from '@/components/ClientGreeting';
 import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, isCliente, loading } = useAuth();
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -128,7 +130,8 @@ const Index = () => {
                       </p>
                     </div>
                   </div>
-                  <UserMenu />
+                  {/* Show appropriate menu based on user type */}
+                  {isCliente ? <ClientGreeting /> : <UserMenu />}
                 </div>
               )}
               {showHeaderControls && (
