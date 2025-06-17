@@ -115,213 +115,122 @@ Tráfego (Cliques externos, em links)
 
 
 
-📊 Páginas Operacionais
-2. Dashboard
-Dados de visão geral da conta ativa.
-
-
-Exibe:
-
-
-Impressões totais
-Cliques totais
-Gasto total
-CTR médio
-Cards de campanhas ativas com estatísticas rápidas
-
-
-Problemas pendentes:
-
-
-Data range ainda não atualiza os dados corretamente
-Alguns cards não carregam informações
-
-
-
-3. Campanhas
-Tabela com todas as campanhas da conta ativa selecionada.
-
-
-Filtros:
-
-
-Status da campanha
-Período (últimos X dias)
-
-
-Colunas:
-
-
-Nome, Status, Objetivo
-Impressões, Cliques, Resultados
-Custo por Resultado
-Data de criação
-
-
-Sorting funciona por clique nas colunas
-
-
-Ponto de atenção:
-
-
-Fontes ainda grandes, precisa de um ajuste visual
-Algumas métricas ainda com valores zerados
-
-
-
-4. Conjuntos de Anúncios
-Listagem dos adsets vinculados à campanha
-
-
-Filtros:
-
-
-Por campanha
-Por status
-Por período
-
-
-Colunas:
-
-
-Nome do conjunto
-Campanha associada
-Métricas (impressões, cliques, CPM, resultados, CPA)
-
-
-Problemas:
-
-
-Carregamento lento dos dados
-Colunas desalinhadas
-Botão de limpar desalinhado
-
-
-
-5. Anúncios
-Tabela com todos os anúncios do adset
-
-
-Filtros:
-
-
-Por campanha
-Por conjunto
-Por status
-Por período
-
-
-Colunas:
-
-
-Criativo (imagem miniatura)
-Nome do anúncio
-Status
-Conjunto
-Campanha
-Métricas (Impressões, CTR, Frequência, etc.)
-
-
-Funcionalidade importante:
-
-
-Clicar na imagem do criativo abre modal ou visualização ampliada (em desenvolvimento)
-
-
-Problemas:
-
-
-Algumas métricas não carregam
-Falta alinhar os inputs e filtros no topo
-Botão “Limpar” desalinhado
-
-
-
-🎯 Página: Personalização de Métricas
-Aqui é onde a mágica acontece!
-
-
-Possível selecionar quais métricas devem ser exibidas em:
-
-
-Dashboard
-Campanhas
-Conjuntos
-Anúncios
-
-
-Templates com configurações visuais para bom, médio e ruim por faixa de valor
-
-
-Exemplo:
-
-
-CPC: Verde = R$0-R$6,80 | Laranja = R$6,80-R$18,80 | Vermelho = R$18,80+
-CTR: Verde = 5%+ | Laranja = 2-5% | Vermelho <2%
-
-
-
-📤 Relatórios via WhatsApp
-Conecta com API de WhatsApp
-Permite agendar envio semanal/mensal de relatórios para clientes
-Clientes configurados via painel
-
-
-Status atual:
-
-
-Funcionalidade de conexão está no ar
-Envio depende da conta estar conectada
-
-
-
-📥 Gerenciar Chamados
-Lista de chamados abertos por clientes
-Status: Aguardando, Respondido
-Sistema de resposta interno com botão de criar novo chamado
-
-
-
-👤 Gerenciar Clientes
-Lista de clientes vinculados ao sistema
-
-
-Exibe:
-Nome, e-mail
-Tipo de acesso (API ou Sheets)
-Contas vinculadas
-Botões de editar, desativar, remover
-
-
-
-🔌 Integrações & Lógica
-📡 Supabase
-Armazena:
-
-
-Configs de métricas (metrics_config)
-Clientes (clientes)
-Perfis (profiles)
-Contas vinculadas (contas)
-Atividades do sistema (system_logs)
-
-
-Queries usando .from(...).select().order()... com mapeamento em interfaces
-
-
-🔄 React Query
-Cache das queries principais: ['metrics-config'], ['clients-management'], etc.
-Mutations com onSuccess e onError + toast feedback
-
-
-📂 Estrutura de Diretórios Relevante
-
-├── api/
-│   ├── settings.ts           # Configurações de conexão com a API Meta
-│   ├── storeKey.ts           # Chave de acesso/token da conta
-│   ├── testConnection.ts     # Função de teste de conexão com a API
-│   └── __tests__/            # Testes unitários da API
-
+Partner Ads Pro - README.md
+✨ Visão Geral
+Partner Ads Pro é um sistema completo de gestão de campanhas, criativos, métricas e relatórios publicitários, com integração direta ao Meta Ads e gestão de comunicação via WhatsApp. Ele é pensado para times de mídia paga, gestores de tráfego e agências.
+🌐 Tecnologias Principais
+React + TypeScript
+Vite
+Supabase (auth e banco de dados)
+React Router DOM
+TailwindCSS
+Tanstack Query
+Lucide Icons
+
+🌎 Estrutura Geral de Pastas
+src/components/
+Contém a maioria dos componentes compartilhados e modulares, separados por tipo ou função:
+dashboard/: componentes da página de métricas (novo dashboard modularizado)
+ui/: componentes de UI (buttons, cards, toasts, inputs...)
+dashboard.ui/: UI personalizada para o dashboard
+tickets/: componentes para chamados
+whatsapp/: gestão de mensagens e campanhas WhatsApp
+src/hooks/
+Contém hooks reutilizáveis para controle de autenticação, permissões, dados do Meta, etc.
+dashboard_hooks/: hooks exclusivos para o novo dashboard (index/métricas)
+src/pages/
+Contém as rotas principais:
+Index.tsx: página principal que renderiza o sistema com tabs
+dashboard/Index.tsx: novo dashboard ("Métricas")
+NotFound.tsx: rota fallback
+src/lib/ e src/integrations/
+lib/: funções auxiliares, integrações e chamadas a APIs (Meta, etc.)
+integrations/supabase/: client e tipos do Supabase
+supabase/
+Contém o config.toml para configuração de policies e projetos do Supabase
+
+🔍 Funcionalidades por Seção
+▶ Dashboard (Principal)
+Visualização geral de campanhas ativas, impressões, gastos e log de atividades
+📊 Métricas (Nova página)
+Charts, Tabelas e KPIs organizados por Ad / Adset / Campaign
+Hierarquia por cliente + conta + campanha
+Filtros avançados e granularidade
+📉 Métricas e Objetivos
+Definição de KPIs, metas e configurações personalizadas
+📰 WhatsApp
+Gestão de contatos, campanhas e mensagens
+Conexão com conta do WhatsApp Business
+📆 Chamados
+Criação e gestão de chamados por cliente/admin
+Status com RLS seguro e detalhado
+👥 Colaboradores e Clientes
+CRUD de colaboradores e permissões (inclusive templates)
+CRUD de clientes e contas
+🌟 Criativos
+Upload e organização de criativos com detalhes por campanha
+⚙ Configurações
+Integrações com API, controle de acesso e logs de sistema
+
+🚀 Como Rodar Localmente
+Instale dependências (caso erro de peer, use --legacy-peer-deps ou --force):
+npm install --legacy-peer-deps
+
+Rode o projeto:
+npm run dev
+
+URL de acesso:
+http://localhost:5173
+
+🔒 Controle de Acesso
+O projeto usa permissões baseadas em RLS via Supabase. As principais permissoes são:
+access_dashboard
+access_paid_media
+access_tasks
+access_whatsapp
+manage_user_settings, manage_collaborators, etc.
+
+🔍 Navegação
+O sistema tem duas formas de renderização de páginas:
+Via activeTab no Index.tsx (tabs internas)
+Via React Router (/metricas, /notfound, etc.)
+⚡ A página de Métricas (dashboard/Index.tsx) é acessada pela rota /metricas
+
+🚨 Considerações
+O sistema é modular, responsivo e seguro
+Toda a lógica de permissão está baseada no useAuth + Supabase
+Vários componentes e hooks foram desacoplados para reuso
+
+🚀 Roadmap
+
+🙌 Colaboração
+Pull Requests são bem-vindos! Organize-se pelo roadmap e issues, ou fale com a equipe técnica.
+
+
+
+🌐 Estrutura
+
+
+C:.
+|   .env
+|   bun.lockb
+|   components.json
+|   eslint.config.js
+|   estrutura.txt
+|   estruturapartner.txt
+|   index.html
+|   package-lock.json
+|   package.json
+|   postcss.config.js
+|   README.md
+|   tailwind.config.ts
+|   tsconfig.app.json
+|   tsconfig.json
+|   tsconfig.node.json
+|   vite.config.ts
+|   
++---api
+|       settings.ts
 
 +---public
 |       favicon.ico
@@ -329,6 +238,7 @@ Mutations com onSuccess e onError + toast feedback
 |       robots.txt
 |       
 +---src
+|   |   antigo_index.css
 |   |   App.css
 |   |   App.tsx
 |   |   index.css
@@ -396,6 +306,81 @@ Mutations com onSuccess e onError + toast feedback
 |   |   |       CollaboratorsList.tsx
 |   |   |       CollaboratorsSearch.tsx
 |   |   |       LoadingSpinner.tsx
+|   |   |       
+|   |   +---dashboard
+|   |   |       AdLevel.tsx
+|   |   |       AdSetLevel.tsx
+|   |   |       CampaignCharts.tsx
+|   |   |       CampaignLevel.tsx
+|   |   |       CampaignTable.tsx
+|   |   |       DashboardFilters.tsx
+|   |   |       DashboardHeader.tsx
+|   |   |       FunnelVisualization.tsx
+|   |   |       MetricsGrid.tsx
+|   |   |       MetricsOverview.tsx
+|   |   |       ObservacoesTable.tsx
+|   |   |       RelatorioDailyTable.tsx
+|   |   |       
+|   |   +---dashboard.ui
+|   |   |       accordion.tsx
+|   |   |       alert-dialog.tsx
+|   |   |       alert.tsx
+|   |   |       aspect-ratio.tsx
+|   |   |       avatar.tsx
+|   |   |       badge.tsx
+|   |   |       breadcrumb.tsx
+|   |   |       button.tsx
+|   |   |       calendar.tsx
+|   |   |       card.tsx
+|   |   |       carousel.tsx
+|   |   |       chart.tsx
+|   |   |       checkbox.tsx
+|   |   |       collapsible.tsx
+|   |   |       command.tsx
+|   |   |       context-menu.tsx
+|   |   |       dialog.tsx
+|   |   |       drawer.tsx
+|   |   |       dropdown-menu.tsx
+|   |   |       form.tsx
+|   |   |       hover-card.tsx
+|   |   |       input-otp.tsx
+|   |   |       input.tsx
+|   |   |       label.tsx
+|   |   |       menubar.tsx
+|   |   |       navigation-menu.tsx
+|   |   |       pagination.tsx
+|   |   |       popover.tsx
+|   |   |       progress.tsx
+|   |   |       radio-group.tsx
+|   |   |       resizable.tsx
+|   |   |       scroll-area.tsx
+|   |   |       select.tsx
+|   |   |       separator.tsx
+|   |   |       sheet.tsx
+|   |   |       sidebar.tsx
+|   |   |       skeleton.tsx
+|   |   |       slider.tsx
+|   |   |       sonner.tsx
+|   |   |       switch.tsx
+|   |   |       table.tsx
+|   |   |       tabs.tsx
+|   |   |       textarea.tsx
+|   |   |       theme-toggle.tsx
+|   |   |       toast.tsx
+|   |   |       toaster.tsx
+|   |   |       toggle-group.tsx
+|   |   |       toggle.tsx
+|   |   |       tooltip.tsx
+|   |   |       use-toast.ts
+|   |   |       
+|   |   +---dashboard_filters
+|   |   |       AdvancedFilters.tsx
+|   |   |       DateRangePicker.tsx
+|   |   |       ItemLevelFilter.tsx
+|   |   |       
+|   |   +---dashboard_navigation
+|   |   |       PlatformNavigation.tsx
+|   |   |       SectionTabs.tsx
 |   |   |       
 |   |   +---tickets
 |   |   |       ClientMessageForm.tsx
@@ -472,47 +457,74 @@ Mutations com onSuccess e onError + toast feedback
 |   |           WhatsAppDashboard.tsx
 |   |           
 |   +---hooks
-|   |       use-mobile.tsx
-|   |       use-toast.ts
-|   |       useAccountInsights.tsx
-|   |       useActivityLog.tsx
-|   |       useAuth.tsx
-|   |       useAuthActions.tsx
-|   |       useCollaborators.tsx
-|   |       useDateRange.tsx
-|   |       useGlobalAdAccount.tsx
-|   |       useInsights.tsx
-|   |       useMetaData.tsx
-|   |       useMetricsConfig.tsx
-|   |       usePermissions.tsx
-|   |       useSystemLog.tsx
-|   |       useUserAccess.tsx
-|   |       useUserPermissions.tsx
-|   |       useUserProfile.tsx
-|   |       useWhatsAppConfig.ts
-|   |       useWhatsAppContacts.ts
-|   |       useWhatsAppMessages.ts
-|   |       useWhatsAppTemplates.ts
-|   |       
+|   |   |   use-mobile.tsx
+|   |   |   use-toast.ts
+|   |   |   useAccountInsights.tsx
+|   |   |   useActivityLog.tsx
+|   |   |   useAuth.tsx
+|   |   |   useAuthActions.tsx
+|   |   |   useCollaborators.tsx
+|   |   |   useDateRange.tsx
+|   |   |   useGlobalAdAccount.tsx
+|   |   |   useInsights.tsx
+|   |   |   useMetaData.tsx
+|   |   |   useMetricsConfig.tsx
+|   |   |   usePermissions.tsx
+|   |   |   useSystemLog.tsx
+|   |   |   useUserAccess.tsx
+|   |   |   useUserPermissions.tsx
+|   |   |   useUserProfile.tsx
+|   |   |   useWhatsAppConfig.ts
+|   |   |   useWhatsAppContacts.ts
+|   |   |   useWhatsAppMessages.ts
+|   |   |   useWhatsAppTemplates.ts
+|   |   |   
+|   |   \---dashboard_hooks
+|   |           use-mobile.tsx
+|   |           use-toast.ts
+|   |           useAnalyticsData.ts
+|   |           useClientManager.ts
+|   |           useDataSelector.ts
+|   |           useFilters.tsx
+|   |           useHierarchicalData.ts
+|   |           useHierarchicalNavigation.ts
+|   |           useMetaData.ts
+|   |           usePlatformNavigation.ts
+|   |           useSettings.tsx
+|   |           useSheetData.ts
+|   |           useTheme.tsx
+|   |           
 |   +---integrations
 |   |   \---supabase
 |   |           client.ts
 |   |           types.ts
 |   |           
 |   +---lib
-|   |       metaApi.ts
-|   |       metaApiWithRateLimit.ts
-|   |       metaInsights.ts
-|   |       rateLimit.ts
-|   |       utils.ts
-|   |       
+|   |   |   metaApi.ts
+|   |   |   metaApiWithRateLimit.ts
+|   |   |   metaInsights.ts
+|   |   |   rateLimit.ts
+|   |   |   utils.ts
+|   |   |   
+|   |   \---dashboard_lib
+|   |           analyticsApi.ts
+|   |           clients.ts
+|   |           integrations.ts
+|   |           metaApi.ts
+|   |           supabase.ts
+|   |           utils.ts
+|   |           
 |   +---pages
-|   |       Index.tsx
-|   |       MetricsObjectivesTab.tsx
-|   |       NotFound.tsx
-|   |       objetivos-metricas.tsx
-|   |       WhatsAppReportsTab.tsx
-|   |       
+|   |   |   Index.tsx
+|   |   |   MetricsObjectivesTab.tsx
+|   |   |   NotFound.tsx
+|   |   |   objetivos-metricas.tsx
+|   |   |   WhatsAppReportsTab.tsx
+|   |   |   
+|   |   \---dashboard
+|   |           Index.tsx
+|   |           NotFound.tsx
+|   |           
 |   +---types
 |   |       auth.ts
 |   |       
@@ -520,25 +532,6 @@ Mutations com onSuccess e onError + toast feedback
 |           permissionUtils.ts
 |           seedActivityLogs.ts
 |           
-\---supabase/
-├── |   config.toml
-├── |   
-└── \---migrations/
-    ├── 20250613071447-8131066b-e700-4e37-be32-745036d7e8e6.sql
-    ├── 20250613072000_create_storage_buckets.sql
-    ├── 20250613124901-096449ce-64bc-435c-87de-d87a01dfbf84.sql
-    ├── 20250613190527-9cb15cc5-b5bc-442e-9ee5-fa29566dac42.sql
-    ├── 20250613201736-d0f77029-c2dd-4eac-a645-509965ade5c5.sql
-    ├── 20250614154950-c3750da7-f88d-423c-a5d5-a0d8f90d8a3a.sql
-    ├── 20250614224124-176e0d70-2d98-47b5-adff-d5a754a2f47a.sql
-    ├── 20250614233723-5f705efc-3d21-480f-be46-be3fcf4d1e1b.sql
-    ├── 20250615144518-272c2790-d849-4c4e-83c3-63e9bb3bb8a3.sql
-    ├── 20250615181741-e98ebf9f-6e85-4c92-8200-8e3eb181deb4.sql
-    ├── 20250615190541-cbc5dc16-3363-4d32-ae85-ca9f37bbbf30.sql
-    ├── 20250616103857-4719ac7e-4fb4-409b-8fa9-2f004bc05588.sql
-    ├── 20250616115306-3ff9f576-2c1a-4902-ad26-acc974f054dc.sql
-    ├── 20250616120000_fix_rls_policies.sql
-    ├── 20250616182336-b8a6d049-20a7-4cb8-a4d8-fb5f465c1574.sql
-    ├── 20250616183058-0b913d7d-7af5-4155-930f-6ac232dc0aca.sql
-    ├── 20250616191136-f2fc3e55-87af-420f-a580-ddad4efae45c.sql
-    └── 20250616191200_fix_tickets_system.sql
+\---supabase
+    |   config.toml
+
