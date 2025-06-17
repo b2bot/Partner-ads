@@ -173,6 +173,7 @@ const Index = () => {
       'campaigns': 'Campanhas',
       'adsets': 'Conjuntos de Anúncios', 
       'ads': 'Anúncios',
+      'metricas': 'Painel de Métricas'
       'whatsapp-reports': 'Relatórios WhatsApp',
       'metrics-objectives': 'Personalização de Métricas',
       'tickets': hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados',
