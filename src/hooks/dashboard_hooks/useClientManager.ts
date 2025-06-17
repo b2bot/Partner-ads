@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/dashboard_lib/supabase';
 import { useAuth } from './useAuth';
@@ -5,6 +6,7 @@ import { useAuth } from './useAuth';
 export const useClientManager = () => {
   const { user } = useAuth();
   const [currentClientId, setCurrentClientId] = useState<string | null>(null);
+  const [currentSheetId, setCurrentSheetId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +26,7 @@ export const useClientManager = () => {
         setError(error.message);
       } else {
         setCurrentClientId(data.id);
+        setCurrentSheetId(data.id); // Use client ID as sheet ID for now
       }
       setLoading(false);
     };
@@ -33,6 +36,7 @@ export const useClientManager = () => {
 
   return {
     currentClientId,
+    currentSheetId,
     setCurrentClientId,
     loading,
     error,

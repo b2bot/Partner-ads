@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import PlatformNavigation from '@/components/dashboard_navigation/PlatformNavigation';
 import SectionTabs from '@/components/dashboard_navigation/SectionTabs';
-//import AdvancedFilters from '@/components/dashboard_filters/AdvancedFilters';
 import MetricsGrid from '@/components/dashboard/MetricsGrid';
 import CampaignCharts from '@/components/dashboard/CampaignCharts';
 import FunnelVisualization from '@/components/dashboard/FunnelVisualization';
@@ -18,7 +17,7 @@ import { useHierarchicalData } from '@/hooks/dashboard_hooks/useHierarchicalData
 import { useHierarchicalNavigation } from '@/hooks/dashboard_hooks/useHierarchicalNavigation';
 import { SettingsProvider } from '@/hooks/dashboard_hooks/useSettings';
 import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/dashboard_ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { isWithinInterval, parseISO } from 'date-fns';
 import ItemLevelFilter from '@/components/dashboard_filters/ItemLevelFilter';
@@ -43,7 +42,7 @@ interface SheetRow {
   [key: string]: any;
 }
 
-const Index = () => {
+const MetricsDashboard = () => {
   const { currentSheetId } = useClientManager();
   const { currentSheetRange, platformConfig, section, platform } = usePlatformNavigation();
   const { filters } = useFilters();
@@ -109,7 +108,7 @@ const Index = () => {
 
   const { campaignGroups } = useHierarchicalData(filteredData);
   const uniqueAccounts = useMemo(
-    () => [...new Set((data || []).map((r) => r.accountName))].filter(Boolean),
+    () => [...new Set((data || []).map((r) => r.accountName).filter(Boolean))] as string[],
     [data]
   );
 
@@ -128,7 +127,7 @@ const Index = () => {
   const groupKey = getGroupKey(section);
   
   const uniqueItems = useMemo(
-    () => [...new Set(filteredData.map((r) => r[groupKey] as string))].filter(Boolean),
+    () => [...new Set(filteredData.map((r) => r[groupKey] as string).filter(Boolean))] as string[],
     [filteredData, groupKey]
   );
 
@@ -136,7 +135,6 @@ const Index = () => {
     if (selectedItem === 'all') return filteredData;
     return filteredData.filter((r) => r[groupKey] === selectedItem);
   }, [filteredData, selectedItem, groupKey]);
-
 
   // Build a composite identifier so names with the same label under different
   // parents are treated as unique groups
@@ -159,7 +157,6 @@ const Index = () => {
     });
     return groups;
   }, [metricsData, section]);
-
 
   const aggregatedData = useMemo(() => {
     return Object.values(groupedData).map((rows) => {
@@ -189,8 +186,8 @@ const Index = () => {
         base.adSetName = rows[0].adSetName;
       }
 
-    return base;
-  });
+      return base;
+    });
   }, [groupedData, groupKey, section]);
 
   // Loading skeleton component
@@ -216,11 +213,6 @@ const Index = () => {
         <PlatformNavigation />
         <SectionTabs accounts={[]} data={[]} />
         <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-		{/*
-          <div className="py-3">
-            <AdvancedFilters data={[]} platformName={platformConfig?.name} />
-          </div>
-		*/}  
           <div className="space-y-4 pb-8">
             <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
               <CardContent className="flex items-center justify-center py-12">
@@ -247,7 +239,6 @@ const Index = () => {
         <PlatformNavigation />
         <SectionTabs accounts={[]} data={[]} />
         <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-6">
-          {/*<AdvancedFilters data={[]} platformName={platformConfig?.name} />*/}
           <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-red-200 dark:border-red-700 mt-4">
             <CardContent className="flex items-center justify-center py-12">
               <div className="text-center">
@@ -264,9 +255,9 @@ const Index = () => {
   }
 
   const renderContent = () => {
-	if (platform === 'relatorios') { 
-      return <RelatorioDailyTable data={filteredData} />;	
-	}  
+    if (platform === 'relatorios') { 
+      return <RelatorioDailyTable data={filteredData} />;  
+    }  
     if (section === 'campanhas') {
       if (viewLevel === 'campaigns') {
         return <CampaignLevel campaigns={campaignGroups} onCampaignClick={handleCampaignClick} />;
@@ -290,12 +281,12 @@ const Index = () => {
         );
       }
     } else if (section === 'grupos') {
-      return <CampaignTable data={aggregatedData} section="grupos" />;
+      return <CampaignTable data={aggregatedData} />;
     } else if (section === 'anuncios') {
-      return <CampaignTable data={aggregatedData} section="anuncios" />;
+      return <CampaignTable data={aggregatedData} />;
     }
 
-    return <CampaignTable data={filteredData} section="campanhas" />;
+    return <CampaignTable data={filteredData} />;
   };
 
   return (
@@ -308,11 +299,6 @@ const Index = () => {
           {/* Filters and Platform header */}
           <div className="py-3">
             <div className="flex flex-col lg:flex-row gap-3 items-start justify-start">
-              {/*
-              <div className="flex-1">
-                <AdvancedFilters data={data || []} platformName={platformConfig?.name} />
-              </div>
-              */}
               <div className="flex-1 lg:flex-none lg:ml-auto">
                 <ItemLevelFilter
                   items={uniqueItems}
@@ -338,10 +324,10 @@ const Index = () => {
             {/* Charts com altura reduzida */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <div className="lg:col-span-2">
-                  <CampaignCharts data={metricsData} platform={platform} />
+                  <CampaignCharts data={metricsData} />
               </div>
               <div className="lg:col-span-1">
-                  <FunnelVisualization data={metricsData} platform={platform} />
+                  <FunnelVisualization data={metricsData} />
               </div>
             </div>
             
@@ -354,4 +340,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default MetricsDashboard;

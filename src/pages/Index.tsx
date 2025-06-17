@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
@@ -17,7 +16,7 @@ import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
-import MetricasIndex from '@/pages/dashboard/Index';
+import MetricsDashboard from '@/pages/dashboard/MetricsDashboard';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -118,7 +117,7 @@ const Index = () => {
           </div>
         );
       case 'metricas':
-        return hasPermission('access_paid_media') ? <MetricasIndex /> : (
+        return hasPermission('access_paid_media') ? <MetricsDashboard /> : (
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
             <p className="text-slate-500 mt-2">Você não tem permissão para acessar o Painel de Métricas.</p>
@@ -188,13 +187,11 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-        {/* Botão de logout de emergência - sempre visível se há usuário */}
         {user && <EmergencyLogout />}
         
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Header */}
           <div className="border-b bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               {showHeaderControls ? (
@@ -217,7 +214,6 @@ const Index = () => {
                       </p>
                     </div>
                   </div>
-                  {/* Show appropriate menu based on user type */}
                   <div className="flex items-center gap-2">
                     {isCliente ? <ClientGreeting /> : <UserMenu />}
                   </div>
@@ -231,7 +227,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <main className="flex-1 overflow-auto">
             <div className="container-responsive py-4">
               {renderContent()}
