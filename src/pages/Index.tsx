@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { Dashboard } from '@/components/Dashboard';
 import { CampaignsTab } from '@/components/CampaignsTab';
@@ -17,7 +16,8 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
 import MetricasTab from '@/components/MetricasTab';
-import { SidebarProvider } from "@/components/sidebar"; 
+import { SidebarProvider } from "@/components/ui/sidebar"; // este é o correto
+import { Sidebar } from "@/components/ui/sidebar"; // componente visual personalizado
 
 
 const Index = () => {
