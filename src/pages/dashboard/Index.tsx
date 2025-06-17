@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import PlatformNavigation from '@/components/dashboard_navigation/PlatformNavigation';
 import SectionTabs from '@/components/dashboard_navigation/SectionTabs';
@@ -17,11 +16,32 @@ import { usePlatformNavigation } from '@/hooks/dashboard_hooks/usePlatformNaviga
 import { useFilters } from '@/hooks/dashboard_hooks/useFilters';
 import { useHierarchicalData } from '@/hooks/dashboard_hooks/useHierarchicalData';
 import { useHierarchicalNavigation } from '@/hooks/dashboard_hooks/useHierarchicalNavigation';
+import { SettingsProvider } from '@/hooks/dashboard_hooks/useSettings';
 import { Card, CardContent } from '@/components/dashboard_ui/card';
 import { Skeleton } from '@/components/dashboard_ui/skeleton';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { isWithinInterval, parseISO } from 'date-fns';
 import ItemLevelFilter from '@/components/dashboard_filters/ItemLevelFilter';
+
+// Definir tipos básicos para evitar erros
+interface SheetRow {
+  accountName?: string;
+  campaignName?: string;
+  adSetName?: string;
+  adName?: string;
+  day?: string;
+  impressions?: number;
+  clicks?: number;
+  amountSpent?: number;
+  actionMessagingConversationsStarted?: number;
+  costPerActionMessagingConversations?: number;
+  actionLinkClicks?: number;
+  reach?: number;
+  frequency?: number;
+  cpm?: number;
+  cpc?: number;
+  [key: string]: any;
+}
 
 const Index = () => {
   const { currentSheetId } = useClientManager();

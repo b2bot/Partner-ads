@@ -17,8 +17,7 @@ import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
-import Metricas from '@/pages/dashboard/Index';
-
+import MetricasIndex from '@/pages/dashboard/Index';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -119,10 +118,10 @@ const Index = () => {
           </div>
         );
       case 'metricas':
-        return hasPermission('access_paid_media') ? <Metricas /> : (
+        return hasPermission('access_paid_media') ? <MetricasIndex /> : (
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-slate-600">Acesso Negado</h2>
-            <p className="text-slate-500 mt-2">Você não tem permissão para acessar Métricas.</p>
+            <p className="text-slate-500 mt-2">Você não tem permissão para acessar o Painel de Métricas.</p>
           </div>
         );  
       case 'whatsapp-reports':

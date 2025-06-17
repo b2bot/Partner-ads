@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
@@ -56,7 +57,18 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     }
   };
 
-  const isItemActive = (itemTab: string) => location.pathname.includes(itemTab);
+  const handleItemClick = (itemId: string) => {
+    // Para itens que devem usar o sistema de abas interno
+    if (['dashboard', 'campaigns', 'adsets', 'ads', 'metricas', 'whatsapp-reports', 
+         'tickets', 'creatives', 'metrics-objectives', 'activity-log', 'settings'].includes(itemId)) {
+      setActiveTab(itemId);
+    } else {
+      // Para outros itens que precisam de navegação por URL
+      navigate(`/${itemId}`);
+    }
+  };
+
+  const isItemActive = (itemTab: string) => activeTab === itemTab;
 
   const mainMenuItems = [
     { 
@@ -97,7 +109,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     },
     {
       id: 'metricas',
-      label: 'Métricas',
+      label: 'Painel de Métricas',
       icon: BarChart3,
       permission: 'access_paid_media' as Permission
     },
@@ -155,7 +167,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       .map((item) => (
         <div key={item.id} className="mb-1">
           <button
-            onClick={() => navigate(`/${item.id}`)}
+            onClick={() => handleItemClick(item.id)}
             className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
               isItemActive(item.id) 
                 ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' 
