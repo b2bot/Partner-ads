@@ -16,7 +16,7 @@ import { ActivityLog } from '@/components/ActivityLog';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
-import { EmergencyLogout } from '@/components/EmergencyLogout';
+//import { EmergencyLogout } from '@/components/EmergencyLogout';//
 import { useAuth } from '@/hooks/useAuth';
 import Resultados from '@/pages/Resultados';
 
