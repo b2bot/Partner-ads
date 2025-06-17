@@ -61,11 +61,11 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     hasAccessDashboard: hasPermission('access_dashboard')
   });
 
-  if (loading) {
+ {/*if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-        {user && <EmergencyLogout />}
+         {user && <EmergencyLogout />} 
       </div>
     );
   }
@@ -81,7 +81,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
         </div>
       </div>
     );
-  }
+  }*/}
 
   const renderContent = () => {
     switch (activeTab) {
@@ -191,7 +191,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
         {/* Botão de logout de emergência - sempre visível se há usuário */}
-        {user && <EmergencyLogout />}
+       {/* {user && <EmergencyLogout />}*/}
         
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         
