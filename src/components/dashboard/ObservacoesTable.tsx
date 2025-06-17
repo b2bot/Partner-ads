@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/dashboard_ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SheetRow } from '@/hooks/dashboard_hooks/useSheetData';
 import { format, parseISO } from 'date-fns';
 

@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { usePlatformNavigation } from '@/hooks/dashboard_hooks/usePlatformNavigation';
-import { Button } from '@/components/dashboard_ui/button';
-import { cn } from '@/lib/dashboard_lib/utils';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { BookOpenCheck, BarChart3, Activity } from 'lucide-react';
 
 const platformOptions = [
