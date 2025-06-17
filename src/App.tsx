@@ -20,7 +20,7 @@ const App = () => (
           <Routes>
             {/* Rota padrão */}
             <Route path="/" element={<Index />} />
-
+            <Route path="/metricas" element={<MetricasPage />} /> 
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
