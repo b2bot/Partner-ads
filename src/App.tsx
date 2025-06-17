@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import DashboardPage from "./pages/dashboard/Index"; // 🔥 novo módulo integrado
+import MetricasPage from "./pages/dashboard/Index"; // 🔥 novo módulo: Métricas
 
 const queryClient = new QueryClient();
 
@@ -19,8 +18,13 @@ const App = () => (
       <BrowserRouter>
         <AuthWrapper>
           <Routes>
+            {/* Rota padrão */}
             <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+            {/* Rota das Métricas (dashboard modularizado) */}
+            <Route path="/metricas" element={<MetricasPage />} />
+
+            {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthWrapper>
