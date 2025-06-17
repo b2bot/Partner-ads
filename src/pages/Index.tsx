@@ -13,13 +13,13 @@ import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
 import { TicketsTab } from '@/components/TicketsTab';
 import { CreativesTab } from '@/components/CreativesTab';
+import { MetricasTab } from '@/components/MetricasTab';
 import { ActivityLog } from '@/components/ActivityLog';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
-import Resultados from '@/pages/Resultados';
 
 interface IndexProps {
   initialTab?: string;
@@ -144,7 +144,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
           </div>
         );
       case 'resultados':
-        return hasPermission('access_paid_media') ? <ResultadosTab viewMode={viewMode} /> : (
+        return hasPermission('access_paid_media') ? <ResultadosTab /> : (
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-full flex items-center justify-center mb-6">
               <span className="text-gray-400 text-2xl">🔒</span>

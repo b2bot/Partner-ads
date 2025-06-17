@@ -1,122 +1,108 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Platform } from './usePlatformNavigation';
-import { supabase } from '@/lib/dashboard_lib/supabase';
 
-export interface PlatformConfig {
-  mode: 'sheets' | 'api';
-  apiKey?: string;
-  accountId?: string;
-  metrics: string[];
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface SettingsData {
+  [key: string]: any;
 }
 
-interface SettingsState {
-  platforms: Record<Platform, PlatformConfig>;
+interface SettingsContextType {
+  settings: SettingsData;
+  updateSettings: (newSettings: Partial<SettingsData>) => Promise<void>;
+  loading: boolean;
+  error: string | null;
 }
 
-const defaultSettings: SettingsState = {
-  platforms: {
-    meta: { mode: 'sheets', metrics: [] },
-    google: { mode: 'sheets', metrics: [] },
-    youtube: { mode: 'sheets', metrics: [] },
-    linkedin: { mode: 'sheets', metrics: [] },
-    tiktok: { mode: 'sheets', metrics: [] },
-    analytics: { mode: 'sheets', metrics: [] },
-    instagram: { mode: 'sheets', metrics: [] },
-    b2bot: { mode: 'sheets', metrics: [] },
-    relatorios: { mode: 'sheets', metrics: [] },
-    rd: { mode: 'sheets', metrics: [] },
-  },
-};
+const SettingsContext = createContext<SettingsContextType>({
+  settings: {},
+  updateSettings: async () => {},
+  loading: false,
+  error: null,
+});
 
-interface SettingsContextValue {
-  settings: SettingsState;
-  updatePlatform: (platform: Platform, config: Partial<PlatformConfig>) => void;
-  saveSettings: (data: SettingsState) => Promise<void>;
+interface SettingsProviderProps {
+  children: ReactNode;
+  clientId: string;
 }
 
-const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
+export function SettingsProvider({ children, clientId }: SettingsProviderProps) {
+  const [settings, setSettings] = useState<SettingsData>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-function isValidUUID(uuid: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
-}
+  const fetchSettings = async () => {
+    if (!clientId) return;
 
-export const SettingsProvider = ({
-  children,
-  clientId,
-}: {
-  children: React.ReactNode;
-  clientId?: string;
-}) => {
-  const [settings, setSettings] = useState<SettingsState>(() => {
-    const stored = localStorage.getItem('dashboard-settings');
-    return stored ? JSON.parse(stored) : defaultSettings;
-  });
+    setLoading(true);
+    setError(null);
 
-  useEffect(() => {
-    localStorage.setItem('dashboard-settings', JSON.stringify(settings));
-
-    if (!clientId || !isValidUUID(clientId)) return;
-    supabase
-      .from('settings')
-      .upsert({ client_id: clientId, data: settings })
-      .then(({ error }) => {
-        if (error) console.error('Erro ao salvar settings:', error.message);
-      })
-      .catch(err => {
-        console.error('Erro inesperado ao salvar settings:', err);
-      });
-  }, [settings, clientId]);
-
-  useEffect(() => {
-    if (!clientId || !isValidUUID(clientId)) return;
-
-    const fetchSettings = async () => {
-      const { data, error } = await supabase
+    try {
+      const { data, error: fetchError } = await supabase
         .from('settings')
         .select('data')
         .eq('client_id', clientId)
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        console.error('Erro ao buscar settings:', error.message);
-      } else if (data?.data) {
-        setSettings(data.data as SettingsState);
+      if (fetchError) {
+        throw fetchError;
       }
-    };
 
-    fetchSettings();
-  }, [clientId]);
-
-  const updatePlatform = (platform: Platform, config: Partial<PlatformConfig>) => {
-    setSettings(prev => ({
-      platforms: {
-        ...prev.platforms,
-        [platform]: { ...prev.platforms[platform], ...config },
-      },
-    }));
-  };
-
-  const saveSettings = async (data: SettingsState) => {
-    setSettings(data);
-    localStorage.setItem('dashboard-settings', JSON.stringify(data));
-
-    if (clientId && isValidUUID(clientId)) {
-      const { error } = await supabase.from('settings').upsert({ client_id: clientId, data });
-      if (error) {
-        console.error('Erro ao salvar settings manualmente:', error.message);
-      }
+      setSettings(data?.data || {});
+    } catch (err) {
+      console.error('Error fetching settings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch settings');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const updateSettings = async (newSettings: Partial<SettingsData>) => {
+    if (!clientId) return;
+
+    try {
+      const updatedSettings = { ...settings, ...newSettings };
+
+      const { error: updateError } = await supabase
+        .from('settings')
+        .upsert({
+          client_id: clientId,
+          data: updatedSettings,
+        });
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setSettings(updatedSettings);
+    } catch (err) {
+      console.error('Error updating settings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      throw err;
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, [clientId]);
+
+  const value = {
+    settings,
+    updateSettings,
+    loading,
+    error,
+  };
+
   return (
-    <SettingsContext.Provider value={{ settings, updatePlatform, saveSettings }}>
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   );
-};
+}
 
-export const useSettings = () => {
-  const ctx = useContext(SettingsContext);
-  if (!ctx) throw new Error('useSettings must be used within SettingsProvider');
-  return ctx;
-};
+export function useSettings() {
+  const context = useContext(SettingsContext);
+  if (!context) {
+    throw new Error('useSettings must be used within a SettingsProvider');
+  }
+  return context;
+}
