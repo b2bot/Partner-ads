@@ -22,7 +22,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
 
             {/* Rota das Métricas (dashboard modularizado) */}
-            <Route path="/metricas" element={<MetricasPage />} />
+            <Route path="/metricas" element={<Metricas />} />
 
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
