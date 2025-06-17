@@ -189,7 +189,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+      {/*<div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">*/}
         {/* Botão de logout de emergência - sempre visível se há usuário */}
        {/* {user && <EmergencyLogout />}*/}
         
