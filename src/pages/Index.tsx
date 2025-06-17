@@ -14,7 +14,6 @@ import { SettingsTab } from '@/components/SettingsTab';
 import { TicketsTab } from '@/components/TicketsTab';
 import { CreativesTab } from '@/components/CreativesTab';
 import { ActivityLog } from '@/components/ActivityLog';
-import { MetricasTab } from '@/components/MetricasTab';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
