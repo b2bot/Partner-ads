@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Resultados from "./pages/Resultados";
 import { FiltersProvider } from "@/hooks/dashboard_hooks/useFilters";
 import { SettingsProvider } from "@/hooks/dashboard_hooks/useSettings";
 
