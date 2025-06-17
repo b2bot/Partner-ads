@@ -3,14 +3,10 @@ import React, { useMemo } from 'react';
 import PlatformNavigation from '@/components/dashboard_navigation/PlatformNavigation';
 import SectionTabs from '@/components/dashboard_navigation/SectionTabs';
 import MetricsGrid from '@/components/dashboard/MetricsGrid';
-import CampaignCharts from '@/components/dashboard/CampaignCharts';
-import FunnelVisualization from '@/components/dashboard/FunnelVisualization';
-import CampaignTable from '@/components/dashboard/CampaignTable';
 import { useMetaAPI } from '@/api/metaAPI';
 import { useGoogleAPI } from '@/api/googleAPI';
 import { useFilters } from '@/hooks/dashboard_hooks/useFilters';
 import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 const MetricsDashboard = () => {
@@ -48,44 +44,21 @@ const MetricsDashboard = () => {
     [combinedData]
   );
 
-  // Loading skeleton component
-  const LoadingSkeleton = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...Array(6)].map((_, i) => (
-          <Card key={i} className="border-0 bg-white/80 dark:bg-gray-800/80">
-            <CardContent className="p-4">
-              <Skeleton className="h-4 w-20 mb-2" />
-              <Skeleton className="h-6 w-16 mb-2" />
-              <Skeleton className="h-3 w-12" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
         <PlatformNavigation />
         <SectionTabs accounts={[]} data={[]} />
         <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="space-y-4 pb-8">
-            <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-              <CardContent className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="relative">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-                    <div className="absolute -inset-2 bg-blue-600/20 rounded-full animate-pulse" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Carregando insights...</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Conectando com as plataformas</p>
-                </div>
-              </CardContent>
-            </Card>
-            <LoadingSkeleton />
-          </div>
+          <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm mt-8">
+            <CardContent className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Carregando insights...</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">Conectando com as plataformas</p>
+              </div>
+            </CardContent>
+          </Card>
         </main>
       </div>
     );
@@ -119,22 +92,7 @@ const MetricsDashboard = () => {
       
       <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="space-y-4 pb-8">
-          
-          {/* Metrics Grid */}
           <MetricsGrid data={filteredData} section="campanhas" />
-          
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2">
-                <CampaignCharts data={filteredData} />
-            </div>
-            <div className="lg:col-span-1">
-                <FunnelVisualization data={filteredData} />
-            </div>
-          </div>
-          
-          {/* Campaign Table */}
-          <CampaignTable data={filteredData} />
         </div>
       </main>
     </div>
