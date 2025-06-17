@@ -17,6 +17,8 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
 import MetricasTab from '@/components/MetricasTab';
+import { SidebarProvider } from "@/components/sidebar"; 
+
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -62,25 +64,27 @@ const Index = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <SidebarProvider>
+      <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header 
-          activeTab={activeTab}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Header 
+            activeTab={activeTab}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          />
         
-        <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="container-responsive py-4">
-            {renderActiveTab()}
-          </div>
-        </main>
-      </div>
+          <main className="flex-1 overflow-x-hidden overflow-y-auto">
+            <div className="container-responsive py-4">
+              {renderActiveTab()}
+            </div>
+          </main>
+        </div>
 
-      <EmergencyLogout />
-    </div>
+        <EmergencyLogout />
+      </div>
+    </SidebarProvider>  
   );
 };
 
