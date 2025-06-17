@@ -1,22 +1,11 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { usePlatformNavigation } from '@/hooks/dashboard_hooks/usePlatformNavigation';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useFilters } from '@/hooks/dashboard_hooks/useFilters';
-import DashboardFilters from '@/components/dashboard/DashboardFilters';
-import AdvancedFilters from '@/components/dashboard_filters/AdvancedFilters';
-import ItemLevelFilter from '@/components/dashboard_filters/ItemLevelFilter';
-import { cn } from '@/lib/utils';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Filter, Search } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 interface SectionTabsProps {
   accounts: string[];
@@ -24,68 +13,47 @@ interface SectionTabsProps {
 }
 
 const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
-  const { section, setSection, platform } = usePlatformNavigation();
   const { filters, updateFilters } = useFilters();
 
-  const sections = [
-    { key: 'campanhas', label: 'Campanhas', count: data?.length || 0 },
-    { key: 'grupos', label: 'Grupos de Anúncios', count: data?.length || 0 },
-    { key: 'anuncios', label: 'Anúncios', count: data?.length || 0 },
-  ];
-
-  if (platform === 'relatorios') {
-    sections.push(
-      { key: 'observacoes', label: 'Observações', count: 0 },
-      { key: 'relatorio-diario', label: 'Relatório Diário', count: 0 }
-    );
-  }
-
   return (
-    <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Tabs value={section} onValueChange={setSection} className="w-full">
-          <div className="flex items-center justify-between py-4">
-            <TabsList className="grid w-full max-w-2xl grid-cols-3 lg:grid-cols-5">
-              {sections.map(({ key, label, count }) => (
-                <TabsTrigger 
-                  key={key} 
-                  value={key}
-                  className={cn(
-                    "data-[state=active]:bg-blue-600 data-[state=active]:text-white",
-                    "hover:bg-gray-100 dark:hover:bg-gray-800"
-                  )}
-                >
-                  <span className="hidden sm:inline">{label}</span>
-                  <span className="sm:hidden">{label.split(' ')[0]}</span>
-                  {count > 0 && (
-                    <Badge variant="outline" className="ml-2 text-xs">
-                      {count}
-                    </Badge>
-                  )}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+    <div className="border-b bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between py-4">
+          
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="w-full sm:w-64">
+              <Select value={filters.selectedAccount} onValueChange={(value) => updateFilters({ selectedAccount: value })}>
+                <SelectTrigger className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9">
+                  <SelectValue placeholder="Todas as contas" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                  <SelectItem value="all">Todas as contas</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem key={account} value={account}>
+                      {account}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Filter className="w-4 h-4 mr-2" />
-                Filtros
-              </Button>
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar campanhas..."
+                value={filters.searchTerm}
+                onChange={(e) => updateFilters({ searchTerm: e.target.value })}
+                className="pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9"
+              />
             </div>
           </div>
 
-          <div className="pb-4">
-            <DashboardFilters
-              accounts={accounts}
-              selectedAccount={filters.selectedAccount}
-              onAccountChange={(account) => updateFilters({ selectedAccount: account })}
-              dateRange={filters.dateRange}
-              onDateRangeChange={(range) => updateFilters({ dateRange: range })}
-              searchTerm={filters.searchTerm}
-              onSearchTermChange={(term) => updateFilters({ searchTerm: term })}
-            />
+          {/* Stats */}
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {data.length} campanhas encontradas
           </div>
-        </Tabs>
+        </div>
       </div>
     </div>
   );
