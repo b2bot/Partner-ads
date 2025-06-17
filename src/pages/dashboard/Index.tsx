@@ -17,7 +17,7 @@ import { useFilters } from '@/hooks/dashboard_hooks/useFilters';
 import { useHierarchicalData } from '@/hooks/dashboard_hooks/useHierarchicalData';
 import { useHierarchicalNavigation } from '@/hooks/dashboard_hooks/useHierarchicalNavigation';
 import { SettingsProvider } from '@/hooks/dashboard_hooks/useSettings';
-import { Card, CardContent } from '@/components/dashboard_ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/dashboard_ui/skeleton';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { isWithinInterval, parseISO } from 'date-fns';

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/dashboard_ui/card';
-import { Badge } from '@/components/dashboard_ui/badge';
-import { Button } from '@/components/dashboard_ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, Eye, Users, MousePointer, DollarSign } from 'lucide-react';
 import { AdGroup } from '@/hooks/dashboard_hooks/useHierarchicalData';
 

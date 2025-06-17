@@ -1,18 +1,8 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/dashboard_ui/card';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
-import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { ptBR } from 'date-fns/locale';
 import { SheetRow } from '@/hooks/dashboard_hooks/useSheetData';
 import { usePlatformNavigation } from '@/hooks/dashboard_hooks/usePlatformNavigation';
 
@@ -76,10 +66,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
 
   const dailyData = rawDailyData.map(d => ({
     ...d,
-    day: format(parseISO(d.day), 'dd.MM.yyyy'),
+    day: format(parseISO(d.day), 'dd.MM.yyyy', { locale: ptBR }),
   }));
-
-
 
   // Agregar dados por plataforma
   const platformData = data.reduce((acc, row) => {
@@ -102,7 +90,6 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
     const index = platform.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
     return colors[index];
   }
-
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

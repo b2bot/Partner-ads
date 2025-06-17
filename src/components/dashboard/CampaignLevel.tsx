@@ -1,7 +1,6 @@
-
 import React from 'react';
-import { Card, CardContent } from '@/components/dashboard_ui/card';
-import { Badge } from '@/components/dashboard_ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Eye, Users, MousePointer, Zap } from 'lucide-react';
 import { CampaignGroup } from '@/hooks/dashboard_hooks/useHierarchicalData';
 

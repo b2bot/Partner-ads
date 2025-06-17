@@ -1,12 +1,10 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/dashboard_ui/card';
-import { Badge } from '@/components/dashboard_ui/badge';
-import { Button } from '@/components/dashboard_ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/dashboard_ui/tooltip';
-import { MoreHorizontal, TrendingUp, TrendingDown } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/dashboard_ui/dialog';
-import { SheetRow } from '@/hooks/dashboard_hooks/useSheetData';
-import { format, parseISO } from 'date-fns';
+import React, { useState } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Eye, MousePointer, Users, DollarSign, ExternalLink, ArrowUpDown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 import { TabSection, usePlatformNavigation } from '@/hooks/dashboard_hooks/usePlatformNavigation';
 
@@ -17,7 +15,7 @@ interface CampaignTableProps {
 
 
 const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
-  const [previewImage, setPreviewImage] = React.useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { platform } = usePlatformNavigation();
 
 
@@ -249,9 +247,9 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                           )}
                         </div>
                         {row.clicks > 100 ? (
-                          <TrendingUp className="w-3 h-3 text-green-500 transition-transform duration-200 group-hover/row:scale-110" />
+                          <ArrowUpDown className="w-3 h-3 text-green-500 transition-transform duration-200 group-hover/row:scale-110" />
                         ) : (
-                          <TrendingDown className="w-3 h-3 text-red-500 transition-transform duration-200 group-hover/row:scale-110" />
+                          <ArrowUpDown className="w-3 h-3 text-red-500 transition-transform duration-200 group-hover/row:scale-110" />
                         )}
                       </div>
                     </td>
@@ -294,26 +292,26 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                     </td>
 
                     {section === 'anuncios' && (
-                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-400 text-xs">
                         {formatFrequency(row.frequency)}
                       </td>
                     )}
 
                     {section === 'grupos' && (
-                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-400 text-xs">
                         {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
                       </td>
                     )}
 
-                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-400 text-xs">
                       {formatNumber(row.clicks)}
                     </td>
-                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-400 text-xs">
                       {calculateCTR(row.clicks, row.impressions)}%
                     </td>
 
                     {section === 'grupos' && (
-                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-400 text-xs">
                         {typeof row.cpc === 'number' && !isNaN(row.cpc) ? `R$ ${row.cpc.toFixed(2)}` : 'R$ 0,00'}
                       </td>
                     )}
@@ -325,7 +323,7 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                             {formatCurrency(row.amountSpent)}
                           </div>
                         </td>
-                        <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-400 text-xs">
                           {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
                         </td>
                       </>
@@ -336,7 +334,7 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                         {formatNumber(row.actionMessagingConversationsStarted)}
                       </div>
                     </td>
-                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-400 text-xs">
                       {formatCurrency(
                         row.actionMessagingConversationsStarted > 0
                           ? row.amountSpent / row.actionMessagingConversationsStarted
