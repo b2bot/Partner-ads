@@ -15,6 +15,12 @@
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks"
+    "hooks": "@/hooks",
+    "dashboard_ui": "@/components/dashboard_ui",
+    "dashboard_navigation": "@/components/dashboard_navigation",
+    "dashboard_filters": "@/components/dashboard_filters",
+    "dashboard": "@/components/dashboard",
+    "dashboard_hooks": "@/hooks/dashboard_hooks",
+    "dashboard_lib": "@/lib/dashboard_lib"
   }
 }

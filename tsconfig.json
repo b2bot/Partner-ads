@@ -7,7 +7,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/components/dashboard_ui/*": ["src/components/dashboard_ui/*"],
+      "@/components/dashboard_navigation/*": ["src/components/dashboard_navigation/*"],
+      "@/components/dashboard_filters/*": ["src/components/dashboard_filters/*"],
+      "@/components/dashboard/*": ["src/components/dashboard/*"],
+      "@/hooks/dashboard_hooks/*": ["src/hooks/dashboard_hooks/*"],
+      "@/lib/dashboard_lib/*": ["src/lib/dashboard_lib/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,

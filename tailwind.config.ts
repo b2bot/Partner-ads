@@ -2,12 +2,16 @@ import type { Config } from "tailwindcss";
 
 export default {
 	darkMode: ["class"],
-	content: [
-		"./pages/**/*.{ts,tsx}",
-		"./components/**/*.{ts,tsx}",
-		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
-	],
+        content: [
+                "./pages/**/*.{ts,tsx}",
+                "./components/**/*.{ts,tsx}",
+                "./app/**/*.{ts,tsx}",
+                "./src/**/*.{ts,tsx}",
+                "./src/components/dashboard/**/*.{ts,tsx}",
+                "./src/components/dashboard_ui/**/*.{ts,tsx}",
+                "./src/components/dashboard_navigation/**/*.{ts,tsx}",
+                "./src/components/dashboard_filters/**/*.{ts,tsx}",
+        ],
 	prefix: "",
 	theme: {
 		container: {

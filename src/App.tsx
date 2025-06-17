@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import DashboardPage from "./pages/dashboard/Index"; // 🔥 novo módulo integrado
 
 const queryClient = new QueryClient();
 
