@@ -155,7 +155,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       .map((item) => (
         <div key={item.id} className="mb-1">
           <button
-            onClick={() => navigate(`/${item.id}`)}
+            onClick={() => setActiveTab(item.id)}
             className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
               isItemActive(item.id) 
                 ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' 
