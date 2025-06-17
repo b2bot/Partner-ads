@@ -17,7 +17,7 @@ import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
 import MetricasTab from '@/components/MetricasTab';
 import { SidebarProvider } from "@/components/ui/sidebar"; // este é o correto
-import { Sidebar } from "@/components/ui/sidebar"; // componente visual personalizado
+import { Sidebar } from "@/components/Sidebar"; // componente visual personalizado
 
 
 const Index = () => {
