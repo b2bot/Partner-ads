@@ -47,7 +47,12 @@ export function SettingsProvider({ children, clientId }: SettingsProviderProps) 
         throw fetchError;
       }
 
-      setSettings(data?.data || {});
+      const settingsData = data?.data || {};
+      if (typeof settingsData === 'object' && settingsData !== null) {
+        setSettings(settingsData as SettingsData);
+      } else {
+        setSettings({});
+      }
     } catch (err) {
       console.error('Error fetching settings:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch settings');

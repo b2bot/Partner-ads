@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import PlatformNavigation from '@/components/dashboard_navigation/PlatformNavigation';
 import SectionTabs from '@/components/dashboard_navigation/SectionTabs';
@@ -216,6 +217,8 @@ export function ResultadosTab() {
   }
 
   if (error) {
+    const errorMessage = typeof error === 'string' ? error : error.message || 'Erro desconhecido';
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-orange-50 dark:from-gray-900 dark:via-red-900 dark:to-orange-900 transition-colors duration-300">
         <PlatformNavigation />
@@ -227,7 +230,7 @@ export function ResultadosTab() {
                 <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Erro ao carregar dados</h3>
                 <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">Não foi possível conectar com {platformConfig?.name}</p>
-                <p className="text-sm text-red-600 dark:text-red-400">{error.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
               </div>
             </CardContent>
           </Card>

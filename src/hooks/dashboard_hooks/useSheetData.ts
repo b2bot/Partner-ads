@@ -2,6 +2,25 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+export interface SheetRow {
+  day?: string;
+  campaignName?: string;
+  adSetName?: string;
+  adName?: string;
+  accountName?: string;
+  impressions?: number;
+  clicks?: number;
+  amountSpent?: number;
+  actionMessagingConversationsStarted?: number;
+  costPerActionMessagingConversations?: number;
+  actionLinkClicks?: number;
+  reach?: number;
+  frequency?: number;
+  cpm?: number;
+  cpc?: number;
+  [key: string]: any;
+}
+
 interface SheetDataHook {
   data: any[];
   isLoading: boolean;

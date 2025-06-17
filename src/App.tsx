@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,7 +8,6 @@ import { AuthWrapper } from "@/components/AuthWrapper";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { FiltersProvider } from "@/hooks/dashboard_hooks/useFilters";
-import { SettingsProvider } from "@/hooks/dashboard_hooks/useSettings";
 
 const queryClient = new QueryClient();
 
@@ -19,12 +19,10 @@ const App = () => (
       <BrowserRouter>
         <AuthWrapper>
           <FiltersProvider>
-            <SettingsProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </SettingsProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </FiltersProvider>
         </AuthWrapper>
       </BrowserRouter>

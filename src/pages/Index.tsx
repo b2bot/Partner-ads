@@ -172,8 +172,6 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Métricas.</p>
           </div>
         );
-      case 'metricas':
-        return <MetricasTab />;
       case 'tickets':
         return <TicketsTab />;
       case 'creatives':
@@ -220,7 +218,6 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
       'resultados': 'Resultados',
       'whatsapp-reports': 'Relatórios WhatsApp',
       'metrics-objectives': 'Personalização de Métricas',
-      'metricas': 'Painel de Métricas',
       'tickets': hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados',
       'creatives': hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos',
       'activity-log': 'Log de Atividades',

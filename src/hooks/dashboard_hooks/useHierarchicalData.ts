@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { SheetRow } from './useSheetData';
+import { SheetRow } from '@/types/dashboard';
 
 export interface CampaignGroup {
   campaignName: string;
