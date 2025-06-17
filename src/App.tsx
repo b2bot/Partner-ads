@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import MetricasPage from "./pages/dashboard/Index"; // 🔥 novo módulo: Métricas
+import Metricas from "./pages/dashboard/Index"; // 🔥 novo módulo: Métricas
 
 const queryClient = new QueryClient();
 
