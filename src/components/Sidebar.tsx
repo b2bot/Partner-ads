@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Permission } from '@/types/auth';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   activeTab: string;
@@ -27,6 +27,8 @@ interface SidebarProps {
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { hasPermission, isRootAdmin, isCliente, profile } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');
@@ -54,7 +56,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     }
   };
 
-  const isItemActive = (itemTab: string) => activeTab === itemTab;
+  const isItemActive = (itemTab: string) => location.pathname.includes(itemTab);
 
   const mainMenuItems = [
     { 
@@ -93,6 +95,12 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       icon: Target,
       permission: 'access_paid_media' as Permission
     },
+    {
+      id: 'metricas',
+      label: 'Métricas',
+      icon: BarChart3,
+      permission: 'access_paid_media' as Permission
+    },
   ];
 
   const managementItems = [
@@ -127,7 +135,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       id: 'settings', 
       label: 'Configurações', 
       icon: Settings,
-      permission: null // Verificação especial para configurações
+      permission: null
     },
   ];
 
@@ -147,7 +155,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       .map((item) => (
         <div key={item.id} className="mb-1">
           <button
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => navigate(`/${item.id}`)}
             className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
               isItemActive(item.id) 
                 ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' 
@@ -178,7 +186,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
       {/* Navigation */}
       <div className="flex-1 p-4 space-y-6 overflow-y-auto">
-        {/* Principal */}
         <div>
           <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
             Principal
@@ -186,7 +193,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           {renderMenuItems(mainMenuItems)}
         </div>
 
-        {/* WhatsApp */}
         {whatsappItems.some(item => hasPermission(item.permission)) && (
           <div>
             <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
@@ -196,7 +202,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           </div>
         )}
 
-        {/* Mídia Paga */}
         {mediaItems.some(item => hasPermission(item.permission)) && (
           <div>
             <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
@@ -206,7 +211,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           </div>
         )}
 
-        {/* Gestão */}
         <div>
           <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
             Gestão
@@ -214,7 +218,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           {renderMenuItems(managementItems, true)}
         </div>
 
-        {/* Sistema */}
         <div>
           <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
             Sistema
