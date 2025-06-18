@@ -6,7 +6,6 @@ import { Dashboard } from '@/components/Dashboard';
 import { CampaignsTab } from '@/components/CampaignsTab';
 import { AdSetsTab } from '@/components/AdSetsTab';
 import { AdsTab } from '@/components/AdsTab';
-import { RelatoriosTab } from '@/components/RelatoriosTab';
 import { ResultadosTab } from '@/components/ResultadosTab';
 import { WhatsAppReportsTab } from '@/components/WhatsAppReportsTab';
 import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
@@ -17,51 +16,53 @@ import { ActivityLog } from '@/components/ActivityLog';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, LogOut } from 'lucide-react';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import Resultados from '@/pages/Resultados';
 
 interface IndexProps {
   initialTab?: string;
 }
 
 const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
-  console.log('🔄 Index component initializing...', { initialTab });
-  
   const location = useLocation();
-  const route = location.pathname.replace("/", "") || initialTab;
+  const route = location.pathname.replace('/', '') || initialTab;
+
   const [activeTab, setActiveTab] = useState(route);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
-  const [loadingTimeout, setLoadingTimeout] = useState(false);
-  
-  console.log('🔄 Index state:', { route, activeTab, viewMode });
-  
-  const authResult = useAuth();
-  console.log('🔄 Auth hook result:', authResult);
-  
-  // Safe destructuring with fallbacks
-  const {
-    isAdmin = false,
-    isRootAdmin = false,
-    isCliente = false,
-    hasPermission = () => false,
-    loading = true,
-    user = null,
-    error = null
-  } = authResult || {};
 
-  console.log('🔄 Auth values after destructuring:', {
+  const { isAdmin = false, isRootAdmin = false, isCliente = false, hasPermission = () => false, loading = true, user = null } = useAuth() || {};
+
+  useEffect(() => {
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          caches.delete(name);
+        });
+      });
+    }
+    localStorage.removeItem('react-query-cache');
+  }, []);
+
+  console.log('Index render - Auth state:', {
     isAdmin,
     isRootAdmin,
     isCliente,
     loading,
-    user: user ? 'present' : 'null',
-    hasPermission: typeof hasPermission,
-    error
+    hasPermission,
+    user,
+    hasAccessDashboard: hasPermission('access_dashboard'),
   });
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
@@ -71,7 +72,6 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     );
   }
 
-  // Se tem usuário mas não consegue acessar dashboard E não é cliente, mostrar interface de emergência
   if (user && !hasPermission('access_dashboard') && !isCliente && !isRootAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
