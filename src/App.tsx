@@ -1,15 +1,20 @@
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './App.css';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import MetricsObjectivesTab from '@/pages/MetricsObjectivesTab';
-import WhatsAppReportsTab from '@/pages/WhatsAppReportsTab';
-import Relatorios from '@/pages/Relatorios';
+import Relatorios from './pages/Relatorios';
 
-// Instância do QueryClient
-const queryClient = new QueryClient();
+// Instância do QueryClient com configurações básicas
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutos
+    },
+  },
+});
 
 function App() {
   return (
@@ -18,6 +23,7 @@ function App() {
         <div className="min-h-screen bg-background">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/relatorios" element={<Relatorios />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

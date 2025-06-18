@@ -1,270 +1,230 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { 
   BarChart3, 
   TrendingUp, 
   Users, 
-  DollarSign, 
-  Eye, 
-  MousePointer,
-  Download,
+  MousePointer, 
+  DollarSign,
   Calendar,
+  Download,
   Filter
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { DatePickerWithRange } from '@/components/ui/date-picker';
-import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
-import { ReportsCharts } from '@/components/reports/ReportsCharts';
-import { ReportsTable } from '@/components/reports/ReportsTable';
 
-interface Platform {
-  id: string;
-  name: string;
-  icon: React.ComponentType;
-  color: string;
-}
+const Relatorios = () => {
+  const [activeTab, setActiveTab] = useState('meta');
+  const [selectedPeriod, setSelectedPeriod] = useState('7d');
 
-const platforms: Platform[] = [
-  { id: 'meta', name: 'Meta', icon: BarChart3, color: 'bg-blue-500' },
-  { id: 'google', name: 'Google', icon: BarChart3, color: 'bg-red-500' },
-  { id: 'linkedin', name: 'LinkedIn', icon: BarChart3, color: 'bg-blue-600' },
-  { id: 'youtube', name: 'YouTube', icon: BarChart3, color: 'bg-red-600' },
-  { id: 'tiktok', name: 'TikTok', icon: BarChart3, color: 'bg-black' },
-  { id: 'analytics', name: 'Analytics', icon: BarChart3, color: 'bg-orange-500' },
-  { id: 'instagram', name: 'Instagram', icon: BarChart3, color: 'bg-pink-500' },
-  { id: 'b2bot', name: 'B2Bot', icon: BarChart3, color: 'bg-green-500' },
-  { id: 'relatorios', name: 'Relatórios Diários', icon: BarChart3, color: 'bg-purple-500' },
-];
+  const platforms = [
+    { id: 'meta', name: 'Meta', icon: '📘' },
+    { id: 'google', name: 'Google', icon: '🔍' },
+    { id: 'linkedin', name: 'LinkedIn', icon: '💼' },
+    { id: 'youtube', name: 'YouTube', icon: '📺' },
+    { id: 'tiktok', name: 'TikTok', icon: '🎵' },
+    { id: 'analytics', name: 'Analytics', icon: '📊' },
+    { id: 'instagram', name: 'Instagram', icon: '📷' },
+    { id: 'b2bot', name: 'B2Bot', icon: '🤖' },
+    { id: 'relatorios', name: 'Relatórios Diários', icon: '📈' }
+  ];
 
-function RelatoriosContent() {
-  const { hasPermission, isAdmin, isCliente } = useAuth();
-  const [selectedPlatform, setSelectedPlatform] = useState('meta');
-  const [selectedClient, setSelectedClient] = useState('');
-  const [dateRange, setDateRange] = useState({
-    from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    to: new Date()
-  });
-  const [filters, setFilters] = useState({
-    account: '',
-    campaign: '',
-    adset: '',
-    ad: ''
-  });
+  const mockMetrics = {
+    impressions: { value: 125430, change: 12.5 },
+    clicks: { value: 2430, change: -3.2 },
+    spend: { value: 1250.30, change: 8.7 },
+    conversions: { value: 45, change: 22.1 }
+  };
 
-  // Mock data query - substituir pela integração real com a API
-  const { data: reportData, isLoading } = useQuery({
-    queryKey: ['reports', selectedPlatform, selectedClient, dateRange, filters],
-    queryFn: async () => {
-      // Simular chamada para a API do Google Sheets
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return {
-        metrics: {
-          impressions: 1250000,
-          clicks: 45200,
-          spend: 15600.50,
-          conversions: 892,
-          ctr: 3.62,
-          cpc: 0.35,
-          cpm: 12.48
-        },
-        chartData: [
-          { date: '2024-01-01', impressions: 12000, clicks: 450, spend: 1200 },
-          { date: '2024-01-02', impressions: 15000, clicks: 520, spend: 1400 },
-          { date: '2024-01-03', impressions: 11000, clicks: 380, spend: 1100 },
-        ],
-        tableData: [
-          { 
-            campaign: 'Campanha Verão 2024', 
-            impressions: 125000, 
-            clicks: 4200, 
-            spend: 1560.50,
-            ctr: 3.36,
-            cpc: 0.37
-          },
-        ]
-      };
-    }
-  });
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  };
 
-  // Persistir filtros no localStorage
-  useEffect(() => {
-    const savedFilters = localStorage.getItem('reports-filters');
-    if (savedFilters) {
-      setFilters(JSON.parse(savedFilters));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('reports-filters', JSON.stringify(filters));
-  }, [filters]);
-
-  const isSpecialPlatform = selectedPlatform === 'relatorios';
+  const formatCurrency = (num: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(num);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="container mx-auto p-6 space-y-8">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
               Relatórios Personalizados
             </h1>
             <p className="text-slate-600 dark:text-slate-400 mt-2">
-              Visualize e analise suas métricas de campanhas e dados operacionais
+              Visualize suas métricas de campanhas e dados operacionais
             </p>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* Seletor de Cliente (apenas para admins) */}
-            {!isCliente && (
-              <Select value={selectedClient} onValueChange={setSelectedClient}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Selecionar Cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cliente1">Cliente A</SelectItem>
-                  <SelectItem value="cliente2">Cliente B</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Filtro de Data */}
-            <DatePickerWithRange
-              date={dateRange}
-              onDateChange={setDateRange}
-            />
-
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
+          
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Calendar className="w-4 h-4" />
+              Últimos 7 dias
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Filter className="w-4 h-4" />
+              Filtros
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Download className="w-4 h-4" />
               Exportar
             </Button>
           </div>
         </div>
 
-        {/* Navegação por Plataformas */}
-        <Card className="premium-card">
-          <CardContent className="p-4">
-            <Tabs value={selectedPlatform} onValueChange={setSelectedPlatform} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 gap-1">
-                {platforms.map((platform) => (
-                  <TabsTrigger
-                    key={platform.id}
-                    value={platform.id}
-                    className="flex items-center gap-2 text-xs lg:text-sm"
-                  >
-                    <div className={`w-2 h-2 rounded-full ${platform.color}`} />
-                    <span className="hidden sm:inline">{platform.name}</span>
-                    <span className="sm:hidden">{platform.name.slice(0, 3)}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </CardContent>
-        </Card>
+        {/* Platform Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-3 lg:grid-cols-9 w-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50">
+            {platforms.map((platform) => (
+              <TabsTrigger 
+                key={platform.id} 
+                value={platform.id}
+                className="flex flex-col items-center gap-1 p-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+              >
+                <span className="text-lg">{platform.icon}</span>
+                <span className="text-xs font-medium hidden sm:block">{platform.name}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        {/* Filtros Avançados */}
-        {!isSpecialPlatform && (
-          <Card className="premium-card">
-            <CardContent className="p-4">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <Select value={filters.account} onValueChange={(value) => setFilters(prev => ({ ...prev, account: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas as Contas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="conta1">Conta Principal</SelectItem>
-                    <SelectItem value="conta2">Conta Secundária</SelectItem>
-                  </SelectContent>
-                </Select>
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  Impressões
+                </CardTitle>
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  {formatNumber(mockMetrics.impressions.value)}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="h-3 w-3 text-green-500" />
+                  <span className="text-xs text-green-600 dark:text-green-400">
+                    +{mockMetrics.impressions.change}%
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">vs período anterior</span>
+                </div>
+              </CardContent>
+            </Card>
 
-                <Select value={filters.campaign} onValueChange={(value) => setFilters(prev => ({ ...prev, campaign: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas as Campanhas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="camp1">Campanha Verão</SelectItem>
-                    <SelectItem value="camp2">Campanha Inverno</SelectItem>
-                  </SelectContent>
-                </Select>
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  Cliques
+                </CardTitle>
+                <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                  <MousePointer className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  {formatNumber(mockMetrics.clicks.value)}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="h-3 w-3 text-red-500 rotate-180" />
+                  <span className="text-xs text-red-600 dark:text-red-400">
+                    {mockMetrics.clicks.change}%
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">vs período anterior</span>
+                </div>
+              </CardContent>
+            </Card>
 
-                <Select value={filters.adset} onValueChange={(value) => setFilters(prev => ({ ...prev, adset: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos os Grupos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="adset1">Grupo A</SelectItem>
-                    <SelectItem value="adset2">Grupo B</SelectItem>
-                  </SelectContent>
-                </Select>
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  Investimento
+                </CardTitle>
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                  <DollarSign className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  {formatCurrency(mockMetrics.spend.value)}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="h-3 w-3 text-green-500" />
+                  <span className="text-xs text-green-600 dark:text-green-400">
+                    +{mockMetrics.spend.change}%
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">vs período anterior</span>
+                </div>
+              </CardContent>
+            </Card>
 
-                <Select value={filters.ad} onValueChange={(value) => setFilters(prev => ({ ...prev, ad: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos os Anúncios" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ad1">Anúncio 1</SelectItem>
-                    <SelectItem value="ad2">Anúncio 2</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Conteúdo Principal */}
-        {isLoading ? (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <Card key={i} className="premium-card">
-                  <CardContent className="p-6">
-                    <Skeleton className="h-8 w-full mb-2" />
-                    <Skeleton className="h-4 w-20" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <Skeleton className="h-[400px] w-full rounded-xl" />
-            <Skeleton className="h-[300px] w-full rounded-xl" />
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  Conversões
+                </CardTitle>
+                <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                  <BarChart3 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  {mockMetrics.conversions.value}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="h-3 w-3 text-green-500" />
+                  <span className="text-xs text-green-600 dark:text-green-400">
+                    +{mockMetrics.conversions.change}%
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">vs período anterior</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Cards de Métricas */}
-            <ReportsMetricsCards 
-              data={reportData?.metrics} 
-              platform={selectedPlatform} 
-            />
 
-            {/* Gráficos */}
-            <ReportsCharts 
-              data={reportData?.chartData} 
-              platform={selectedPlatform} 
-            />
-
-            {/* Tabela Detalhada */}
-            <ReportsTable 
-              data={reportData?.tableData} 
-              platform={selectedPlatform} 
-            />
-          </div>
-        )}
+          {/* Tab Content */}
+          {platforms.map((platform) => (
+            <TabsContent key={platform.id} value={platform.id} className="mt-8">
+              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <span className="text-2xl">{platform.icon}</span>
+                    <span>Dados de {platform.name}</span>
+                    <Badge variant="outline" className="ml-auto">
+                      Em desenvolvimento
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12">
+                    <div className="mx-auto w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl flex items-center justify-center mb-4">
+                      <BarChart3 className="w-12 h-12 text-slate-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                      Dados de {platform.name}
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+                      Os dados desta plataforma serão carregados via API do Google Sheets.
+                      Interface completa em desenvolvimento.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </div>
   );
-}
+};
 
-export default function Relatorios() {
-  return (
-    <ProtectedRoute requiredPermission="access_client_reports">
-      <RelatoriosContent />
-    </ProtectedRoute>
-  );
-}
+export default Relatorios;
