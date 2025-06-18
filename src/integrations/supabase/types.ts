@@ -613,35 +613,6 @@ export type Database = {
         }
         Relationships: []
       }
-      settings: {
-        Row: {
-          client_id: string | null
-          created_at: string | null
-          data: Json | null
-          id: number
-        }
-        Insert: {
-          client_id?: string | null
-          created_at?: string | null
-          data?: Json | null
-          id?: never
-        }
-        Update: {
-          client_id?: string | null
-          created_at?: string | null
-          data?: Json | null
-          id?: never
-        }
-        Relationships: [
-          {
-            foreignKeyName: "settings_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clientes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       system_activity_logs: {
         Row: {
           acao: string
