@@ -94,7 +94,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
   }
 
   const renderContent = () => {
-	console.log('🔄 Rendering content for tab:', activeTab);
+  console.log('🔄 Rendering content for tab:', activeTab);
     switch (activeTab) {
       case 'dashboard':
         return (
@@ -184,22 +184,10 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
           </div>
         );
     }
-  } catch (error) {
-      console.error('🔥 Error rendering content:', error);
-      return (
-        <div className={`text-center py-16 ${contentClasses}`}>
-          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
-            <span className="text-white font-bold text-xl">⚠️</span>
-          </div>
-          <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Erro de Renderização</h2>
-          <p className="text-slate-500 dark:text-slate-400">Ocorreu um erro ao carregar o conteúdo.</p>
-        </div>
-      );
-    }
   };
 
   const getPageTitle = () => {
-	console.log('🔄 Getting page title for:', activeTab);  
+  console.log('🔄 Getting page title for:', activeTab);  
     const titles: Record<string, string> = {
       'dashboard': 'Dashboard',
       'campaigns': 'Campanhas',
@@ -223,15 +211,15 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
   
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         {/* Botão de logout de emergência - sempre visível se há usuário */}
-        {user && <EmergencyLogout />}
+        {/* {user && <EmergencyLogout />} */}
         
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
-          <div className="border-b bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+          <div className="border-b border-slate-200/60 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm shadow-sm">
             <div className="flex items-center justify-between">
               {showHeaderControls ? (
                 <div className="flex-1">
@@ -242,25 +230,25 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
                   />
                 </div>
               ) : (
-                <div className="container-responsive py-3 flex items-center justify-between w-full">
-                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className="container-responsive py-6 flex items-center justify-between w-full">
+                  <div className="flex items-center gap-6 min-w-0 flex-1">
                     <div className="min-w-0">
-                      <h1 className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent truncate">
                         {getPageTitle()}
                       </h1>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      <p className="text-sm text-slate-500 dark:text-slate-400 truncate font-medium">
                         {isCliente ? 'Área do Cliente' : 'Área Administrativa'}
                       </p>
                     </div>
                   </div>
                   {/* Show appropriate menu based on user type */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {isCliente ? <ClientGreeting /> : <UserMenu />}
                   </div>
                 </div>
               )}
               {showHeaderControls && (
-                <div className="pr-4">
+                <div className="pr-6">
                   <UserMenu />
                 </div>
               )}
@@ -268,17 +256,15 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
           </div>
 
           {/* Main Content */}
-            <main className="flex-1 overflow-auto">
-              <div className="container-responsive py-8">
-                {renderContent()}
-              </div>
-            </main>
-          </div>
+          <main className="flex-1 overflow-auto">
+            <div className="container-responsive py-8">
+              {renderContent()}
+            </div>
+          </main>
         </div>
-      </SidebarProvider>
-    );
-  } 
+      </div>
+    </SidebarProvider>
+  );
 };
-
 
 export default Index;
