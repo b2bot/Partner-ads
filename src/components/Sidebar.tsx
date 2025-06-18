@@ -67,7 +67,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     },
     { 
       id: 'relatorios', 
-      label: 'Relatórios Personalizados', 
+      label: 'Relatórios', 
       icon: FileText,
       permission: 'access_client_reports' as Permission
     },
