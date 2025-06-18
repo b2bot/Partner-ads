@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +15,7 @@ import { DatePickerWithRange } from '@/components/ui/date-picker';
 import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
 import { ReportsCharts } from '@/components/reports/ReportsCharts';
 import { ReportsTable } from '@/components/reports/ReportsTable';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 interface Platform {
   id: string;
@@ -53,6 +55,36 @@ function RelatoriosContent() {
     queryKey: ['reports', selectedPlatform, selectedClient, dateRange, filters],
     queryFn: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (selectedPlatform === 'relatorios') {
+        return {
+          metrics: {
+            contatos: 1250,
+            agendado: 892,
+            atendimento: 654,
+            vendas: 234,
+            orcamentos: 456,
+            faturado: 125600.50
+          },
+          chartData: [
+            { date: '2024-01-01', contatos: 120, agendado: 85, atendimento: 65, vendas: 25 },
+            { date: '2024-01-02', contatos: 150, agendado: 102, atendimento: 78, vendas: 28 },
+            { date: '2024-01-03', contatos: 110, agendado: 75, atendimento: 58, vendas: 22 },
+          ],
+          tableData: [
+            { 
+              data: '2024-01-01', 
+              responsavel: 'João Silva',
+              contatos: 120, 
+              agendado: 85, 
+              atendimento: 65,
+              vendas: 25,
+              orcamentos: 35
+            },
+          ]
+        };
+      }
+      
       return {
         metrics: {
           impressions: 1250000,
@@ -244,4 +276,3 @@ export default function Relatorios() {
     </ProtectedRoute>
   );
 }
-

@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './App.css';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
+import Relatorios from './pages/Relatorios';
 
 // Instância do QueryClient com configurações básicas
 const queryClient = new QueryClient({
@@ -22,6 +23,7 @@ function App() {
         <div className="min-h-screen bg-background">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/relatorios" element={<Relatorios />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
