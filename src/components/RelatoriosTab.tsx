@@ -1,205 +1,264 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Download, RefreshCw } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
-import type { DateRange } from '@/types/sheets';
 
-interface ReportData {
-  date: string;
-  impressions: number;
-  clicks: number;
-  cost: number;
-  conversions: number;
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Users, 
+  DollarSign, 
+  Eye, 
+  MousePointer,
+  Download,
+  Calendar,
+  Filter
+} from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { DatePickerWithRange } from '@/components/ui/date-picker';
+import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
+import { ReportsCharts } from '@/components/reports/ReportsCharts';
+import { ReportsTable } from '@/components/reports/ReportsTable';
+
+interface Platform {
+  id: string;
+  name: string;
+  icon: React.ComponentType;
+  color: string;
 }
 
-const initialData: ReportData[] = [
-  { date: '2024-01-01', impressions: 1000, clicks: 100, cost: 20, conversions: 10 },
-  { date: '2024-01-02', impressions: 1200, clicks: 120, cost: 25, conversions: 12 },
-  { date: '2024-01-03', impressions: 1500, clicks: 150, cost: 30, conversions: 15 },
+const platforms: Platform[] = [
+  { id: 'meta', name: 'Meta', icon: BarChart3, color: 'bg-blue-500' },
+  { id: 'google', name: 'Google', icon: BarChart3, color: 'bg-red-500' },
+  { id: 'linkedin', name: 'LinkedIn', icon: BarChart3, color: 'bg-blue-600' },
+  { id: 'youtube', name: 'YouTube', icon: BarChart3, color: 'bg-red-600' },
+  { id: 'tiktok', name: 'TikTok', icon: BarChart3, color: 'bg-black' },
+  { id: 'analytics', name: 'Analytics', icon: BarChart3, color: 'bg-orange-500' },
+  { id: 'instagram', name: 'Instagram', icon: BarChart3, color: 'bg-pink-500' },
+  { id: 'b2bot', name: 'B2Bot', icon: BarChart3, color: 'bg-green-500' },
+  { id: 'relatorios', name: 'Relatórios Diários', icon: BarChart3, color: 'bg-purple-500' },
 ];
 
-  const [data, setData] = useState<ReportData[]>(initialData);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
-    from: new Date(new Date().setDate(new Date().getDate() - 30)),
-    to: new Date(),
+function RelatoriosContent() {
+  const { hasPermission, isAdmin, isCliente } = useAuth();
+  const [selectedPlatform, setSelectedPlatform] = useState('meta');
+  const [selectedClient, setSelectedClient] = useState('');
+  const [dateRange, setDateRange] = useState({
+    from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    to: new Date()
   });
-  const { user, profile } = useAuth();
+  const [filters, setFilters] = useState({
+    account: '',
+    campaign: '',
+    adset: '',
+    ad: ''
+  });
 
+  // Mock data query - substituir pela integração real com a API
+  const { data: reportData, isLoading } = useQuery({
+    queryKey: ['reports', selectedPlatform, selectedClient, dateRange, filters],
+    queryFn: async () => {
+      // Simular chamada para a API do Google Sheets
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return {
+        metrics: {
+          impressions: 1250000,
+          clicks: 45200,
+          spend: 15600.50,
+          conversions: 892,
+          ctr: 3.62,
+          cpc: 0.35,
+          cpm: 12.48
+        },
+        chartData: [
+          { date: '2024-01-01', impressions: 12000, clicks: 450, spend: 1200 },
+          { date: '2024-01-02', impressions: 15000, clicks: 520, spend: 1400 },
+          { date: '2024-01-03', impressions: 11000, clicks: 380, spend: 1100 },
+        ],
+        tableData: [
+          { 
+            campaign: 'Campanha Verão 2024', 
+            impressions: 125000, 
+            clicks: 4200, 
+            spend: 1560.50,
+            ctr: 3.36,
+            cpc: 0.37
+          },
+        ]
+      };
+    }
+  });
+
+  // Persistir filtros no localStorage
   useEffect(() => {
-    // Simulação de carregamento de dados
-    setLoading(true);
-    setTimeout(() => {
-      setData(initialData);
-      setLoading(false);
-    }, 1000);
+    const savedFilters = localStorage.getItem('reports-filters');
+    if (savedFilters) {
+      setFilters(JSON.parse(savedFilters));
+    }
   }, []);
 
-  const handleRefreshData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setData(initialData);
-      setLoading(false);
-      toast.success('Relatórios atualizados com sucesso!');
-    }, 1000);
-  };
+  useEffect(() => {
+    localStorage.setItem('reports-filters', JSON.stringify(filters));
+  }, [filters]);
 
-  const handleDownloadReport = () => {
-    toast.info('Download do relatório iniciado...');
-    // Lógica real de download aqui
-  };
-
-  const handleDateRangeChange = (range: DateRange) => {
-    if (range?.from) {
-      setDateRange({
-        from: range.from,
-        to: range.to || range.from
-      });
-    }
-  };
+  const isSpecialPlatform = selectedPlatform === 'relatorios';
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-            Relatórios
-          </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Acompanhe os resultados das suas campanhas
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefreshData}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Atualizando...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Atualizar
-              </>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      <div className="container mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
+              Relatórios Personalizados
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">
+              Visualize e analise suas métricas de campanhas e dados operacionais
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Seletor de Cliente (apenas para admins) */}
+            {!isCliente && (
+              <Select value={selectedClient} onValueChange={setSelectedClient}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Selecionar Cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cliente1">Cliente A</SelectItem>
+                  <SelectItem value="cliente2">Cliente B</SelectItem>
+                </SelectContent>
+              </Select>
             )}
-          </Button>
-          <Button size="sm" onClick={handleDownloadReport}>
-            <Download className="mr-2 h-4 w-4" />
-            Download
-          </Button>
-        </div>
-      </div>
 
-      <div className="flex items-center gap-4">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[280px] justify-start text-left font-normal",
-                !dateRange && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {dateRange?.from ? (
-                dateRange.to ? (
-                  <>
-                    {format(dateRange.from, "LLL dd, y")} -{" "}
-                    {format(dateRange.to, "LLL dd, y")}
-                  </>
-                ) : (
-                  format(dateRange.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Selecionar período</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              initialFocus
-              mode="range"
-              defaultMonth={dateRange?.from}
-              selected={{ from: dateRange.from, to: dateRange.to }}
-              onSelect={handleDateRangeChange}
-              numberOfMonths={2}
+            {/* Filtro de Data */}
+            <DatePickerWithRange
+              date={dateRange}
+              onDateChange={setDateRange}
             />
-          </PopoverContent>
-        </Popover>
 
-        {error && (
-          <Badge variant="destructive">
-            Erro ao carregar os dados: {error}
-          </Badge>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </Button>
+          </div>
+        </div>
+
+        {/* Navegação por Plataformas */}
+        <Card className="premium-card">
+          <CardContent className="p-4">
+            <Tabs value={selectedPlatform} onValueChange={setSelectedPlatform} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 gap-1">
+                {platforms.map((platform) => (
+                  <TabsTrigger
+                    key={platform.id}
+                    value={platform.id}
+                    className="flex items-center gap-2 text-xs lg:text-sm"
+                  >
+                    <div className={`w-2 h-2 rounded-full ${platform.color}`} />
+                    <span className="hidden sm:inline">{platform.name}</span>
+                    <span className="sm:hidden">{platform.name.slice(0, 3)}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        {/* Filtros Avançados */}
+        {!isSpecialPlatform && (
+          <Card className="premium-card">
+            <CardContent className="p-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <Select value={filters.account} onValueChange={(value) => setFilters(prev => ({ ...prev, account: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas as Contas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="conta1">Conta Principal</SelectItem>
+                    <SelectItem value="conta2">Conta Secundária</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={filters.campaign} onValueChange={(value) => setFilters(prev => ({ ...prev, campaign: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas as Campanhas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="camp1">Campanha Verão</SelectItem>
+                    <SelectItem value="camp2">Campanha Inverno</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={filters.adset} onValueChange={(value) => setFilters(prev => ({ ...prev, adset: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos os Grupos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="adset1">Grupo A</SelectItem>
+                    <SelectItem value="adset2">Grupo B</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={filters.ad} onValueChange={(value) => setFilters(prev => ({ ...prev, ad: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos os Anúncios" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ad1">Anúncio 1</SelectItem>
+                    <SelectItem value="ad2">Anúncio 2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
         )}
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Impressões</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.reduce((acc, item) => acc + item.impressions, 0)}</div>
-            <div className="text-sm text-slate-500 dark:text-slate-400">
-              Total de impressões
+        {/* Conteúdo Principal */}
+        {isLoading ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <Card key={i} className="premium-card">
+                  <CardContent className="p-6">
+                    <Skeleton className="h-8 w-full mb-2" />
+                    <Skeleton className="h-4 w-20" />
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+            <Skeleton className="h-[400px] w-full rounded-xl" />
+            <Skeleton className="h-[300px] w-full rounded-xl" />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Cards de Métricas */}
+            <ReportsMetricsCards 
+              data={reportData?.metrics} 
+              platform={selectedPlatform} 
+            />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Cliques</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.reduce((acc, item) => acc + item.clicks, 0)}</div>
-            <div className="text-sm text-slate-500 dark:text-slate-400">
-              Total de cliques
-            </div>
-          </CardContent>
-        </Card>
+            {/* Gráficos */}
+            <ReportsCharts 
+              data={reportData?.chartData} 
+              platform={selectedPlatform} 
+            />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Custo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              R$ {data.reduce((acc, item) => acc + item.cost, 0).toFixed(2)}
-            </div>
-            <div className="text-sm text-slate-500 dark:text-slate-400">
-              Custo total
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Conversões</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.reduce((acc, item) => acc + item.conversions, 0)}</div>
-            <div className="text-sm text-slate-500 dark:text-slate-400">
-              Total de conversões
-            </div>
-          </CardContent>
-        </Card>
+            {/* Tabela Detalhada */}
+            <ReportsTable 
+              data={reportData?.tableData} 
+              platform={selectedPlatform} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export function RelatoriosTab
+export const RelatoriosTab = RelatoriosContent;
