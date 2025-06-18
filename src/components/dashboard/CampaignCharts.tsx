@@ -229,4 +229,4 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
   );
 };
 
-export default CampaignCharts;
+export default CampaignChartsX;
