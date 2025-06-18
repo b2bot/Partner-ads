@@ -25,7 +25,6 @@ const initialData: ReportData[] = [
   { date: '2024-01-03', impressions: 1500, clicks: 150, cost: 30, conversions: 15 },
 ];
 
-export function RelatoriosTab() {
   const [data, setData] = useState<ReportData[]>(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -202,3 +201,5 @@ export function RelatoriosTab() {
     </div>
   );
 }
+
+export function RelatoriosTab
