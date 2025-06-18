@@ -210,9 +210,9 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       {/* Navigation */}
       <div className="flex-1 p-6 space-y-8 overflow-y-auto custom-scrollbar">
         <div>
-         {/* <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 px-2">
-            Principal
-          </h3> */}
+          <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 px-2">
+            
+          </h3>
           <div className="space-y-1">
             {renderMenuItems(mainMenuItems)}
           </div>
