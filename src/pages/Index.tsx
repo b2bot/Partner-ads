@@ -63,15 +63,15 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center gradient-surface">
-        <div className="flex flex-col items-center space-y-8 animate-fade-in">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="flex flex-col items-center space-y-6">
           <div className="relative">
-            <div className="animate-spin rounded-full h-20 w-20 border-4 border-blue-200 border-t-blue-600 shadow-xl"></div>
-            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-400/20 via-purple-400/20 to-indigo-400/20"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600"></div>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-400/20 to-purple-400/20"></div>
           </div>
-          <div className="text-center premium-card p-8">
-            <h3 className="text-heading-4 text-slate-700 dark:text-slate-300 mb-2">Carregando...</h3>
-            <p className="text-body-small text-slate-500 dark:text-slate-400">Preparando sua experiência premium</p>
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300">Carregando...</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Preparando sua experiência</p>
           </div>
         </div>
         {/* {user && <EmergencyLogout />} */}
@@ -83,15 +83,13 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
   if (user && !hasPermission('access_dashboard') && !isCliente && !isRootAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-red-50 to-orange-50 dark:from-slate-900 dark:via-red-900/20 dark:to-orange-900/20">
-        <div className="text-center space-y-8 premium-card p-12 max-w-md animate-scale-in">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl">
-            <span className="text-white font-bold text-2xl">!</span>
+        <div className="text-center space-y-6 p-8 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-2xl border border-slate-200/60 dark:border-slate-700/60">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-xl">!</span>
           </div>
           <div>
-            <h1 className="text-heading-3 text-slate-800 dark:text-slate-200 mb-4">Sistema Bloqueado</h1>
-            <p className="text-body text-slate-600 dark:text-slate-400 leading-relaxed">
-              Usuário sem permissões adequadas. Entre em contato com o administrador para obter acesso.
-            </p>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">Sistema Bloqueado</h1>
+            <p className="text-slate-600 dark:text-slate-400">Usuário sem permissões. Use o botão de emergência para resetar.</p>
           </div>
           {/* <EmergencyLogout /> */}
         </div>
@@ -100,15 +98,15 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
   }
 
   const renderContent = () => {
-    const contentClasses = "premium-card p-10 animate-fade-in";
+    const contentClasses = "bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-xl p-8";
     
     switch (activeTab) {
       case 'dashboard':
         return (
-          <div className={`space-y-10 ${contentClasses}`}>
+          <div className={`space-y-8 ${contentClasses}`}>
             <Dashboard />
             {hasPermission('view_system_logs') && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-10">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
                 <div className="lg:col-span-2">
                   <ActivityLog />
                 </div>
@@ -122,12 +120,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <CampaignsTab />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Campanhas.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Campanhas.</p>
           </div>
         );
       case 'adsets':
@@ -136,12 +134,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <AdSetsTab />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Conjuntos de Anúncios.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Conjuntos de Anúncios.</p>
           </div>
         );
       case 'ads':
@@ -150,12 +148,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <AdsTab />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Anúncios.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Anúncios.</p>
           </div>
         );
       case 'resultados':
@@ -164,12 +162,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <ResultadosTab />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Métricas.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Métricas.</p>
           </div>
         );
       case 'whatsapp-reports':
@@ -178,12 +176,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <WhatsAppReportsTab />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Relatórios WhatsApp.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Relatórios WhatsApp.</p>
           </div>
         );
       case 'metrics-objectives':
@@ -192,12 +190,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <MetricsObjectivesTab />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Métricas.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Métricas.</p>
           </div>
         );
       case 'tickets':
@@ -218,12 +216,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <ActivityLog />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para ver logs do sistema.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para ver logs do sistema.</p>
           </div>
         );
       case 'settings':
@@ -232,12 +230,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <SettingsTab />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">×</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">×</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Configurações.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Configurações.</p>
           </div>
         );
       default:
@@ -246,12 +244,12 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <Dashboard />
           </div>
         ) : (
-          <div className={`text-center py-20 ${contentClasses}`}>
-            <div className="w-20 h-20 mx-auto gradient-primary rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-              <span className="text-white font-bold text-2xl">👋</span>
+          <div className={`text-center py-16 ${contentClasses}`}>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-xl">👋</span>
             </div>
-            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Bem-vindo!</h2>
-            <p className="text-body text-slate-500 dark:text-slate-400">Entre em contato com o administrador para obter acesso.</p>
+            <h2 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">Bem-vindo!</h2>
+            <p className="text-slate-500 dark:text-slate-400">Entre em contato com o administrador para obter acesso.</p>
           </div>
         );
     }
@@ -278,7 +276,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full gradient-surface">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         {/* Botão de logout de emergência - sempre visível se há usuário */}
         {/* {user && <EmergencyLogout />} */}
         
@@ -286,7 +284,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
-          <div className="premium-header border-b border-slate-200/60 dark:border-slate-700/60 shadow-sm">
+          <div className="border-b border-slate-200/60 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm shadow-sm">
             <div className="flex items-center justify-between">
               {showHeaderControls ? (
                 <div className="flex-1">
@@ -297,25 +295,25 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
                   />
                 </div>
               ) : (
-                <div className="premium-container py-8 flex items-center justify-between w-full">
-                  <div className="flex items-center gap-8 min-w-0 flex-1">
+                <div className="container-responsive py-6 flex items-center justify-between w-full">
+                  <div className="flex items-center gap-6 min-w-0 flex-1">
                     <div className="min-w-0">
-                      <h1 className="text-heading-3 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 dark:from-slate-200 dark:via-slate-300 dark:to-slate-400 bg-clip-text text-transparent truncate">
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent truncate">
                         {getPageTitle()}
                       </h1>
-                      <p className="text-body-small text-slate-500 dark:text-slate-400 truncate font-semibold mt-1">
+                      <p className="text-sm text-slate-500 dark:text-slate-400 truncate font-medium">
                         {isCliente ? 'Área do Cliente' : 'Área Administrativa'}
                       </p>
                     </div>
                   </div>
                   {/* Show appropriate menu based on user type */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     {isCliente ? <ClientGreeting /> : <UserMenu />}
                   </div>
                 </div>
               )}
               {showHeaderControls && (
-                <div className="pr-8">
+                <div className="pr-6">
                   <UserMenu />
                 </div>
               )}
@@ -324,7 +322,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
 
           {/* Main Content */}
           <main className="flex-1 overflow-auto">
-            <div className="premium-container py-10">
+            <div className="container-responsive py-8">
               {renderContent()}
             </div>
           </main>
