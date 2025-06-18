@@ -19,6 +19,7 @@ import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, LogOut } from 'lucide-react';
+import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -60,7 +61,28 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     hasPermission: typeof hasPermission,
     error
   });
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        {user && <EmergencyLogout />}
+      </div>
+    );
+  }
 
+  // Se tem usuário mas não consegue acessar dashboard E não é cliente, mostrar interface de emergência
+  if (user && !hasPermission('access_dashboard') && !isCliente && !isRootAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-slate-800">Sistema Bloqueado</h1>
+          <p className="text-slate-600">Usuário sem permissões. Use o botão de emergência para resetar.</p>
+          <EmergencyLogout />
+        </div>
+      </div>
+    );
+  }
   // Timeout para mostrar interface de emergência se loading demorar muito
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -420,6 +442,9 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     return (
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+          {/* Botão de logout de emergência - sempre visível se há usuário */}
+          {user && <EmergencyLogout />}
+          
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           
           <div className="flex-1 flex flex-col min-w-0">
