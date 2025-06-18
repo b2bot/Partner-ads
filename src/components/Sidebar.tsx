@@ -218,10 +218,19 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           </div>
         </div>
 
+        <div>
+          <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 px-2">
+      
+          </h3>
+          <div className="space-y-1">
+            {renderMenuItems(managementItems, true)}
+          </div>
+        </div> 
+
         {whatsappItems.some(item => hasPermission(item.permission)) && (
           <div>
             <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 px-2">
-              WhatsApp
+              
             </h3>
             <div className="space-y-1">
               {renderMenuItems(whatsappItems)}
@@ -240,19 +249,14 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           </div>
         )}
 
-        <div>
-          <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 px-2">
-            Gestão
-          </h3>
-          <div className="space-y-1">
-            {renderMenuItems(managementItems, true)}
-          </div>
-        </div>
 
         <div>
           <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 px-2">
-            Sistema
+      
           </h3>
+          <div className="space-y-1">
+              {renderMenuItems(whatsappItems)}
+            </div>
           <div className="space-y-1">
             {renderMenuItems(systemItems)}
           </div>
