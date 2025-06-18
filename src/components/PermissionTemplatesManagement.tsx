@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -100,8 +99,7 @@ const PERMISSION_LABELS: Record<PermissionType, string> = {
   'manage_variables_and_pre_configurations': 'Gerenciar variáveis e pré-configurações',
   'view_billing_settings': '⚠️ Visualizar configurações de faturamento',
   'view_system_logs': '⚠️ Visualizar logs do sistema',
-  'access_client_reports: "Acessar relatórios do cliente'
-  
+  'access_client_reports': 'Acessar relatórios do cliente'
 };
 
 export function PermissionTemplatesManagement() {
