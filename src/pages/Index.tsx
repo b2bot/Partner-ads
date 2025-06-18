@@ -17,7 +17,10 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import Resultados from '@/pages/Resultados';
 
 interface IndexProps {
@@ -30,9 +33,19 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
 
   const [activeTab, setActiveTab] = useState(route);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
 
-  const { isAdmin = false, isRootAdmin = false, isCliente = false, hasPermission = () => false, loading = true, user = null } = useAuth() || {};
+  const { 
+    isAdmin = false, 
+    isRootAdmin = false, 
+    isCliente = false, 
+    hasPermission = () => false, 
+    loading = true, 
+    user = null,
+    error = null
+  } = useAuth() || {};
 
+  // Theme effect
   useEffect(() => {
     const theme = localStorage.getItem('theme');
     if (theme === 'dark') {
@@ -42,6 +55,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     }
   }, []);
 
+  // Cache cleanup effect
   useEffect(() => {
     if ('caches' in window) {
       caches.keys().then(names => {
@@ -53,37 +67,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     localStorage.removeItem('react-query-cache');
   }, []);
 
-  console.log('Index render - Auth state:', {
-    isAdmin,
-    isRootAdmin,
-    isCliente,
-    loading,
-    hasPermission,
-    user,
-    hasAccessDashboard: hasPermission('access_dashboard'),
-  });
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-        {user && <EmergencyLogout />}
-      </div>
-    );
-  }
-
-  if (user && !hasPermission('access_dashboard') && !isCliente && !isRootAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-slate-800">Sistema Bloqueado</h1>
-          <p className="text-slate-600">Usuário sem permissões. Use o botão de emergência para resetar.</p>
-          <EmergencyLogout />
-        </div>
-      </div>
-    );
-  }
-  // Timeout para mostrar interface de emergência se loading demorar muito
+  // Timeout effect for loading
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (loading) {
@@ -99,15 +83,17 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     return () => clearTimeout(timeout);
   }, [loading]);
 
-  useEffect(() => {
-    console.log('🔄 Theme effect running...');
-    const theme = localStorage.getItem('theme');
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
+  console.log('Index render - Auth state:', {
+    isAdmin,
+    isRootAdmin,
+    isCliente,
+    loading,
+    hasPermission,
+    user,
+    error,
+    loadingTimeout,
+    hasAccessDashboard: hasPermission('access_dashboard')
+  });
 
   const handleEmergencyLogout = async () => {
     try {
@@ -125,18 +111,6 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     localStorage.clear();
     window.location.reload();
   };
-
-  console.log('Index render - Auth state:', {
-    isAdmin,
-    isRootAdmin,
-    isCliente,
-    loading,
-    hasPermission,
-    user,
-    error,
-    loadingTimeout,
-    hasAccessDashboard: hasPermission('access_dashboard')
-  });
 
   // Interface de Emergência - se loading demorar muito ou houver erro
   if ((loading && loadingTimeout) || error) {
@@ -204,6 +178,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <p className="text-sm text-slate-500 dark:text-slate-400">Preparando sua experiência</p>
           </div>
         </div>
+        {user && <EmergencyLogout />}
       </div>
     );
   }
