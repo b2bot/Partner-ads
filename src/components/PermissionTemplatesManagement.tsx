@@ -49,6 +49,7 @@ const PERMISSION_GROUPS = {
   ],
   'Relatórios': [
     'access_reports',
+    'access_client_reports',
     'create_automatic_reports'
   ],
   'Configurações': [
@@ -98,7 +99,9 @@ const PERMISSION_LABELS: Record<PermissionType, string> = {
   'manage_external_integrations': 'Gerenciar integrações externas',
   'manage_variables_and_pre_configurations': 'Gerenciar variáveis e pré-configurações',
   'view_billing_settings': '⚠️ Visualizar configurações de faturamento',
-  'view_system_logs': '⚠️ Visualizar logs do sistema'
+  'view_system_logs': '⚠️ Visualizar logs do sistema',
+  'access_client_reports: "Acessar relatórios do cliente'
+  
 };
 
 export function PermissionTemplatesManagement() {
