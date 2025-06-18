@@ -12,7 +12,6 @@ export interface UserProfile {
 
 export type Permission = 
   | 'access_dashboard'
-  | 'access_resultados'
   | 'access_whatsapp'
   | 'create_campaigns'
   | 'edit_campaigns'
@@ -49,7 +48,6 @@ export type Permission =
 
 export const ALL_PERMISSIONS: Permission[] = [
   'access_dashboard',
-  'access_resultados',
   'access_whatsapp',
   'create_campaigns',
   'edit_campaigns',

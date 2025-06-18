@@ -48,17 +48,17 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
   console.log('Header render - isCliente:', isCliente, 'isAdmin:', isAdmin);
 
   return (
-    <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
-      <div className="container-responsive py-2">
-        <div className="flex items-center justify-between gap-4">
+    <header className="premium-header">
+      <div className="premium-container py-4">
+        <div className="flex items-center justify-between gap-6">
           {/* Left side - Title and Trigger */}
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
             <SidebarTrigger className="lg:hidden" />
             <div className="min-w-0 flex-1">
-              <h1 className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+              <h1 className="text-heading-4 text-slate-800 dark:text-slate-200 truncate">
                 {getTabTitle()}
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+              <p className="text-caption text-slate-500 dark:text-slate-400 truncate">
                 {isCliente ? 'Área do Cliente' : 'Gerencie suas campanhas do Facebook Ads'}
               </p>
             </div>
@@ -66,27 +66,27 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
 
           {/* Center - Global Search (only for admin) */}
           {isAdmin && !isCliente && (
-            <div className="hidden lg:flex flex-1 justify-center max-w-sm">
+            <div className="hidden lg:flex flex-1 justify-center max-w-md">
               <GlobalSearch />
             </div>
           )}
 
           {/* Right side - Controls */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-3 flex-shrink-0">
             {/* Client greeting and logout - Always show for clients */}
             {isCliente && <ClientGreeting />}
             
             {/* Admin controls - Only show for admins */}
             {isAdmin && !isCliente && activeTab !== 'settings' && activeTab !== 'whatsapp-reports' && activeTab !== 'metrics-objectives' && (
               <>
-                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
-                  <RefreshCw className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline text-xs">Atualizar</span>
+                <Button variant="outline" size="sm" className="premium-button hidden md:flex text-xs h-9 px-4 font-semibold">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  <span className="hidden lg:inline">Atualizar</span>
                 </Button>
                 
-                <Button variant="outline" size="sm" className="hidden md:flex text-xs h-7 px-2">
-                  <Download className="w-3 h-3 mr-1" />
-                  <span className="hidden lg:inline text-xs">Exportar</span>
+                <Button variant="outline" size="sm" className="premium-button hidden md:flex text-xs h-9 px-4 font-semibold">
+                  <Download className="w-4 h-4 mr-2" />
+                  <span className="hidden lg:inline">Exportar</span>
                 </Button>
               </>
             )}
@@ -95,7 +95,7 @@ export function Header({ activeTab, viewMode, setViewMode }: HeaderProps) {
 
         {/* Mobile search - Only for admin */}
         {isAdmin && !isCliente && (
-          <div className="lg:hidden mt-2">
+          <div className="lg:hidden mt-4">
             <GlobalSearch />
           </div>
         )}
