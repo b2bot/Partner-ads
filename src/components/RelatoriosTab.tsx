@@ -266,7 +266,8 @@ function RelatoriosContent() {
         </div>
       )}
     </div>
+
+    export const RelatoriosTab = RelatoriosContent;
   );
 }
 
-export const RelatoriosTab = RelatoriosContent;
