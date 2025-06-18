@@ -36,7 +36,7 @@ const platforms: Platform[] = [
   { id: 'relatorios', name: 'Relatórios Diários', icon: BarChart3, color: 'bg-purple-500' },
 ];
 
-function RelatoriosContent() {
+export function RelatoriosTab() {
   const { hasPermission, isAdmin, isCliente } = useAuth();
   const [selectedPlatform, setSelectedPlatform] = useState('meta');
   const [selectedClient, setSelectedClient] = useState('');
@@ -269,11 +269,4 @@ function RelatoriosContent() {
   );
 }
 
-export default function RelatoriosTab() {
-  return (
-    <ProtectedRoute requiredPermission="access_client_reports">
-      <RelatoriosContent />
-    </ProtectedRoute>
-  );
-}
 
