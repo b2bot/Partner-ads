@@ -277,21 +277,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
         </div>
       </SidebarProvider>
     );
-  } catch (error) {
-    console.error('🔥 Critical error in Index component:', error);
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-red-50 dark:bg-red-900/20">
-        <div className="text-center space-y-4 p-8">
-          <h1 className="text-2xl font-bold text-red-600">Erro Crítico</h1>
-          <p className="text-red-500">Ocorreu um erro na aplicação. Verifique o console para mais detalhes.</p>
-          <Button onClick={handleForceReload} variant="destructive">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Recarregar Aplicação
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  } 
 };
 
 
