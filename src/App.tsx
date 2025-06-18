@@ -1,35 +1,23 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthWrapper } from "@/components/AuthWrapper";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import { FiltersProvider } from "@/hooks/dashboard_hooks/useFilters";
-import { SettingsProvider } from "@/hooks/dashboard_hooks/useSettings";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
+import Index from './pages/Index';
+import NotFound from './pages/NotFound';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import MetricsObjectivesTab from '@/pages/MetricsObjectivesTab';
+import WhatsAppReportsTab from '@/pages/WhatsAppReportsTab';
+import Relatorios from '@/pages/Relatorios';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthWrapper>
-          <FiltersProvider>
-            <SettingsProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </SettingsProvider>
-          </FiltersProvider>
-        </AuthWrapper>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen bg-background">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/relatorios" element={<Relatorios />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
 
 export default App;

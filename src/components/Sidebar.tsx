@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
@@ -65,6 +64,12 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       label: 'Dashboard', 
       icon: BarChart3,
       permission: 'access_dashboard' as Permission
+    },
+    { 
+      id: 'relatorios', 
+      label: 'Relatórios Personalizados', 
+      icon: FileText,
+      permission: 'access_client_reports' as Permission
     },
   ];
 
