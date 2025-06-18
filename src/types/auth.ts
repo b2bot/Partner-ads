@@ -1,3 +1,4 @@
+
 export type Role = 'admin' | 'cliente';
 
 export type Permission =
@@ -7,6 +8,7 @@ export type Permission =
   | 'access_calls'
   | 'access_creatives'
   | 'access_tasks'
+  | 'access_reports'
   | 'access_client_reports'
   | 'view_metrics'
   | 'view_system_logs'
@@ -25,8 +27,7 @@ export type Permission =
   | 'delete_ads'
   | 'export_data'
   | 'manage_creatives_approval'
-  | 'manage_tickets_advanced'
-  | 'access_client_reports';
+  | 'manage_tickets_advanced';
 
 export const ALL_PERMISSIONS: Permission[] = [
   'access_dashboard',
@@ -35,7 +36,8 @@ export const ALL_PERMISSIONS: Permission[] = [
   'access_calls',
   'access_creatives',
   'access_tasks',
-  'access_client_reports', // Nova permissão adicionada
+  'access_reports',
+  'access_client_reports',
   'view_metrics',
   'view_system_logs',
   'manage_api_settings',
@@ -63,6 +65,7 @@ export const permissionDescriptions: { [key in Permission]: string } = {
     'access_calls': 'Acessar chamados',
     'access_creatives': 'Acessar criativos',
     'access_tasks': 'Acessar tarefas',
+    'access_reports': 'Acessar relatórios',
     'access_client_reports': 'Acessar relatórios do cliente',
     'view_metrics': 'Visualizar métricas',
     'view_system_logs': 'Visualizar logs do sistema',
