@@ -209,7 +209,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
   }
 
   // Se tem usuário mas não consegue acessar dashboard E não é cliente, mostrar interface de emergência
-  if (user && !hasPermission('access_dashboard') && !isCliente && !isRootAdmin) {
+  if (!loading && user && !hasPermission('access_dashboard') && !isCliente && !isRootAdmin) {
     console.log('🔄 Rendering blocked state...');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-red-50 to-orange-50 dark:from-slate-900 dark:via-red-900/20 dark:to-orange-900/20">
