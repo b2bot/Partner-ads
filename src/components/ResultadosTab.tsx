@@ -8,10 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarIcon, Filter, RefreshCw, Download, TrendingUp, TrendingDown, Activity, Target } from 'lucide-react';
 import { useSheetData, SheetRow } from '@/hooks/dashboard_hooks/useSheetData';
-import { CampaignCharts } from '@/components/dashboard/CampaignCharts';
-import { FunnelVisualization } from '@/components/dashboard/FunnelVisualization';
-import { MetricsGrid } from '@/components/dashboard/MetricsGrid';
-import { CampaignTable } from '@/components/dashboard/CampaignTable';
+import CampaignCharts from '@/components/dashboard/CampaignCharts';
+import FunnelVisualization from '@/components/dashboard/FunnelVisualization';
+import MetricsGrid from '@/components/dashboard/MetricsGrid';
+import CampaignTable from '@/components/dashboard/CampaignTable';
 import { useAuth } from '@/hooks/useAuth';
 
 interface Platform {
@@ -104,7 +104,7 @@ export function ResultadosTab() {
     return (
       <div className="text-center py-8">
         <div className="text-red-500 mb-4">
-          Erro ao carregar dados: {typeof error === 'string' ? error : (error as Error).message}
+          Erro ao carregar dados: {typeof error === 'string' ? error : String(error)}
         </div>
         <Button onClick={refetch} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />

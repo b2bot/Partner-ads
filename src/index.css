@@ -121,7 +121,7 @@
   }
 
   .premium-sidebar-item {
-    @apply group w-full flex items-center gap-4 px-6 py-4 text-sm rounded-2xl transition-all duration-300 relative overflow-hidden;
+    @apply w-full flex items-center gap-4 px-6 py-4 text-sm rounded-2xl transition-all duration-300 relative overflow-hidden;
   }
 
   .premium-sidebar-item-active {

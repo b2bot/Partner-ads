@@ -40,8 +40,8 @@ export function SettingsProvider({ children, clientId }: SettingsProviderProps) 
         throw error;
       }
 
-      if (data?.settings && typeof data.settings === 'object') {
-        setSettings(data.settings as SettingsData);
+      if (data?.data && typeof data.data === 'object') {
+        setSettings(data.data as SettingsData);
       }
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
@@ -58,7 +58,7 @@ export function SettingsProvider({ children, clientId }: SettingsProviderProps) 
         .from('settings')
         .upsert({
           client_id: clientId || 'default',
-          settings: updatedSettings
+          data: updatedSettings
         });
 
       if (error) throw error;
