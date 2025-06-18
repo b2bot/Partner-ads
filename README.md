@@ -136,6 +136,29 @@ Queries usando .from(...).select().order()... com mapeamento em interfaces
 Cache das queries principais: ['metrics-config'], ['clients-management'], etc.
 Mutations com onSuccess e onError + toast feedback
 
+sistema completo de limpeza de cache e diagnóstico com os seguintes recursos:
+
+🔧 Utilitários de Cache:
+
+CacheManager singleton para gerenciar cache do Vite
+Diagnóstico automático de problemas
+Limpeza completa de todos os tipos de cache
+📊 Painel de Debug:
+
+Interface visual para diagnosticar problemas
+Botões para limpar cache e forçar reload
+Exibição detalhada do status do sistema
+🚨 Detecção Automática:
+
+Detecta erros de importação automaticamente
+Mostra notificações quando há problemas
+Sistema de auto-correção configurável
+Como usar:
+
+Acesse /cache-debug para usar o painel visual
+Console automático - o sistema detecta erros e oferece soluções
+Notificações aparecem automaticamente quando há problemas de cache
+O sistema agora detectará automaticamente o erro "does not provide an export named" e oferecerá soluções imediatas!
 
 📂 Estrutura de Diretórios Relevante
 
