@@ -25,7 +25,8 @@ export type Permission =
   | 'delete_ads'
   | 'export_data'
   | 'manage_creatives_approval'
-  | 'manage_tickets_advanced';
+  | 'manage_tickets_advanced'
+  | 'access_client_reports';
 
 export const ALL_PERMISSIONS: Permission[] = [
   'access_dashboard',
