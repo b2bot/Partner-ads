@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RefreshCw, Download, TrendingUp, TrendingDown } from 'lucide-react';
 import { useSheetData } from '@/hooks/dashboard_hooks/useSheetData';
-import { CampaignCharts } from '@/components/dashboard/CampaignCharts';
+import CampaignCharts from '@/components/dashboard/CampaignCharts';
 import { FunnelVisualization } from '@/components/dashboard/FunnelVisualization';
 import { MetricsGrid } from '@/components/dashboard/MetricsGrid';
 import { PlatformNavigation } from '@/components/dashboard_navigation/PlatformNavigation';
