@@ -1,55 +1,177 @@
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from './useUserProfile';
-import { useUserPermissions } from './useUserPermissions';
-import { useAuthActions } from './useAuthActions';
-import { Permission, ALL_PERMISSIONS } from '@/types/auth';
-import { hasPermission as checkPermission } from '@/utils/permissionUtils';
+import { Permission } from '@/types/auth';
 
-export function useAuth() {
+interface Profile {
+  id: string;
+  nome: string;
+  email: string;
+  role: 'admin' | 'cliente';
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
+  is_root_admin?: boolean;
+  foto_url?: string;
+  status?: string;
+}
+
+interface AuthState {
+  user: User | null;
+  profile: Profile | null;
+  permissions: Permission[];
+  loading: boolean;
+  isAdmin: boolean;
+  isRootAdmin: boolean;
+  isCliente: boolean;
+  hasPermission: (permission: Permission) => boolean;
+}
+
+export const useAuth = (): AuthState => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { data: profile, isLoading: profileLoading } = useUserProfile(user);
-  const { signIn, signUp, signOut } = useAuthActions();
-
-  // Verificar se é root admin baseado no perfil do banco
-  const isRootAdmin = profile?.is_root_admin === true;
-
-  const { data: userPermissions = [], isLoading: permissionsLoading } = useUserPermissions(user, isRootAdmin);
+  console.log('🔐 useAuth hook called, current state:', {
+    user: user ? 'present' : 'null',
+    profile: profile ? 'present' : 'null',
+    permissions: permissions.length,
+    loading
+  });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    console.log('🔐 useAuth effect running...');
+    
+    const getSession = async () => {
+      try {
+        console.log('🔐 Getting session...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('🔐 Session error:', error);
+          setLoading(false);
+          return;
+        }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setUser(session?.user ?? null);
+        console.log('🔐 Session result:', session ? 'found' : 'not found');
+        
+        if (session?.user) {
+          setUser(session.user);
+          await loadUserProfile(session.user.id);
+        } else {
+          setUser(null);
+          setProfile(null);
+          setPermissions([]);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('🔐 Error getting session:', error);
         setLoading(false);
       }
-    );
+    };
 
-    return () => subscription.unsubscribe();
+    const loadUserProfile = async (userId: string) => {
+      try {
+        console.log('🔐 Loading profile for user:', userId);
+        
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (profileError) {
+          console.error('🔐 Profile error:', profileError);
+          setLoading(false);
+          return;
+        }
+
+        console.log('🔐 Profile loaded:', profileData);
+        setProfile(profileData);
+
+        // Load permissions based on role
+        if (profileData?.role === 'admin' || profileData?.is_root_admin) {
+          console.log('🔐 Loading admin permissions...');
+          
+          const { data: permissionsData, error: permissionsError } = await supabase
+            .from('user_permissions')
+            .select('permission_type')
+            .eq('user_id', userId);
+
+          if (permissionsError) {
+            console.error('🔐 Permissions error:', permissionsError);
+          } else {
+            console.log('🔐 Permissions loaded:', permissionsData);
+            const userPermissions = permissionsData?.map(p => p.permission_type) || [];
+            setPermissions(userPermissions);
+          }
+        } else {
+          console.log('🔐 Cliente user, setting basic permissions...');
+          setPermissions(['access_dashboard', 'access_calls', 'access_creatives']);
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error('🔐 Error loading profile:', error);
+        setLoading(false);
+      }
+    };
+
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔐 Auth state changed:', event, session ? 'session present' : 'no session');
+      
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user);
+        await loadUserProfile(session.user.id);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setProfile(null);
+        setPermissions([]);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      console.log('🔐 Cleaning up auth subscription...');
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const isAdmin = profile?.role === 'admin' || isRootAdmin;
-  const isCliente = profile?.role === 'cliente' && !isRootAdmin;
-
   const hasPermission = (permission: Permission): boolean => {
-    // Root admin sempre tem todas as permissões
-    if (isRootAdmin) return true;
+    if (!profile) {
+      console.log('🔐 hasPermission: no profile, returning false');
+      return false;
+    }
     
-    // Para outros usuários, verificar permissões específicas
-    return checkPermission(userPermissions, permission, isRootAdmin);
+    if (profile.is_root_admin) {
+      console.log('🔐 hasPermission: root admin, returning true');
+      return true;
+    }
+    
+    const result = permissions.includes(permission);
+    console.log(`🔐 hasPermission(${permission}):`, result);
+    return result;
   };
 
-  const allPermissions = isRootAdmin ? ALL_PERMISSIONS : userPermissions;
+  const isAdmin = profile?.role === 'admin' || profile?.is_root_admin === true;
+  const isRootAdmin = profile?.is_root_admin === true;
+  const isCliente = profile?.role === 'cliente';
 
-  // Debug mais detalhado
+  const authState = {
+    user,
+    profile,
+    permissions,
+    loading,
+    isAdmin,
+    isRootAdmin,
+    isCliente,
+    hasPermission,
+  };
+
   console.log('🔐 Auth state detailed:', {
     userId: user?.id,
     userEmail: user?.email,
@@ -58,24 +180,12 @@ export function useAuth() {
     isRootAdmin,
     isAdmin,
     isCliente,
-    loading: loading || profileLoading || permissionsLoading,
-    permissionsCount: allPermissions.length,
+    loading,
+    permissionsCount: permissions.length,
     hasAccessDashboard: hasPermission('access_dashboard'),
     hasManageCollaborators: hasPermission('manage_collaborators'),
-    profile: profile
+    profile
   });
 
-  return {
-    user,
-    profile,
-    loading: loading || profileLoading || permissionsLoading,
-    signIn,
-    signUp,
-    signOut,
-    isAdmin,
-    isRootAdmin,
-    isCliente,
-    permissions: allPermissions,
-    hasPermission,
-  };
-}
+  return authState;
+};
