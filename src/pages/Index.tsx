@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from '@/components/Sidebar';
@@ -18,7 +17,10 @@ import { ActivityLog } from '@/components/ActivityLog';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface IndexProps {
   initialTab?: string;
@@ -31,6 +33,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
   const route = location.pathname.replace("/", "") || initialTab;
   const [activeTab, setActiveTab] = useState(route);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   
   console.log('🔄 Index state:', { route, activeTab, viewMode });
   
@@ -44,7 +47,8 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     isCliente = false,
     hasPermission = () => false,
     loading = true,
-    user = null
+    user = null,
+    error = null
   } = authResult || {};
 
   console.log('🔄 Auth values after destructuring:', {
@@ -53,8 +57,25 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     isCliente,
     loading,
     user: user ? 'present' : 'null',
-    hasPermission: typeof hasPermission
+    hasPermission: typeof hasPermission,
+    error
   });
+
+  // Timeout para mostrar interface de emergência se loading demorar muito
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.log('🔄 Loading timeout reached in Index');
+        setLoadingTimeout(true);
+      }
+    }, 8000); // 8 segundos
+
+    if (!loading) {
+      setLoadingTimeout(false);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [loading]);
 
   useEffect(() => {
     console.log('🔄 Theme effect running...');
@@ -66,17 +87,22 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log('🔄 Cache cleanup effect running...');
-    if ('caches' in window) {
-      caches.keys().then(names => {
-        names.forEach(name => {
-          caches.delete(name);
-        });
-      });
+  const handleEmergencyLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      localStorage.clear();
+      window.location.reload();
+    } catch (error) {
+      console.error('Erro no logout de emergência:', error);
+      localStorage.clear();
+      window.location.reload();
     }
-    localStorage.removeItem('react-query-cache');
-  }, []);
+  };
+
+  const handleForceReload = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   console.log('Index render - Auth state:', {
     isAdmin,
@@ -85,8 +111,62 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     loading,
     hasPermission,
     user,
+    error,
+    loadingTimeout,
     hasAccessDashboard: hasPermission('access_dashboard')
   });
+
+  // Interface de Emergência - se loading demorar muito ou houver erro
+  if ((loading && loadingTimeout) || error) {
+    console.log('🔄 Rendering emergency interface...', { loading, loadingTimeout, error });
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20">
+        <div className="text-center space-y-6 p-8 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-2xl border border-red-200/60 dark:border-red-700/60 max-w-md">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-xl">⚠️</span>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+              {error ? 'Erro de Carregamento' : 'Carregamento Demorado'}
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
+              {error || 'O sistema está demorando para carregar. Tente uma das opções abaixo:'}
+            </p>
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-3 mb-4">
+                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+              </div>
+            )}
+          </div>
+          <div className="space-y-3">
+            <Button 
+              onClick={handleForceReload}
+              className="w-full"
+              variant="default"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Recarregar Aplicação
+            </Button>
+            <Button 
+              onClick={handleEmergencyLogout}
+              className="w-full"
+              variant="destructive"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout e Limpar Cache
+            </Button>
+          </div>
+          {user && (
+            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Usuário: {user.email}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     console.log('🔄 Rendering loading state...');
@@ -119,6 +199,10 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">Sistema Bloqueado</h1>
             <p className="text-slate-600 dark:text-slate-400">Usuário sem permissões. Use o botão de emergência para resetar.</p>
           </div>
+          <Button onClick={handleEmergencyLogout} variant="destructive">
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout de Emergência
+          </Button>
         </div>
       </div>
     );
@@ -393,6 +477,10 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
         <div className="text-center space-y-4 p-8">
           <h1 className="text-2xl font-bold text-red-600">Erro Crítico</h1>
           <p className="text-red-500">Ocorreu um erro na aplicação. Verifique o console para mais detalhes.</p>
+          <Button onClick={handleForceReload} variant="destructive">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Recarregar Aplicação
+          </Button>
         </div>
       </div>
     );
