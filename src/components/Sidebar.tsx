@@ -101,6 +101,12 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       icon: Target,
       permission: 'access_paid_media' as Permission
     },
+    {
+      id: 'resultados',
+      label: 'Resultados',
+      icon: BarChart3,
+      permission: 'access_paid_media' as Permission
+    },
   ];
 
   const managementItems = [
