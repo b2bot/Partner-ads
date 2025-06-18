@@ -269,4 +269,11 @@ function RelatoriosContent() {
   );
 }
 
-export const RelatoriosTab = RelatoriosContent;
+export default function RelatoriosTab() {
+  return (
+    <ProtectedRoute requiredPermission="access_client_reports">
+      <RelatoriosContent />
+    </ProtectedRoute>
+  );
+}
+
