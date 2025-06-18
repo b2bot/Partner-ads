@@ -8,6 +8,7 @@ import { CampaignsTab } from '@/components/CampaignsTab';
 import { AdSetsTab } from '@/components/AdSetsTab';
 import { AdsTab } from '@/components/AdsTab';
 import { RelatoriosTab } from '@/components/RelatoriosTab';
+import { ResultadosTab } from '@/components/ResultadosTab';
 import { WhatsAppReportsTab } from '@/components/WhatsAppReportsTab';
 import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
