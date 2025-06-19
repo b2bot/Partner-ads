@@ -12,7 +12,7 @@ Exemplo de permissões: access_dashboard manage_collaborators view_system_logs m
 
 📦 MÓDULOS ATIVOS NO SISTEMA 🎛️ Dashboard: Exibe dados agregados das campanhas (impressões, cliques, conversões). Tem cards, gráficos, filtros por conta, e modo cards/tabela. Mostra também log de atividades com permissão view_system_logs.
 
-📈 Resultados: Visualização avançada das campanhas (funil, gráficos, desempenho por data). Tabs com filtros por plataforma: Meta, Google, TikTok, etc. Integração com Google Sheets API via Vercel e criando a integração Meta Ads API. Dashboard de performance por período e funil de conversão.
+📈 Relatórios: Visualização avançada das campanhas (funil, gráficos, desempenho por data). Tabs com filtros por plataforma: Meta, Google, TikTok, etc. Integração com Google Sheets API via Vercel e criando a integração Meta Ads API. Dashboard de performance por período e funil de conversão.
 
 📊 Campanhas / Conjuntos / Anúncios Interface tipo painel de controle com filtros avançados. Estados como ACTIVE, PAUSED, etc. Cada item possui dados como: nome, status, métricas, ações.
 
