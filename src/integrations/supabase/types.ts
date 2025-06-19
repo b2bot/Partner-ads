@@ -1200,8 +1200,6 @@ export type Database = {
         | "manage_variables_and_pre_configurations"
         | "view_billing_settings"
         | "view_system_logs"
-        | "access_client_reports"
-        | "manage_clients"
       task_priority: "baixa" | "media" | "alta" | "urgente"
       task_status:
         | "backlog"
@@ -1383,8 +1381,6 @@ export const Constants = {
         "manage_variables_and_pre_configurations",
         "view_billing_settings",
         "view_system_logs",
-        "access_client_reports",
-        "manage_clients",
       ],
       task_priority: ["baixa", "media", "alta", "urgente"],
       task_status: [

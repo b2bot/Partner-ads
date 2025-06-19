@@ -37,6 +37,7 @@ const PERMISSION_GROUPS = {
     'access_whatsapp',
     'create_campaigns',
     'edit_campaigns',
+    'view_templates',
     'send_messages',
     'view_metrics'
   ],
@@ -86,6 +87,7 @@ const PERMISSION_LABELS: Record<PermissionType, string> = {
   'access_whatsapp': 'Acessar WhatsApp',
   'create_campaigns': 'Criar campanhas',
   'edit_campaigns': 'Editar campanhas',
+  'view_templates': 'Visualizar templates',
   'send_messages': 'Enviar mensagens',
   'view_metrics': 'Visualizar métricas',
   'access_tasks': 'Acessar tarefas',

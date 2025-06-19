@@ -1,85 +1,85 @@
-import { useState, useEffect } from 'react';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Settings {
-  theme: 'light' | 'dark' | 'system';
-  // Adicione outras configurações aqui
+export interface SettingsData {
+  [key: string]: any;
 }
 
-const initialSettings: Settings = {
-  theme: 'system',
-  // Defina outros valores iniciais aqui
-};
+interface SettingsContextType {
+  settings: SettingsData;
+  updateSettings: (newSettings: Partial<SettingsData>) => Promise<void>;
+  loading: boolean;
+}
 
-export function useSettings() {
-  const [settings, setSettings] = useState<Settings>(initialSettings);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+
+interface SettingsProviderProps {
+  children: ReactNode;
+  clientId?: string;
+}
+
+export function SettingsProvider({ children, clientId }: SettingsProviderProps) {
+  const [settings, setSettings] = useState<SettingsData>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadSettings();
+  }, [clientId]);
 
   const loadSettings = async () => {
-    setLoading(true);
-    setError('');
-    
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('settings')
-        .select('data')
-        .eq('id', 1)
+        .select('*')
+        .eq('client_id', clientId || 'default')
         .single();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         throw error;
       }
 
-      if (data?.data) {
-        setSettings(data.data as Settings);
+      if (data?.data && typeof data.data === 'object') {
+        setSettings(data.data as SettingsData);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar configurações';
-      setError(errorMessage);
+    } catch (error) {
+      console.error('Erro ao carregar configurações:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const saveSettings = async (newSettings: Partial<Settings>) => {
-    setLoading(true);
-    setError('');
-    
+  const updateSettings = async (newSettings: Partial<SettingsData>) => {
     try {
       const updatedSettings = { ...settings, ...newSettings };
       
       const { error } = await supabase
         .from('settings')
-        .upsert({ 
-          id: 1,
-          data: updatedSettings,
-          client_id: null
+        .upsert({
+          client_id: clientId || 'default',
+          data: updatedSettings
         });
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
       setSettings(updatedSettings);
-      setLoading(false);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao salvar configurações';
-      setError(errorMessage);
-      setLoading(false);
-      throw err;
+    } catch (error) {
+      console.error('Erro ao atualizar configurações:', error);
+      throw error;
     }
   };
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
+  return (
+    <SettingsContext.Provider value={{ settings, updateSettings, loading }}>
+      {children}
+    </SettingsContext.Provider>
+  );
+}
 
-  return {
-    settings,
-    loading,
-    error,
-    saveSettings,
-    loadSettings
-  };
+export function useSettings() {
+  const context = useContext(SettingsContext);
+  if (context === undefined) {
+    throw new Error('useSettings deve ser usado dentro de um SettingsProvider');
+  }
+  return context;
 }

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +19,7 @@ const PERMISSION_GROUPS = {
     'access_whatsapp',
     'create_campaigns',
     'edit_campaigns',
+    'view_templates',
     'send_messages',
     'view_metrics'
   ],
@@ -47,7 +49,6 @@ const PERMISSION_GROUPS = {
   ],
   'Relatórios': [
     'access_reports',
-    'access_client_reports',
     'create_automatic_reports'
   ],
   'Configurações': [
@@ -68,6 +69,7 @@ const PERMISSION_LABELS: Record<PermissionType, string> = {
   'access_whatsapp': 'Acessar WhatsApp',
   'create_campaigns': 'Criar campanhas',
   'edit_campaigns': 'Editar campanhas',
+  'view_templates': 'Visualizar templates',
   'send_messages': 'Enviar mensagens',
   'view_metrics': 'Visualizar métricas',
   'access_tasks': 'Acessar tarefas',
@@ -96,8 +98,7 @@ const PERMISSION_LABELS: Record<PermissionType, string> = {
   'manage_external_integrations': 'Gerenciar integrações externas',
   'manage_variables_and_pre_configurations': 'Gerenciar variáveis e pré-configurações',
   'view_billing_settings': '⚠️ Visualizar configurações de faturamento',
-  'view_system_logs': '⚠️ Visualizar logs do sistema',
-  'access_client_reports': 'Acessar relatórios do cliente'
+  'view_system_logs': '⚠️ Visualizar logs do sistema'
 };
 
 export function PermissionTemplatesManagement() {
