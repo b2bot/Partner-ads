@@ -120,7 +120,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
     { id: 'chamados', name: 'Chamados', icon: MessageCircle, description: 'Sistema de tickets e suporte' },
     { id: 'criativos', name: 'Criativos', icon: Palette, description: 'Gerenciamento de materiais criativos' },
     { id: 'relatorios', name: 'Relatórios', icon: FileText, description: 'Acesso aos relatórios personalizados' },
-    { id: 'tarefas', name: 'Tarefas', icon: ClipboardList, description: 'Gerenciamento de projetos e tarefas da equipe' },
+    { id: 'tarefas', name: 'Tarefas', icon: ClipboardList, description: 'Módulo de gerenciamento de projetos e tarefas' },
   ];
 
   const reportTypes = [
