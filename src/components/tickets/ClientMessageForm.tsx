@@ -36,12 +36,15 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
           autor_tipo: 'cliente'
         });
 
+      // ❌ Se der erro
+      if (insertError) throw insertError;
+      
       const { error: updateError } = await supabase
         .from('chamados')
         .update({ status: 'Aguardando equipe' })
         .eq('id', ticketId);
-      // ❌ Se der erro no update, lança também
-      if (insertError) throw insertError;
+      
+      // ❌ Se der erro
       if (updateError) throw updateError;
 
     },
