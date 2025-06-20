@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,33 +19,32 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
   const [mensagem, setMensagem] = useState('');
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [error, setError] = useState('');
-  
+
   const { user } = useAuth();
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: { conteudo: string; arquivo_url?: string }) => {
+      if (!user) throw new Error('Usuário não autenticado');
+
       const { error: insertError } = await supabase
         .from('chamados_mensagens')
         .insert({
           chamado_id: ticketId,
           conteudo: data.conteudo,
           arquivo_url: data.arquivo_url,
-          autor_id: user?.id,
-          autor_nome: user?.email || 'Cliente',
-          autor_tipo: 'cliente'
+          autor_id: user.id,
+          autor_nome: user.email || 'Cliente',
+          autor_tipo: 'cliente',
         });
 
-      // ❌ Se der erro
       if (insertError) throw insertError;
-      
+
       const { error: updateError } = await supabase
         .from('chamados')
         .update({ status: 'Aguardando equipe' })
         .eq('id', ticketId);
-      
-      // ❌ Se der erro
-      if (updateError) throw updateError;
 
+      if (updateError) throw updateError;
     },
     onSuccess: () => {
       toast.success('Mensagem enviada com sucesso!');
@@ -70,13 +68,18 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
       return;
     }
 
+    if (!user) {
+      setError('Usuário não autenticado. Tente novamente.');
+      return;
+    }
+
     let arquivo_url = undefined;
 
     if (arquivo) {
       try {
         const fileExt = arquivo.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
-        
+
         const { error: uploadError } = await supabase.storage
           .from('tickets')
           .upload(fileName, arquivo);
