@@ -44,7 +44,9 @@ export type Permission =
   | 'manage_external_integrations'
   | 'manage_variables_and_pre_configurations'
   | 'view_billing_settings'
-  | 'view_system_logs';
+  | 'view_system_logs'
+  | 'access_client_reports'
+  | 'manage_clients';
 
 export const ALL_PERMISSIONS: Permission[] = [
   'access_dashboard',
@@ -80,5 +82,7 @@ export const ALL_PERMISSIONS: Permission[] = [
   'manage_external_integrations',
   'manage_variables_and_pre_configurations',
   'view_billing_settings',
-  'view_system_logs'
+  'view_system_logs',
+  'access_client_reports',
+  'manage_clients'
 ];

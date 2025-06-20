@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from '@/components/Sidebar';
@@ -20,6 +19,7 @@ import { UserMenu } from '@/components/UserMenu';
 import { ClientGreeting } from '@/components/ClientGreeting';
 import { EmergencyLogout } from '@/components/EmergencyLogout';
 import { useAuth } from '@/hooks/useAuth';
+import { TasksTab } from '@/components/task/TasksTab';
 
 interface IndexProps {
   initialTab?: string;
@@ -218,6 +218,20 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <TicketsTab />
           </div>
         );
+      case 'tasks':
+        return hasPermission('access_tasks') ? (
+          <div className={contentClasses}>
+            <TasksTab />
+          </div>
+        ) : (
+          <div className={`text-center py-20 ${contentClasses}`}>
+            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+              <span className="text-white font-bold text-2xl">×</span>
+            </div>
+            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
+            <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Tarefas.</p>
+          </div>
+        );
       case 'creatives':
         return (
           <div className={contentClasses}>
@@ -280,6 +294,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
       'whatsapp-reports': 'Relatórios WhatsApp',
       'metrics-objectives': 'Personalização de Métricas',
       'tickets': hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados',
+      'tasks': 'Tarefas',
       'creatives': hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos',
       'activity-log': 'Log de Atividades',
       'settings': 'Configurações'
