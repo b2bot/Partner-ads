@@ -38,17 +38,37 @@ export function ResetClientPasswordModal({ client, open, onClose }: ResetClientP
 
   const resetPasswordMutation = useMutation({
     mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      console.log('Initiating password reset for user:', userId);
+      
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error('Usuário não autenticado');
+      }
+
       const { data, error } = await supabase.functions.invoke('reset-client-password', {
         body: {
           userId: userId,
           newPassword: password,
         },
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Erro ao chamar função de reset');
+      }
+
+      if (!data || !data.success) {
+        console.error('Function returned error:', data);
+        throw new Error(data?.error || 'Erro desconhecido ao redefinir senha');
+      }
+
       return data;
     },
     onSuccess: () => {
+      console.log('Password reset successful');
       toast.success('Senha do cliente atualizada com sucesso!');
       setNewPassword('');
       setConfirmPassword('');
@@ -60,9 +80,15 @@ export function ResetClientPasswordModal({ client, open, onClose }: ResetClientP
       }, 2000);
     },
     onError: (error: any) => {
-      console.error('Erro ao redefinir senha:', error);
-      const errorMessage = error.message || 'Erro ao redefinir senha. Verifique suas permissões de administrador.';
+      console.error('Password reset failed:', error);
+      let errorMessage = 'Erro ao redefinir senha. Tente novamente.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       setError(errorMessage);
+      toast.error(errorMessage);
     },
   });
 
@@ -81,6 +107,7 @@ export function ResetClientPasswordModal({ client, open, onClose }: ResetClientP
       return;
     }
 
+    console.log('Submitting password reset for client:', client.nome);
     resetPasswordMutation.mutate({ 
       userId: client.user_id, 
       password: newPassword 
