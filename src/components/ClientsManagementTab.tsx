@@ -108,7 +108,7 @@ export function ClientsManagementTab() {
       deleteClientMutation.mutate(clientId);
     }
   };
-
+  
   const filteredClientes = clientes?.filter(cliente =>
     cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     cliente.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
