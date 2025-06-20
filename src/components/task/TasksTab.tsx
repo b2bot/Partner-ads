@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TasksList } from './TasksList';
-import { ProjectsList } from './ProjectsList';
-import { TaskKanban } from './TaskKanban';
-import { TaskCalendar } from './TaskCalendar';
+import { TaskTabView } from './TaskTabView';
 import { CreateTaskModal } from './CreateTaskModal';
 import { CreateProjectModal } from './CreateProjectModal';
 import { EditProjectModal } from './EditProjectModal';
@@ -19,7 +15,6 @@ export function TasksTab() {
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [showEditProject, setShowEditProject] = useState(false);
-  const [activeView, setActiveView] = useState('list');
 
   if (!hasPermission('access_tasks')) {
     return (
@@ -69,35 +64,12 @@ export function TasksTab() {
           </div>
         </div>
 
-        <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 max-w-md mb-6">
-            <TabsTrigger value="list">Lista</TabsTrigger>
-            <TabsTrigger value="kanban">Kanban</TabsTrigger>
-            <TabsTrigger value="calendar">Calendário</TabsTrigger>
-            <TabsTrigger value="projects">Projetos</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="list" className="space-y-6">
-            <TasksList />
-          </TabsContent>
-
-          <TabsContent value="kanban" className="space-y-6">
-            <TaskKanban />
-          </TabsContent>
-
-          <TabsContent value="calendar" className="space-y-6">
-            <TaskCalendar />
-          </TabsContent>
-
-          <TabsContent value="projects" className="space-y-6">
-            <ProjectsList
-              onEditProject={(project) => {
-                setEditProject(project);
-                setShowEditProject(true);
-              }}
-            />
-          </TabsContent>
-        </Tabs>
+        <TaskTabView
+          onEditProject={(project) => {
+            setEditProject(project);
+            setShowEditProject(true);
+          }}
+        />
 
         {/* Modais */}
         {showCreateTask && (

@@ -14,6 +14,7 @@ const statusColumns: { status: TaskStatus; label: string; color: string }[] = [
   { status: 'revisao', label: 'Em Revisão', color: 'bg-yellow-100 dark:bg-yellow-900' },
   { status: 'aguardando', label: 'Aguardando', color: 'bg-orange-100 dark:bg-orange-900' },
   { status: 'finalizada', label: 'Finalizada', color: 'bg-green-100 dark:bg-green-900' },
+  { status: 'cancelada', label: 'Cancelada', color: 'bg-red-100 dark:bg-red-900' },
 ];
 
 export function TaskKanban() {
