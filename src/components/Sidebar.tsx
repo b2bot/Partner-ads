@@ -47,6 +47,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const { hasPermission, isAdmin, isRootAdmin, isCliente, user } = useAuth();
   const { hasModulePermission } = useClientPermissions(user, isCliente);
 
+  console.log('🎯 Sidebar state:', { collapsed, activeTab });
+
   const navigationItems: NavigationItem[] = [
     { 
       id: 'dashboard', 
@@ -137,6 +139,14 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const filteredAdminItems = adminItems.filter(canAccessItem);
 
   const isActive = (itemId: string) => activeTab === itemId;
+
+  console.log('📊 Sidebar items:', {
+    navigationItems: filteredNavigationItems.length,
+    adminItems: filteredAdminItems.length,
+    isRootAdmin,
+    isAdmin,
+    isCliente
+  });
 
   return (
     <Sidebar className={cn(collapsed ? "w-14" : "w-60", "border-r border-slate-200/60 dark:border-slate-700/60")}>

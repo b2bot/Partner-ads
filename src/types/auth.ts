@@ -105,7 +105,6 @@ export interface ClientModulePermission {
   enabled: boolean;
 }
 
-
 export const ALL_PERMISSIONS: Permission[] = [
   'access_dashboard',
   'access_whatsapp',
@@ -120,7 +119,7 @@ export const ALL_PERMISSIONS: Permission[] = [
   'finalize_tasks',
   'edit_execution_time',
   'access_calls',
-  'create_calls',
+  'create_calls',  
   'finalize_calls',
   'link_calls_to_tasks',
   'access_creatives',
@@ -142,5 +141,29 @@ export const ALL_PERMISSIONS: Permission[] = [
   'view_billing_settings',
   'view_system_logs',
   'access_client_reports',
-  'manage_clients'
+  'manage_clients',
+  'delete_campaigns',
+  'create_adsets',
+  'edit_adsets',
+  'delete_adsets',
+  'create_ads',
+  'edit_ads',
+  'delete_ads',
+  'export_data',
+  'manage_creatives',
+  'upload_creatives',
+  'edit_creatives',
+  'delete_creatives',
+  'view_tickets',
+  'create_tickets',
+  'edit_tickets',
+  'resolve_tickets',
+  'create_collaborators',
+  'edit_collaborators',
+  'delete_collaborators',
+  'create_campaigns_whatsapp',
+  'manage_contacts',
+  'edit_tasks',
+  'delete_tasks',
+  'manage_tasks'
 ];

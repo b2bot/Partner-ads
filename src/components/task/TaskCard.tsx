@@ -52,7 +52,30 @@ export function TaskCard({ task }: TaskCardProps) {
       case 'revisao': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
       case 'finalizada': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
       case 'cancelada': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+      case 'aguardando': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'backlog': return 'Backlog';
+      case 'execucao': return 'Em Execução';
+      case 'revisao': return 'Em Revisão';
+      case 'aguardando': return 'Aguardando';
+      case 'finalizada': return 'Finalizada';
+      case 'cancelada': return 'Cancelada';
+      default: return status;
+    }
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case 'baixa': return 'Baixa';
+      case 'media': return 'Média';
+      case 'alta': return 'Alta';
+      case 'urgente': return 'Urgente';
+      default: return priority;
     }
   };
 
@@ -89,10 +112,10 @@ export function TaskCard({ task }: TaskCardProps) {
             
             <div className="flex items-center gap-2">
               <Badge className={getPriorityColor(task.priority)}>
-                {task.priority}
+                {getPriorityLabel(task.priority)}
               </Badge>
               <Badge className={getStatusColor(task.status)}>
-                {task.status}
+                {getStatusLabel(task.status)}
               </Badge>
               
               {hasPermission('manage_tasks') && (

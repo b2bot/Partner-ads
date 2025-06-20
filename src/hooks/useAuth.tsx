@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 import { useUserPermissions } from './useUserPermissions';
-import { useClientPermissions } from './useClientPermissions'; // já refatorado
+import { useClientPermissions } from './useClientPermissions';
 import { useAuthActions } from './useAuthActions';
 import { Permission, ALL_PERMISSIONS } from '@/types/auth';
 import { hasPermission as checkPermission } from '@/utils/permissionUtils';
@@ -28,13 +29,17 @@ export function useAuth() {
   } = useClientPermissions(user, isCliente);
 
   useEffect(() => {
+    console.log('🚀 Inicializando useAuth...');
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('📝 Sessão inicial:', session?.user ? 'Usuário logado' : 'Sem usuário');
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário');
         setUser(session?.user ?? null);
         setLoading(false);
       }
@@ -72,7 +77,7 @@ export function useAuth() {
 
   const allPermissions = isRootAdmin ? ALL_PERMISSIONS : userPermissions;
 
-  console.log('🔐 Auth state detailed:', {
+  const authState = {
     userId: user?.id,
     userEmail: user?.email,
     profileRole: profile?.role,
@@ -84,8 +89,12 @@ export function useAuth() {
     permissionsCount: allPermissions.length,
     hasAccessDashboard: hasPermission('access_dashboard'),
     hasManageCollaborators: hasPermission('manage_collaborators'),
+    hasAccessTasks: hasPermission('access_tasks'),
+    hasManageTasks: hasPermission('manage_tasks'),
     profile: profile
-  });
+  };
+
+  console.log('🔐 Auth state detalhado:', authState);
 
   return {
     user,
