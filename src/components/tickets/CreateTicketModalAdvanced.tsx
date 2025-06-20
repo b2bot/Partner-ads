@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +17,24 @@ interface CreateTicketModalAdvancedProps {
   open: boolean;
   onClose: () => void;
 }
+
+// Função de validação para garantir consistência nos dados
+const validateTicketData = (data: any) => {
+  console.log('Validando dados do chamado:', data);
+  
+  // Garantir que o status seja sempre "novo" para chamados novos
+  if (data.status && data.status !== 'novo') {
+    console.warn(`Status ${data.status} alterado para 'novo' na criação`);
+  }
+  
+  return {
+    ...data,
+    status: 'novo', // Sempre definir como 'novo' para chamados novos
+    aberto_por: data.aberto_por || 'cliente',
+    categoria: data.categoria || 'outros',
+    prioridade: data.prioridade || 'media'
+  };
+};
 
 export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAdvancedProps) {
   const [titulo, setTitulo] = useState('');
@@ -68,18 +85,20 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
     }) => {
       console.log('Criando chamado avançado com dados:', data);
       
-      const insertData = {
+      const rawData = {
         cliente_id: data.cliente_id,
         titulo: data.titulo,
         mensagem: data.mensagem,
-        categoria: data.categoria || 'outros',
-        prioridade: data.prioridade || 'media',
+        categoria: data.categoria,
+        prioridade: data.prioridade,
         arquivo_url: data.arquivo_url || null,
         aberto_por: isAdmin ? 'admin' : 'cliente',
-        // Não definir status - o banco usará o padrão 'novo'
       };
 
-      console.log('Dados para inserção (advanced):', insertData);
+      // Validar e processar dados
+      const insertData = validateTicketData(rawData);
+
+      console.log('Dados validados para inserção (advanced):', insertData);
 
       const { data: result, error } = await supabase
         .from('chamados')
@@ -102,7 +121,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
       onClose();
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Erro na mutation avançada:', error);
       setError(`Erro ao criar chamado: ${error.message}`);
       toast.error('Erro ao criar chamado');

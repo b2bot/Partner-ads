@@ -8,9 +8,29 @@ interface TicketStatusBadgeProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+// Função para normalizar status inválidos
+const normalizeStatus = (status: string): 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido' => {
+  // Se o status for "aberto" (status antigo), converter para "novo"
+  if (status === 'aberto') {
+    console.warn('Status "aberto" detectado, convertendo para "novo"');
+    return 'novo';
+  }
+  
+  const validStatuses = ['novo', 'aguardando_equipe', 'aguardando_cliente', 'em_analise', 'em_andamento', 'resolvido'];
+  
+  if (validStatuses.includes(status)) {
+    return status as any;
+  }
+  
+  console.warn(`Status inválido detectado: ${status}. Usando 'novo' como padrão.`);
+  return 'novo';
+};
+
 export function TicketStatusBadge({ status, prioridade, size = 'md' }: TicketStatusBadgeProps) {
+  const normalizedStatus = normalizeStatus(status);
+  
   const getStatusConfig = () => {
-    switch (status) {
+    switch (normalizedStatus) {
       case 'novo':
         return {
           color: 'bg-purple-100 text-purple-800 border-purple-200',
@@ -51,7 +71,7 @@ export function TicketStatusBadge({ status, prioridade, size = 'md' }: TicketSta
         return {
           color: 'bg-gray-100 text-gray-800 border-gray-200',
           icon: Clock,
-          label: status
+          label: 'Novo'
         };
     }
   };

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,16 +31,30 @@ interface TicketDetailModalProps {
   onClose: () => void;
 }
 
+// Função de validação para garantir que apenas status válidos sejam utilizados
+const validateTicketStatus = (status: string): TicketStatus => {
+  const validStatuses: TicketStatus[] = ['novo', 'aguardando_equipe', 'aguardando_cliente', 'em_analise', 'em_andamento', 'resolvido'];
+  
+  if (validStatuses.includes(status as TicketStatus)) {
+    return status as TicketStatus;
+  }
+  
+  console.warn(`Status inválido detectado: ${status}. Usando 'novo' como padrão.`);
+  return 'novo';
+};
+
 export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalProps) {
   const { isAdmin, user } = useAuth();
   const [resposta, setResposta] = useState(ticket.resposta || '');
-  const [status, setStatus] = useState<TicketStatus>(ticket.status);
+  const [status, setStatus] = useState<TicketStatus>(validateTicketStatus(ticket.status));
   const [error, setError] = useState('');
   
   const queryClient = useQueryClient();
 
   const updateTicketMutation = useMutation({
     mutationFn: async (data: { resposta?: string; status?: string }) => {
+      console.log('Atualizando chamado com dados:', data);
+      
       const updateData: any = {};
       
       if (data.resposta !== undefined) {
@@ -50,7 +63,10 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
       }
       
       if (data.status !== undefined) {
-        updateData.status = data.status;
+        // Validar status antes de enviar
+        const validatedStatus = validateTicketStatus(data.status);
+        updateData.status = validatedStatus;
+        console.log('Status validado para atualização:', validatedStatus);
       }
 
       const { error } = await supabase
@@ -58,16 +74,20 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
         .update(updateData)
         .eq('id', ticket.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro na atualização do chamado:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       toast.success('Chamado atualizado com sucesso!');
       onClose();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Erro ao atualizar chamado:', error);
-      setError('Erro ao atualizar chamado. Tente novamente.');
+      setError(`Erro ao atualizar chamado: ${error.message}`);
+      toast.error('Erro ao atualizar chamado');
     },
   });
 
@@ -141,7 +161,8 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
   };
 
   const handleStatusChange = (value: string) => {
-    setStatus(value as TicketStatus);
+    const validatedStatus = validateTicketStatus(value);
+    setStatus(validatedStatus);
   };
 
   return (
