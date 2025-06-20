@@ -9,7 +9,6 @@ import {
   Send,
   BarChart3,
   Users,
-  Settings,
 } from 'lucide-react';
 import { WhatsAppConnectionCard } from './whatsapp/WhatsAppConnectionCard';
 import { WhatsAppDashboard } from './whatsapp/WhatsAppDashboard';
@@ -31,30 +30,12 @@ export function WhatsAppReportsTab() {
   const [editingContact, setEditingContact] = useState<WhatsAppContact | null>(null);
   const [campaignRefreshKey, setCampaignRefreshKey] = useState(0);
 
-  const handleNewCampaign = () => {
-    setShowNewCampaignModal(true);
-  };
+  const handleNewCampaign = () => setShowNewCampaignModal(true);
+  const handleNewMessage = () => setShowNewMessageModal(true);
+  const handleNewContact = () => setShowNewContactModal(true);
+  const handleMessageFilters = () => setShowMessageFiltersModal(true);
 
-  const handleNewMessage = () => {
-    setShowNewMessageModal(true);
-  };
-
-  const handleNewContact = () => {
-    setShowNewContactModal(true);
-  };
-
-  const handleMessageFilters = () => {
-    setShowMessageFiltersModal(true);
-  };
-
-  const handleCampaignSuccess = () => {
-    setCampaignRefreshKey(prev => prev + 1);
-  };
-
-  const handleApplyMessageFilters = (filters: any) => {
-    console.log('Applying filters:', filters);
-    // Implementar lógica de filtros aqui
-  };
+  const handleCampaignSuccess = () => setCampaignRefreshKey(prev => prev + 1);
 
   const handleEditContact = (contact: WhatsAppContact) => {
     setEditingContact(contact);
@@ -67,81 +48,72 @@ export function WhatsAppReportsTab() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <div className="space-y-6 max-w-7xl px-4 lg:px-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-lg font-bold text-slate-800">Campanhas WhatsApp</h1>
-          <p className="text-slate-600 text-xs">
+          <h1 className="text-h2 text-foreground">Campanhas WhatsApp</h1>
+          <p className="text-caption text-muted-foreground">
             Automação e disparo de mensagens para clientes via WhatsApp Business API
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowNewMessageModal(true)}>
-            <Send className="w-4 h-4 mr-1" />
+          <Button variant="outline" size="sm" onClick={handleNewMessage}>
+            <Send className="size-4 mr-1" />
             Nova Mensagem
           </Button>
-          <Button size="sm" onClick={() => setShowNewCampaignModal(true)}>
-            <Plus className="w-4 h-4 mr-1" />
+          <Button size="sm" onClick={handleNewCampaign}>
+            <Plus className="size-4 mr-1" />
             Nova Campanha
           </Button>
         </div>
       </div>
 
-      {/* Conexão WhatsApp */}
       <WhatsAppConnectionCard />
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
-            Dashboard
+            <BarChart3 className="size-4" /> Dashboard
           </TabsTrigger>
           <TabsTrigger value="campaigns" className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            Campanhas
+            <Clock className="size-4" /> Campanhas
           </TabsTrigger>
           <TabsTrigger value="messages" className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" />
-            Mensagens
+            <MessageSquare className="size-4" /> Mensagens
           </TabsTrigger>
           <TabsTrigger value="contacts" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Contatos
+            <Users className="size-4" /> Contatos
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="dashboard" className="space-y-6">
           <WhatsAppDashboard />
-          
-          {/* Últimas Atividades */}
-          <Card>
+          <Card className="premium-card">
             <CardHeader>
-              <CardTitle className="text-lg">Últimas Atividades</CardTitle>
+              <CardTitle className="text-h4">Últimas Atividades</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between p-3 border rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full" />
                     <div>
                       <p className="text-sm font-medium">Relatório semanal enviado</p>
-                      <p className="text-xs text-gray-500">João Silva - há 2 horas</p>
+                      <p className="text-caption text-muted-foreground">João Silva - há 2 horas</p>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500">Entregue</div>
+                  <div className="text-caption text-muted-foreground">Entregue</div>
                 </div>
-                
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between p-3 border rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
                     <div>
                       <p className="text-sm font-medium">Promoção mensal programada</p>
-                      <p className="text-xs text-gray-500">Campanha Marketing - há 3 horas</p>
+                      <p className="text-caption text-muted-foreground">Campanha Marketing - há 3 horas</p>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500">Agendado</div>
+                  <div className="text-caption text-muted-foreground">Agendado</div>
                 </div>
               </div>
             </CardContent>
@@ -149,50 +121,22 @@ export function WhatsAppReportsTab() {
         </TabsContent>
 
         <TabsContent value="campaigns" className="space-y-6">
-          <CampaignList 
-            key={campaignRefreshKey}
-            onNewCampaign={() => setShowNewCampaignModal(true)} 
-          />
+          <CampaignList key={campaignRefreshKey} onNewCampaign={handleNewCampaign} />
         </TabsContent>
 
         <TabsContent value="messages" className="space-y-6">
-          <MessagesTable 
-            onNewMessage={() => setShowNewMessageModal(true)}
-            onOpenFilters={() => setShowMessageFiltersModal(true)}
-          />
+          <MessagesTable onNewMessage={handleNewMessage} onOpenFilters={handleMessageFilters} />
         </TabsContent>
 
         <TabsContent value="contacts" className="space-y-6">
-          <ContactsTable 
-            onNewContact={() => setShowNewContactModal(true)}
-            onEditContact={handleEditContact}
-          />
+          <ContactsTable onNewContact={handleNewContact} onEditContact={handleEditContact} />
         </TabsContent>
       </Tabs>
 
-      {/* Modals */}
-      <NewMessageModal 
-        open={showNewMessageModal} 
-        onClose={() => setShowNewMessageModal(false)} 
-      />
-      
-      <NewCampaignModal 
-        open={showNewCampaignModal} 
-        onClose={() => setShowNewCampaignModal(false)}
-        onSuccess={() => setCampaignRefreshKey(prev => prev + 1)}
-      />
-      
-      <NewContactModal 
-        open={showNewContactModal} 
-        onClose={handleCloseContactModal}
-        editingContact={editingContact}
-      />
-      
-      <MessageFiltersModal 
-        open={showMessageFiltersModal} 
-        onClose={() => setShowMessageFiltersModal(false)}
-        onApplyFilters={(filters) => console.log('Applying filters:', filters)}
-      />
+      <NewMessageModal open={showNewMessageModal} onClose={() => setShowNewMessageModal(false)} />
+      <NewCampaignModal open={showNewCampaignModal} onClose={() => setShowNewCampaignModal(false)} onSuccess={handleCampaignSuccess} />
+      <NewContactModal open={showNewContactModal} onClose={handleCloseContactModal} editingContact={editingContact} />
+      <MessageFiltersModal open={showMessageFiltersModal} onClose={() => setShowMessageFiltersModal(false)} onApplyFilters={(filters) => console.log('Applying filters:', filters)} />
     </div>
   );
 }

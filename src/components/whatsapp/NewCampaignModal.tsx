@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -82,7 +81,7 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
       });
       setSelectedTemplate(null);
       setTemplateVariables({});
-      
+
       onSuccess?.();
       onClose();
     } catch (error) {
@@ -103,9 +102,9 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova Campanha Automatizada</DialogTitle>
+          <DialogTitle className="text-h3">Nova Campanha Automatizada</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nome da Campanha</Label>
@@ -123,12 +122,9 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
               <Select 
                 value={formData.type} 
                 onValueChange={(value: 'relatorio' | 'financeiro' | 'promocional' | 'suporte') => 
-                  setFormData({ ...formData, type: value })
-                }
+                  setFormData({ ...formData, type: value })}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="relatorio">Relatório</SelectItem>
                   <SelectItem value="financeiro">Financeiro</SelectItem>
@@ -143,12 +139,9 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
               <Select 
                 value={formData.frequency} 
                 onValueChange={(value: 'diario' | 'semanal' | 'mensal') => 
-                  setFormData({ ...formData, frequency: value })
-                }
+                  setFormData({ ...formData, frequency: value })}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="diario">Diário</SelectItem>
                   <SelectItem value="semanal">Semanal</SelectItem>
@@ -165,14 +158,10 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
                 value={formData.dayOfWeek.toString()} 
                 onValueChange={(value) => setFormData({ ...formData, dayOfWeek: parseInt(value) })}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {dayLabels.map((day, index) => (
-                    <SelectItem key={index} value={index.toString()}>
-                      {day}
-                    </SelectItem>
+                    <SelectItem key={index} value={index.toString()}>{day}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -196,9 +185,7 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
                 value={formData.dataPeriodDays.toString()} 
                 onValueChange={(value) => setFormData({ ...formData, dataPeriodDays: parseInt(value) })}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1">1 dia</SelectItem>
                   <SelectItem value="7">7 dias</SelectItem>
@@ -215,11 +202,9 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
           />
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
             <Button onClick={handleCreate} disabled={loading || !selectedTemplate}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="size-4 mr-2" />
               {loading ? 'Criando...' : 'Criar Campanha'}
             </Button>
           </div>

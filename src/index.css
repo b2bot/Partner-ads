@@ -16,8 +16,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* PRIMARY custom roxo + HOVER */
+    --primary: 248 70% 60%;
+    --primary-hover: 248 65% 50%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -57,8 +59,10 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* PRIMARY custom roxo + HOVER */
+    --primary: 248 70% 60%;
+    --primary-hover: 248 65% 50%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -75,6 +79,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -386,6 +391,18 @@
   }
 
   .text-caption {
-    @apply text-xs font-medium tracking-wide uppercase;
+    @apply text-xs font-medium tracking-wide;
+  }
+  
+  /* Reduz o tamanho da fonte da legenda globalmente nos gráficos */
+  .recharts-legend-item-text {
+    font-size: 0.50rem; /* Tailwind equivale a text-xs */
+    line-height: 1rem;
+  }
+  
+  /* Recharts axis tick numbers */
+  .recharts-cartesian-axis-tick-value {
+    font-size: 0.625rem; /* Tailwind's text-xs */
+   fill: hsl(var(--muted-foreground)); /* Use seu tema de cor padrão */
   }
 }

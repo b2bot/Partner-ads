@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -29,10 +28,7 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name.trim() || !formData.phone_number.trim()) {
-      return;
-    }
+    if (!formData.name.trim() || !formData.phone_number.trim()) return;
 
     setLoading(true);
     try {
@@ -41,15 +37,8 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
       } else {
         await createContact(formData);
       }
-      
       onClose();
-      setFormData({
-        name: '',
-        phone_number: '',
-        grupo: '',
-        observacoes: '',
-        tags: [],
-      });
+      setFormData({ name: '', phone_number: '', grupo: '', observacoes: '', tags: [] });
     } catch (error) {
       console.error('Error saving contact:', error);
     } finally {
@@ -59,19 +48,13 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()]
-      }));
+      setFormData(prev => ({ ...prev, tags: [...prev.tags, newTag.trim()] }));
       setNewTag('');
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }));
+    setFormData(prev => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -85,11 +68,11 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-h3">
             {editingContact ? 'Editar Contato' : 'Novo Contato'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -102,7 +85,6 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="phone">Telefone *</Label>
               <Input
@@ -136,10 +118,10 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
                 className="flex-1"
               />
               <Button type="button" onClick={addTag} variant="outline" size="sm">
-                <Plus className="w-4 h-4" />
+                <Plus className="size-4" />
               </Button>
             </div>
-            
+
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {formData.tags.map((tag) => (
@@ -152,7 +134,7 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
                       className="h-4 w-4 p-0 ml-1"
                       onClick={() => removeTag(tag)}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="size-3" />
                     </Button>
                   </Badge>
                 ))}
@@ -172,9 +154,7 @@ export function NewContactModal({ open, onClose, editingContact }: NewContactMod
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
+            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={loading}>
               {loading ? 'Salvando...' : editingContact ? 'Atualizar' : 'Criar'}
             </Button>

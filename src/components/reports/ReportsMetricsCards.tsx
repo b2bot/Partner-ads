@@ -1,16 +1,9 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Eye, 
-  MousePointer, 
-  DollarSign, 
-  TrendingUp, 
-  Users, 
-  Calendar,
-  Target,
-  Phone
+import {
+  Eye, MousePointer, DollarSign, TrendingUp, Users,
+  Calendar, Target, Phone
 } from 'lucide-react';
 
 interface MetricsData {
@@ -39,187 +32,74 @@ export function ReportsMetricsCards({ data, platform }: ReportsMetricsCardsProps
 
   const isRelatorios = platform === 'relatorios';
 
-  // Métricas para relatórios diários
-  if (isRelatorios) {
-    const relatoriosMetrics = [
-      {
-        title: 'Contatos',
-        value: data.contatos || 0,
-        icon: Users,
-        change: '+12.3%',
-        changeType: 'positive' as const,
-        format: 'number'
-      },
-      {
-        title: 'Agendado',
-        value: data.agendado || 0,
-        icon: Calendar,
-        change: '+8.1%',
-        changeType: 'positive' as const,
-        format: 'number'
-      },
-      {
-        title: 'Atendimento',
-        value: data.atendimento || 0,
-        icon: Phone,
-        change: '+15.2%',
-        changeType: 'positive' as const,
-        format: 'number'
-      },
-      {
-        title: 'Orçamentos',
-        value: data.orcamentos || 0,
-        icon: Target,
-        change: '+6.7%',
-        changeType: 'positive' as const,
-        format: 'number'
-      },
-      {
-        title: 'Vendas',
-        value: data.vendas || 0,
-        icon: TrendingUp,
-        change: '+18.5%',
-        changeType: 'positive' as const,
-        format: 'number'
-      },
-      {
-        title: 'Faturado',
-        value: data.faturado || 0,
-        icon: DollarSign,
-        change: '+22.1%',
-        changeType: 'positive' as const,
-        format: 'currency'
-      }
-    ];
+  const formatNumber = (value: number | undefined, type: 'currency' | 'number') => {
+    if (!value && value !== 0) return '-';
+    return type === 'currency'
+      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+      : value.toLocaleString('pt-BR');
+  };
 
-    return (
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {relatoriosMetrics.map((metric, index) => (
-          <Card key={index} className="shadow rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300 lg:col-span-2">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                    {metric.title}
-                  </p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                    {metric.format === 'currency' 
-                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(metric.value)
-                      : metric.value.toLocaleString('pt-BR')
-                    }
-                  </p>
-                  <Badge 
-                    variant={metric.changeType === 'positive' ? 'default' : 'destructive'}
-                    className="text-xs"
-                  >
-                    {metric.change}
-                  </Badge>
-                </div>
-                <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">
-                  <metric.icon className="h-4 w-4" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
-  // Métricas para outras plataformas
-  const standardMetrics = [
-    {
-      title: 'Impressões',
-      value: data.impressions || 0,
-      icon: Eye,
-      change: '+12.3%',
-      changeType: 'positive' as const,
-      format: 'number'
-    },
-    {
-      title: 'Cliques',
-      value: data.clicks || 0,
-      icon: MousePointer,
-      change: '+8.1%',
-      changeType: 'positive' as const,
-      format: 'number'
-    },
-    {
-      title: 'Investimento',
-      value: data.spend || 0,
-      icon: DollarSign,
-      change: '+15.2%',
-      changeType: 'positive' as const,
-      format: 'currency'
-    },
-    {
-      title: 'Conversões',
-      value: data.conversions || 0,
-      icon: TrendingUp,
-      change: '+18.5%',
-      changeType: 'positive' as const,
-      format: 'number'
-    }
+  const relatoriosMetrics = [
+    { title: 'Contatos', value: data.contatos, icon: Users, change: '+12.3%', format: 'number' },
+    { title: 'Agendado', value: data.agendado, icon: Calendar, change: '+8.1%', format: 'number' },
+    { title: 'Atendimento', value: data.atendimento, icon: Phone, change: '+15.2%', format: 'number' },
+    { title: 'Orçamentos', value: data.orcamentos, icon: Target, change: '+6.7%', format: 'number' },
+    { title: 'Vendas', value: data.vendas, icon: TrendingUp, change: '+18.5%', format: 'number' },
+    { title: 'Faturado', value: data.faturado, icon: DollarSign, change: '+22.1%', format: 'currency' }
   ];
 
+  const standardMetrics = [
+    { title: 'Impressões', value: data.impressions, icon: Eye, change: '+12.3%', format: 'number' },
+    { title: 'Cliques', value: data.clicks, icon: MousePointer, change: '+8.1%', format: 'number' },
+    { title: 'Investimento', value: data.spend, icon: DollarSign, change: '+15.2%', format: 'currency' },
+    { title: 'Conversões', value: data.conversions, icon: TrendingUp, change: '+18.5%', format: 'number' }
+  ];
+
+  const renderCard = (metric: any, index: number) => (
+    <Card key={index} className="premium-card">
+      <CardContent className="p-5">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-caption text-muted-foreground">{metric.title}</p>
+            <p className="text-h4 text-foreground font-bold">
+              {formatNumber(metric.value, metric.format)}
+            </p>
+            <Badge variant="secondary" className="text-[0.7rem] font-medium">
+              {metric.change}
+            </Badge>
+          </div>
+          <div className="p-2 bg-muted rounded-lg text-muted-foreground">
+            <metric.icon className="h-4 w-4" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {standardMetrics.map((metric, index) => (
-        <Card
-          key={index}
-          className="shadow rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300"
-        >
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {metric.title}
-                </p>
-                <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                  {metric.format === 'currency'
-                    ? new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                      }).format(metric.value)
-                    : metric.value.toLocaleString('pt-BR')}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {metric.change}
-                </p>
-              </div>
-              <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">
-                <metric.icon className="h-4 w-4" />
-              </div>
+    <div className={`grid gap-4 ${isRelatorios ? 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-6' : 'grid-cols-2 lg:grid-cols-4'}`}>
+      {(isRelatorios ? relatoriosMetrics : standardMetrics).map(renderCard)}
+
+      {!isRelatorios && (
+        <Card className="premium-card lg:col-span-2">
+          <CardContent className="p-5">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {[
+                { label: 'CTR', value: data.ctr, suffix: '%' },
+                { label: 'CPC', value: data.cpc, prefix: 'R$' },
+                { label: 'CPM', value: data.cpm, prefix: 'R$' }
+              ].map((metric, i) => (
+                <div key={i}>
+                  <p className="text-caption text-muted-foreground">{metric.label}</p>
+                  <p className="text-h4 text-foreground font-bold">
+                    {metric.prefix || ''}{metric.value?.toFixed(2)}{metric.suffix || ''}
+                  </p>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
-      ))}
-
-      {/* Métricas secundárias para plataformas padrão */}
-      <Card className="shadow rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300 lg:col-span-2">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">CTR</p>
-              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {data.ctr?.toFixed(2)}%
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">CPC</p>
-              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                R$ {data.cpc?.toFixed(2)}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">CPM</p>
-              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                R$ {data.cpm?.toFixed(2)}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      )}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -31,23 +30,16 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
   };
 
   const handleSend = async () => {
-    if (!selectedTemplate || selectedContacts.length === 0) {
-      return;
-    }
+    if (!selectedTemplate || selectedContacts.length === 0) return;
 
-    // Verificar se todas as variáveis foram preenchidas
     const missingVariables = selectedTemplate.variables.filter(
       variable => !templateVariables[variable]?.trim()
     );
-
-    if (missingVariables.length > 0) {
-      return;
-    }
+    if (missingVariables.length > 0) return;
 
     setLoading(true);
     try {
       if (selectedContacts.length === 1) {
-        // Envio único
         await sendMessage({
           phoneNumber: selectedContacts[0].phone_number,
           templateName: selectedTemplate.name,
@@ -55,15 +47,12 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
           contactId: selectedContacts[0].id,
         });
       } else {
-        // Envio em lote
         await sendBulkMessages(
           selectedContacts.map(c => c.phone_number),
           selectedTemplate.name,
           templateVariables
         );
       }
-
-      // Reset form
       setSelectedContacts([]);
       setSelectedTemplate(null);
       setTemplateVariables({});
@@ -82,9 +71,9 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova Mensagem WhatsApp</DialogTitle>
+          <DialogTitle className="text-h3">Nova Mensagem WhatsApp</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
           <ContactSelector
             onContactsSelect={handleContactsSelect}
@@ -106,7 +95,7 @@ export function NewMessageModal({ open, onClose }: NewMessageModalProps) {
               onClick={handleSend} 
               disabled={loading || !isFormValid}
             >
-              <Send className="w-4 h-4 mr-2" />
+              <Send className="size-4 mr-2" />
               {loading ? 'Enviando...' : 
                selectedContacts.length > 1 ? `Enviar para ${selectedContacts.length} contatos` : 'Enviar'}
             </Button>
