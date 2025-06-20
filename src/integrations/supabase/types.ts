@@ -283,6 +283,79 @@ export type Database = {
           },
         ]
       }
+      client_permissions: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          enabled: boolean
+          id: string
+          module: Database["public"]["Enums"]["client_module"]
+          updated_at: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          enabled?: boolean
+          id?: string
+          module: Database["public"]["Enums"]["client_module"]
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          enabled?: boolean
+          id?: string
+          module?: Database["public"]["Enums"]["client_module"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_permissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_report_permissions: {
+        Row: {
+          account_ids: string[] | null
+          client_id: string
+          created_at: string | null
+          enabled: boolean
+          id: string
+          report_type: Database["public"]["Enums"]["report_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          account_ids?: string[] | null
+          client_id: string
+          created_at?: string | null
+          enabled?: boolean
+          id?: string
+          report_type: Database["public"]["Enums"]["report_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          account_ids?: string[] | null
+          client_id?: string
+          created_at?: string | null
+          enabled?: boolean
+          id?: string
+          report_type?: Database["public"]["Enums"]["report_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_report_permissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           ativo: boolean
@@ -1127,6 +1200,20 @@ export type Database = {
         Args: { user_id: string }
         Returns: boolean
       }
+      client_has_module_permission: {
+        Args: {
+          client_user_id: string
+          module_name: Database["public"]["Enums"]["client_module"]
+        }
+        Returns: boolean
+      }
+      client_has_report_permission: {
+        Args: {
+          client_user_id: string
+          report_name: Database["public"]["Enums"]["report_type"]
+        }
+        Returns: boolean
+      }
       get_user_cliente_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1160,6 +1247,7 @@ export type Database = {
     Enums: {
       access_type: "api" | "sheet"
       account_type: "meta" | "google"
+      client_module: "dashboard" | "chamados" | "relatorios" | "criativos"
       creative_status:
         | "pendente"
         | "aprovado"
@@ -1202,6 +1290,12 @@ export type Database = {
         | "view_system_logs"
         | "access_client_reports"
         | "manage_clients"
+      report_type:
+        | "campanhas"
+        | "conjuntos_anuncios"
+        | "anuncios"
+        | "criativos_performance"
+        | "whatsapp"
       task_priority: "baixa" | "media" | "alta" | "urgente"
       task_status:
         | "backlog"
@@ -1342,6 +1436,7 @@ export const Constants = {
     Enums: {
       access_type: ["api", "sheet"],
       account_type: ["meta", "google"],
+      client_module: ["dashboard", "chamados", "relatorios", "criativos"],
       creative_status: [
         "pendente",
         "aprovado",
@@ -1385,6 +1480,13 @@ export const Constants = {
         "view_system_logs",
         "access_client_reports",
         "manage_clients",
+      ],
+      report_type: [
+        "campanhas",
+        "conjuntos_anuncios",
+        "anuncios",
+        "criativos_performance",
+        "whatsapp",
       ],
       task_priority: ["baixa", "media", "alta", "urgente"],
       task_status: [

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Plus, Edit, Trash2, Users, Search, Key } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Search, Key, Shield } from 'lucide-react';
 import { CreateClientModal } from '@/components/CreateClientModal';
 import { EditClientModal } from '@/components/EditClientModal';
 import { ResetClientPasswordModal } from '@/components/ResetClientPasswordModal';
+import { ClientPermissionsManager } from '@/components/ClientPermissionsManager';
 import { toast } from 'sonner';
 import {
   Table,
@@ -47,6 +47,7 @@ export function ClientsManagementTab() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Cliente | null>(null);
   const [resetPasswordClient, setResetPasswordClient] = useState<Cliente | null>(null);
+  const [permissionsClient, setPermissionsClient] = useState<Cliente | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
 
@@ -238,6 +239,15 @@ export function ClientsManagementTab() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => setPermissionsClient(cliente)}
+                            className="h-8 w-8 p-0"
+                            title="Gerenciar permissões"
+                          >
+                            <Shield className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setEditingClient(cliente)}
                             className="h-8 w-8 p-0"
                           >
@@ -301,6 +311,14 @@ export function ClientsManagementTab() {
           client={resetPasswordClient}
           open={!!resetPasswordClient}
           onClose={() => setResetPasswordClient(null)}
+        />
+      )}
+
+      {permissionsClient && (
+        <ClientPermissionsManager
+          client={permissionsClient}
+          open={!!permissionsClient}
+          onClose={() => setPermissionsClient(null)}
         />
       )}
     </div>
