@@ -110,7 +110,7 @@ export function LoginForm() {
             Meta Ads Pro Manager
           </CardTitle>
           <p className="text-slate-600">
-            {isForgotPassword 
+			{isForgotPassword 
               ? 'Redefinir senha' 
               : isSignUp 
                 ? 'Crie sua conta para acessar o painel' 
