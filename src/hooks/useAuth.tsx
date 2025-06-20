@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 import { useUserPermissions } from './useUserPermissions';
-import { useClientPermissions } from './useClientPermissions';
+import { useClientPermissions } from './useClientPermissions'; // já refatorado
 import { useAuthActions } from './useAuthActions';
 import { Permission, ALL_PERMISSIONS } from '@/types/auth';
 import { hasPermission as checkPermission } from '@/utils/permissionUtils';
@@ -16,13 +15,17 @@ export function useAuth() {
   const { data: profile, isLoading: profileLoading } = useUserProfile(user);
   const { signIn, signUp, signOut } = useAuthActions();
 
-  // Verificar se é root admin baseado no perfil do banco
   const isRootAdmin = profile?.is_root_admin === true;
+  const isAdmin = profile?.role === 'admin' || isRootAdmin;
+  const isCliente = profile?.role === 'cliente' && !isRootAdmin;
 
   const { data: userPermissions = [], isLoading: permissionsLoading } = useUserPermissions(user, isRootAdmin);
-  
-  // Para clientes, usar o sistema de permissões específico
-  const { hasModulePermission, hasReportPermission, loading: clientPermissionsLoading } = useClientPermissions();
+
+  const {
+    hasModulePermission,
+    hasReportPermission,
+    loading: clientPermissionsLoading,
+  } = useClientPermissions(user, isCliente);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -40,14 +43,9 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const isAdmin = profile?.role === 'admin' || isRootAdmin;
-  const isCliente = profile?.role === 'cliente' && !isRootAdmin;
-
   const hasPermission = (permission: Permission): boolean => {
-    // Root admin sempre tem todas as permissões
     if (isRootAdmin) return true;
-    
-    // Para clientes, verificar permissões específicas de módulos
+
     if (isCliente) {
       switch (permission) {
         case 'access_dashboard':
@@ -59,19 +57,21 @@ export function useAuth() {
         case 'access_reports':
           return hasModulePermission('relatorios');
         case 'access_paid_media':
-          return hasReportPermission('campanhas') || hasReportPermission('conjuntos_anuncios') || hasReportPermission('anuncios');
+          return (
+            hasReportPermission('campanhas') ||
+            hasReportPermission('conjuntos_anuncios') ||
+            hasReportPermission('anuncios')
+          );
         default:
           return false;
       }
     }
-    
-    // Para outros usuários, verificar permissões específicas
+
     return checkPermission(userPermissions, permission, isRootAdmin);
   };
 
   const allPermissions = isRootAdmin ? ALL_PERMISSIONS : userPermissions;
 
-  // Debug mais detalhado
   console.log('🔐 Auth state detailed:', {
     userId: user?.id,
     userEmail: user?.email,
