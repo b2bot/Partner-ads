@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Settings, Shield, FileText, MessageCircle, BarChart3, Palette } from 'lucide-react';
+import { Settings, Shield, FileText, MessageCircle, BarChart3, Palette, ClipboardList } from 'lucide-react';
 
 interface Cliente {
   id: string;
@@ -120,6 +120,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
     { id: 'chamados', name: 'Chamados', icon: MessageCircle, description: 'Sistema de tickets e suporte' },
     { id: 'criativos', name: 'Criativos', icon: Palette, description: 'Gerenciamento de materiais criativos' },
     { id: 'relatorios', name: 'Relatórios', icon: FileText, description: 'Acesso aos relatórios personalizados' },
+    { id: 'tarefas', name: 'Tarefas', icon: ClipboardList, description: 'Gerenciamento de projetos e tarefas da equipe' },
   ];
 
   const reportTypes = [
