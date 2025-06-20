@@ -24,7 +24,9 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: { conteudo: string; arquivo_url?: string }) => {
-      if (!user) throw new Error('Usuário não autenticado');
+      if (!user || !user.id) {
+        throw new Error('Usuário não autenticado ou inválido');
+      }
 
       const { error: insertError } = await supabase
         .from('chamados_mensagens')
@@ -69,7 +71,7 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
     }
 
     if (!user) {
-      setError('Usuário não autenticado. Tente novamente.');
+      setError('Usuário não autenticado. Faça login novamente.');
       return;
     }
 
