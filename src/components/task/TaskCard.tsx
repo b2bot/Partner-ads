@@ -24,6 +24,7 @@ import { TaskDetailModal } from './TaskDetailModal';
 import { EditTaskModal } from './EditTaskModal';
 import { useTasks } from '@/hooks/task/useTasks';
 import { useAuth } from '@/hooks/useAuth';
+import { TaskQuickActions } from './TaskQuickActions';
 
 interface TaskCardProps {
   task: Task;
@@ -32,7 +33,7 @@ interface TaskCardProps {
 export function TaskCard({ task }: TaskCardProps) {
   const [showDetail, setShowDetail] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-  const { deleteTask } = useTasks();
+  const { deleteTask, updateTask } = useTasks();
   const { hasPermission } = useAuth();
 
   const getPriorityColor = (priority: string) => {
@@ -98,10 +99,14 @@ export function TaskCard({ task }: TaskCardProps) {
     }
   };
 
+  const handleComplete = () => {
+    updateTask({ id: task.id, status: 'finalizada' });
+  };
+
   return (
     <>
-      <Card 
-        className="premium-card hover:shadow-lg transition-all duration-200 cursor-pointer"
+      <Card
+        className="premium-card hover:shadow-lg transition-all duration-200 cursor-pointer group"
         onClick={() => setShowDetail(true)}
       >
         <CardHeader className="pb-3">
@@ -157,6 +162,10 @@ export function TaskCard({ task }: TaskCardProps) {
         </CardHeader>
 
         <CardContent className="space-y-3">
+          <TaskQuickActions
+            onEdit={() => setShowEdit(true)}
+            onComplete={handleComplete}
+          />
           <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
             {task.project && (
               <div className="flex items-center gap-1">

@@ -4,10 +4,10 @@ import { useTasks } from '@/hooks/task/useTasks';
 import { useProjects } from '@/hooks/task/useProjects';
 import { Task } from '@/types/task';
 import { TaskCard } from './TaskCard';
-import { TaskFilters } from './TaskFilters';
+import { TaskFilterBar } from './TaskFilterBar';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function TasksList() {
+export function TaskListView() {
   const [filters, setFilters] = useState<{
     project_id?: string;
     status?: string;
@@ -35,9 +35,9 @@ export function TasksList() {
 
   return (
     <div className="space-y-6">
-      <TaskFilters
+      <TaskFilterBar
         filters={filters}
-        onFiltersChange={setFilters}
+        onChange={setFilters}
         projects={projects}
       />
       
