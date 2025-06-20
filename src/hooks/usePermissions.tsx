@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Permission } from '@/types/auth';
 
-// Exportar o tipo Permission para compatibilidade
+// Exportar o tipo Permission para compatibilidad
 export type PermissionType = Permission;
 
 export interface UserPermission {
