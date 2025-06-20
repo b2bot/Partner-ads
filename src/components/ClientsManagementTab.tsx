@@ -5,10 +5,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Users } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Edit, Trash2, Users, Search, Key } from 'lucide-react';
 import { CreateClientModal } from '@/components/CreateClientModal';
 import { EditClientModal } from '@/components/EditClientModal';
+import { ResetClientPasswordModal } from '@/components/ResetClientPasswordModal';
 import { toast } from 'sonner';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface Cliente {
   id: string;
@@ -36,6 +46,8 @@ interface Cliente {
 export function ClientsManagementTab() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Cliente | null>(null);
+  const [resetPasswordClient, setResetPasswordClient] = useState<Cliente | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
 
   const { data: clientes, isLoading } = useQuery({
@@ -97,6 +109,13 @@ export function ClientsManagementTab() {
     }
   };
 
+  const filteredClientes = clientes?.filter(cliente =>
+    cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cliente.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cliente.empresa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cliente.telefone?.includes(searchTerm)
+  ) || [];
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -104,7 +123,7 @@ export function ClientsManagementTab() {
           <div className="h-5 bg-gray-200 rounded w-1/4 mb-3"></div>
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              <div key={i} className="h-16 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
@@ -121,113 +140,149 @@ export function ClientsManagementTab() {
             Cadastre e gerencie clientes, suas contas e permissões
           </p>
         </div>
-        <Button onClick={() => setCreateModalOpen(true)} size="sm" className="h-7 text-xs px-2">
-          <Plus className="h-3 w-3 mr-1" />
+        <Button onClick={() => setCreateModalOpen(true)} size="sm" className="h-8 text-xs px-3">
+          <Plus className="h-4 w-4 mr-1" />
           Novo Cliente
         </Button>
       </div>
 
-      <div className="grid gap-3">
-        {!clientes || clientes.length === 0 ? (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <Users className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
-                Nenhum cliente cadastrado
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                Comece criando seu primeiro cliente e configurando suas contas.
-              </p>
-              <Button onClick={() => setCreateModalOpen(true)} size="sm" className="h-7 text-xs px-2">
-                <Plus className="h-3 w-3 mr-1" />
-                Criar Primeiro Cliente
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          clientes.map((cliente) => (
-            <Card key={cliente.id}>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-sm">{cliente.nome}</CardTitle>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      {cliente.profiles?.email || 'Email não disponível'}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={cliente.ativo ? 'default' : 'secondary'}
-                      className={`text-xs ${cliente.ativo ? 'bg-green-100 text-green-800' : ''}`}
-                    >
-                      {cliente.ativo ? 'Ativo' : 'Inativo'}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {cliente.profiles?.role === 'admin' ? 'Admin' : 'Cliente'}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Tipo de acesso:</span>
-                    <span className="ml-2 text-xs">
-                      {cliente.tipo_acesso === 'api' ? 'API' : 'Google Sheets'}
-                    </span>
-                  </div>
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Buscar clientes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-9 text-sm"
+          />
+        </div>
+      </div>
 
-                  <div>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Contas vinculadas:</span>
-                    <div className="ml-2 mt-1">
-                      {!cliente.contas || cliente.contas.length === 0 ? (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">Nenhuma conta vinculada</span>
-                      ) : (
+      {!clientes || clientes.length === 0 ? (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              Nenhum cliente cadastrado
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Comece criando seu primeiro cliente e configurando suas contas.
+            </p>
+            <Button onClick={() => setCreateModalOpen(true)} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Criar Primeiro Cliente
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Lista de Clientes</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[200px]">Nome do Contato</TableHead>
+                    <TableHead>Empresa</TableHead>
+                    <TableHead>E-mail</TableHead>
+                    <TableHead>Telefone</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Contas</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredClientes.map((cliente) => (
+                    <TableRow key={cliente.id}>
+                      <TableCell className="font-medium">
+                        {cliente.nome}
+                      </TableCell>
+                      <TableCell>
+                        {cliente.empresa || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {cliente.profiles?.email || cliente.email || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {cliente.telefone || '-'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">
+                          {cliente.tipo_acesso === 'api' ? 'API' : 'Google Sheets'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={cliente.ativo ? 'default' : 'secondary'}
+                          className={`text-xs ${cliente.ativo ? 'bg-green-100 text-green-800' : ''}`}
+                        >
+                          {cliente.ativo ? 'Ativo' : 'Inativo'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {cliente.contas.map((conta) => (
+                          {cliente.contas?.map((conta) => (
                             <Badge key={conta.id} variant="outline" className="text-xs">
                               {conta.tipo.toUpperCase()}: {conta.nome}
                             </Badge>
-                          ))}
+                          )) || (
+                            <span className="text-xs text-gray-500">Nenhuma</span>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" onClick={() => setEditingClient(cliente)} className="h-6 text-xs px-2">
-                      <Edit className="h-3 w-3 mr-1" />
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        toggleClientStatus.mutate({
-                          clientId: cliente.id,
-                          ativo: !cliente.ativo,
-                        })
-                      }
-                      className="h-6 text-xs px-2"
-                    >
-                      {cliente.ativo ? 'Desativar' : 'Ativar'}
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteClient(cliente.id)}
-                      className="h-6 text-xs px-2"
-                    >
-                      <Trash2 className="h-3 w-3 mr-1" />
-                      Remover
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditingClient(cliente)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setResetPasswordClient(cliente)}
+                            className="h-8 w-8 p-0"
+                            title="Redefinir senha"
+                          >
+                            <Key className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              toggleClientStatus.mutate({
+                                clientId: cliente.id,
+                                ativo: !cliente.ativo,
+                              })
+                            }
+                            className="h-8 px-2 text-xs"
+                          >
+                            {cliente.ativo ? 'Desativar' : 'Ativar'}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteClient(cliente.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {createModalOpen && (
         <CreateClientModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} />
@@ -238,6 +293,14 @@ export function ClientsManagementTab() {
           client={editingClient}
           open={!!editingClient}
           onClose={() => setEditingClient(null)}
+        />
+      )}
+
+      {resetPasswordClient && (
+        <ResetClientPasswordModal
+          client={resetPasswordClient}
+          open={!!resetPasswordClient}
+          onClose={() => setResetPasswordClient(null)}
         />
       )}
     </div>
