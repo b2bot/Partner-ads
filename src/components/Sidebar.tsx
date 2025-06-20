@@ -41,7 +41,7 @@ interface NavigationItem {
   adminOnly?: boolean;
 }
 
-export function AppSidebar({ activeTab, setActiveTab }: SidebarProps) {
+export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const { hasPermission, isAdmin, isRootAdmin, isCliente, user } = useAuth();
