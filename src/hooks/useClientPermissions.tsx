@@ -1,7 +1,6 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { User } from '@supabase/supabase-js';
 
 export type ClientModule = 'dashboard' | 'chamados' | 'relatorios' | 'criativos';
 export type ReportType = 'campanhas' | 'conjuntos_anuncios' | 'anuncios' | 'criativos_performance' | 'whatsapp';
@@ -21,9 +20,7 @@ export interface ClientReportPermission {
   account_ids: string[];
 }
 
-export function useClientPermissions() {
-  const { user, isCliente } = useAuth();
-
+export function useClientPermissions(user: User | null, isCliente: boolean) {
   const { data: modulePermissions = [], isLoading: moduleLoading } = useQuery({
     queryKey: ['client-module-permissions', user?.id],
     queryFn: async () => {
