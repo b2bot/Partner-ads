@@ -38,12 +38,15 @@ export function ResetClientPasswordModal({ client, open, onClose }: ResetClientP
 
   const resetPasswordMutation = useMutation({
     mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
-      // Usar Supabase Admin API para atualizar senha de outro usuário
-      const { error } = await supabase.auth.admin.updateUserById(userId, {
-        password: password,
+      const { data, error } = await supabase.functions.invoke('reset-client-password', {
+        body: {
+          userId: userId,
+          newPassword: password,
+        },
       });
-      
+
       if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       toast.success('Senha do cliente atualizada com sucesso!');
@@ -58,7 +61,8 @@ export function ResetClientPasswordModal({ client, open, onClose }: ResetClientP
     },
     onError: (error: any) => {
       console.error('Erro ao redefinir senha:', error);
-      setError('Erro ao redefinir senha. Verifique suas permissões de administrador.');
+      const errorMessage = error.message || 'Erro ao redefinir senha. Verifique suas permissões de administrador.';
+      setError(errorMessage);
     },
   });
 
@@ -97,7 +101,7 @@ export function ResetClientPasswordModal({ client, open, onClose }: ResetClientP
         <DialogHeader>
           <DialogTitle>Redefinir Senha do Cliente</DialogTitle>
           <p className="text-sm text-gray-600">
-            Definir nova senha for <strong>{client.nome}</strong>
+            Definir nova senha para <strong>{client.nome}</strong>
             <br />
             <span className="text-xs text-gray-500">
               {client.profiles?.email || client.email}
