@@ -37,15 +37,15 @@ export function useAuth() {
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário');
-        setUser(session?.user ?? null);
-        setLoading(false);
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    async (_event, session) => {
+      console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário');
+      setUser(session?.user ?? null);
+      setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+  return () => subscription.unsubscribe();
   }, []);
 
   const hasPermission = (permission: Permission): boolean => {
@@ -104,7 +104,7 @@ export function useAuth() {
     signUp,
     signOut,
     isAdmin,
-    isRootAdmin,
+    isRootAdmin: profile?.is_root_admin ?? false,
     isCliente,
     permissions: allPermissions,
     hasPermission,

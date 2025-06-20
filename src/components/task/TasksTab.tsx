@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,13 +7,18 @@ import { TaskKanban } from './TaskKanban';
 import { TaskCalendar } from './TaskCalendar';
 import { CreateTaskModal } from './CreateTaskModal';
 import { CreateProjectModal } from './CreateProjectModal';
+import { EditProjectModal } from './EditProjectModal';
 import { Button } from '@/components/ui/button';
 import { Plus, FolderPlus } from 'lucide-react';
+import { Project } from '@/types/task';
 
 export function TasksTab() {
   const { hasPermission } = useAuth();
+
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
+  const [editProject, setEditProject] = useState<Project | null>(null);
+  const [showEditProject, setShowEditProject] = useState(false);
   const [activeView, setActiveView] = useState('list');
 
   if (!hasPermission('access_tasks')) {
@@ -30,19 +34,19 @@ export function TasksTab() {
   }
 
   return (
-    <div className="premium-surface h-full">
-      <div className="premium-container py-6">
-        <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6 max-w-9xl">
+      <div className="premium-container py-0">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-heading-2 text-slate-800 dark:text-slate-100 mb-2">
+            <h1 className="text-lg font-bold text-slate-800">
               Gerenciamento de Tarefas
             </h1>
-            <p className="text-body text-slate-600 dark:text-slate-400">
+            <p className="text-slate-600 text-xs">
               Organize e acompanhe o progresso dos seus projetos e tarefas
             </p>
           </div>
-          
-          <div className="flex gap-3">
+
+          <div className="flex flex-col sm:flex-row gap-3">
             {hasPermission('create_tasks') && (
               <>
                 <Button
@@ -86,10 +90,16 @@ export function TasksTab() {
           </TabsContent>
 
           <TabsContent value="projects" className="space-y-6">
-            <ProjectsList />
+            <ProjectsList
+              onEditProject={(project) => {
+                setEditProject(project);
+                setShowEditProject(true);
+              }}
+            />
           </TabsContent>
         </Tabs>
 
+        {/* Modais */}
         {showCreateTask && (
           <CreateTaskModal
             open={showCreateTask}
@@ -101,6 +111,14 @@ export function TasksTab() {
           <CreateProjectModal
             open={showCreateProject}
             onClose={() => setShowCreateProject(false)}
+          />
+        )}
+
+        {editProject && showEditProject && (
+          <EditProjectModal
+            open={showEditProject}
+            onClose={() => setShowEditProject(false)}
+            project={editProject}
           />
         )}
       </div>

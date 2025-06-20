@@ -1,15 +1,26 @@
-
 import { useState } from 'react';
 import { useProjects } from '@/hooks/task/useProjects';
 import { CreateProjectData } from '@/types/task';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface CreateProjectModalProps {
   open: boolean;
@@ -18,14 +29,14 @@ interface CreateProjectModalProps {
 
 export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
   const { createProject, isCreating } = useProjects();
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState<Partial<CreateProjectData>>({
     name: '',
     description: '',
-    client_id: '',
+    client_id: null,
   });
 
-  // Buscar clientes para o select
   const { data: clients = [] } = useQuery({
     queryKey: ['clients-for-projects'],
     queryFn: async () => {
@@ -42,13 +53,15 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name) return;
 
-    const projectData = {
-      ...formData,
-      client_id: formData.client_id || undefined,
-    } as CreateProjectData;
+    if (!formData.name || !user?.id) return;
+
+    const projectData: CreateProjectData = {
+      name: formData.name,
+      description: formData.description || '',
+      client_id: formData.client_id || null,
+      created_by: user.id, // 🔥 Aqui tava o ouro faltando
+    };
 
     createProject(projectData, {
       onSuccess: () => {
@@ -56,7 +69,7 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
         setFormData({
           name: '',
           description: '',
-          client_id: '',
+          client_id: null,
         });
       },
     });
@@ -76,7 +89,9 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
               placeholder="Digite o nome do projeto"
               required
             />
@@ -86,19 +101,26 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
           <div className="space-y-2">
             <Label htmlFor="client">Cliente</Label>
             <Select
-              value={formData.client_id}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, client_id: value }))}
+              value={formData.client_id ?? 'none'}
+              onValueChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  client_id: value === 'none' ? null : value,
+                }))
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um cliente (opcional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhum cliente</SelectItem>
-                {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.nome}
-                  </SelectItem>
-                ))}
+                <SelectItem value="none">Nenhum cliente</SelectItem>
+                {clients
+                  .filter((client) => client?.id)
+                  .map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.nome}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -109,7 +131,12 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               placeholder="Descreva o objetivo e escopo do projeto"
               rows={4}
             />

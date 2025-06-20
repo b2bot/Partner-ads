@@ -1,17 +1,31 @@
-
 import { useState } from 'react';
 import { useProjects } from '@/hooks/task/useProjects';
 import { Project } from '@/types/task';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Edit, Archive, Folder, Building } from 'lucide-react';
 import { format } from 'date-fns';
 
-export function ProjectsList() {
+interface ProjectsListProps {
+  onEditProject: (project: Project) => void;
+}
+
+export function ProjectsList({ onEditProject }: ProjectsListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
 
@@ -29,7 +43,7 @@ export function ProjectsList() {
 
   const filteredProjects = projects.filter((project: Project) => {
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = !statusFilter || project.status === statusFilter;
+    const matchesStatus = !statusFilter || statusFilter === 'all' || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -50,7 +64,7 @@ export function ProjectsList() {
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="ativo">Ativo</SelectItem>
             <SelectItem value="arquivado">Arquivado</SelectItem>
           </SelectContent>
@@ -73,7 +87,11 @@ export function ProjectsList() {
           </div>
         ) : (
           filteredProjects.map((project: Project) => (
-            <ProjectCard key={project.id} project={project} />
+            <ProjectCard
+              key={project.id}
+              project={project}
+              onEdit={() => onEditProject(project)}
+            />
           ))
         )}
       </div>
@@ -81,7 +99,13 @@ export function ProjectsList() {
   );
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard({
+  project,
+  onEdit
+}: {
+  project: Project;
+  onEdit: () => void;
+}) {
   return (
     <Card className="premium-card hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
@@ -89,7 +113,7 @@ function ProjectCard({ project }: { project: Project }) {
           <div className="flex-1">
             <CardTitle className="text-lg mb-2">{project.name}</CardTitle>
             <div className="flex items-center gap-2 mb-2">
-              <Badge 
+              <Badge
                 variant={project.status === 'ativo' ? 'default' : 'secondary'}
                 className="text-xs"
               >
@@ -103,7 +127,7 @@ function ProjectCard({ project }: { project: Project }) {
               )}
             </div>
           </div>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={onEdit}>
             <Edit className="h-4 w-4" />
           </Button>
         </div>
@@ -115,15 +139,12 @@ function ProjectCard({ project }: { project: Project }) {
             {project.description}
           </p>
         )}
-
         <div className="flex items-center justify-between text-xs text-slate-500">
           <span>
             Criado em {format(new Date(project.created_at), 'dd/MM/yyyy')}
           </span>
           {project.created_by_profile && (
-            <span>
-              por {project.created_by_profile.nome}
-            </span>
+            <span>por {project.created_by_profile.nome}</span>
           )}
         </div>
       </CardContent>
