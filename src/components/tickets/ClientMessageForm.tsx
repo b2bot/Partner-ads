@@ -25,7 +25,7 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: { conteudo: string; arquivo_url?: string }) => {
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('chamados_mensagens')
         .insert({
           chamado_id: ticketId,
@@ -36,7 +36,14 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
           autor_tipo: 'cliente'
         });
 
-      if (error) throw error;
+      const { error: updateError } = await supabase
+        .from('chamados')
+        .update({ status: 'Aguardando equipe' })
+        .eq('id', ticketId);
+      // ❌ Se der erro no update, lança também
+      if (insertError) throw insertError;
+      if (updateError) throw updateError;
+
     },
     onSuccess: () => {
       toast.success('Mensagem enviada com sucesso!');
