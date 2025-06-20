@@ -7,7 +7,7 @@ import { Plus, Clock, Users, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// Permitir string para tipo custom vindo do banco
+// Permitir string para tipo custom vindo do-banco
 type Campaign = {
   id: string;
   name: string;
