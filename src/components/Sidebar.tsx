@@ -42,7 +42,8 @@ interface NavigationItem {
 }
 
 export function AppSidebar({ activeTab, setActiveTab }: SidebarProps) {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const collapsed = state === 'collapsed';
   const { hasPermission, isAdmin, isRootAdmin, isCliente, user } = useAuth();
   const { hasModulePermission } = useClientPermissions(user, isCliente);
 

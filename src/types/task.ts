@@ -148,6 +148,20 @@ export interface CreateTaskData {
   frequency?: TaskFrequency;
 }
 
+export interface UpdateTaskData {
+  id: string;
+  title?: string;
+  description?: string;
+  type?: string;
+  priority?: TaskPriority;
+  status?: TaskStatus;
+  owner_id?: string;
+  start_date?: string;
+  due_date?: string;
+  tags?: string[];
+  project_id?: string;
+}
+
 export interface CreateTaskStepData {
   task_id: string;
   title: string;

@@ -1,18 +1,14 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Task, CreateTaskData } from '@/types/task';
+import { Task, CreateTaskData, UpdateTaskData } from '@/types/task';
 import { toast } from 'sonner';
 
-export function useTasks(filters?: {
-  project_id?: string;
-  owner_id?: string;
-  status?: string;
-  client_id?: string;
-}) {
+export function useTasks(filters?: any) {
   const queryClient = useQueryClient();
 
-  const { data: tasks = [], isLoading } = useQuery({
+  // Buscar tarefas
+  const { data: tasks = [], isLoading, error } = useQuery({
     queryKey: ['tasks', filters],
     queryFn: async () => {
       let query = supabase
@@ -26,88 +22,97 @@ export function useTasks(filters?: {
         `)
         .order('created_at', { ascending: false });
 
+      // Aplicar filtros se fornecidos
       if (filters?.project_id) {
         query = query.eq('project_id', filters.project_id);
-      }
-      if (filters?.owner_id) {
-        query = query.eq('owner_id', filters.owner_id);
       }
       if (filters?.status) {
         query = query.eq('status', filters.status);
       }
-      if (filters?.client_id) {
-        query = query.eq('project.client_id', filters.client_id);
+      if (filters?.priority) {
+        query = query.eq('priority', filters.priority);
+      }
+      if (filters?.owner_id) {
+        query = query.eq('owner_id', filters.owner_id);
       }
 
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error loading tasks:', error);
+        console.error('Erro ao buscar tarefas:', error);
         throw error;
       }
 
-      return data as Task[];
+      return data || [];
     },
   });
 
+  // Criar tarefa
   const createTaskMutation = useMutation({
-    mutationFn: async (taskData: CreateTaskData) => {
-      const { data, error } = await supabase
+    mutationFn: async (data: CreateTaskData) => {
+      const { data: result, error } = await supabase
         .from('tasks')
-        .insert(taskData)
+        .insert([{
+          ...data,
+          status: 'backlog'
+        }])
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast.success('Tarefa criada com sucesso!');
     },
     onError: (error) => {
-      console.error('Error creating task:', error);
+      console.error('Erro ao criar tarefa:', error);
       toast.error('Erro ao criar tarefa');
     },
   });
 
+  // Atualizar tarefa
   const updateTaskMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Task> & { id: string }) => {
-      const { data, error } = await supabase
+    mutationFn: async (data: UpdateTaskData) => {
+      const { id, ...updateData } = data;
+      const { data: result, error } = await supabase
         .from('tasks')
-        .update(updates)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast.success('Tarefa atualizada com sucesso!');
     },
     onError: (error) => {
-      console.error('Error updating task:', error);
+      console.error('Erro ao atualizar tarefa:', error);
       toast.error('Erro ao atualizar tarefa');
     },
   });
 
+  // Deletar tarefa
   const deleteTaskMutation = useMutation({
-    mutationFn: async (taskId: string) => {
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('tasks')
         .delete()
-        .eq('id', taskId);
+        .eq('id', id);
 
       if (error) throw error;
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast.success('Tarefa excluída com sucesso!');
     },
     onError: (error) => {
-      console.error('Error deleting task:', error);
+      console.error('Erro ao excluir tarefa:', error);
       toast.error('Erro ao excluir tarefa');
     },
   });
@@ -115,11 +120,12 @@ export function useTasks(filters?: {
   return {
     tasks,
     isLoading,
+    error,
     createTask: createTaskMutation.mutate,
-    updateTask: updateTaskMutation.mutate,
-    deleteTask: deleteTaskMutation.mutate,
     isCreating: createTaskMutation.isPending,
+    updateTask: updateTaskMutation.mutate,
     isUpdating: updateTaskMutation.isPending,
+    deleteTask: deleteTaskMutation.mutate,
     isDeleting: deleteTaskMutation.isPending,
   };
 }

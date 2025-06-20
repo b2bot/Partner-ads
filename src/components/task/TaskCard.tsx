@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Task } from '@/types/task';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -96,7 +95,7 @@ export function TaskCard({ task }: TaskCardProps) {
                 {task.status}
               </Badge>
               
-              {hasPermission('edit_tasks') && (
+              {hasPermission('manage_tasks') && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                     <Button variant="ghost" size="sm">

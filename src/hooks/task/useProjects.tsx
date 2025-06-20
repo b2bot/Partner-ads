@@ -7,7 +7,8 @@ import { toast } from 'sonner';
 export function useProjects() {
   const queryClient = useQueryClient();
 
-  const { data: projects = [], isLoading } = useQuery({
+  // Buscar projetos
+  const { data: projects = [], isLoading, error } = useQuery({
     queryKey: ['projects'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -15,77 +16,85 @@ export function useProjects() {
         .select(`
           *,
           client:clientes(id, nome),
-          created_by_profile:profiles(id, nome)
+          created_by_profile:profiles!projects_created_by_fkey(id, nome)
         `)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading projects:', error);
+        console.error('Erro ao buscar projetos:', error);
         throw error;
       }
 
-      return data as Project[];
+      return data || [];
     },
   });
 
+  // Criar projeto
   const createProjectMutation = useMutation({
-    mutationFn: async (projectData: CreateProjectData) => {
-      const { data, error } = await supabase
+    mutationFn: async (data: CreateProjectData) => {
+      const { data: result, error } = await supabase
         .from('projects')
-        .insert(projectData)
+        .insert([{
+          ...data,
+          status: 'ativo'
+        }])
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast.success('Projeto criado com sucesso!');
     },
     onError: (error) => {
-      console.error('Error creating project:', error);
+      console.error('Erro ao criar projeto:', error);
       toast.error('Erro ao criar projeto');
     },
   });
 
+  // Atualizar projeto
   const updateProjectMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Project> & { id: string }) => {
-      const { data, error } = await supabase
+    mutationFn: async (data: { id: string; name?: string; description?: string; status?: string }) => {
+      const { id, ...updateData } = data;
+      const { data: result, error } = await supabase
         .from('projects')
-        .update(updates)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast.success('Projeto atualizado com sucesso!');
     },
     onError: (error) => {
-      console.error('Error updating project:', error);
+      console.error('Erro ao atualizar projeto:', error);
       toast.error('Erro ao atualizar projeto');
     },
   });
 
+  // Deletar projeto
   const deleteProjectMutation = useMutation({
-    mutationFn: async (projectId: string) => {
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('projects')
         .delete()
-        .eq('id', projectId);
+        .eq('id', id);
 
       if (error) throw error;
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast.success('Projeto excluído com sucesso!');
     },
     onError: (error) => {
-      console.error('Error deleting project:', error);
+      console.error('Erro ao excluir projeto:', error);
       toast.error('Erro ao excluir projeto');
     },
   });
@@ -93,11 +102,12 @@ export function useProjects() {
   return {
     projects,
     isLoading,
+    error,
     createProject: createProjectMutation.mutate,
-    updateProject: updateProjectMutation.mutate,
-    deleteProject: deleteProjectMutation.mutate,
     isCreating: createProjectMutation.isPending,
+    updateProject: updateProjectMutation.mutate,
     isUpdating: updateProjectMutation.isPending,
+    deleteProject: deleteProjectMutation.mutate,
     isDeleting: deleteProjectMutation.isPending,
   };
 }
