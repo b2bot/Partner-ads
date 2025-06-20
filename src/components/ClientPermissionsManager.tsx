@@ -76,7 +76,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
         .from('client_permissions')
         .upsert({
           client_id: client.id,
-          module,
+          module: module as any,
           enabled,
         });
 
@@ -98,7 +98,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
         .from('client_report_permissions')
         .upsert({
           client_id: client.id,
-          report_type: reportType,
+          report_type: reportType as any,
           enabled,
           account_ids: accountIds || [],
         });
