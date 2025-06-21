@@ -7,6 +7,15 @@ import { TaskCard } from './TaskCard';
 import { TaskFilterBar } from './TaskFilterBar';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const statusGroups = [
+  { status: 'backlog', label: 'Planejamento' },
+  { status: 'execucao', label: 'Execução' },
+  { status: 'revisao', label: 'Revisão' },
+  { status: 'aguardando', label: 'Aguardando' },
+  { status: 'finalizada', label: 'Finalizada' },
+  { status: 'cancelada', label: 'Cancelada' },
+];
+
 export function TaskListView() {
   const [filters, setFilters] = useState<{
     project_id?: string;
@@ -40,9 +49,9 @@ export function TaskListView() {
         onChange={setFilters}
         projects={projects}
       />
-      
-      <div className="space-y-4">
-        {filteredTasks.length === 0 ? (
+
+      <div className="space-y-8">
+        {filteredTasks.length === 0 && (
           <div className="text-center py-12 premium-card">
             <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-4 shadow-xl">
               <span className="text-white font-bold text-xl">📋</span>
@@ -54,11 +63,24 @@ export function TaskListView() {
               Crie uma nova tarefa para começar
             </p>
           </div>
-        ) : (
-          filteredTasks.map((task: Task) => (
-            <TaskCard key={task.id} task={task} />
-          ))
         )}
+
+        {statusGroups.map((group) => {
+          const groupTasks = filteredTasks.filter(t => t.status === group.status);
+          if (groupTasks.length === 0) return null;
+          return (
+            <div key={group.status} className="space-y-3">
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {group.label}
+              </h3>
+              <div className="space-y-3">
+                {groupTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
