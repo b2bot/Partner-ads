@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { TaskTabView } from './TaskTabView';
-import { CreateTaskModal } from './CreateTaskModal';
+import { TaskModal } from './TaskModal';
 import { CreateProjectModal } from './CreateProjectModal';
 import { EditProjectModal } from './EditProjectModal';
 import { Button } from '@/components/ui/button';
@@ -73,7 +73,7 @@ export function TasksTab() {
 
         {/* Modais */}
         {showCreateTask && (
-          <CreateTaskModal
+          <TaskModal
             open={showCreateTask}
             onClose={() => setShowCreateTask(false)}
           />
