@@ -54,6 +54,7 @@ export function TaskProjectsView({ onEditProject }: TaskProjectsViewProps) {
     const matchesClient =
       !clientFilter || clientFilter === 'all' ||
       (project.client && project.client.nome === clientFilter);
+
     return matchesSearch && matchesStatus && matchesClient;
   });
 
@@ -83,6 +84,7 @@ export function TaskProjectsView({ onEditProject }: TaskProjectsViewProps) {
             <SelectValue placeholder="Cliente" />
           </SelectTrigger>
           <SelectContent>
+
             <SelectItem value="all">Todos</SelectItem>
             {uniqueClients.map((client) => (
               <SelectItem key={client} value={client}>
