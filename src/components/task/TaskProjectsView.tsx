@@ -52,7 +52,9 @@ export function TaskProjectsView({ onEditProject }: TaskProjectsViewProps) {
     const matchesStatus =
       !statusFilter || statusFilter === 'all' || project.status === statusFilter;
     const matchesClient =
-      !clientFilter || (project.client && project.client.nome === clientFilter);
+      !clientFilter || clientFilter === 'all' ||
+      (project.client && project.client.nome === clientFilter);
+
     return matchesSearch && matchesStatus && matchesClient;
   });
 
@@ -82,7 +84,8 @@ export function TaskProjectsView({ onEditProject }: TaskProjectsViewProps) {
             <SelectValue placeholder="Cliente" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
+
+            <SelectItem value="all">Todos</SelectItem>
             {uniqueClients.map((client) => (
               <SelectItem key={client} value={client}>
                 {client}
