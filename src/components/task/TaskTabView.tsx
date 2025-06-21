@@ -5,22 +5,28 @@ import { TaskKanban } from './TaskKanban';
 import { TaskCalendar } from './TaskCalendar';
 import { TaskProjectsView } from './TaskProjectsView';
 import { TaskFlowTemplates } from './TaskFlowTemplates';
+import { TaskManagerDashboard } from './TaskManagerDashboard';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TaskTabViewProps {
   onEditProject: (projectId: any) => void;
 }
 
 export function TaskTabView({ onEditProject }: TaskTabViewProps) {
+  const { isRootAdmin } = useAuth();
   const [activeView, setActiveView] = useState('list');
 
   return (
     <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-      <TabsList className="grid w-full grid-cols-5 max-w-md mb-6">
+      <TabsList className={`grid w-full ${isRootAdmin ? 'grid-cols-6' : 'grid-cols-5'} max-w-md mb-6`}>
         <TabsTrigger value="list">Lista</TabsTrigger>
         <TabsTrigger value="kanban">Kanban</TabsTrigger>
         <TabsTrigger value="calendar">Calendário</TabsTrigger>
         <TabsTrigger value="projects">Projetos</TabsTrigger>
         <TabsTrigger value="flows">Fluxos</TabsTrigger>
+        {isRootAdmin && (
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+        )}
       </TabsList>
 
       <TabsContent value="list" className="space-y-6">
@@ -38,6 +44,11 @@ export function TaskTabView({ onEditProject }: TaskTabViewProps) {
       <TabsContent value="flows" className="space-y-6">
         <TaskFlowTemplates />
       </TabsContent>
+      {isRootAdmin && (
+        <TabsContent value="overview" className="space-y-6">
+          <TaskManagerDashboard />
+        </TabsContent>
+      )}
     </Tabs>
   );
 }

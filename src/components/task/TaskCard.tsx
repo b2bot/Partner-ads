@@ -20,8 +20,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { TaskDetailModal } from './TaskDetailModal';
-import { EditTaskModal } from './EditTaskModal';
+import { TaskDetailsDrawer } from './TaskDetailsDrawer';
+import { TaskModal } from './TaskModal';
 import { useTasks } from '@/hooks/task/useTasks';
 import { useAuth } from '@/hooks/useAuth';
 import { TaskQuickActions } from './TaskQuickActions';
@@ -31,7 +31,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task }: TaskCardProps) {
-  const [showDetail, setShowDetail] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const { deleteTask, updateTask } = useTasks();
   const { hasPermission } = useAuth();
@@ -107,7 +107,7 @@ export function TaskCard({ task }: TaskCardProps) {
     <>
       <Card
         className="premium-card hover:shadow-lg transition-all duration-200 cursor-pointer group"
-        onClick={() => setShowDetail(true)}
+        onDoubleClick={() => setShowDrawer(true)}
       >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
@@ -226,16 +226,16 @@ export function TaskCard({ task }: TaskCardProps) {
         </CardContent>
       </Card>
 
-      {showDetail && (
-        <TaskDetailModal
+      {showDrawer && (
+        <TaskDetailsDrawer
           task={task}
-          open={showDetail}
-          onClose={() => setShowDetail(false)}
+          open={showDrawer}
+          onOpenChange={setShowDrawer}
         />
       )}
 
       {showEdit && (
-        <EditTaskModal
+        <TaskModal
           task={task}
           open={showEdit}
           onClose={() => setShowEdit(false)}
