@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AnimatePresence, motion } from 'framer-motion';
 import { TaskListView } from './TaskListView';
 import { TaskKanban } from './TaskKanban';
 import { TaskCalendar } from './TaskCalendar';
@@ -15,40 +16,42 @@ interface TaskTabViewProps {
 export function TaskTabView({ onEditProject }: TaskTabViewProps) {
   const { isRootAdmin } = useAuth();
   const [activeView, setActiveView] = useState('list');
+  const tabs = [
+    { value: 'list', label: 'Lista', element: <TaskListView /> },
+    { value: 'kanban', label: 'Kanban', element: <TaskKanban /> },
+    { value: 'calendar', label: 'Calendário', element: <TaskCalendar /> },
+    { value: 'projects', label: 'Projetos', element: <TaskProjectsView onEditProject={onEditProject} /> },
+    { value: 'flows', label: 'Fluxos', element: <TaskFlowTemplates /> },
+    { value: 'overview', label: 'Visão Geral', element: <TaskManagerDashboard /> },
+  ];
+
+  const visibleTabs = isRootAdmin ? tabs : tabs.filter(t => t.value !== 'overview');
+
+  const ActiveComponent = visibleTabs.find(t => t.value === activeView)?.element;
 
   return (
-    <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-      <TabsList className={`grid w-full ${isRootAdmin ? 'grid-cols-6' : 'grid-cols-5'} max-w-md mb-6`}>
-        <TabsTrigger value="list">Lista</TabsTrigger>
-        <TabsTrigger value="kanban">Kanban</TabsTrigger>
-        <TabsTrigger value="calendar">Calendário</TabsTrigger>
-        <TabsTrigger value="projects">Projetos</TabsTrigger>
-        <TabsTrigger value="flows">Fluxos</TabsTrigger>
-        {isRootAdmin && (
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-        )}
-      </TabsList>
-
-      <TabsContent value="list" className="space-y-6">
-        <TaskListView />
-      </TabsContent>
-      <TabsContent value="kanban" className="space-y-6">
-        <TaskKanban />
-      </TabsContent>
-      <TabsContent value="calendar" className="space-y-6">
-        <TaskCalendar />
-      </TabsContent>
-      <TabsContent value="projects" className="space-y-6">
-        <TaskProjectsView onEditProject={onEditProject} />
-      </TabsContent>
-      <TabsContent value="flows" className="space-y-6">
-        <TaskFlowTemplates />
-      </TabsContent>
-      {isRootAdmin && (
-        <TabsContent value="overview" className="space-y-6">
-          <TaskManagerDashboard />
-        </TabsContent>
-      )}
-    </Tabs>
+    <div className="w-full">
+      <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
+        <TabsList className={`grid w-full ${isRootAdmin ? 'grid-cols-6' : 'grid-cols-5'} max-w-md mb-6`}>
+          {visibleTabs.map(tab => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeView}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+          className="space-y-6"
+        >
+          {ActiveComponent}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }
