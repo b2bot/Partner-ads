@@ -1,22 +1,20 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Project, CreateProjectData } from '@/types/task';
-import { toast } from 'sonner';
+import { Project, CreateProjectData, ProjectInsert, ProjectWithDetails } from '@/types/task';
+import { toast } from '@/hooks/use-toast';
 
-export function useProjects() {
-  const queryClient = useQueryClient();
-
-  // Buscar projetos
-  const { data: projects = [], isLoading, error } = useQuery({
+export const useProjects = () => {
+  return useQuery({
     queryKey: ['projects'],
-    queryFn: async () => {
+    queryFn: async (): Promise<ProjectWithDetails[]> => {
       const { data, error } = await supabase
         .from('projects')
         .select(`
           *,
           client:clientes(id, nome),
-          created_by_profile:profiles!projects_created_by_fkey(id, nome)
+          responsible:profiles!fk_projects_responsible(*),
+          creator:profiles!projects_created_by_fkey(id, nome),
+          tasks(*)
         `)
         .order('created_at', { ascending: false });
 
@@ -25,37 +23,52 @@ export function useProjects() {
         throw error;
       }
 
-      return data || [];
+      return (data || []).map(project => ({
+        ...project,
+        responsible: Array.isArray(project.responsible) ? project.responsible[0] || null : project.responsible,
+        creator: Array.isArray(project.creator) ? project.creator[0] || null : project.creator,
+        client: Array.isArray(project.client) ? project.client[0] || null : project.client,
+        tasks: project.tasks || []
+      }));
     },
   });
+};
 
-  // Criar projeto
-  const createProjectMutation = useMutation({
-    mutationFn: async (data: CreateProjectData) => {
-      const { data: result, error } = await supabase
+export const useCreateProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (project: ProjectInsert) => {
+      const { data, error } = await supabase
         .from('projects')
-        .insert([{
-          ...data,
-          status: 'ativo'
-        }])
+        .insert(project)
         .select()
         .single();
 
       if (error) throw error;
-      return result;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      toast.success('Projeto criado com sucesso!');
+      toast({
+        title: 'Projeto criado',
+        description: 'O projeto foi criado com sucesso.',
+      });
     },
     onError: (error) => {
-      console.error('Erro ao criar projeto:', error);
-      toast.error('Erro ao criar projeto');
+      toast({
+        title: 'Erro ao criar projeto',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
+};
 
-  // Atualizar projeto
-  const updateProjectMutation = useMutation({
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: async (data: { id: string; name?: string; description?: string; status?: string }) => {
       const { id, ...updateData } = data;
       const { data: result, error } = await supabase
@@ -70,16 +83,22 @@ export function useProjects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      toast.success('Projeto atualizado com sucesso!');
+      toast({ title: 'Projeto atualizado com sucesso.' });
     },
     onError: (error) => {
-      console.error('Erro ao atualizar projeto:', error);
-      toast.error('Erro ao atualizar projeto');
+      toast({
+        title: 'Erro ao atualizar projeto',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
+};
 
-  // Deletar projeto
-  const deleteProjectMutation = useMutation({
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('projects')
@@ -91,23 +110,32 @@ export function useProjects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      toast.success('Projeto excluído com sucesso!');
+      toast({ title: 'Projeto excluído com sucesso.' });
     },
     onError: (error) => {
-      console.error('Erro ao excluir projeto:', error);
-      toast.error('Erro ao excluir projeto');
+      toast({
+        title: 'Erro ao excluir projeto',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
+};
 
+export const useCreateProjectCompat = () => {
+  const createMutation = useCreateProject();
   return {
-    projects,
-    isLoading,
-    error,
-    createProject: createProjectMutation.mutate,
-    isCreating: createProjectMutation.isPending,
-    updateProject: updateProjectMutation.mutate,
-    isUpdating: updateProjectMutation.isPending,
-    deleteProject: deleteProjectMutation.mutate,
-    isDeleting: deleteProjectMutation.isPending,
+    mutate: createMutation.mutate,
+    isPending: createMutation.isPending,
+    mutateAsync: async (...args: Parameters<typeof createMutation.mutate>) => {
+      return new Promise((resolve, reject) => {
+        try {
+          createMutation.mutate(...args);
+          resolve(true);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    },
   };
-}
+};

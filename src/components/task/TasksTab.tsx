@@ -1,99 +1,149 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ListView } from "@/components/Tarefas/ListView";
+import { KanbanView } from "@/components/Tarefas/KanbanView";
+import { CalendarView } from "@/components/Tarefas/CalendarView";
+import { ProjectsView } from "@/components/Tarefas/ProjectsView";
+import { WorkflowsView } from "@/components/Tarefas/WorkflowsView";
+import { ManagerView } from "@/components/Tarefas/ManagerView";
+import { TaskModal } from "@/components/Tarefas/TaskModal";
+import { TaskDetailsDrawer } from "@/components/Tarefas/TaskDetailsDrawer";
 import { useAuth } from '@/hooks/useAuth';
-import { TaskTabView } from './TaskTabView';
-import { TaskModal } from './TaskModal';
-import { CreateProjectModal } from './CreateProjectModal';
-import { EditProjectModal } from './EditProjectModal';
-import { Button } from '@/components/ui/button';
-import { Plus, FolderPlus } from 'lucide-react';
-import { Project } from '@/types/task';
+import { TaskWithDetails, TabType } from "@/types/task";
+import {
+  List,
+  Layout,
+  Calendar,
+  Folder,
+  Workflow,
+  BarChart3,
+  Plus,
+  LogOut,
+} from "lucide-react";
 
 export function TasksTab() {
   const { hasPermission } = useAuth();
+  
+  const [activeTab, setActiveTab] = useState<TabType>("lista");
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
+  const { signOut, profile } = useAuth();
 
-  const [showCreateTask, setShowCreateTask] = useState(false);
-  const [showCreateProject, setShowCreateProject] = useState(false);
-  const [editProject, setEditProject] = useState<Project | null>(null);
-  const [showEditProject, setShowEditProject] = useState(false);
+  const handleTaskClick = (task: TaskWithDetails) => {
+    setSelectedTask(task);
+    setTaskDetailsOpen(true);
+  };
 
-  if (!hasPermission('access_tasks')) {
-    return (
-      <div className="text-center py-20 premium-surface">
-        <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-          <span className="text-white font-bold text-2xl">×</span>
-        </div>
-        <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
-        <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Tarefas.</p>
-      </div>
-    );
-  }
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  useEffect(() => {
+    console.log("TAB ATIVA:", activeTab);
+    console.log("PROFILE:", profile);
+  }, [activeTab, profile]);
 
   return (
-    <div className="space-y-6 max-w-9xl">
-      <div className="premium-container py-0">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-lg font-bold text-slate-800">
-              Gerenciamento de Tarefas
-            </h1>
-            <p className="text-slate-600 text-xs">
-              Organize e acompanhe o progresso dos seus projetos e tarefas
-            </p>
-          </div>
+    <div className="min-h-screen bg-background">
+      <header className="border-b bg-card">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Sistema de Tarefas</h1>
+              <p className="text-muted-foreground">
+                Gerencie suas tarefas e projetos de forma eficiente
+              </p>
+            </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            {hasPermission('create_tasks') && (
-              <>
-                <Button
-                  onClick={() => setShowCreateProject(true)}
-                  className="premium-button"
-                  variant="outline"
-                >
-                  <FolderPlus className="h-4 w-4 mr-2" />
-                  Novo Projeto
+            <div className="flex items-center gap-4">
+              <Button onClick={() => setTaskModalOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Tarefa
+              </Button>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Olá, {profile?.name}
+                </span>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
                 </Button>
-                <Button
-                  onClick={() => setShowCreateTask(true)}
-                  className="premium-button"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Tarefa
-                </Button>
-              </>
-            )}
+              </div>
+            </div>
           </div>
         </div>
+      </header>
 
-        <TaskTabView
-          onEditProject={(project) => {
-            setEditProject(project);
-            setShowEditProject(true);
-          }}
+      <main className="container mx-auto px-4 py-6">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)}>
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="lista" className="flex items-center gap-2">
+              <List className="h-4 w-4" />
+              Lista
+            </TabsTrigger>
+            <TabsTrigger value="kanban" className="flex items-center gap-2">
+              <Layout className="h-4 w-4" />
+              Kanban
+            </TabsTrigger>
+            <TabsTrigger value="calendario" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Calendário
+            </TabsTrigger>
+            <TabsTrigger value="projetos" className="flex items-center gap-2">
+              <Folder className="h-4 w-4" />
+              Projetos
+            </TabsTrigger>
+            <TabsTrigger value="fluxos" className="flex items-center gap-2">
+              <Workflow className="h-4 w-4" />
+              Fluxos
+            </TabsTrigger>
+            <TabsTrigger value="gestor" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Visão de Gestor
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="mt-6">
+            <TabsContent value="lista">
+              <ListView onTaskClick={handleTaskClick} />
+            </TabsContent>
+
+            <TabsContent value="kanban">
+              <KanbanView onTaskClick={handleTaskClick} />
+            </TabsContent>
+
+            <TabsContent value="calendario">
+              <CalendarView />
+            </TabsContent>
+
+            <TabsContent value="projetos">
+              <ProjectsView />
+            </TabsContent>
+
+            <TabsContent value="fluxos">
+              <WorkflowsView />
+            </TabsContent>
+
+            <TabsContent value="gestor">
+              <ManagerView />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </main>
+
+      <TaskModal open={taskModalOpen} onOpenChange={setTaskModalOpen} mode="create" />
+
+      {selectedTask && (
+        <TaskDetailsDrawer
+          open={taskDetailsOpen}
+          onOpenChange={setTaskDetailsOpen}
+          task={selectedTask}
         />
-
-        {/* Modais */}
-        {showCreateTask && (
-          <TaskModal
-            open={showCreateTask}
-            onClose={() => setShowCreateTask(false)}
-          />
-        )}
-
-        {showCreateProject && (
-          <CreateProjectModal
-            open={showCreateProject}
-            onClose={() => setShowCreateProject(false)}
-          />
-        )}
-
-        {editProject && showEditProject && (
-          <EditProjectModal
-            open={showEditProject}
-            onClose={() => setShowEditProject(false)}
-            project={editProject}
-          />
-        )}
-      </div>
+      )}
     </div>
   );
-}
+};
+

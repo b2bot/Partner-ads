@@ -129,3 +129,28 @@ export function useTasks(filters?: any) {
     isDeleting: deleteTaskMutation.isPending,
   };
 }
+
+// Alias para manter compatibilidade com componentes que usam os hooks separadamente
+export const useUpdateTask = () => {
+  const { updateTask, isUpdating } = useTasks();
+  return {
+    mutate: updateTask,
+    isPending: isUpdating,
+  };
+};
+
+export const useCreateTask = () => {
+  const { createTask, isCreating } = useTasks();
+  return {
+    mutate: createTask,
+    isPending: isCreating,
+  };
+};
+
+export const useDeleteTask = () => {
+  const { deleteTask, isDeleting } = useTasks();
+  return {
+    mutate: deleteTask,
+    isPending: isDeleting,
+  };
+};
