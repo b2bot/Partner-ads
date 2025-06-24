@@ -30,7 +30,7 @@ export function ProjectTasksView({ projectId }: { projectId: string }) {
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
-          <TabsTrigger value="lista"/TabsTrigger>
+          <TabsTrigger value="lista"></TabsTrigger>
           {/*<TabsTrigger value="kanban">Kanban</TabsTrigger>
           <TabsTrigger value="calendario">Calendário</TabsTrigger>
           <TabsTrigger value="workflows">Workflows</TabsTrigger>
