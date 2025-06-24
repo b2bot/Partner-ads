@@ -26,7 +26,6 @@ export function ProjectTasksView({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-4 p-4">
       <h4 className="text-xs font-regular">Projeto: {project.name}</h4>
-      <p className="text-sm text-muted-foreground">{project.description}</p>
 
       <Tabs value={tab} onValueChange={setTab}>
         {/*<TabsList>
@@ -53,6 +52,7 @@ export function ProjectTasksView({ projectId }: { projectId: string }) {
           <ManagerView projectId={projectId} />*/}
         </TabsContent>
       </Tabs>
+      <p className="text-sm text-muted-foreground">{project.description}</p>
     </div>
   );
 }
