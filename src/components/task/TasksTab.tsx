@@ -48,7 +48,7 @@ export function TasksTab() {
   }, [activeTab, profile]);
 
   return (
-    <div className="bg-transparent border-none shadow-none p-0">
+    <div className="bg-whitet border-none shadow-none p-0">
       <header className="p-0">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
