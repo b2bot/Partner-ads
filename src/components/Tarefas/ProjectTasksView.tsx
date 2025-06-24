@@ -37,7 +37,7 @@ export function ProjectTasksView({ projectId }: { projectId: string }) {
           <TabsTrigger value="gestor">Visão do Gestor</TabsTrigger>*/}
         </TabsList>
 
-        <TabsContent value="lista">
+        <TabsContent>
           <ListView projectId={projectId} />
         {/*</TabsContent>
         <TabsContent value="kanban">
