@@ -25,7 +25,7 @@ export function ProjectTasksView({ projectId }: { projectId: string }) {
 
   return (
     <div className="space-y-4 p-4">
-      <h2 className="text-xl font-bold">Projeto: {project.name}</h2>
+      <h4 className="text-xs font-regular">Projeto: {project.name}</h4>
       <p className="text-sm text-muted-foreground">{project.description}</p>
 
       <Tabs value={tab} onValueChange={setTab}>
