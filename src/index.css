@@ -177,7 +177,7 @@
     @apply bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900;
   */}
   .gradient-surface {
-    @apply bg-white dark:bg-slate-900 p-10 shadow-none border-none rounded-none
+    @apply bg-white dark:bg-slate-900 
   }
 
   .gradient-card {
