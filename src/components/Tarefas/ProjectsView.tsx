@@ -93,12 +93,12 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
+        {/*<div>
           <h2 className="text-2xl font-bold">Projetos</h2>
           <p className="text-gray-600">
             Gerencie todos os projetos da empresa ({safeProjects.length} total)
           </p>
-        </div>
+        </div>*/}
 
         <Button onClick={() => setProjectModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
