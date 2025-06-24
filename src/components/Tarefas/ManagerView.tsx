@@ -86,10 +86,10 @@ export const ManagerView = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+     {/* <div>
         <h2 className="text-2xl font-bold">Visão de Gestor</h2>
         <p className="text-gray-600">Painel gerencial com métricas e indicadores</p>
-      </div>
+      </div>*/}
 
       {/* Cards de métricas principais */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
