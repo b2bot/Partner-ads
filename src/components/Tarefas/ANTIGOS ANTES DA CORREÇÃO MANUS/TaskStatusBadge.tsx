@@ -1,6 +1,6 @@
 
 import { Badge } from '@/components/ui/badge';
-import { TaskStatus } from '@/types/task';
+import { TaskStatus } from '@/types/Tarefas';
 
 interface TaskStatusBadgeProps {
   status: TaskStatus;

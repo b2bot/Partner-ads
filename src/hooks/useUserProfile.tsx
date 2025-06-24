@@ -31,7 +31,7 @@ export function useUserProfile(user: User | null) {
               id: user.id,
               nome: user.email?.split('@')[0] || 'Usuário',
               email: user.email || '',
-              role: 'admin',
+              role: 'colaborador',
               is_root_admin: false,
               ativo: true
             })

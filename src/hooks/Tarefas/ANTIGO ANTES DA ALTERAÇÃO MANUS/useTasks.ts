@@ -1,53 +1,49 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskInsert, TaskUpdate, TaskWithDetails } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
-export const useTasks = (projectId?: string) => {
+export const useTasks = () => {
   return useQuery({
-    queryKey: ['tasks', projectId],
+    queryKey: ['tasks'],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('tasks')
         .select(`
           *,
-          project:projects!tasks_project_id_fkey(*),
-          assigned_user:profiles!fk_tasks_assigned_to(*),
-          creator:profiles!tasks_created_by_fkey(*)
+          project:projects(*),
+          section:task_sections(*),
+          assigned_user:profiles!tasks_assigned_to_fkey(*),
+          creator:profiles!tasks_created_by_fkey(*),
+          subtasks(*),
+          comments:task_comments(*),
+          attachments:task_attachments(*)
         `)
         .order('order_index', { ascending: true });
-
-      if (projectId) {
-        query = query.eq('project_id', projectId); // ✅ filtro aplicado se fornecido
-      }
-
-      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching tasks:', error);
         throw error;
       }
-
+      
       return (data || []).map(task => ({
         ...task,
         assigned_user: Array.isArray(task.assigned_user) ? task.assigned_user[0] || null : task.assigned_user,
         creator: Array.isArray(task.creator) ? task.creator[0] || null : task.creator,
         project: Array.isArray(task.project) ? task.project[0] || null : task.project,
-        section: null,
-        subtasks: [],
-        comments: [],
-        attachments: []
+        section: Array.isArray(task.section) ? task.section[0] || null : task.section,
+        subtasks: task.subtasks || [],
+        comments: task.comments || [],
+        attachments: task.attachments || []
       }));
     },
-    enabled: true, // Se quiser evitar execução sem projectId, use: !!projectId
-    staleTime: 0,  // 👈 força atualização sempre que necessário
-    gcTime: 0,     // 👈 ajuda a garantir que a tarefa deletada "some"
   });
 };
 
 export const useCreateTask = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
       const { data, error } = await supabase
@@ -55,15 +51,12 @@ export const useCreateTask = () => {
         .insert(task)
         .select()
         .single();
-
+      
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      if (variables.project_id) {
-        queryClient.invalidateQueries({ queryKey: ['tasks', variables.project_id] });
-      }
       toast({
         title: "Tarefa criada",
         description: "A tarefa foi criada com sucesso.",
@@ -81,7 +74,7 @@ export const useCreateTask = () => {
 
 export const useUpdateTask = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: TaskUpdate }) => {
       const { data, error } = await supabase
@@ -90,15 +83,12 @@ export const useUpdateTask = () => {
         .eq('id', id)
         .select()
         .single();
-
+      
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      if (variables?.updates?.project_id) {
-        queryClient.invalidateQueries({ queryKey: ['tasks', variables.updates.project_id] });
-      }
       toast({
         title: "Tarefa atualizada",
         description: "A tarefa foi atualizada com sucesso.",
@@ -116,23 +106,18 @@ export const useUpdateTask = () => {
 
 export const useDeleteTask = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('tasks')
         .delete()
         .eq('id', id);
-
+      
       if (error) throw error;
     },
-    onSuccess: (_, id) => {
-      // Remove tarefas em geral
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-
-      // Se possível, remove tarefa específica do cache local
-      queryClient.removeQueries({ queryKey: ['tasks'] });
-
       toast({
         title: "Tarefa excluída",
         description: "A tarefa foi excluída com sucesso.",

@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { useTaskComments, useCreateComment } from '@/hooks/Tarefas/useComments';
-import { useUpdateTask, useDeleteTask } from '@/hooks/Tarefas/useTasks';
+import { useUpdateTask } from '@/hooks/Tarefas/useTasks';
 import { useAuth } from '@/hooks/Tarefas/useAuth';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -10,12 +11,12 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { TaskStatusBadge } from './TaskStatusBadge';
 import { TaskPriorityBadge } from './TaskPriorityBadge';
-import { TaskWithDetails } from '@/types/task';
-import {
-  MessageCircle,
-  Paperclip,
-  Calendar,
-  User,
+import { TaskWithDetails } from '@/types/Tarefas';
+import { 
+  MessageCircle, 
+  Paperclip, 
+  Calendar, 
+  User, 
   Clock,
   Send,
   History
@@ -32,8 +33,7 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
   const { data: comments } = useTaskComments(task?.id || '');
   const createComment = useCreateComment();
   const updateTask = useUpdateTask();
-  const deleteTask = useDeleteTask();
-
+  
   const [newComment, setNewComment] = useState('');
 
   if (!task) return null;
@@ -44,7 +44,7 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
     try {
       await createComment.mutateAsync({
         task_id: task.id,
-        author_id: profile.id,
+        user_id: profile.id,
         content: newComment.trim(),
       });
       setNewComment('');
@@ -67,7 +67,7 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
       <SheetContent className="w-[600px] sm:max-w-[600px] overflow-y-auto">
         <SheetHeader className="space-y-4 pb-6 border-b">
           <SheetTitle className="text-left text-xl">{task.title}</SheetTitle>
-
+          
           <div className="flex items-center gap-3">
             <TaskStatusBadge status={task.status} />
             <TaskPriorityBadge priority={task.priority} />
@@ -96,7 +96,7 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
                 <span className="text-gray-600">Responsável:</span>
                 <span>{task.assigned_user?.name || 'Não atribuído'}</span>
               </div>
-
+              
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-gray-400" />
                 <span className="text-gray-600">Data de entrega:</span>
@@ -110,7 +110,7 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
                 <span className="text-gray-600">Horas estimadas:</span>
                 <span>{task.estimated_hours || 0}h</span>
               </div>
-
+              
               <div className="flex items-center gap-2 text-sm">
                 <History className="h-4 w-4 text-gray-400" />
                 <span className="text-gray-600">Criada em:</span>
@@ -186,14 +186,14 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
                 <div key={comment.id} className="flex gap-3">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="text-xs">
-                      {getInitials(comment.author?.nome || 'Usuario')}
+                      {getInitials(comment.user?.name || 'Usuario')}
                     </AvatarFallback>
                   </Avatar>
-
+                  
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">
-                        {comment.author?.nome || 'Usuário'}
+                        {comment.user?.name || 'Usuário'}
                       </span>
                       <span className="text-xs text-gray-500">
                         {new Date(comment.created_at || '').toLocaleDateString('pt-BR')}
@@ -230,22 +230,6 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
                 </Button>
               </div>
             </div>
-          </div>
-
-          {/* Excluir tarefa */}
-          <div className="border-t pt-6 mt-6">
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (task && confirm('Deseja realmente excluir esta tarefa?')) {
-                  deleteTask.mutate(task.id, {
-                    onSuccess: () => onOpenChange(false),
-                  });
-                }
-              }}
-            >
-              Excluir Tarefa
-            </Button>
           </div>
         </div>
       </SheetContent>

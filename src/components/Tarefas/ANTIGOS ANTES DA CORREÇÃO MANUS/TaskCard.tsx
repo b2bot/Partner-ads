@@ -1,24 +1,20 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { TaskWithDetails } from '@/types/task';
+import { TaskWithDetails } from '@/types/Tarefas';
 import { TaskStatusBadge } from './TaskStatusBadge';
 import { TaskPriorityBadge } from './TaskPriorityBadge';
-import { CalendarDays, MessageCircle, Paperclip, Trash } from 'lucide-react';
+import { CalendarDays, MessageCircle, Paperclip } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { useDeleteTask } from '@/hooks/Tarefas/useTasks';
 
 interface TaskCardProps {
   task: TaskWithDetails;
   onClick?: () => void;
-  compact?: boolean;
 }
 
-export const TaskCard = ({ task, onClick, compact = false }: TaskCardProps) => {
-  const assigneeName = task.assigned_user?.name ?? '??';
-  const deleteTask = useDeleteTask();
-
+export const TaskCard = ({ task, onClick }: TaskCardProps) => {
   return (
     <Card 
       className="cursor-pointer hover:shadow-md transition-shadow"
@@ -29,18 +25,7 @@ export const TaskCard = ({ task, onClick, compact = false }: TaskCardProps) => {
           {/* Header */}
           <div className="flex items-start justify-between">
             <h3 className="font-medium text-sm line-clamp-2">{task.title}</h3>
-            <div className="flex items-center gap-2">
-              <TaskPriorityBadge priority={task.priority} />
-              <Trash
-                className="h-4 w-4 text-red-500 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (confirm('Deseja excluir esta tarefa?')) {
-                    deleteTask.mutate(task.id);
-                  }
-                }}
-              />
-            </div>
+            <TaskPriorityBadge priority={task.priority} />
           </div>
 
           {/* Status */}
@@ -52,11 +37,11 @@ export const TaskCard = ({ task, onClick, compact = false }: TaskCardProps) => {
               <Avatar className="h-6 w-6">
                 <AvatarImage src={task.assigned_user.avatar_url || ''} />
                 <AvatarFallback className="text-xs">
-                  {assigneeName.slice(0, 2).toUpperCase()}
+                  {task.assigned_user.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <span className="text-xs text-muted-foreground">
-                {assigneeName}
+                {task.assigned_user.name}
               </span>
             </div>
           )}
@@ -86,20 +71,23 @@ export const TaskCard = ({ task, onClick, compact = false }: TaskCardProps) => {
 
           {/* Footer */}
           <div className="flex items-center justify-between text-xs text-muted-foreground">
+            {/* Due Date */}
             {task.due_date && (
               <div className="flex items-center gap-1">
                 <CalendarDays className="h-3 w-3" />
                 {format(new Date(task.due_date), 'dd/MM', { locale: ptBR })}
               </div>
             )}
+
+            {/* Comments and Attachments */}
             <div className="flex items-center gap-2">
-              {task.comments?.length > 0 && (
+              {task.comments && task.comments.length > 0 && (
                 <div className="flex items-center gap-1">
                   <MessageCircle className="h-3 w-3" />
                   {task.comments.length}
                 </div>
               )}
-              {task.attachments?.length > 0 && (
+              {task.attachments && task.attachments.length > 0 && (
                 <div className="flex items-center gap-1">
                   <Paperclip className="h-3 w-3" />
                   {task.attachments.length}

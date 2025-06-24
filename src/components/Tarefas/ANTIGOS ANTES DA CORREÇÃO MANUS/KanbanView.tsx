@@ -1,6 +1,6 @@
 
-import { useTasks, useUpdateTask } from '@/hooks/Tarefas/useTasks';
-import { TaskWithDetails, TaskStatus } from '@/types/task';
+import { useTasks, useUpdateTask } from '@/hooks/task/useTasks';
+import { TaskWithDetails, TaskStatus } from '@/types/Tarefas';
 import { TaskCard } from './TaskCard';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';

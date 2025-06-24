@@ -8,8 +8,8 @@ export type TaskUpdate = Database['public']['Tables']['tasks']['Update'];
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type ProjectInsert = Database['public']['Tables']['projects']['Insert'];
 
-export type Client = Database['public']['Tables']['clientes']['Row'];
-export type ClientInsert = Database['public']['Tables']['clientes']['Insert'];
+export type Client = Database['public']['Tables']['clients']['Row'];
+export type ClientInsert = Database['public']['Tables']['clients']['Insert'];
 
 export type TaskSection = Database['public']['Tables']['task_sections']['Row'];
 export type TaskSectionInsert = Database['public']['Tables']['task_sections']['Insert'];

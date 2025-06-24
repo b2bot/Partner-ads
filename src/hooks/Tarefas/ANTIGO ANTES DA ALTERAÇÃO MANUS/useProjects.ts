@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Project, ProjectInsert, ProjectWithDetails } from '@/types/task';
+import { Project, ProjectInsert, ProjectWithDetails } from '@/types/Tarefas';
 import { toast } from '@/hooks/use-toast';
 
 export const useProjects = () => {
@@ -11,9 +11,9 @@ export const useProjects = () => {
         .from('projects')
         .select(`
           *,
-          client:clientes!projects_client_id_fkey(*),
+          client:clients(*),
           responsible:profiles!fk_projects_responsible(*),
-          creator:profiles!projects_created_by_fkey(*),
+          creator:profiles!fk_projects_created_by(*),
           tasks(*)
         `)
         .order('created_at', { ascending: false });
@@ -63,20 +63,6 @@ export const useCreateProject = () => {
         description: error.message,
         variant: 'destructive',
       });
-    },
-  });
-};
-
-export const useUpdateProject = () => {
-  return useMutation({
-    mutationFn: async (project: ProjectUpdate) => {
-      const { id, ...rest } = project;
-      const { error } = await supabase
-        .from('projects')
-        .update(rest)
-        .eq('id', id);
-
-      if (error) throw error;
     },
   });
 };

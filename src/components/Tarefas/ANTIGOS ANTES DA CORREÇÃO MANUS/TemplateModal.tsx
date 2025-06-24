@@ -1,12 +1,12 @@
 
 import { useState } from 'react';
 import { useCreateTasksFromTemplate } from '@/hooks/Tarefas/useWorkflowTemplates';
-import { useProjects } from '@/hooks/Tarefas/useProjects';
+import { useProjects } from '@/hooks/task/useProjects';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { WorkflowTemplate } from '@/types/task';
+import { WorkflowTemplate } from '@/types/Tarefas';
 import { CheckCircle, Circle, Workflow } from 'lucide-react';
 
 interface TemplateModalProps {

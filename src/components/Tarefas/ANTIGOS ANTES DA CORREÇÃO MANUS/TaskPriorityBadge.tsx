@@ -1,6 +1,6 @@
 
 import { Badge } from '@/components/ui/badge';
-import { TaskPriority } from '@/types/task';
+import { TaskPriority } from '@/types/Tarefas';
 import { AlertTriangle, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
 interface TaskPriorityBadgeProps {

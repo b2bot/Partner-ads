@@ -1,49 +1,24 @@
-import { useProjects } from '@/hooks/Tarefas/useProjects';
+
+import { useProjects, useCreateProject } from '@/hooks/task/useProjects';
 import { useClientes } from '@/hooks/useClientes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ProjectModal } from './ProjectModal';
-import { ProjectEditModal } from './ProjectEditModal';
-import { Plus, Folder, User, Calendar, Eye, Edit, Loader2, Trash } from 'lucide-react';
+import { Plus, Folder, User, Calendar, Eye, Edit, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { ProjectTasksView } from './ProjectTasksView'; 
-import { useDeleteProject } from '@/hooks/Tarefas/useDeleteProject';
 
-type ProjectsViewProps = {
-  setActiveTab: (tab: 'lista' | 'kanban' | 'calendario' | 'fluxos' | 'gestor' | 'projetos' | 'tarefas') => void;
-  setSelectedProjectId: (id: string) => void;
-};
-
-export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsViewProps) => {
+export const ProjectsView = () => {
   const { data: projects, isLoading, error } = useProjects();
   const { data: clients } = useClientes();
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [projectModalOpen, setProjectModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<any>(null);
-  const deleteProject = useDeleteProject();
 
-  const handleViewTasks = (projectId: string) => {
-    setSelectedProjectId(projectId);
-    setActiveTab('tarefas');
-
-    toast({
-      title: 'Ver Tarefas',
-      description: `Abrindo tarefas do projeto ${projectId}`,
-    });
-  };
-
-  const handleEditProject = (project: any) => {
-    setSelectedProject(project);
-    setEditModalOpen(true);
-    toast({
-      title: 'Editar Projeto',
-      description: `Editando projeto ${project.id}`,
-    });
-  };
+  console.log('ProjectsView - projects:', projects);
+  console.log('ProjectsView - isLoading:', isLoading);
+  console.log('ProjectsView - error:', error);
 
   if (isLoading) {
     return (
@@ -55,6 +30,7 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
   }
 
   if (error) {
+    console.error('Erro ao carregar projetos:', error);
     return (
       <div className="text-center py-8">
         <div className="text-red-600 mb-4">
@@ -68,9 +44,10 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
     );
   }
 
+  // Garantir que projects é sempre um array
   const safeProjects = Array.isArray(projects) ? projects : [];
-
-  const filteredProjects = safeProjects.filter(project =>
+  
+  const filteredProjects = safeProjects.filter(project => 
     selectedStatus === 'all' || project.status === selectedStatus
   );
 
@@ -89,6 +66,22 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
     }
   };
 
+  const handleViewTasks = (projectId: string) => {
+    // TODO: Implementar navegação para tarefas do projeto
+    toast({
+      title: "Ver Tarefas",
+      description: `Navegando para tarefas do projeto ${projectId}`,
+    });
+  };
+
+  const handleEditProject = (projectId: string) => {
+    // TODO: Implementar edição de projeto
+    toast({
+      title: "Editar Projeto",
+      description: `Editando projeto ${projectId}`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -99,7 +92,7 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
             Gerencie todos os projetos da empresa ({safeProjects.length} total)
           </p>
         </div>
-
+        
         <Button onClick={() => setProjectModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Projeto
@@ -118,9 +111,10 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
           >
             {status === 'all' ? 'Todos' : status}
             <Badge variant="secondary" className="ml-2">
-              {status === 'all'
-                ? safeProjects.length
-                : safeProjects.filter(p => p.status === status).length}
+              {status === 'all' 
+                ? safeProjects.length 
+                : safeProjects.filter(p => p.status === status).length
+              }
             </Badge>
           </Button>
         ))}
@@ -146,7 +140,7 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
                       {project.status || 'ativo'}
                     </Badge>
                   </div>
-
+                  
                   {project.description && (
                     <p className="text-sm text-gray-600 line-clamp-2">
                       {project.description}
@@ -196,33 +190,22 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
 
                   {/* Ações */}
                   <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
                       className="flex-1"
                       onClick={() => handleViewTasks(project.id)}
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       Ver Tarefas
                     </Button>
-                    <Button
-                      variant="outline"
+                    <Button 
+                      variant="outline" 
                       size="sm"
-                      onClick={() => handleEditProject(project)}
+                      onClick={() => handleEditProject(project.id)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
-					<Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => { 
-					    if (confirm('Deseja realmente excluir este projeto?')) {
-						  deleteProject.mutate(project.id);
-						}
-					  }}
-					>
-					  <Trash className="h-4 w-4" />
-					</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -233,14 +216,16 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
         <div className="text-center py-12">
           <Folder className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {selectedStatus === 'all'
-              ? 'Nenhum projeto encontrado'
-              : `Nenhum projeto ${selectedStatus} encontrado`}
+            {selectedStatus === 'all' 
+              ? 'Nenhum projeto encontrado' 
+              : `Nenhum projeto ${selectedStatus} encontrado`
+            }
           </h3>
           <p className="text-gray-600 mb-6">
-            {safeProjects.length === 0
+            {safeProjects.length === 0 
               ? 'Comece criando seu primeiro projeto para organizar suas tarefas'
-              : 'Tente alterar os filtros ou criar um novo projeto'}
+              : 'Tente alterar os filtros ou criar um novo projeto'
+            }
           </p>
           <Button onClick={() => setProjectModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
@@ -253,13 +238,6 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
       <ProjectModal
         open={projectModalOpen}
         onOpenChange={setProjectModalOpen}
-      />
-
-      {/* Modal de Edição de Projeto */}
-      <ProjectEditModal
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        project={selectedProject}
       />
     </div>
   );

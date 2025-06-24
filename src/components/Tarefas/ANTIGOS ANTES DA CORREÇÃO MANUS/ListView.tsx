@@ -1,15 +1,15 @@
-import { useTasks } from '@/hooks/Tarefas/useTasks';
-import { TaskWithDetails } from '@/types/task';
+
+import { useTasks } from '@/hooks/Task/useTasks';
+import { TaskWithDetails } from '@/types/Tarefas';
 import { TaskCard } from './TaskCard';
 import { Loader2 } from 'lucide-react';
 
 interface ListViewProps {
   onTaskClick: (task: TaskWithDetails) => void;
-  projectId?: string; // ✅ agora aceita um projectId opcional
 }
 
-export const ListView = ({ onTaskClick, projectId }: ListViewProps) => {
-  const { data: tasks, isLoading } = useTasks(projectId); // ✅ passa o projectId para filtrar
+export const ListView = ({ onTaskClick }: ListViewProps) => {
+  const { data: tasks, isLoading } = useTasks();
 
   if (isLoading) {
     return (

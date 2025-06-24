@@ -1,7 +1,7 @@
+
 import { useState } from 'react';
-import { useCreateProject } from '@/hooks/Tarefas/useProjects';
+import { useCreateProject } from '@/hooks/task/useProjects';
 import { useClientes } from '@/hooks/useClientes';
-import { useCollaborators } from '@/hooks/useCollaborators';
 import { useAuth } from '@/hooks/useAuth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,6 @@ interface ProjectModalProps {
 export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
   const { profile } = useAuth();
   const { data: clients } = useClientes();
-  const { collaborators } = useCollaborators();
   const createProject = useCreateProject();
 
   const [formData, setFormData] = useState({
@@ -35,7 +34,9 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name.trim()) return;
+    if (!formData.name.trim()) {
+      return;
+    }
 
     const projectData: ProjectInsert = {
       ...formData,
@@ -49,6 +50,7 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
     try {
       await createProject.mutateAsync(projectData);
       onOpenChange(false);
+      // Reset form
       setFormData({
         name: '',
         description: '',
@@ -65,7 +67,7 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Novo Projeto</DialogTitle>
         </DialogHeader>
@@ -106,27 +108,7 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
               <SelectContent>
                 {clients?.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
-                    {client.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Responsável */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Responsável</label>
-            <Select
-              value={formData.responsible_id}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, responsible_id: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um responsável" />
-              </SelectTrigger>
-              <SelectContent>
-                {collaborators.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.nome}
+                    {client.name}
                   </SelectItem>
                 ))}
               </SelectContent>

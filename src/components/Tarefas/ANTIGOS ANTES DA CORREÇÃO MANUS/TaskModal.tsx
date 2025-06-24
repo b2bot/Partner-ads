@@ -2,14 +2,14 @@
 import { useState } from 'react';
 import { useCreateTask, useUpdateTask } from '@/hooks/Tarefas/useTasks';
 import { useProjects } from '@/hooks/Tarefas/useProjects';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/Tarefas/useAuth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/task';
+import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/Tarefas';
 import { X, Plus, Trash2 } from 'lucide-react';
 
 interface TaskModalProps {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Workflow, Plus, Play, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { WorkflowTemplate } from '@/types/task';
+import { WorkflowTemplate } from '@/types/Tarefas';
 
 export const WorkflowsView = () => {
   const { data: templates, isLoading } = useWorkflowTemplates();

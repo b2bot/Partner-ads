@@ -7,7 +7,6 @@ import { CalendarView } from "@/components/Tarefas/CalendarView";
 import { ProjectsView } from "@/components/Tarefas/ProjectsView";
 import { WorkflowsView } from "@/components/Tarefas/WorkflowsView";
 import { ManagerView } from "@/components/Tarefas/ManagerView";
-import { ProjectTasksView } from "@/components/Tarefas/ProjectTasksView"; // ✅ NOVO
 import { TaskModal } from "@/components/Tarefas/TaskModal";
 import { TaskDetailsDrawer } from "@/components/Tarefas/TaskDetailsDrawer";
 import { useAuth } from '@/hooks/useAuth';
@@ -27,7 +26,6 @@ export function TasksTab() {
   const { hasPermission } = useAuth();
   
   const [activeTab, setActiveTab] = useState<TabType>("lista");
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // ✅ NOVO
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
@@ -81,7 +79,7 @@ export function TasksTab() {
 
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)}>
-          <TabsList className="grid w-full grid-cols-7"> {/* aumentamos para 7 colunas */}
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="lista" className="flex items-center gap-2">
               <List className="h-4 w-4" />
               Lista
@@ -106,10 +104,6 @@ export function TasksTab() {
               <BarChart3 className="h-4 w-4" />
               Visão de Gestor
             </TabsTrigger>
-            <TabsTrigger value="tarefas" className="flex items-center gap-2"> {/* ✅ NOVA ABA */}
-              <List className="h-4 w-4" />
-              Tarefas
-            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
@@ -126,10 +120,7 @@ export function TasksTab() {
             </TabsContent>
 
             <TabsContent value="projetos">
-              <ProjectsView
-                setActiveTab={setActiveTab}
-                setSelectedProjectId={setSelectedProjectId}
-              />
+              <ProjectsView />
             </TabsContent>
 
             <TabsContent value="fluxos">
@@ -138,16 +129,6 @@ export function TasksTab() {
 
             <TabsContent value="gestor">
               <ManagerView />
-            </TabsContent>
-
-            <TabsContent value="tarefas">
-              {selectedProjectId ? (
-                <ProjectTasksView projectId={selectedProjectId} />
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  Nenhum projeto selecionado.
-                </div>
-              )}
             </TabsContent>
           </div>
         </Tabs>
@@ -164,4 +145,5 @@ export function TasksTab() {
       )}
     </div>
   );
-}
+};
+

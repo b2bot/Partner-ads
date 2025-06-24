@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { usePermissions, PermissionType } from '@/hooks/usePermissions';
 import { PERMISSION_LABELS, PERMISSION_GROUPS } from './permissions/PermissionLabels';
+import { useCreateCollaborator } from '@/hooks/useCreateCollaborator';
+import { supabase } from '@/integrations/supabase/client';
+import { supabaseAdmin } from '@/integrations/supabase/supabaseAdmin';
 
 interface CreateCollaboratorModalProps {
   open: boolean;
@@ -30,84 +32,9 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [error, setError] = useState('');
 
-  const { permissionTemplates, grantPermission } = usePermissions();
+  const { permissionTemplates } = usePermissions();
   const queryClient = useQueryClient();
-
-  const createCollaboratorMutation = useMutation({
-    mutationFn: async (data: {
-      nome: string;
-      email: string;
-      senha: string;
-      foto_url?: string;
-      status: string;
-      permissions: PermissionType[];
-    }) => {
-      // Criar usuário no Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.senha,
-        options: {
-          data: {
-            nome: data.nome,
-            role: 'cliente',
-          },
-        },
-      });
-
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Falha ao criar usuário');
-
-      // Criar perfil
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          nome: data.nome,
-          email: data.email,
-          foto_url: data.foto_url,
-          status: data.status,
-          role: 'cliente',
-          ativo: data.status === 'ativo',
-        });
-
-      if (profileError) throw profileError;
-
-      // Aguardar criação do perfil
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Atribuir permissões
-      for (const permission of data.permissions) {
-        try {
-          const { error: permError } = await supabase
-            .from('user_permissions')
-            .insert({
-              user_id: authData.user.id,
-              permission: permission as any,
-            });
-
-          if (permError) {
-            console.error('Erro ao atribuir permissão:', permission, permError);
-          }
-        } catch (err) {
-          console.error('Erro na atribuição de permissão:', permission, err);
-        }
-      }
-
-      return authData.user;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
-      toast.success('Colaborador criado com sucesso!');
-      onClose();
-      resetForm();
-    },
-    onError: (error: any) => {
-      console.error('Erro ao criar colaborador:', error);
-      const errorMessage = error.message || 'Erro ao criar colaborador. Verifique os dados e tente novamente.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    },
-  });
+  const createCollaboratorMutation = useCreateCollaborator();
 
   const resetForm = () => {
     setNome('');
@@ -122,21 +49,21 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
 
   const handlePermissionChange = (permission: PermissionType, checked: boolean) => {
     if (checked) {
-      setSelectedPermissions(prev => [...prev, permission]);
+      setSelectedPermissions((prev) => [...prev, permission]);
     } else {
-      setSelectedPermissions(prev => prev.filter(p => p !== permission));
+      setSelectedPermissions((prev) => prev.filter((p) => p !== permission));
     }
   };
 
   const handleTemplateSelect = (templateId: string) => {
-    const template = permissionTemplates?.find(t => t.id === templateId);
+    const template = permissionTemplates?.find((t) => t.id === templateId);
     if (template) {
       setSelectedPermissions(template.permissions);
       setSelectedTemplate(templateId);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -150,14 +77,54 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       return;
     }
 
-    createCollaboratorMutation.mutate({
-      nome: nome.trim(),
-      email: email.trim(),
-      senha,
-      foto_url: fotoUrl.trim() || undefined,
-      status,
-      permissions: selectedPermissions,
-    });
+    createCollaboratorMutation.mutate(
+      {
+        nome: nome.trim(),
+        email: email.trim(),
+        password: senha,
+        foto_url: fotoUrl.trim() || undefined,
+        role: 'colaborador',
+        status,
+      },
+      {
+        onSuccess: async (result) => {
+          const userId = result?.userId;
+          if (!userId) {
+            toast.error('Usuário criado, mas ID não retornado');
+            return;
+          }
+
+          // Inserir permissões
+          const inserts = selectedPermissions.map((perm) => ({
+            user_id: userId,
+            permission: perm,
+          }));
+
+          if (inserts.length > 0) {
+            const { error: permError } = await supabase
+              .from('user_permissions')
+              .insert(inserts);
+
+            if (permError) {
+              console.error('Erro ao salvar permissões:', permError);
+              toast.error('Erro ao salvar permissões');
+            }
+          }
+
+          queryClient.invalidateQueries({ queryKey: ['collaborators'] });
+          toast.success('Colaborador criado com sucesso!');
+          onClose();
+          resetForm();
+        },
+        onError: (error: any) => {
+          console.error('Erro ao criar colaborador:', error);
+          const errorMessage =
+            error.message || 'Erro ao criar colaborador. Verifique os dados e tente novamente.';
+          setError(errorMessage);
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
   return (
@@ -166,31 +133,17 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
         <DialogHeader>
           <DialogTitle>Novo Colaborador</DialogTitle>
         </DialogHeader>
-        
+
         <ScrollArea className="max-h-[80vh] pr-4">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome completo *</Label>
-                <Input
-                  id="nome"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Nome do colaborador"
-                  required
-                />
+                <Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} required />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="email@exemplo.com"
-                  required
-                />
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
             </div>
 
@@ -207,7 +160,6 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
                   required
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select value={status} onValueChange={setStatus}>
@@ -257,25 +209,18 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
               <CardContent className="space-y-4">
                 {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => (
                   <div key={groupName} className="space-y-2">
-                    <h4 className="font-medium text-sm text-slate-900 dark:text-slate-100">{groupName}</h4>
+                    <h4 className="font-medium text-sm">{groupName}</h4>
                     <div className="grid grid-cols-2 gap-2">
                       {permissions.map((permission) => (
                         <div key={permission} className="flex items-center space-x-2">
                           <Checkbox
                             id={permission}
                             checked={selectedPermissions.includes(permission as PermissionType)}
-                            onCheckedChange={(checked) => 
+                            onCheckedChange={(checked) =>
                               handlePermissionChange(permission as PermissionType, checked as boolean)
                             }
                           />
-                          <Label 
-                            htmlFor={permission} 
-                            className={`text-sm ${
-                              PERMISSION_LABELS[permission as PermissionType]?.startsWith('⚠️') 
-                                ? 'text-amber-600 dark:text-amber-400 font-medium' 
-                                : ''
-                            }`}
-                          >
+                          <Label htmlFor={permission} className="text-sm">
                             {PERMISSION_LABELS[permission as PermissionType]}
                           </Label>
                         </div>
@@ -296,11 +241,7 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
               <Button type="button" variant="outline" onClick={onClose} className="flex-1">
                 Cancelar
               </Button>
-              <Button 
-                type="submit" 
-                disabled={createCollaboratorMutation.isPending}
-                className="flex-1"
-              >
+              <Button type="submit" disabled={createCollaboratorMutation.isPending} className="flex-1">
                 {createCollaboratorMutation.isPending ? 'Criando...' : 'Criar Colaborador'}
               </Button>
             </div>

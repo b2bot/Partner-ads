@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TaskComment, TaskCommentInsert } from '@/types/Tarefas';
+import { TaskComment, TaskCommentInsert } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
 export const useTaskComments = (taskId: string) => {
@@ -12,7 +12,7 @@ export const useTaskComments = (taskId: string) => {
         .from('task_comments')
         .select(`
           *,
-          user:profiles!task_comments_user_id_fkey(*)
+          author:profiles!fk_task_comments_author(*)
         `)
         .eq('task_id', taskId)
         .order('created_at', { ascending: true });
@@ -21,10 +21,10 @@ export const useTaskComments = (taskId: string) => {
         console.error('Error fetching comments:', error);
         throw error;
       }
-      
+
       return (data || []).map(comment => ({
         ...comment,
-        user: Array.isArray(comment.user) ? comment.user[0] || null : comment.user
+        author: Array.isArray(comment.author) ? comment.author[0] || null : comment.author
       }));
     },
     enabled: !!taskId,
