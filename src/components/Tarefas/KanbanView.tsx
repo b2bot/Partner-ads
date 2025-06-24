@@ -116,8 +116,8 @@ export const KanbanView = ({ onTaskClick, onCreateTask }: KanbanViewProps) => {
     <div className="space-y-4">
       {/* Header do Kanban */}
       <div className="flex items-center justify-between">
-        <div>
-           {/*<h2 className="text-lg font-semibold">Quadro Kanban</h2>
+         {/*<div>
+          <h2 className="text-lg font-semibold">Quadro Kanban</h2>
           <p className="text-sm text-gray-600">
             Arraste as tarefas entre as colunas para alterar o status
           </p>
