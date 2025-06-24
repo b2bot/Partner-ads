@@ -1,3 +1,4 @@
+
 // /src/components/Tarefas/ListView.tsx
 
 import { useTasks } from '@/hooks/Tarefas/useTasks';
@@ -9,10 +10,11 @@ import { TaskStatusBadge } from './TaskStatusBadge';
 import { TaskPriorityBadge } from './TaskPriorityBadge';
 
 interface ListViewProps {
+  onTaskClick: (task: TaskWithDetails) => void;
   projectId?: string;
 }
 
-export const ListView = ({ projectId }: ListViewProps) => {
+export const ListView = ({ onTaskClick, projectId }: ListViewProps) => {
   const { data: tasks, isLoading } = useTasks(projectId);
   const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
 
@@ -33,13 +35,13 @@ export const ListView = ({ projectId }: ListViewProps) => {
       <table className="min-w-full text-sm border-collapse">
         <thead>
           <tr className="bg-white text-left text-xs font-semibold text-gray-600 border-b">
-            <th className="p-3 border-r">Tarefa</th>
-            <th className="p-3 border-r">Responsável</th>
-            <th className="p-3 border-r">Status</th>
-            <th className="p-3 border-r">Prioridade</th>
-            <th className="p-3 border-r">Entrega</th>
-            <th className="p-3 border-r">Comentários</th>
-            <th className="p-3 border-r">Anexos</th>
+            <th className="p-3">Tarefa</th>
+            <th className="p-3">Responsável</th>
+            <th className="p-3">Status</th>
+            <th className="p-3">Prioridade</th>
+            <th className="p-3">Entrega</th>
+            <th className="p-3">Comentários</th>
+            <th className="p-3">Anexos</th>
           </tr>
         </thead>
         <tbody>
@@ -49,8 +51,8 @@ export const ListView = ({ projectId }: ListViewProps) => {
               className="hover:bg-gray-50 border-b cursor-pointer"
               onClick={() => handleTaskClick(task)}
             >
-              <td className="p-3 font-medium text-gray-800 border-r">{task.title}</td>
-              <td className="p-3 border-r">
+              <td className="p-3 font-medium text-gray-800">{task.title}</td>
+              <td className="p-3">
                 {task.assigned_user ? (
                   <div className="flex items-center gap-2">
                     <img
@@ -64,16 +66,16 @@ export const ListView = ({ projectId }: ListViewProps) => {
                   <span className="text-gray-400">Não atribuído</span>
                 )}
               </td>
-              <td className="p-3 border-r">
+              <td className="p-3">
                 <TaskStatusBadge status={task.status} />
               </td>
-              <td className="p-3 border-r">
+              <td className="p-3">
                 <TaskPriorityBadge priority={task.priority} />
               </td>
-              <td className="p-3 border-r">
+              <td className="p-3">
                 {task.due_date ? new Date(task.due_date).toLocaleDateString('pt-BR') : '—'}
               </td>
-              <td className="p-3 border-r">
+              <td className="p-3">
                 {task.comments?.length > 0 && (
                   <div className="flex items-center gap-1">
                     <MessageCircle className="h-4 w-4" />
@@ -96,11 +98,14 @@ export const ListView = ({ projectId }: ListViewProps) => {
 
       {selectedTask && (
         <TaskDetailsDrawer
-          open={!!selectedTask}
-          onOpenChange={() => setSelectedTask(null)}
           task={selectedTask}
+          onClose={() => setSelectedTask(null)}
         />
       )}
     </div>
   );
 };
+
+// IMPORTS NECESSÁRIOS (adicionar manualmente no topo do arquivo):
+// import { TaskStatusBadge } from './TaskStatusBadge';
+// import { TaskPriorityBadge } from './TaskPriorityBadge';
