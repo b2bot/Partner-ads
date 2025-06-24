@@ -46,12 +46,12 @@ export const WorkflowsView = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
+        {/*<div>
           <h2 className="text-2xl font-bold">Fluxos de Trabalho</h2>
           <p className="text-gray-600">
             Templates prontos para acelerar seu trabalho ({templates?.length || 0} disponíveis)
           </p>
-        </div>
+        </div>*/}
         
         <Button variant="outline">
           <Plus className="h-4 w-4 mr-2" />
