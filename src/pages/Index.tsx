@@ -100,7 +100,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
   }
 
   const renderContent = () => {
-    const contentClasses = "premium-surface animate-fade-in";
+    const contentClasses = "gradient-surface animate-fade-in";
     
     switch (activeTab) {
       case 'dashboard':
