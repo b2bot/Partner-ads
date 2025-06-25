@@ -75,7 +75,7 @@ export function Dashboard() {
   if (loading.campaigns || !selectedAdAccount) {
     return (
       <div className="p-2">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-1">
           <div className="flex gap-1">
             <AccountFilter />
             <DateRangeFilter onDateChange={setDateRange} />
