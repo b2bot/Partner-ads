@@ -109,16 +109,16 @@ function RelatoriosContent() {
   const isSpecialPlatform = selectedPlatform === 'relatorios';
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <div className="w-full p-0 m-0 space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-lg font-bold text-slate-800">
+         {/* <h1 className="text-lg font-bold text-slate-800">
             Relatórios Personalizados
           </h1>
           <p className="text-slate-600 text-xs">
             Métricas, tendências e performance de campanhas
-          </p>
+          </p>*/}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
