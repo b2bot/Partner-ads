@@ -33,6 +33,33 @@ const platforms: Platform[] = [
   { id: 'relatorios', name: 'Relatórios', icon: BarChart3, color: 'bg-purple-500' },
 ];
 
+const metricMap: Record<string, Record<string, string>> = {
+  Meta: {
+    impressions: 'Impressions',
+    clicks: 'Clicks',
+    spend: 'Spend (Cost, Amount Spent)',
+    cpc: 'CPC (Cost per Click)',
+    cpm: 'CPM (Cost per 1000 Impressions)',
+    ctr: 'CTR (Clickthrough Rate)',
+  },
+  Google: {
+    impressions: 'Impressions',
+    clicks: 'Clicks',
+    spend: 'Cost (Spend, Amount Spent)',
+    cpc: 'Average CPC',
+    cpm: 'Average CPM',
+    ctr: 'CTR',
+  },
+  LinkedIn: {
+    impressions: 'Ad Analytics Impressions',
+    clicks: 'Ad Analytics Clicks',
+    spend: 'Ad Analytics Cost (USD)',
+    cpc: 'CPC',
+    cpm: 'CPM',
+    ctr: 'CTR',
+  },
+};
+
 function RelatoriosContent() {
   const { hasPermission, isAdmin, isCliente, profile } = useAuth();
   const [selectedPlatform, setSelectedPlatform] = useState('meta');
@@ -85,6 +112,8 @@ function RelatoriosContent() {
 
   const reportData = useMemo(() => {
     if (filteredByDate.length === 0) return null;
+
+    const mapping = metricMap[sheetName] || {};
 
     const sum = (field: string) =>
       filteredByDate.reduce((acc, row) => acc + (Number(row[field]) || 0), 0);
@@ -140,37 +169,13 @@ function RelatoriosContent() {
       return partial ? lowerMap[partial] : null;
     };
 
-    const impressionsKey = getKey([
-      'impressions',
-      'impressões',
-      'impressao',
-    ]);
-    const clicksKey = getKey(['clicks', 'cliques']);
-    const spendKey = getKey([
-      'spend',
-      'amount spent',
-      'investimento',
-      'valor gasto',
-    ]);
-    const conversionsKey = getKey([
-      'conversions',
-      'resultados',
-      'leads',
-      'conversas',
-      'mensagens',
-      'conversas iniciadas',
-      'messages',
-    ]);
-    const costConvKey = getKey([
-      'cost per conversion',
-      'custo por resultado',
-      'custo por conversa',
-      'custo por mensagem',
-      'cost per action messaging conversations',
-    ]);
-    const ctrKey = getKey(['ctr']);
-    const cpcKey = getKey(['cpc']);
-    const cpmKey = getKey(['cpm']);
+    const impressionsKey = mapping.impressions || getKey(['impressions', 'impressões']);
+    const clicksKey = mapping.clicks || getKey(['clicks', 'cliques']);
+    const spendKey = mapping.spend || getKey(['spend', 'amount spent', 'investimento']);
+    const conversionsKey = getKey(['conversions', 'resultados', 'leads']);
+    const ctrKey = mapping.ctr || getKey(['ctr']);
+    const cpcKey = mapping.cpc || getKey(['cpc']);
+    const cpmKey = mapping.cpm || getKey(['cpm']);
     const campaignKey = getKey(['campaign name', 'campanha']);
     const adSetKey = getKey(['ad set name', 'conjunto', 'grupo']);
     const adNameKey = getKey(['ad name', 'anuncio']);
@@ -300,7 +305,7 @@ function RelatoriosContent() {
     }
 
     return { metrics, chartData, tableData };
-  }, [filteredByDate, selectedPlatform, dateKey]);
+  }, [filteredByDate, selectedPlatform, dateKey, sheetName]);
 
 
   return (

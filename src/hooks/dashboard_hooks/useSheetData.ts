@@ -47,15 +47,22 @@ export const useSheetData = (
           if (clean.includes(mapKey)) return mappings[mapKey];
         }
 
-        return key;
+
+        return key
+          .toLowerCase()
+          .replace(/[^a-z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
       };
 
       const normalizedHeader = header.map(normalizeKey);
-	  
+
       const mapped = dataRows.map((row) => {
         const obj: SheetRow = {};
-		normalizedHeader.forEach((key, idx) => {
+        normalizedHeader.forEach((key, idx) => {
+          const originalKey = header[idx];
           obj[key] = row[idx];
+          if (!obj.hasOwnProperty(originalKey)) {
+            obj[originalKey] = row[idx];
+          }
         });
         return obj;
       });
