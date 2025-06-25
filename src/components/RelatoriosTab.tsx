@@ -1,25 +1,14 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  Eye, 
-  MousePointer,
-  Download,
-  Calendar,
-  Filter
-} from 'lucide-react';
+import { BarChart3, Download, Calendar } from 'lucide-react';
 import { useSheetData } from '@/hooks/dashboard_hooks/useSheetData';
+import { platformConfig } from '@/hooks/dashboard_hooks/usePlatformNavigation';
 import { DatePickerWithRange } from '@/components/ui/date-picker';
 import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
 import { ReportsCharts } from '@/components/reports/ReportsCharts';
@@ -52,17 +41,13 @@ function RelatoriosContent() {
     from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     to: new Date()
   });
-  const [filters, setFilters] = useState({
-    account: '',
-    campaign: '',
-    adset: '',
-    ad: ''
-  });
 
   const accountFilter = isCliente ? profile?.account_name || '' : selectedClient;
-  const { data: allRows = [], isLoading } = useSheetData(selectedPlatform, accountFilter || undefined);
+  const sheetName = platformConfig[selectedPlatform]?.sheetRange.split('!')[0] || selectedPlatform;
 
-  const { data: accountRows = [] } = useSheetData(selectedPlatform);
+  const { data: allRows = [], isLoading } = useSheetData(sheetName, accountFilter || undefined);
+
+  const { data: accountRows = [] } = useSheetData(sheetName);
   const accountOptions = useMemo(
     () => [...new Set(accountRows.map((r) => r['Account Name']))].filter(Boolean),
     [accountRows],
@@ -121,19 +106,6 @@ function RelatoriosContent() {
     return { metrics: {}, chartData: [], tableData: filteredByDate };
   }, [filteredByDate, selectedPlatform]);
 
-  // Persistir filtros no localStorage
-  useEffect(() => {
-    const savedFilters = localStorage.getItem('reports-filters');
-    if (savedFilters) {
-      setFilters(JSON.parse(savedFilters));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('reports-filters', JSON.stringify(filters));
-  }, [filters]);
-
-  const isSpecialPlatform = selectedPlatform === 'relatorios';
 
   return (
     <div className="w-full p-0 m-0 space-y-3">
@@ -193,49 +165,6 @@ function RelatoriosContent() {
         </CardContent>
       </Card>
 
-      {!isSpecialPlatform && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Select value={filters.account} onValueChange={(value) => setFilters(prev => ({ ...prev, account: value }))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todas as Contas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="conta1">Conta Principal</SelectItem>
-              <SelectItem value="conta2">Conta Secundária</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.campaign} onValueChange={(value) => setFilters(prev => ({ ...prev, campaign: value }))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todas as Campanhas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="camp1">Campanha Verão</SelectItem>
-              <SelectItem value="camp2">Campanha Inverno</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.adset} onValueChange={(value) => setFilters(prev => ({ ...prev, adset: value }))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos os Grupos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="adset1">Grupo A</SelectItem>
-              <SelectItem value="adset2">Grupo B</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.ad} onValueChange={(value) => setFilters(prev => ({ ...prev, ad: value }))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos os Anúncios" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ad1">Anúncio 1</SelectItem>
-              <SelectItem value="ad2">Anúncio 2</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
 
       {isLoading ? (
         <div className="space-y-6">
