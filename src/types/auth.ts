@@ -6,6 +6,7 @@ export interface UserProfile {
   role: 'admin' | 'cliente';
   ativo: boolean;
   is_root_admin?: boolean;
+  account_name?: string;
   foto_url?: string;
   avatar_url?: string;
   status?: string;
