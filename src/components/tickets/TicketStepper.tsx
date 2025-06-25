@@ -1,5 +1,4 @@
-
-import { CheckCircle, Clock, AlertCircle, User, Eye, Play } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, Eye, Play } from 'lucide-react';
 
 interface TicketStepperProps {
   status: 'novo' | 'aguardando_equipe' | 'aguardando_cliente' | 'em_analise' | 'em_andamento' | 'resolvido';
@@ -20,7 +19,7 @@ export function TicketStepper({ status, categoria, className }: TicketStepperPro
     switch (status) {
       case 'novo': return 0;
       case 'aguardando_equipe': return 1;
-      case 'aguardando_cliente': return 1; // Mesmo nível que aguardando_equipe
+      case 'aguardando_cliente': return 1;
       case 'em_analise': return 2;
       case 'em_andamento': return 3;
       case 'resolvido': return 4;
@@ -40,19 +39,19 @@ export function TicketStepper({ status, categoria, className }: TicketStepperPro
         return (
           <div key={step.id} className="flex items-center">
             <div className={`
-              flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors
+              flex items-center justify-center w-5 h-5 rounded-full border-2 text-[10px] transition-colors
               ${isActive 
                 ? 'bg-blue-500 border-blue-500 text-white' 
                 : 'bg-gray-100 border-gray-300 text-gray-400'
               }
-              ${isCurrent ? 'ring-2 ring-blue-200' : ''}
+              ${isCurrent ? 'ring-1 ring-blue-200' : ''}
             `}>
-              <IconComponent className="h-4 w-4" />
+              <IconComponent className="h-3 w-3" />
             </div>
-            
+
             {index < steps.length - 1 && (
               <div className={`
-                w-12 h-0.5 mx-2 transition-colors
+                w-8 h-0.5 mx-1 transition-colors
                 ${index < currentStep ? 'bg-blue-500' : 'bg-gray-300'}
               `} />
             )}
