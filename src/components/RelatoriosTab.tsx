@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BarChart3, Download, Calendar } from 'lucide-react';
 import { useSheetData } from '@/hooks/dashboard_hooks/useSheetData';
+import { platformConfig } from '@/hooks/dashboard_hooks/usePlatformNavigation';
 import { DatePickerWithRange } from '@/components/ui/date-picker';
 import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
 import { ReportsCharts } from '@/components/reports/ReportsCharts';
@@ -42,9 +43,11 @@ function RelatoriosContent() {
   });
 
   const accountFilter = isCliente ? profile?.account_name || '' : selectedClient;
-  const { data: allRows = [], isLoading } = useSheetData(selectedPlatform, accountFilter || undefined);
+  const sheetName = platformConfig[selectedPlatform]?.sheetRange.split('!')[0] || selectedPlatform;
 
-  const { data: accountRows = [] } = useSheetData(selectedPlatform);
+  const { data: allRows = [], isLoading } = useSheetData(sheetName, accountFilter || undefined);
+
+  const { data: accountRows = [] } = useSheetData(sheetName);
   const accountOptions = useMemo(
     () => [...new Set(accountRows.map((r) => r['Account Name']))].filter(Boolean),
     [accountRows],
