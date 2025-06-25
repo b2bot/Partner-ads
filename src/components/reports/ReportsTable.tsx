@@ -30,13 +30,13 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const itemsPerPage = 10;
 
-  if (!data || data.length === 0) return null;
+  const safeData = data ?? [];
 
   const isRelatorios = platform === 'relatorios';
 
   const relatoriosData = useMemo(() => {
     if (!isRelatorios) return [];
-    return data.map((row) => {
+    return safeData.map((row) => {
       const contatos = Number(row['Contatos']) || 0;
       const agendado = Number(row['Agendado']) || 0;
       const atendimento = Number(row['Atendimento']) || 0;
@@ -83,11 +83,13 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
     setSortConfig({ key, direction });
   };
 
-  const filteredData = data.filter((item) =>
+  const filteredData = safeData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
+  if (safeData.length === 0) return null;
 
   if (sortConfig) {
     filteredData.sort((a, b) => {
