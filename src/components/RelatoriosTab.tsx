@@ -45,7 +45,10 @@ function RelatoriosContent() {
   const accountFilter = isCliente ? profile?.account_name || '' : selectedClient;
   const sheetName = platformConfig[selectedPlatform]?.sheetRange.split('!')[0] || selectedPlatform;
 
-  const { data: allRows = [], isLoading } = useSheetData(sheetName, accountFilter || undefined);
+  const { data: allRows = [], isLoading, error } = useSheetData(
+    sheetName,
+    accountFilter || undefined,
+  );
 
   const { data: accountRows = [] } = useSheetData(sheetName);
   const accountOptions = useMemo(
@@ -55,10 +58,20 @@ function RelatoriosContent() {
 
   const dateKey = useMemo(() => {
     const sample = allRows[0] || {};
-    if ('Data' in sample) return 'Data';
-    if ('date' in sample) return 'date';
-    if ('day' in sample) return 'day';
-    return Object.keys(sample).find(k => k.toLowerCase().includes('date')) || 'Data';
+    const lowerKeys: Record<string, string> = {};
+    Object.keys(sample).forEach((k) => {
+      lowerKeys[k.toLowerCase()] = k;
+    });
+
+    if (lowerKeys['data']) return lowerKeys['data'];
+    if (lowerKeys['date']) return lowerKeys['date'];
+    if (lowerKeys['day']) return lowerKeys['day'];
+
+    const dateLike = Object.keys(lowerKeys).find((k) =>
+      k.includes('date') || k.includes('day'),
+    );
+
+    return dateLike ? lowerKeys[dateLike] : 'Data';
   }, [allRows]);
 
   const filteredByDate = useMemo(() => {
@@ -189,6 +202,8 @@ function RelatoriosContent() {
           <Skeleton className="h-[400px] w-full rounded-xl" />
           <Skeleton className="h-[300px] w-full rounded-xl" />
         </div>
+      ) : error ? (
+        <p className="text-sm text-red-500">Erro ao carregar dados.</p>
       ) : (
         <div className="space-y-6">
           {/* Cards de Métricas */}
