@@ -20,7 +20,7 @@ interface TableData {
 }
 
 interface ReportsTableProps {
-  data?: TableData[];
+  data?: any;
   platform: string;
 }
 
@@ -29,8 +29,10 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const itemsPerPage = 10;
+  const [metaTab, setMetaTab] = useState<'campaigns' | 'adsets' | 'ads'>('campaigns');
 
-  const safeData = data ?? [];
+  const isMeta = platform === 'meta' && data && !Array.isArray(data);
+  const safeData = isMeta ? data[metaTab] ?? [] : data ?? [];
 
   const isRelatorios = platform === 'relatorios';
 
@@ -212,6 +214,89 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
               </div>
             </TabsContent>
           </Tabs>
+		        ) : isMeta ? (
+          <>
+            <Tabs value={metaTab} onValueChange={(v) => setMetaTab(v as any)} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
+                <TabsTrigger value="adsets">Grupos</TabsTrigger>
+                <TabsTrigger value="ads">Anúncios</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="relative w-full sm:w-auto">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full sm:w-[300px]"
+                />
+              </div>
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Exportar CSV
+              </Button>
+            </div>
+
+            <div className="rounded-md border overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {[
+                      { key: 'campaign', label: metaTab === 'campaigns' ? 'Campanha' : metaTab === 'adsets' ? 'Grupo' : 'Anúncio' },
+                      { key: 'impressions', label: 'Impressões' },
+                      { key: 'clicks', label: 'Cliques' },
+                      { key: 'spend', label: 'Investimento' },
+                      { key: 'conversions', label: 'Conversões' },
+                    ].map(({ key, label }) => (
+                      <TableHead key={key} className="text-right cursor-pointer" onClick={() => handleSort(key)}>
+                        {label} <ArrowUpDown className="ml-2 h-4 w-4 inline" />
+                      </TableHead>
+                    ))}
+                    <TableHead className="text-right">CTR</TableHead>
+                    <TableHead className="text-right">CPC</TableHead>
+                    <TableHead className="text-right">Custo/Conv.</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedData.map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{row.campaign}</TableCell>
+                      <TableCell className="text-right">{row.impressions?.toLocaleString('pt-BR')}</TableCell>
+                      <TableCell className="text-right">{row.clicks?.toLocaleString('pt-BR')}</TableCell>
+                      <TableCell className="text-right">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(row.spend)}
+                      </TableCell>
+                      <TableCell className="text-right">{row.conversions}</TableCell>
+                      <TableCell className="text-right"><Badge variant="secondary">{row.ctr?.toFixed(2)}%</Badge></TableCell>
+                      <TableCell className="text-right">R$ {row.cpc?.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">R$ {row.costPerConversion?.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4">
+                <div className="text-sm text-muted-foreground">
+                  Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, filteredData.length)} de {filteredData.length} resultados
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <>
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
