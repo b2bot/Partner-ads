@@ -111,10 +111,10 @@ export function CampaignsTab() {
   return (
     <div className="w-full p-0 m-0 space-y-3">
       <div className="flex justify-between items-center">
-        <div>
+        {/* <div>
           <h1 className="text-lg font-bold text-slate-800">Campanhas</h1>
           <p className="text-slate-600 text-xs">Gerencie suas campanhas do Facebook Ads</p>
-        </div>
+        </div>*/}
         <div className="flex gap-2">
           <DateRangeFilter onDateChange={setDateRange} />
           <Button
