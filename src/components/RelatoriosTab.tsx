@@ -53,14 +53,22 @@ function RelatoriosContent() {
     [accountRows],
   );
 
+  const dateKey = useMemo(() => {
+    const sample = allRows[0] || {};
+    if ('Data' in sample) return 'Data';
+    if ('date' in sample) return 'date';
+    if ('day' in sample) return 'day';
+    return Object.keys(sample).find(k => k.toLowerCase().includes('date')) || 'Data';
+  }, [allRows]);
+
   const filteredByDate = useMemo(() => {
     return allRows.filter((row) => {
-      const dateValue = row['Data'];
+      const dateValue = row[dateKey];
       if (!dateValue) return false;
       const d = new Date(dateValue);
       return d >= dateRange.from && d <= dateRange.to;
     });
-  }, [allRows, dateRange]);
+  }, [allRows, dateRange, dateKey]);
 
   const reportData = useMemo(() => {
     if (filteredByDate.length === 0) return null;
