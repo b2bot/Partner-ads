@@ -109,7 +109,7 @@ function RelatoriosContent() {
   const isSpecialPlatform = selectedPlatform === 'relatorios';
 
   return (
-    <div className="w-full p-0 m-0 space-y-6">
+    <div className="w-full p-0 m-0 space-y-3">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
