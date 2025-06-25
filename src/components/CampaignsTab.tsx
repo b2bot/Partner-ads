@@ -79,6 +79,8 @@ export function CampaignsTab() {
     });
   }, [filteredCampaigns, sortConfig, campaignInsights, getVisibleMetrics]);
 
+  return (
+    <div className="w-full p-0 m-0 space-y-3">
   const handleStatusUpdate = async (campaignId: string, newStatus: string) => {
     if (!credentials?.access_token) {
       toast.error('Credenciais da Meta não encontradas.');
