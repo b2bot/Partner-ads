@@ -124,8 +124,100 @@ function RelatoriosContent() {
       return { metrics, chartData, tableData: filteredByDate };
     }
 
-    return { metrics: {}, chartData: [], tableData: filteredByDate };
-  }, [filteredByDate, selectedPlatform]);
+    const sample = filteredByDate[0] || {};
+    const getKey = (names: string[]): string | null => {
+      const lowerMap: Record<string, string> = {};
+      Object.keys(sample).forEach((k) => {
+        lowerMap[k.toLowerCase()] = k;
+      });
+      for (const n of names) {
+        const lower = n.toLowerCase();
+        if (lowerMap[lower]) return lowerMap[lower];
+      }
+      const partial = Object.keys(lowerMap).find((k) =>
+        names.some((n) => k.includes(n.toLowerCase())),
+      );
+      return partial ? lowerMap[partial] : null;
+    };
+
+    const impressionsKey = getKey(['impressions', 'impressões']);
+    const clicksKey = getKey(['clicks', 'cliques']);
+    const spendKey = getKey(['spend', 'amount spent', 'investimento']);
+    const conversionsKey = getKey(['conversions', 'resultados', 'leads']);
+    const ctrKey = getKey(['ctr']);
+    const cpcKey = getKey(['cpc']);
+    const cpmKey = getKey(['cpm']);
+    const campaignKey = getKey(['campaign name', 'campanha']);
+
+    const sumKey = (key: string | null) =>
+      key ? filteredByDate.reduce((acc, row) => acc + (Number(row[key]) || 0), 0) : 0;
+
+    const metrics = {
+      impressions: sumKey(impressionsKey),
+      clicks: sumKey(clicksKey),
+      spend: sumKey(spendKey),
+      conversions: sumKey(conversionsKey),
+    } as any;
+
+    const clicksTotal = metrics.clicks || 0;
+    const impressionsTotal = metrics.impressions || 0;
+    const spendTotal = metrics.spend || 0;
+
+    metrics.ctr = ctrKey
+      ? filteredByDate.reduce((acc, row) => acc + (Number(row[ctrKey]) || 0), 0) /
+          filteredByDate.length
+      : impressionsTotal > 0
+        ? (clicksTotal * 100) / impressionsTotal
+        : 0;
+    metrics.cpc = cpcKey
+      ? filteredByDate.reduce((acc, row) => acc + (Number(row[cpcKey]) || 0), 0) /
+          filteredByDate.length
+      : clicksTotal > 0
+        ? spendTotal / clicksTotal
+        : 0;
+    metrics.cpm = cpmKey
+      ? filteredByDate.reduce((acc, row) => acc + (Number(row[cpmKey]) || 0), 0) /
+          filteredByDate.length
+      : impressionsTotal > 0
+        ? (spendTotal / impressionsTotal) * 1000
+        : 0;
+
+    const chartMap: Record<string, any> = {};
+    filteredByDate.forEach((row) => {
+      const date = row[dateKey];
+      if (!chartMap[date]) {
+        chartMap[date] = { date, impressions: 0, clicks: 0, spend: 0 };
+      }
+      if (impressionsKey) chartMap[date].impressions += Number(row[impressionsKey]) || 0;
+      if (clicksKey) chartMap[date].clicks += Number(row[clicksKey]) || 0;
+      if (spendKey) chartMap[date].spend += Number(row[spendKey]) || 0;
+    });
+
+    const chartData = Object.values(chartMap).sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
+
+    const tableData = filteredByDate.map((row) => ({
+      campaign: campaignKey ? row[campaignKey] : row['Campaign'] || row['Campanha'],
+      impressions: impressionsKey ? Number(row[impressionsKey]) || 0 : 0,
+      clicks: clicksKey ? Number(row[clicksKey]) || 0 : 0,
+      spend: spendKey ? Number(row[spendKey]) || 0 : 0,
+      ctr:
+        ctrKey && row[ctrKey]
+          ? Number(row[ctrKey])
+          : impressionsKey && Number(row[impressionsKey])
+            ? ((Number(row[clicksKey]) || 0) * 100) / Number(row[impressionsKey])
+            : 0,
+      cpc:
+        cpcKey && row[cpcKey]
+          ? Number(row[cpcKey])
+          : Number(row[clicksKey])
+            ? Number(row[spendKey] || 0) / Number(row[clicksKey])
+            : 0,
+    }));
+
+    return { metrics, chartData, tableData };
+  }, [filteredByDate, selectedPlatform, dateKey]);
 
 
   return (
