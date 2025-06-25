@@ -57,7 +57,11 @@ export const useSheetData = (
       const mapped = dataRows.map((row) => {
         const obj: SheetRow = {};
         normalizedHeader.forEach((key, idx) => {
+          const originalKey = header[idx];
           obj[key] = row[idx];
+          if (!obj.hasOwnProperty(originalKey)) {
+            obj[originalKey] = row[idx];
+          }
         });
         return obj;
       });
