@@ -76,7 +76,7 @@ export function Dashboard() {
     return (
       <div className="p-2">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-lg font-semibold text-slate-800"> </h4>
+          <h4 className="text-lg font-semibold text-slate-800"> </h4>
           <div className="flex gap-4">
             <AccountFilter />
             <DateRangeFilter onDateChange={setDateRange} />
