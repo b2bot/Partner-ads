@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,7 +19,7 @@ import {
   Calendar,
   Filter
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useSheetData } from '@/hooks/dashboard_hooks/useSheetData';
 import { DatePickerWithRange } from '@/components/ui/date-picker';
 import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
 import { ReportsCharts } from '@/components/reports/ReportsCharts';
@@ -45,7 +45,7 @@ const platforms: Platform[] = [
 ];
 
 function RelatoriosContent() {
-  const { hasPermission, isAdmin, isCliente } = useAuth();
+  const { hasPermission, isAdmin, isCliente, profile } = useAuth();
   const [selectedPlatform, setSelectedPlatform] = useState('meta');
   const [selectedClient, setSelectedClient] = useState('');
   const [dateRange, setDateRange] = useState({
@@ -59,40 +59,67 @@ function RelatoriosContent() {
     ad: ''
   });
 
-  // Mock data query - substituir pela integração real com a API
-  const { data: reportData, isLoading } = useQuery({
-    queryKey: ['reports', selectedPlatform, selectedClient, dateRange, filters],
-    queryFn: async () => {
-      // Simular chamada para a API do Google Sheets
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return {
-        metrics: {
-          impressions: 1250000,
-          clicks: 45200,
-          spend: 15600.50,
-          conversions: 892,
-          ctr: 3.62,
-          cpc: 0.35,
-          cpm: 12.48
-        },
-        chartData: [
-          { date: '2024-01-01', impressions: 12000, clicks: 450, spend: 1200 },
-          { date: '2024-01-02', impressions: 15000, clicks: 520, spend: 1400 },
-          { date: '2024-01-03', impressions: 11000, clicks: 380, spend: 1100 },
-        ],
-        tableData: [
-          { 
-            campaign: 'Campanha Verão 2024', 
-            impressions: 125000, 
-            clicks: 4200, 
-            spend: 1560.50,
-            ctr: 3.36,
-            cpc: 0.37
-          },
-        ]
+  const accountFilter = isCliente ? profile?.account_name || '' : selectedClient;
+  const { data: allRows = [], isLoading } = useSheetData(selectedPlatform, accountFilter || undefined);
+
+  const { data: accountRows = [] } = useSheetData(selectedPlatform);
+  const accountOptions = useMemo(
+    () => [...new Set(accountRows.map((r) => r['Account Name']))].filter(Boolean),
+    [accountRows],
+  );
+
+  const filteredByDate = useMemo(() => {
+    return allRows.filter((row) => {
+      const dateValue = row['Data'];
+      if (!dateValue) return false;
+      const d = new Date(dateValue);
+      return d >= dateRange.from && d <= dateRange.to;
+    });
+  }, [allRows, dateRange]);
+
+  const reportData = useMemo(() => {
+    if (filteredByDate.length === 0) return null;
+
+    const sum = (field: string) =>
+      filteredByDate.reduce((acc, row) => acc + (Number(row[field]) || 0), 0);
+
+    if (selectedPlatform === 'relatorios') {
+      const metrics = {
+        contatos: sum('Contatos'),
+        agendado: sum('Agendado'),
+        atendimento: sum('Atendimento'),
+        orcamentos: sum('Orçamentos'),
+        vendas: sum('Vendas'),
+        faturado: sum('Faturado'),
       };
+
+      const chartMap: Record<string, any> = {};
+      filteredByDate.forEach((row) => {
+        const date = row['Data'];
+        if (!chartMap[date]) {
+          chartMap[date] = {
+            date,
+            contatos: 0,
+            agendado: 0,
+            atendimento: 0,
+            vendas: 0,
+          };
+        }
+        chartMap[date].contatos += Number(row['Contatos']) || 0;
+        chartMap[date].agendado += Number(row['Agendado']) || 0;
+        chartMap[date].atendimento += Number(row['Atendimento']) || 0;
+        chartMap[date].vendas += Number(row['Vendas']) || 0;
+      });
+
+      const chartData = Object.values(chartMap).sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
+
+      return { metrics, chartData, tableData: filteredByDate };
     }
-  });
+
+    return { metrics: {}, chartData: [], tableData: filteredByDate };
+  }, [filteredByDate, selectedPlatform]);
 
   // Persistir filtros no localStorage
   useEffect(() => {
@@ -128,8 +155,9 @@ function RelatoriosContent() {
                 <SelectValue placeholder="Selecionar Cliente" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cliente1">Cliente A</SelectItem>
-                <SelectItem value="cliente2">Cliente B</SelectItem>
+                {accountOptions.map((acc) => (
+                  <SelectItem key={acc} value={acc}>{acc}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           )}

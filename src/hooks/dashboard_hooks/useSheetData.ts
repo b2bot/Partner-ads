@@ -1,86 +1,37 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 export interface SheetRow {
   [key: string]: any;
 }
 
-export interface Platform {
-  id: string;
-  name: string;
-  active: boolean;
-}
+const SHEET_ID = '1RkIUU3a_arzxY7IGAtl8sPeNLA9Ztkj4y0CRtrpBAuE';
+const BASE_URL = import.meta.env.VITE_GSHEETS_API_URL || 'https://gsheets-api-1bdv.vercel.app';
 
-export interface UseSheetDataReturn {
-  data: SheetRow[];
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
-  currentSheetId: string;
-  setCurrentSheetId: (id: string) => void;
-}
-
-export const useSheetData = (clientId?: string): UseSheetDataReturn => {
-  const [data, setData] = useState<SheetRow[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currentSheetId, setCurrentSheetId] = useState<string>('');
-
-  const fetchData = async () => {
-    if (!clientId) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Simular dados para teste já que a tabela sheet_data não existe
-      const mockData = [
-        {
-          id: '1',
-          campaign_name: 'Campanha Teste 1',
-          adset_name: 'Conjunto 1',
-          ad_name: 'Anúncio 1',
-          impressions: 1000,
-          clicks: 50,
-          amountSpent: 100,
-          day: '2024-01-15'
-        },
-        {
-          id: '2',
-          campaign_name: 'Campanha Teste 2',
-          adset_name: 'Conjunto 2',
-          ad_name: 'Anúncio 2',
-          impressions: 2000,
-          clicks: 80,
-          amountSpent: 150,
-          day: '2024-01-16'
-        }
-      ];
-
-      setData(mockData);
-    } catch (err) {
-      console.error('Erro ao buscar dados:', err);
-      setError(err instanceof Error ? err.message : 'Erro desconhecido');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const refetch = () => {
-    fetchData();
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [clientId]);
-
-  return {
-    data,
-    loading,
-    error,
-    refetch,
-    currentSheetId,
-    setCurrentSheetId
-  };
+export const useSheetData = (
+  aba: string,
+  accountName?: string,
+): UseQueryResult<SheetRow[], Error> => {
+  return useQuery<SheetRow[]>({
+    queryKey: ['sheet-data', aba, accountName],
+    queryFn: async () => {
+      if (!aba) return [];
+      const url = `${BASE_URL}/api/sheets?sheetId=${SHEET_ID}&range=${encodeURIComponent(aba)}!A:Z`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch sheet data');
+      const json = await res.json();
+      const rows: string[][] = json?.data || [];
+      if (!rows.length) return [];
+      const [header, ...dataRows] = rows;
+      const mapped = dataRows.map((row) => {
+        const obj: SheetRow = {};
+        header.forEach((key, idx) => {
+          obj[key] = row[idx];
+        });
+        return obj;
+      });
+      return accountName
+        ? mapped.filter((r) => r['Account Name'] === accountName)
+        : mapped;
+    },
+  });
 };

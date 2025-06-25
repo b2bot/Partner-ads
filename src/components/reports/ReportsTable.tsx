@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle
 } from '@/components/ui/card';
@@ -34,49 +34,46 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
 
   const isRelatorios = platform === 'relatorios';
 
-  const relatoriosData = [
-    {
-      dataEnvio: '2024-01-15',
-      data: '2024-01-14',
-      responsavel: 'João Silva',
-      contatos: 45,
-      agendado: 32,
-      atendimento: 28,
-      vendas: 12,
-      orcamentos: 8,
-      taxaAgendamento: '71.1%',
-      taxaConversao: '42.9%',
-    },
-    {
-      dataEnvio: '2024-01-14',
-      data: '2024-01-13',
-      responsavel: 'Maria Santos',
-      contatos: 52,
-      agendado: 38,
-      atendimento: 35,
-      vendas: 15,
-      orcamentos: 10,
-      taxaAgendamento: '73.1%',
-      taxaConversao: '42.9%',
-    }
-  ];
+  const relatoriosData = useMemo(() => {
+    if (!isRelatorios) return [];
+    return data.map((row) => {
+      const contatos = Number(row['Contatos']) || 0;
+      const agendado = Number(row['Agendado']) || 0;
+      const atendimento = Number(row['Atendimento']) || 0;
+      const vendas = Number(row['Vendas']) || 0;
+      const orcamentos = Number(row['Orçamentos']) || 0;
+      const taxaAgendamento = contatos ? `${((agendado / contatos) * 100).toFixed(1)}%` : '0%';
+      const taxaConversao = atendimento ? `${((vendas / atendimento) * 100).toFixed(1)}%` : '0%';
 
-  const observacoesData = [
-    {
-      data: '2024-01-15',
-      conta: 'Conta Principal',
-      responsavel: 'João Silva',
-      observacoes:
-        'Tivemos um ótimo desempenho hoje, principalmente nos anúncios de vídeo. A campanha de retargeting está convertendo muito bem e conseguimos reduzir o CPA em 15%. Recomendo manter essa estratégia para os próximos dias.',
-    },
-    {
-      data: '2024-01-14',
-      conta: 'Conta Secundária',
-      responsavel: 'Maria Santos',
-      observacoes:
-        'Notamos uma queda no CTR dos anúncios estáticos. Sugiro testar novos criativos e ajustar as audiences para melhorar o engajamento. A campanha de awareness está funcionando bem.',
-    }
-  ];
+      return {
+        dataEnvio: row['Data'] || row['Data de Envio'],
+        data: row['Data'],
+        responsavel: row['Responsável'],
+        contatos,
+        agendado,
+        atendimento,
+        vendas,
+        orcamentos,
+        taxaAgendamento,
+        taxaConversao,
+        observacoes: row['Observações'],
+        conta: row['Account Name'],
+      };
+    });
+  }, [data, isRelatorios]);
+
+  const observacoesData = useMemo(
+    () =>
+      relatoriosData
+        .filter((r) => r.observacoes)
+        .map((r) => ({
+          data: r.data,
+          conta: r.conta,
+          responsavel: r.responsavel,
+          observacoes: r.observacoes,
+        })),
+    [relatoriosData],
+  );
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
