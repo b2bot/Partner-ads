@@ -50,14 +50,14 @@ export function TasksTab() {
   return (
     <div className="bg-transparent border-none shadow-none p-0">
       <header className="p-0">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
+        <div className="w-full p-0 m-0 space-y-3">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1">
+           {/* <div>
               <h1 className="text-2xl font-bold">Sistema de Tarefas</h1>
               <p className="text-muted-foreground">
                 Gerencie suas tarefas e projetos de forma eficiente
               </p>
-            </div>
+            </div>*/}
 
             <div className="flex items-center gap-4">
               <Button onClick={() => setTaskModalOpen(true)}>
@@ -79,9 +79,9 @@ export function TasksTab() {
         </div>
       </header>
 
-      <main className="space-y-6 max-w-7xl">
+      <main className="w-full p-0 m-0 space-y-1">
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)}>
-          <TabsList className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 px-1 py-0 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-full"> {/* aumentamos para 7 colunas */}
+          <TabsList className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 px-1 py-1 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-full"> {/* aumentamos para 7 colunas */}
             <TabsTrigger value="lista" className="flex items-center gap-2">
               <List className="h-4 w-4" />
               Lista

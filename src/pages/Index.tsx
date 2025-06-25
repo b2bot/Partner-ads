@@ -336,7 +336,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
 
           {/* Main Content */}
           <main className="flex-1 overflow-auto">
-            <div className="w-full px-0 py-0">
+            <div className="w-full px-10 py-10">
               {renderContent()}
             </div>
           </main>

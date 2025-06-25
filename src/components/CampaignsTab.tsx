@@ -109,7 +109,7 @@ export function CampaignsTab() {
   };
 
   return (
-    <div className="w-full p-0 m-0 space-y-3">
+    <div className="w-full p-0 m-0 space-y-7 ">
       <div className="flex justify-between items-center">
         {/* <div>
           <h1 className="text-lg font-bold text-slate-800">Campanhas</h1>
@@ -132,7 +132,7 @@ export function CampaignsTab() {
           </Button>
         </div>
       </div>
-
+      
       <SelectedAccountDisplay />
 
       <DynamicFilters
@@ -147,95 +147,97 @@ export function CampaignsTab() {
       )}
 
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow className="text-xs">
-              <TableHead 
-                onClick={() => handleSort('name')} 
-                className="cursor-pointer text-xs h-7 hover:bg-slate-50"
-              >
-                <div className="flex items-center gap-1">
-                  Nome
-                  <ArrowUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead className="text-xs h-7">Status</TableHead>
-              <TableHead className="text-xs h-7">Objetivo</TableHead>
-              {getVisibleMetrics('campaigns').map(metric => (
+	    <CardContent className="p-6">
+          <Table>
+            <TableHeader>
+              <TableRow className="text-xs">
                 <TableHead 
-                  key={metric} 
-                  onClick={() => handleSort(metric)}
+                  onClick={() => handleSort('name')} 
                   className="cursor-pointer text-xs h-7 hover:bg-slate-50"
                 >
                   <div className="flex items-center gap-1">
-                    {getMetricDisplayName(metric)}
+                    Nome
                     <ArrowUpDown className="h-3 w-3" />
                   </div>
                 </TableHead>
-              ))}
-              <TableHead className="text-xs h-7">Criada em</TableHead>
-              <TableHead className="text-right text-xs h-7">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {insightsLoading ? (
-              <TableRow>
-                <TableCell colSpan={getVisibleMetrics('campaigns').length + 5} className="text-center text-xs py-4">
-                  Carregando métricas...
-                </TableCell>
+                <TableHead className="text-xs h-7">Status</TableHead>
+                <TableHead className="text-xs h-7">Objetivo</TableHead>
+                {getVisibleMetrics('campaigns').map(metric => (
+                  <TableHead 
+                    key={metric} 
+                    onClick={() => handleSort(metric)}
+                    className="cursor-pointer text-xs h-7 hover:bg-slate-50"
+                  >
+                    <div className="flex items-center gap-1">
+                      {getMetricDisplayName(metric)}
+                      <ArrowUpDown className="h-3 w-3" />
+                    </div>
+                  </TableHead>
+                ))}
+                <TableHead className="text-xs h-7">Criada em</TableHead>
+                <TableHead className="text-right text-xs h-7">Ações</TableHead>
               </TableRow>
-            ) : (
-              sortedCampaigns.map(campaign => {
-                const campaignData = campaignInsights.find(item => item?.id === campaign.id);
+            </TableHeader>
+            <TableBody>
+              {insightsLoading ? (
+                <TableRow>
+                  <TableCell colSpan={getVisibleMetrics('campaigns').length + 5} className="text-center text-xs py-4">
+                    Carregando métricas...
+                  </TableCell>
+                </TableRow>
+              ) : (
+                sortedCampaigns.map(campaign => {
+                  const campaignData = campaignInsights.find(item => item?.id === campaign.id);
                 
-                return (
-                  <TableRow key={campaign.id} className="text-xs h-8">
-                    <TableCell className="font-medium text-xs p-1">{campaign.name}</TableCell>
-                    <TableCell className="p-1">
-                      <Badge variant={campaign.status === 'ACTIVE' ? 'outline' : 'secondary'} className="text-xs px-1 py-0">
-                        {campaign.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs p-1">{campaign.objective}</TableCell>
-                    {getVisibleMetrics('campaigns').map(metric => (
-                      <TableCell key={metric} className="text-xs p-1">
-                        {formatMetricValue(campaignData, metric)}
+                  return (
+                    <TableRow key={campaign.id} className="text-xs h-8">
+                      <TableCell className="font-medium text-xs p-1">{campaign.name}</TableCell>
+                      <TableCell className="p-1">
+                        <Badge variant={campaign.status === 'ACTIVE' ? 'outline' : 'secondary'} className="text-xs px-1 py-0">
+                          {campaign.status}
+                        </Badge>
                       </TableCell>
-                    ))}
-                    <TableCell className="text-xs p-1">{new Date(campaign.created_time).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right p-1">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-6 w-6 p-0">
-                            <span className="sr-only">Abrir menu</span>
-                            <MoreHorizontal className="h-3 w-3" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setEditingCampaign(campaign)}>
-                            <Edit className="h-3 w-3 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          {campaign.status === 'ACTIVE' ? (
-                            <DropdownMenuItem onClick={() => handleStatusUpdate(campaign.id, 'PAUSED')}>
-                              <Pause className="h-3 w-3 mr-2" />
-                              Pausar
+                      <TableCell className="text-xs p-1">{campaign.objective}</TableCell>
+                      {getVisibleMetrics('campaigns').map(metric => (
+                        <TableCell key={metric} className="text-xs p-1">
+                          {formatMetricValue(campaignData, metric)}
+                        </TableCell>
+                      ))}
+                      <TableCell className="text-xs p-1">{new Date(campaign.created_time).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right p-1">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-6 w-6 p-0">
+                              <span className="sr-only">Abrir menu</span>
+                              <MoreHorizontal className="h-3 w-3" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setEditingCampaign(campaign)}>
+                              <Edit className="h-3 w-3 mr-2" />
+                              Editar
                             </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem onClick={() => handleStatusUpdate(campaign.id, 'ACTIVE')}>
-                              <Play className="h-3 w-3 mr-2" />
-                              Ativar
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+                            {campaign.status === 'ACTIVE' ? (
+                              <DropdownMenuItem onClick={() => handleStatusUpdate(campaign.id, 'PAUSED')}>
+                                <Pause className="h-3 w-3 mr-2" />
+                                Pausar
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem onClick={() => handleStatusUpdate(campaign.id, 'ACTIVE')}>
+                                <Play className="h-3 w-3 mr-2" />
+                                Ativar
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+		</CardContent>	  
       </Card>
 
       <CreateCampaignModal

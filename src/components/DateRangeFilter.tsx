@@ -73,7 +73,7 @@ export function DateRangeFilter({ onDateChange }: DateRangeFilterProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-7 text-xs font-normal">
+        <Button variant="outline" size="sm" className="h-7 text-xs font-normal w-[350px]">
           <CalendarIcon className="w-3 h-3 mr-1" />
           {formatDateRange()}
           <ChevronDown className="w-3 h-3 ml-1" />

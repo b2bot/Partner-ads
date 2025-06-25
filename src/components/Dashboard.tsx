@@ -101,9 +101,9 @@ export function Dashboard() {
   return (
     <div className="p-0 space-y-4">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <h4 className="text-lg font-bold text-slate-800"></h4>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
           <AccountFilter />
           <DateRangeFilter onDateChange={setDateRange} />
         </div>

@@ -92,7 +92,7 @@ export function MetricsObjectivesTab() {
     const metric = selectedTemplate.metrics[metricKey];
     
     return (
-      <div className="space-y-4">
+      <div className="w-full p-0 m-0 space-y-3">
         <div className="flex items-center gap-2">
           <Label className="font-medium">{label}</Label>
           <Button 

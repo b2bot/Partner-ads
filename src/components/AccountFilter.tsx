@@ -68,11 +68,11 @@ export function AccountFilter() {
         </Label>
       </div>
       <Select value={selectedAdAccount} onValueChange={setSelectedAdAccount}>
-        <SelectTrigger className="w-[300px]">
+        <SelectTrigger className="w-[350px] h-7">
           <SelectValue placeholder="Selecione uma conta">
             {selectedAdAccountName && (
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{selectedAdAccountName}</span>
+              <div className="flex items-center gap-4">
+                <span className="text-xs">{selectedAdAccountName}</span>
                 <span className="text-xs text-slate-500">({selectedAdAccount.replace('act_', '')})</span>
               </div>
             )}
@@ -90,7 +90,7 @@ export function AccountFilter() {
         </SelectContent>
       </Select>
       {isAdmin && (
-        <span className="text-xs text-amber-600 font-medium">Admin - Todas as contas</span>
+        <span className="text-xs text-amber-600 font-medium w-[460px] truncate">Admin - Todas as contas</span>
       )}
     </div>
   );

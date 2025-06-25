@@ -51,38 +51,40 @@ export function WhatsAppReportsTab() {
     <div className="w-full p-0 m-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+        {/*<div>
           <h1 className="text-h2 text-foreground">Campanhas WhatsApp</h1>
           <p className="text-caption text-muted-foreground">
             Automação e disparo de mensagens para clientes via WhatsApp Business API
           </p>
-        </div>
-        <div className="flex gap-2">
+        </div>*/}
+        <div className="flex gap-6 ">
           <Button variant="outline" size="sm" onClick={handleNewMessage}>
             <Send className="size-4 mr-1" />
             Nova Mensagem
           </Button>
           <Button size="sm" onClick={handleNewCampaign}>
-            <Plus className="size-4 mr-1" />
+            <Plus className="size-4" />
             Nova Campanha
           </Button>
         </div>
       </div>
-
+      
+	  <div className="mt-6 mb-6">
       <WhatsAppConnectionCard />
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="dashboard" className="flex items-center gap-2">
-            <BarChart3 className="size-4" /> Dashboard
+        <TabsList className="grid grid-cols-4 gap-1 bg-white border rounded-md p-0">
+          <TabsTrigger value="dashboard" className="flex items-center gap-3 px-1 py-2 data-[state=active]:bg-primary data-[state=active]:text-white">
+            <BarChart3 className="size-4 " /> Dashboard
           </TabsTrigger>
-          <TabsTrigger value="campaigns" className="flex items-center gap-2">
+          <TabsTrigger value="campaigns" className="flex items-center gap-4 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-white">
             <Clock className="size-4" /> Campanhas
           </TabsTrigger>
-          <TabsTrigger value="messages" className="flex items-center gap-2">
+          <TabsTrigger value="messages" className="flex items-center gap-4 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-white">
             <MessageSquare className="size-4" /> Mensagens
           </TabsTrigger>
-          <TabsTrigger value="contacts" className="flex items-center gap-2">
+          <TabsTrigger value="contacts" className="flex items-center gap-4 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-white">
             <Users className="size-4" /> Contatos
           </TabsTrigger>
         </TabsList>
