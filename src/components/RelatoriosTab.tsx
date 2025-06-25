@@ -177,20 +177,26 @@ function RelatoriosContent() {
     const cpcKey = mapping.cpc || getKey(['cpc']);
     const cpmKey = mapping.cpm || getKey(['cpm']);
     const campaignKey = getKey(['campaign name', 'campanha']);
+    const adSetKey = getKey(['ad set name', 'conjunto', 'grupo']);
+    const adNameKey = getKey(['ad name', 'anuncio']);
 
     const sumKey = (key: string | null) =>
-      key ? filteredByDate.reduce((acc, row) => acc + (Number(row[key]) || 0), 0) : 0;
+      key
+        ? filteredByDate.reduce((acc, row) => acc + (Number(row[key]) || 0), 0)
+        : 0;
 
     const metrics = {
       impressions: sumKey(impressionsKey),
       clicks: sumKey(clicksKey),
       spend: sumKey(spendKey),
       conversions: sumKey(conversionsKey),
+      costPerConversion: 0,
     } as any;
 
     const clicksTotal = metrics.clicks || 0;
     const impressionsTotal = metrics.impressions || 0;
     const spendTotal = metrics.spend || 0;
+    const conversionsTotal = metrics.conversions || 0;
 
     metrics.ctr = ctrKey
       ? filteredByDate.reduce((acc, row) => acc + (Number(row[ctrKey]) || 0), 0) /
@@ -210,6 +216,12 @@ function RelatoriosContent() {
       : impressionsTotal > 0
         ? (spendTotal / impressionsTotal) * 1000
         : 0;
+    metrics.costPerConversion = costConvKey
+      ? filteredByDate.reduce((acc, row) => acc + (Number(row[costConvKey]) || 0), 0) /
+          filteredByDate.length
+      : conversionsTotal > 0
+        ? spendTotal / conversionsTotal
+        : 0;
 
     const chartMap: Record<string, any> = {};
     filteredByDate.forEach((row) => {
@@ -226,7 +238,7 @@ function RelatoriosContent() {
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     );
 
-    const tableData = filteredByDate.map((row) => ({
+    const mapRow = (row: any) => ({
       campaign: campaignKey ? row[campaignKey] : row['Campaign'] || row['Campanha'],
       impressions: impressionsKey ? Number(row[impressionsKey]) || 0 : 0,
       clicks: clicksKey ? Number(row[clicksKey]) || 0 : 0,
@@ -243,7 +255,54 @@ function RelatoriosContent() {
           : Number(row[clicksKey])
             ? Number(row[spendKey] || 0) / Number(row[clicksKey])
             : 0,
-    }));
+      conversions: conversionsKey ? Number(row[conversionsKey]) || 0 : 0,
+      costPerConversion:
+        costConvKey && row[costConvKey]
+          ? Number(row[costConvKey])
+          : Number(row[conversionsKey])
+            ? Number(row[spendKey] || 0) / Number(row[conversionsKey])
+            : 0,
+    });
+
+    const tableData = filteredByDate.map(mapRow);
+
+    const groupRows = (key: string | null) => {
+      if (!key) return [] as typeof tableData;
+      const groups: Record<string, any> = {};
+      filteredByDate.forEach((r) => {
+        const name = r[key];
+        if (!name) return;
+        if (!groups[name]) {
+          groups[name] = { name, rows: [] as any[] };
+        }
+        groups[name].rows.push(mapRow(r));
+      });
+      return Object.values(groups).map((g: any) => {
+        const base = { campaign: g.name, impressions: 0, clicks: 0, spend: 0, conversions: 0 } as any;
+        g.rows.forEach((row: any) => {
+          base.impressions += row.impressions;
+          base.clicks += row.clicks;
+          base.spend += row.spend;
+          base.conversions += row.conversions;
+        });
+        base.ctr = base.impressions > 0 ? (base.clicks * 100) / base.impressions : 0;
+        base.cpc = base.clicks > 0 ? base.spend / base.clicks : 0;
+        base.costPerConversion = base.conversions > 0 ? base.spend / base.conversions : 0;
+        return base;
+      });
+    };
+
+    if (selectedPlatform === 'meta') {
+      return {
+        metrics,
+        chartData,
+        tableData: {
+          campaigns: groupRows(campaignKey),
+          adsets: groupRows(adSetKey),
+          ads: groupRows(adNameKey),
+        },
+      };
+    }
 
     return { metrics, chartData, tableData };
   }, [filteredByDate, selectedPlatform, dateKey, sheetName]);

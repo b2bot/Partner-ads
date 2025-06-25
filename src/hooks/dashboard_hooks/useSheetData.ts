@@ -47,6 +47,7 @@ export const useSheetData = (
           if (clean.includes(mapKey)) return mappings[mapKey];
         }
 
+
         return key
           .toLowerCase()
           .replace(/[^a-z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
@@ -70,4 +71,4 @@ export const useSheetData = (
         : mapped;
     },
   });
-};
+};			
