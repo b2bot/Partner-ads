@@ -135,12 +135,13 @@ export function AdsTab() {
   };
 
   return (
-    <div className="p-3 space-y-3">
+    <div className="w-full p-0 m-0 space-y-3">
       <div className="flex justify-between items-center">
-        <div>
+        {/*<div>
           <h1 className="text-lg font-bold text-slate-800">Anúncios</h1>
           <p className="text-slate-600 text-xs">Gerencie seus anúncios do Facebook Ads</p>
-        </div>
+        </div>*/}
+
         <div className="flex gap-2">
           <DateRangeFilter onDateChange={setDateRange} />
           <Button
