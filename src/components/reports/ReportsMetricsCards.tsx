@@ -35,7 +35,7 @@ export function ReportsMetricsCards({ data, platform }: ReportsMetricsCardsProps
   const formatNumber = (value: number | undefined, type: 'currency' | 'number') => {
     if (!value && value !== 0) return '-';
     return type === 'currency'
-      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+      ? new Intl.NumberFormat('pt-BR', { style: 'number', currency: 'BRL' }).format(value)
       : value.toLocaleString('pt-BR');
   };
 
@@ -45,13 +45,13 @@ export function ReportsMetricsCards({ data, platform }: ReportsMetricsCardsProps
     { title: 'Atendimento', value: data.atendimento, icon: Phone, change: '+15.2%', format: 'number' },
     { title: 'Orçamentos', value: data.orcamentos, icon: Target, change: '+6.7%', format: 'number' },
     { title: 'Vendas', value: data.vendas, icon: TrendingUp, change: '+18.5%', format: 'number' },
-    { title: 'Faturado', value: data.faturado, icon: DollarSign, change: '+22.1%', format: 'currency' }
+    { title: 'Faturado', value: data.faturado, icon: DollarSign, change: '+22.1%', format: 'number' }
   ];
 
   const standardMetrics = [
     { title: 'Impressões', value: data.impressions, icon: Eye, change: '+12.3%', format: 'number' },
     { title: 'Cliques', value: data.clicks, icon: MousePointer, change: '+8.1%', format: 'number' },
-    { title: 'Investimento', value: data.spend, icon: DollarSign, change: '+15.2%', format: 'currency' },
+    { title: 'Investimento', value: data.spend, icon: DollarSign, change: '+15.2%', format: 'number' },
     { title: 'Conversões', value: data.conversions, icon: TrendingUp, change: '+18.5%', format: 'number' }
   ];
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BarChart3, Download, Calendar } from 'lucide-react';
-import { useSheetData } from '@/hooks/dashboard_hooks/useSheetData';
-import { platformConfig } from '@/hooks/dashboard_hooks/usePlatformNavigation';
+import { useSheetData } from '@/hooks/useSheetData';
+import { platformConfig } from '@/hooks/reports/usePlatformNavigation';
 import { DatePickerWithRange } from '@/components/ui/date-picker';
 import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
 import { ReportsCharts } from '@/components/reports/ReportsCharts';
@@ -171,7 +170,7 @@ function RelatoriosContent() {
 
     const impressionsKey = mapping.impressions || getKey(['impressions', 'impressões']);
     const clicksKey = mapping.clicks || getKey(['clicks', 'cliques']);
-    const spendKey = mapping.spend || getKey(['spend', 'amount spent', 'investimento']);
+    const spendKey = mapping.spend || getKey(['spend', 'amountSpent', 'investimento']);
     const conversionsKey = getKey(['conversions', 'resultados', 'leads']);
     const ctrKey = mapping.ctr || getKey(['ctr']);
     const cpcKey = mapping.cpc || getKey(['cpc']);
@@ -179,6 +178,7 @@ function RelatoriosContent() {
     const campaignKey = getKey(['campaign name', 'campanha']);
     const adSetKey = getKey(['ad set name', 'conjunto', 'grupo']);
     const adNameKey = getKey(['ad name', 'anuncio']);
+	const costConvKey = getKey(['cost per conversion', 'custo por conversão']);
 
     const sumKey = (key: string | null) =>
       key
@@ -291,7 +291,7 @@ function RelatoriosContent() {
         return base;
       });
     };
-
+    
     if (selectedPlatform === 'meta') {
       return {
         metrics,

@@ -106,6 +106,12 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       icon: FileText,
       permission: 'access_client_reports' as Permission
     },
+	{ 
+      id: 'resultados', 
+      label: 'Resultados', 
+      icon: FileText,
+      permission: 'access_client_reports' as Permission
+    },
   ];
 
   const managementItems = [

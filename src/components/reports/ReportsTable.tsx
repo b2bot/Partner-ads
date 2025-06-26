@@ -44,6 +44,7 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
       const atendimento = Number(row['Atendimento']) || 0;
       const vendas = Number(row['Vendas']) || 0;
       const orcamentos = Number(row['Orçamentos']) || 0;
+	  const faturado = Number(row['Faturado']) || 0;
       const taxaAgendamento = contatos ? `${((agendado / contatos) * 100).toFixed(1)}%` : '0%';
       const taxaConversao = atendimento ? `${((vendas / atendimento) * 100).toFixed(1)}%` : '0%';
 
@@ -56,6 +57,7 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
         atendimento,
         vendas,
         orcamentos,
+		faturado,
         taxaAgendamento,
         taxaConversao,
         observacoes: row['Observações'],
@@ -165,6 +167,7 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
                       <TableHead className="text-right">Atendimento</TableHead>
                       <TableHead className="text-right">Vendas</TableHead>
                       <TableHead className="text-right">Orçamentos</TableHead>
+					  <TableHead className="text-right">Faturado</TableHead>
                       <TableHead className="text-right">Taxa Agendamento</TableHead>
                       <TableHead className="text-right">Taxa Conversão</TableHead>
                     </TableRow>
@@ -180,6 +183,7 @@ export function ReportsTable({ data, platform }: ReportsTableProps) {
                         <TableCell className="text-right">{row.atendimento}</TableCell>
                         <TableCell className="text-right">{row.vendas}</TableCell>
                         <TableCell className="text-right">{row.orcamentos}</TableCell>
+						<TableCell className="text-right">{row.faturado}</TableCell>
                         <TableCell className="text-right"><Badge variant="secondary">{row.taxaAgendamento}</Badge></TableCell>
                         <TableCell className="text-right"><Badge variant="secondary">{row.taxaConversao}</Badge></TableCell>
                       </TableRow>

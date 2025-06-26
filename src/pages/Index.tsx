@@ -7,6 +7,7 @@ import { CampaignsTab } from '@/components/CampaignsTab';
 import { AdSetsTab } from '@/components/AdSetsTab';
 import { AdsTab } from '@/components/AdsTab';
 import { RelatoriosTab } from '@/components/RelatoriosTab';
+import { ResultadosTab } from '@/components/ResultadosTab';
 import { WhatsAppReportsTab } from '@/components/WhatsAppReportsTab';
 import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
@@ -157,11 +158,22 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
             <p className="text-body text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Anúncios.</p>
           </div>
-        );
+        );ResultadosTab
 	  case 'relatorios':
         return hasPermission('access_client_reports') ? (
           <div className={contentClasses}>
 		    <RelatoriosTab />
+		  </div>
+        ) : (
+          <div className={`text-center py-20 ${contentClasses}`}>
+            <h2 className="text-heading-3 text-slate-600 dark:text-slate-300 mb-4">Acesso Negado</h2>
+            <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Relatórios.</p>
+          </div>
+        );
+	  case 'resultados':
+        return hasPermission('access_client_reports') ? (
+          <div className={contentClasses}>
+		    <ResultadosTab />
 		  </div>
         ) : (
           <div className={`text-center py-20 ${contentClasses}`}>
@@ -275,6 +287,7 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
       'adsets': 'Conjuntos de Anúncios', 
       'ads': 'Anúncios',
 	  'relatorios': 'Relatórios',
+	  'resultados': 'Resultados',
       'whatsapp-reports': 'Relatórios WhatsApp',
       'metrics-objectives': 'Personalização de Métricas',
       'tickets': hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados',

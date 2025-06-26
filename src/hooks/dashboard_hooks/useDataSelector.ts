@@ -11,7 +11,10 @@ export const useDataSelector = (
   range: string
 ) => {
   const { settings } = useSettings();
-  const conf = settings.platforms[platform];
+
+  const conf = settings?.platforms?.[platform];
+
+  // Caso esteja configurado como API
   if (conf?.mode === 'api') {
     if (platform === 'analytics') {
       return useAnalyticsData({
@@ -20,11 +23,14 @@ export const useDataSelector = (
         metrics: conf.metrics,
       });
     }
+
     return useMetaData({
       token: conf.apiKey || '',
       accountId: conf.accountId || '',
       fields: conf.metrics,
     });
   }
+
+  // Fallback para dados do Google Sheets
   return useSheetData(sheetId, range);
 };

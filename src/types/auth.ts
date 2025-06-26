@@ -33,6 +33,7 @@ export type Module =
   | 'usuarios'
   | 'whatsapp'
   | 'relatorios'
+  | 'resultados'
   | 'chamados'
   | 'estoque'
   | 'marketing'

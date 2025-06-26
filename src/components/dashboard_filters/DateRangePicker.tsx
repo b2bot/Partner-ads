@@ -71,3 +71,4 @@ const DateRangePicker = ({ dateRange, onDateRangeChange }: DateRangePickerProps)
 };
 
 export default DateRangePicker;
+

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/dashboard_ui/card';
 import { Badge } from '@/components/dashboard_ui/badge';
@@ -14,43 +13,29 @@ interface MetricsGridProps {
 
 const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   const { platform } = usePlatformNavigation();
-  const { settings } = useSettings();
+  const { settings, loading } = useSettings();
+
+  if (loading || !settings?.platforms?.[platform]) {
+    return null;
+  }
+
   const totalImpressions = data.reduce((sum, row) => sum + (row.impressions || 0), 0);
   const totalClicks = data.reduce((sum, row) => sum + (row.clicks || 0), 0);
   const totalInvestment = data.reduce((sum, row) => sum + (row.amountSpent || 0), 0);
-  const totalConversions = data.reduce(
-    (sum, row) =>
-      sum +
-      (row.actionMessagingConversationsStarted ||
-        row.conversions ||
-        0),
-    0
-  );
-  const totalCostPerConversion =
-    data.length > 0
-      ? data.reduce(
-          (sum, row) =>
-            sum +
-            (row.costPerActionMessagingConversations || row.costPerConversion || 0),
-          0
-        ) / data.length
-      : 0;
-  const totalActionLinkClicks = data.reduce(
-    (sum, row) => sum + (row.actionLinkClicks || row.landingPageClicks || 0),
-    0
-  );
+  const totalConversions = data.reduce((sum, row) => sum + (row.actionMessagingConversationsStarted || row.conversions || 0), 0);
+  const totalCostPerConversion = data.length > 0
+    ? data.reduce((sum, row) => sum + (row.costPerActionMessagingConversations || row.costPerConversion || 0), 0) / data.length
+    : 0;
+  const totalActionLinkClicks = data.reduce((sum, row) => sum + (row.actionLinkClicks || row.landingPageClicks || 0), 0);
   const totalFrequency = data.reduce((sum, row) => sum + (row.frequency || 0), 0);
-  const totalCallAdConversion = data.reduce(
-    (sum, row) => sum + (row.callAdConversionAction || 0),
-    0
-  );
+  const totalCallAdConversion = data.reduce((sum, row) => sum + (row.callAdConversionAction || 0), 0);
   const totalContatos = data.reduce((sum, row) => sum + (row.contatos || 0), 0);
   const totalAgendado = data.reduce((sum, row) => sum + (row.agendado || 0), 0);
   const totalAtendimento = data.reduce((sum, row) => sum + (row.atendimento || 0), 0);
   const totalOrcamentos = data.reduce((sum, row) => sum + (row.orcamentos || 0), 0);
   const totalVendas = data.reduce((sum, row) => sum + (row.vendas || 0), 0);
   const totalFaturado = data.reduce((sum, row) => sum + (row.faturado || 0), 0);
-  
+
   let conversionRate = 0;
   if (platform === 'relatorios') {
     conversionRate = totalAtendimento > 0 ? (totalVendas / totalAtendimento) * 100 : 0;
@@ -59,13 +44,9 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   }
 
   const formatNumber = (num: number) => num ? new Intl.NumberFormat('pt-BR').format(num) : '0';
-  const formatCurrency = (num: number) => num ? new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(num) : 'R$ 0,00';
+  const formatCurrency = (num: number) => num ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num) : 'R$ 0,00';
   const formatPercentage = (num: number) => num ? `${num.toFixed(2)}%` : '0,00%';
-  const formatFrequency = (num: number) =>
-    num ? new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num) : '0,00';
+  const formatFrequency = (num: number) => num ? new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num) : '0,00';
 
   let metrics;
 
@@ -213,7 +194,6 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
 
     metrics = section === 'campanhas' ? campaignMetrics : groupMetrics;
   }
-  
 
   const order = settings.platforms[platform]?.metrics;
   if (order && order.length) {
@@ -222,13 +202,12 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
       .sort((a, b) => order.indexOf(a.title) - order.indexOf(b.title));
   }
 
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
       {metrics.map((metric, index) => {
-        const Icon = metric.icon;
+        const Icon = settings?.platforms?.[platform]?.meta?.icon || metric.icon;
         const TrendIcon = metric.trendUp ? TrendingUp : TrendingDown;
-        
+
         return (
           <Card 
             key={index} 
