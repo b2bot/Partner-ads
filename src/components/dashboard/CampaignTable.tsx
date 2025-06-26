@@ -53,6 +53,7 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
 
   const isGoogle = platform === 'google';
   const isRelatorios = platform === 'relatorios';
+  const isMeta = platform === 'meta';
 
   const headerTitle = isRelatorios
     ? 'Dados enviados diariamente'
@@ -105,13 +106,22 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                   <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Grupo de Anúncio</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Investimento</th>
-                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Alcance</th>
+                    {!isMeta && (
+                      <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Alcance</th>
+                    )}
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
-                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
+                    {isMeta ? (
+                      <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
+                    ) : null}
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
-                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPC</th>
+                    {isMeta && (
+                      <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPC</th>
+                    )}
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
+                    {isGoogle && (
+                      <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[90px]">Taxa de Conversão</th>
+                    )}
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[110px]">Custo/Conversão</th>
                   </tr>
                 ) : section === 'anuncios' ? (
@@ -333,14 +343,14 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
 
                     <td className="py-3 px-2 text-right">
                       <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
-                        {formatNumber(row.actionMessagingConversationsStarted)}
+                        {formatNumber(row.conversions ?? row.actionMessagingConversationsStarted)}
                       </div>
                     </td>
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {formatCurrency(
-                        row.actionMessagingConversationsStarted > 0
-                          ? row.amountSpent / row.actionMessagingConversationsStarted
-                          : 0
+                        row.costPerConversion ?? row.costPerActionMessagingConversations ?? ((row.conversions ?? row.actionMessagingConversationsStarted) > 0
+                          ? row.amountSpent / (row.conversions ?? row.actionMessagingConversationsStarted)
+                          : 0)
                       )}
                     </td>
                     {section === 'campanhas' && (
