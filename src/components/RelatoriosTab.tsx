@@ -114,8 +114,14 @@ function RelatoriosContent() {
 
     const mapping = metricMap[sheetName] || {};
 
+    const parseNumber = (value: any) => {
+      if (value === null || value === undefined) return 0;
+      const normalized = String(value).replace(/\./g, '').replace(',', '.');
+      return parseFloat(normalized) || 0;
+    };
+
     const sum = (field: string) =>
-      filteredByDate.reduce((acc, row) => acc + (Number(row[field]) || 0), 0);
+      filteredByDate.reduce((acc, row) => acc + parseNumber(row[field]), 0);
 
     if (selectedPlatform === 'relatorios') {
       const metrics = {
@@ -139,10 +145,10 @@ function RelatoriosContent() {
             vendas: 0,
           };
         }
-        chartMap[date].contatos += Number(row['Contatos']) || 0;
-        chartMap[date].agendado += Number(row['Agendado']) || 0;
-        chartMap[date].atendimento += Number(row['Atendimento']) || 0;
-        chartMap[date].vendas += Number(row['Vendas']) || 0;
+        chartMap[date].contatos += parseNumber(row['Contatos']);
+        chartMap[date].agendado += parseNumber(row['Agendado']);
+        chartMap[date].atendimento += parseNumber(row['Atendimento']);
+        chartMap[date].vendas += parseNumber(row['Vendas']);
       });
 
       const chartData = Object.values(chartMap).sort(
@@ -181,9 +187,7 @@ function RelatoriosContent() {
 	const costConvKey = getKey(['cost per conversion', 'custo por conversão']);
 
     const sumKey = (key: string | null) =>
-      key
-        ? filteredByDate.reduce((acc, row) => acc + (Number(row[key]) || 0), 0)
-        : 0;
+      key ? filteredByDate.reduce((acc, row) => acc + parseNumber(row[key]), 0) : 0;
 
     const metrics = {
       impressions: sumKey(impressionsKey),
@@ -199,25 +203,25 @@ function RelatoriosContent() {
     const conversionsTotal = metrics.conversions || 0;
 
     metrics.ctr = ctrKey
-      ? filteredByDate.reduce((acc, row) => acc + (Number(row[ctrKey]) || 0), 0) /
+      ? filteredByDate.reduce((acc, row) => acc + parseNumber(row[ctrKey]), 0) /
           filteredByDate.length
       : impressionsTotal > 0
         ? (clicksTotal * 100) / impressionsTotal
         : 0;
     metrics.cpc = cpcKey
-      ? filteredByDate.reduce((acc, row) => acc + (Number(row[cpcKey]) || 0), 0) /
+      ? filteredByDate.reduce((acc, row) => acc + parseNumber(row[cpcKey]), 0) /
           filteredByDate.length
       : clicksTotal > 0
         ? spendTotal / clicksTotal
         : 0;
     metrics.cpm = cpmKey
-      ? filteredByDate.reduce((acc, row) => acc + (Number(row[cpmKey]) || 0), 0) /
+      ? filteredByDate.reduce((acc, row) => acc + parseNumber(row[cpmKey]), 0) /
           filteredByDate.length
       : impressionsTotal > 0
         ? (spendTotal / impressionsTotal) * 1000
         : 0;
     metrics.costPerConversion = costConvKey
-      ? filteredByDate.reduce((acc, row) => acc + (Number(row[costConvKey]) || 0), 0) /
+      ? filteredByDate.reduce((acc, row) => acc + parseNumber(row[costConvKey]), 0) /
           filteredByDate.length
       : conversionsTotal > 0
         ? spendTotal / conversionsTotal
@@ -229,9 +233,9 @@ function RelatoriosContent() {
       if (!chartMap[date]) {
         chartMap[date] = { date, impressions: 0, clicks: 0, spend: 0 };
       }
-      if (impressionsKey) chartMap[date].impressions += Number(row[impressionsKey]) || 0;
-      if (clicksKey) chartMap[date].clicks += Number(row[clicksKey]) || 0;
-      if (spendKey) chartMap[date].spend += Number(row[spendKey]) || 0;
+      if (impressionsKey) chartMap[date].impressions += parseNumber(row[impressionsKey]);
+      if (clicksKey) chartMap[date].clicks += parseNumber(row[clicksKey]);
+      if (spendKey) chartMap[date].spend += parseNumber(row[spendKey]);
     });
 
     const chartData = Object.values(chartMap).sort(
@@ -240,27 +244,27 @@ function RelatoriosContent() {
 
     const mapRow = (row: any) => ({
       campaign: campaignKey ? row[campaignKey] : row['Campaign'] || row['Campanha'],
-      impressions: impressionsKey ? Number(row[impressionsKey]) || 0 : 0,
-      clicks: clicksKey ? Number(row[clicksKey]) || 0 : 0,
-      spend: spendKey ? Number(row[spendKey]) || 0 : 0,
+      impressions: impressionsKey ? parseNumber(row[impressionsKey]) : 0,
+      clicks: clicksKey ? parseNumber(row[clicksKey]) : 0,
+      spend: spendKey ? parseNumber(row[spendKey]) : 0,
       ctr:
         ctrKey && row[ctrKey]
-          ? Number(row[ctrKey])
-          : impressionsKey && Number(row[impressionsKey])
-            ? ((Number(row[clicksKey]) || 0) * 100) / Number(row[impressionsKey])
+          ? parseNumber(row[ctrKey])
+          : impressionsKey && parseNumber(row[impressionsKey])
+            ? (parseNumber(row[clicksKey]) * 100) / parseNumber(row[impressionsKey])
             : 0,
       cpc:
         cpcKey && row[cpcKey]
-          ? Number(row[cpcKey])
-          : Number(row[clicksKey])
-            ? Number(row[spendKey] || 0) / Number(row[clicksKey])
+          ? parseNumber(row[cpcKey])
+          : parseNumber(row[clicksKey])
+            ? parseNumber(row[spendKey]) / parseNumber(row[clicksKey])
             : 0,
-      conversions: conversionsKey ? Number(row[conversionsKey]) || 0 : 0,
+      conversions: conversionsKey ? parseNumber(row[conversionsKey]) : 0,
       costPerConversion:
         costConvKey && row[costConvKey]
-          ? Number(row[costConvKey])
-          : Number(row[conversionsKey])
-            ? Number(row[spendKey] || 0) / Number(row[conversionsKey])
+          ? parseNumber(row[costConvKey])
+          : parseNumber(row[conversionsKey])
+            ? parseNumber(row[spendKey]) / parseNumber(row[conversionsKey])
             : 0,
     });
 
