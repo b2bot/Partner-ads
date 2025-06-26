@@ -26,7 +26,7 @@ import { FiltersProvider } from '@/hooks/dashboard_hooks/useFilters';
 import { SettingsProvider } from '@/hooks/dashboard_hooks/useSettings';
 
 
-export function ResultadosTab() {
+function ResultadosContent() {
   const { currentSheetId } = useClientManager();
   const { currentSheetRange, platformConfig, section, platform } = usePlatformNavigation();
   const { filters } = useFilters();
@@ -302,8 +302,6 @@ export function ResultadosTab() {
   };
 
   return (
-   <FiltersProvider>
-    <SettingsProvider clientId={currentSheetId}>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
         <PlatformNavigation />
         <SectionTabs accounts={uniqueAccounts} data={filteredData} />
@@ -354,9 +352,18 @@ export function ResultadosTab() {
           </div>
         </main>
       </div>
-    </SettingsProvider>
-   </FiltersProvider>
   );
-};
+}
 
-  
+export function ResultadosTab() {
+  const { currentSheetId } = useClientManager();
+  return (
+    <FiltersProvider>
+      <SettingsProvider clientId={currentSheetId}>
+        <ResultadosContent />
+      </SettingsProvider>
+    </FiltersProvider>
+  );
+}
+
+ 
