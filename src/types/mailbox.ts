@@ -1,5 +1,5 @@
 
-import { Json } from '@/integrations/supabase/types';
+import { Json } from '@/types/database';
 
 export type MailboxMessageStatus = 'unread' | 'read' | 'sent' | 'draft' | 'starred' | 'trash';
 

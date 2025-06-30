@@ -1,5 +1,5 @@
 
-import { Database } from '@/integrations/supabase/types';
+import { Database } from '@/types/database';
 
 export type Task = Database['public']['Tables']['tasks']['Row'];
 export type TaskInsert = Database['public']['Tables']['tasks']['Insert'];
