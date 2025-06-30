@@ -26,20 +26,9 @@ export function useClientPermissions(user: User | null, isCliente: boolean) {
     queryFn: async () => {
       if (!user?.id || !isCliente) return [];
 
-      const { data, error } = await apiClient
-        .from('client_permissions')
-        .select(`
-          *,
-          client:clientes(id, user_id)
-        `)
-        .eq('clientes.user_id', user.id)
-        .eq('enabled', true);
-
-      if (error) {
-        console.error('Error loading client permissions:', error);
-        return [];
-      }
-
+      const data = await apiClient.get<ClientPermission[]>(
+        `/api/client_permissions.php?user_id=${user.id}`
+      );
       return data || [];
     },
     enabled: !!user?.id && isCliente,
@@ -50,20 +39,9 @@ export function useClientPermissions(user: User | null, isCliente: boolean) {
     queryFn: async () => {
       if (!user?.id || !isCliente) return [];
 
-      const { data, error } = await apiClient
-        .from('client_report_permissions')
-        .select(`
-          *,
-          client:clientes(id, user_id)
-        `)
-        .eq('clientes.user_id', user.id)
-        .eq('enabled', true);
-
-      if (error) {
-        console.error('Error loading client report permissions:', error);
-        return [];
-      }
-
+      const data = await apiClient.get<ClientReportPermission[]>(
+        `/api/client_report_permissions.php?user_id=${user.id}`
+      );
       return data || [];
     },
     enabled: !!user?.id && isCliente,

@@ -8,19 +8,9 @@ export const useTaskComments = (taskId: string) => {
   return useQuery({
     queryKey: ['task-comments', taskId],
     queryFn: async () => {
-      const { data, error } = await apiClient
-        .from('task_comments')
-        .select(`
-          *,
-          author:profiles!fk_task_comments_author(*)
-        `)
-        .eq('task_id', taskId)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching comments:', error);
-        throw error;
-      }
+      const data = await apiClient.get<TaskComment[]>(
+        `/api/task_comments.php?task_id=${taskId}`
+      );
 
       return (data || []).map(comment => ({
         ...comment,
@@ -36,13 +26,10 @@ export const useCreateComment = () => {
   
   return useMutation({
     mutationFn: async (comment: TaskCommentInsert) => {
-      const { data, error } = await apiClient
-        .from('task_comments')
-        .insert(comment)
-        .select()
-        .single();
-      
-      if (error) throw error;
+      const data = await apiClient.post<TaskComment>(
+        '/api/task_comments.php',
+        comment
+      );
       return data;
     },
     onSuccess: (data) => {

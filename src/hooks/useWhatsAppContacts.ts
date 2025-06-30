@@ -24,14 +24,7 @@ export function useWhatsAppContacts() {
 
   const fetchContacts = async () => {
     try {
-      const { data, error } = await apiClient
-        .from('whatsapp_contacts')
-        .select('*')
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) throw error;
-
+      const data = await apiClient.get<WhatsAppContact[]>('/api/whatsapp_contacts.php');
       setContacts(data || []);
     } catch (error) {
       console.error('Error fetching contacts:', error);
@@ -47,9 +40,9 @@ export function useWhatsAppContacts() {
 
   const createContact = async (contactData: Partial<WhatsAppContact>) => {
     try {
-      const { data, error } = await apiClient
-        .from('whatsapp_contacts')
-        .insert({
+      const data = await apiClient.post<WhatsAppContact>(
+        '/api/whatsapp_contacts.php',
+        {
           name: contactData.name,
           phone_number: contactData.phone_number,
           client_id: contactData.client_id,
@@ -58,11 +51,8 @@ export function useWhatsAppContacts() {
           observacoes: contactData.observacoes,
           tags: contactData.tags || [],
           is_active: true,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+        }
+      );
 
       // Atualizar lista local
       setContacts(prev => [...prev, data]);
@@ -86,17 +76,13 @@ export function useWhatsAppContacts() {
 
   const updateContact = async (id: string, contactData: Partial<WhatsAppContact>) => {
     try {
-      const { data, error } = await apiClient
-        .from('whatsapp_contacts')
-        .update({
+      const data = await apiClient.put<WhatsAppContact>(
+        `/api/whatsapp_contacts.php?id=${id}`,
+        {
           ...contactData,
           updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
+        }
+      );
 
       // Atualizar lista local
       setContacts(prev => prev.map(contact => 
@@ -122,12 +108,7 @@ export function useWhatsAppContacts() {
 
   const deleteContact = async (id: string) => {
     try {
-      const { error } = await apiClient
-        .from('whatsapp_contacts')
-        .update({ is_active: false })
-        .eq('id', id);
-
-      if (error) throw error;
+      await apiClient.delete(`/api/whatsapp_contacts.php?id=${id}`);
 
       // Remover da lista local
       setContacts(prev => prev.filter(contact => contact.id !== id));

@@ -12,46 +12,29 @@ export function useUserProfile(user: User | null) {
 
       console.log('🔄 Loading profile for user:', user.id, user.email);
 
-      const { data, error } = await apiClient
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('❌ Error loading profile:', error);
-        
-        // Se não encontrar o perfil, tentar criar um básico
-        if (error.code === 'PGRST116') {
-          console.log('🔧 Profile not found, creating default profile...');
-          
-          const { data: newProfile, error: insertError } = await apiClient
-            .from('profiles')
-            .insert({
-              id: user.id,
-              nome: user.email?.split('@')[0] || 'Usuário',
-              email: user.email || '',
-              role: 'colaborador',
-              is_root_admin: false,
-              ativo: true
-            })
-            .select()
-            .single();
-            
-          if (insertError) {
-            console.error('❌ Error creating profile:', insertError);
-            return null;
+      try {
+        const data = await apiClient.get<UserProfile>(
+          `/api/profiles.php?id=${user.id}`
+        );
+        console.log('✅ Profile loaded from DB:', data);
+        return data as UserProfile;
+      } catch (err) {
+        console.error('❌ Error loading profile:', err);
+        // Perfil não encontrado: criar
+        const newProfile = await apiClient.post<UserProfile>(
+          '/api/profiles.php',
+          {
+            id: user.id,
+            nome: user.email?.split('@')[0] || 'Usuário',
+            email: user.email || '',
+            role: 'colaborador',
+            is_root_admin: false,
+            ativo: true
           }
-          
-          console.log('✅ Created new profile:', newProfile);
-          return newProfile as UserProfile;
-        }
-        
-        return null;
+        );
+        console.log('✅ Created new profile:', newProfile);
+        return newProfile as UserProfile;
       }
-
-      console.log('✅ Profile loaded from DB:', data);
-      return data as UserProfile;
     },
     enabled: !!user?.id,
     retry: 1,

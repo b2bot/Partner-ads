@@ -8,12 +8,7 @@ export const useClients = () => {
   return useQuery({
     queryKey: ['clients'],
     queryFn: async (): Promise<Client[]> => {
-      const { data, error } = await apiClient
-        .from('clientes')
-        .select('*')
-        .order('nome');
-
-      if (error) throw error;
+      const data = await apiClient.get<Client[]>('/api/clientes.php');
       return data || [];
     },
   });
@@ -24,13 +19,7 @@ export const useCreateClient = () => {
   
   return useMutation({
     mutationFn: async (client: ClientInsert) => {
-      const { data, error } = await apiClient
-        .from('clientes')
-        .insert(client)
-        .select()
-        .single();
-      
-      if (error) throw error;
+      const data = await apiClient.post<Client>('/api/clientes.php', client);
       return data;
     },
     onSuccess: () => {

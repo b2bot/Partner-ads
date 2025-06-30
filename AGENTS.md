@@ -55,3 +55,4 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
 - Removidos componentes antigos da pasta `ANTIGOS ANTES DA CORREÇÃO MANUS`.
 - Atualizados hooks de autenticação e formulários para consumir `/api/login.php`,
   `/api/register.php` e `/api/logout.php` com token salvo no `localStorage`.
+- Hooks de dados migrados para consumir scripts PHP em `/api/*.php` em vez de consultas Supabase.

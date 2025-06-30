@@ -58,11 +58,7 @@ export const SettingsProvider = ({
 
     if (!clientId || !isValidUUID(clientId)) return;
     apiClient
-      .from('settings')
-      .upsert({ client_id: clientId, data: settings })
-      .then(({ error }) => {
-        if (error) console.error('Erro ao salvar settings:', error.message);
-      })
+      .post('/api/settings.php', { client_id: clientId, data: settings })
       .catch(err => {
         console.error('Erro inesperado ao salvar settings:', err);
       });
@@ -72,15 +68,10 @@ export const SettingsProvider = ({
     if (!clientId || !isValidUUID(clientId)) return;
 
     const fetchSettings = async () => {
-      const { data, error } = await apiClient
-        .from('settings')
-        .select('data')
-        .eq('client_id', clientId)
-        .single();
-
-      if (error) {
-        console.error('Erro ao buscar settings:', error.message);
-      } else if (data?.data) {
+      const data = await apiClient.get<{ data?: SettingsState }>(
+        `/api/settings.php?client_id=${clientId}`
+      );
+      if (data?.data) {
         setSettings(data.data as SettingsState);
       }
     };
@@ -102,10 +93,7 @@ export const SettingsProvider = ({
     localStorage.setItem('dashboard-settings', JSON.stringify(data));
 
     if (clientId && isValidUUID(clientId)) {
-      const { error } = await apiClient.from('settings').upsert({ client_id: clientId, data });
-      if (error) {
-        console.error('Erro ao salvar settings manualmente:', error.message);
-      }
+      await apiClient.post('/api/settings.php', { client_id: clientId, data });
     }
   };
 

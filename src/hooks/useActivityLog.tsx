@@ -18,21 +18,15 @@ export const useActivityLog = () => {
         return;
       }
 
-      const { error } = await apiClient
-        .from('activity_logs')
-        .insert({
-          action,
-          entity_type: entityType,
-          entity_id: entityId,
-          entity_name: entityName,
-          user_id: user.id,
-          user_name: user.email || 'Usuário Desconhecido',
-          details
-        });
-
-      if (error) {
-        console.error('Error logging activity:', error);
-      }
+      await apiClient.post('/api/activity_logs.php', {
+        action,
+        entity_type: entityType,
+        entity_id: entityId,
+        entity_name: entityName,
+        user_id: user.id,
+        user_name: user.email || 'Usuário Desconhecido',
+        details
+      });
     } catch (error) {
       console.error('Error logging activity:', error);
     }

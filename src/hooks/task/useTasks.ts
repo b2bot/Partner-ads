@@ -8,24 +8,9 @@ export const useTasks = () => {
   return useQuery({
     queryKey: ['tasks'],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      const { data, error } = await apiClient
-        .from('tasks')
-        .select(`
-          *,
-          project:projects(*),
-          section:sections(*),
-          assigned_user:profiles!inner(id, name, email),
-          creator:profiles!inner(id, name, email),
-          subtasks(*),
-          comments:task_comments(*),
-          attachments:task_attachments(*)
-        `)
-        .order('order_index', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching tasks:', error);
-        throw error;
-      }
+      const data = await apiClient.get<TaskWithDetails[]>(
+        '/api/tasks.php'
+      );
 
       return (data || []).map(task => ({
         ...task,
@@ -54,13 +39,7 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
-      const { data, error } = await apiClient
-        .from('tasks')
-        .insert(task)
-        .select('*')
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.post<Task>('/api/tasks.php', task);
       return data;
     },
     onSuccess: () => {
@@ -85,14 +64,7 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: TaskUpdate }) => {
-      const { data, error } = await apiClient
-        .from('tasks')
-        .update(updates)
-        .eq('id', id)
-        .select('*')
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.put<Task>(`/api/tasks.php?id=${id}`, updates);
       return data;
     },
     onSuccess: () => {
@@ -117,12 +89,7 @@ export const useDeleteTask = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await apiClient
-        .from('tasks')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      await apiClient.delete(`/api/tasks.php?id=${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
