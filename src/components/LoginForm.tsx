@@ -71,18 +71,17 @@ export function LoginForm() {
       return;
     }
 
-    const { error } = await apiClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-
-    if (error) {
-      setError('Erro ao enviar e-mail de redefinição. Verifique o endereço informado.');
-    } else {
+    try {
+      await apiClient.post('/api/reset_password.php', {
+        email,
+      });
       setSuccess('E-mail de redefinição de senha enviado! Verifique sua caixa de entrada.');
       setTimeout(() => {
         setIsForgotPassword(false);
         setSuccess('');
       }, 3000);
+    } catch {
+      setError('Erro ao enviar e-mail de redefinição. Verifique o endereço informado.');
     }
 
     setLoading(false);

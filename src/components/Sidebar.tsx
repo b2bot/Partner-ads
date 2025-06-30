@@ -52,9 +52,11 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     }
   };
 
+  const { signOut } = useAuth();
+
   const handleLogout = async () => {
     try {
-      await apiClient.auth.signOut();
+      await signOut();
       window.location.reload();
     } catch (error) {
       console.error('Erro no logout:', error);

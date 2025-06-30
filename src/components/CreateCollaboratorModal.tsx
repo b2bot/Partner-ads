@@ -129,19 +129,13 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       status: string;
       permissions: PermissionType[];
     }) => {
-      // Criar usuário no Supabase Auth
-      const { data: authData, error: authError } = await apiClient.auth.signUp({
+      // Criar usuário
+      const authData = await apiClient.post<{ user: { id: string } }>('/api/register.php', {
         email: data.email,
         password: data.senha,
-        options: {
-          data: {
-            nome: data.nome,
-            role: 'admin',
-          },
-        },
+        nome: data.nome,
+        role: 'admin',
       });
-
-      if (authError) throw authError;
       if (!authData.user) throw new Error('Falha ao criar usuário');
 
       // Criar perfil

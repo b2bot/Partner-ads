@@ -21,19 +21,8 @@ export function ResetPasswordForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    // Verificar se há tokens de redefinição de senha na URL
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    
-    if (accessToken && refreshToken) {
-      // Definir a sessão com os tokens
-      apiClient.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-    }
-  }, [searchParams]);
+  const accessToken = searchParams.get('access_token');
+  const refreshToken = searchParams.get('refresh_token');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,18 +42,19 @@ export function ResetPasswordForm() {
       return;
     }
 
-    const { error } = await apiClient.auth.updateUser({
-      password: password 
-    });
-
-    if (error) {
-      setError('Erro ao atualizar senha. Tente novamente.');
-    } else {
+    try {
+      await apiClient.post('/api/reset_password.php', {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        password,
+      });
       setSuccess('Senha atualizada com sucesso!');
       toast.success('Senha atualizada com sucesso!');
       setTimeout(() => {
         navigate('/');
       }, 2000);
+    } catch {
+      setError('Erro ao atualizar senha. Tente novamente.');
     }
 
     setLoading(false);
