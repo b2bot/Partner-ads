@@ -58,3 +58,4 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
 - Hooks de dados migrados para consumir scripts PHP em `/api/*.php` em vez de consultas Supabase.
 
 - Criados scripts PHP na pasta `API/` com CRUD para todas as tabelas e endpoints de autenticacao (`login.php`, `register.php`, `logout.php`).
+- Implementados `upload_ticket_file.php` e `upload_creative_file.php` para recebimento de arquivos via `multipart/form-data`. Componentes de upload agora enviam anexos para esses scripts.

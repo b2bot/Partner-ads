@@ -172,23 +172,15 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
     // Upload do arquivo se fornecido
     if (arquivo) {
       try {
-        console.log('Fazendo upload do arquivo (advanced):', arquivo.name);
-        const fileExt = arquivo.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await apiClient.storage
-          .from('tickets')
-          .upload(fileName, arquivo);
+        const formData = new FormData();
+        formData.append('file', arquivo);
 
-        if (uploadError) {
-          console.error('Erro no upload (advanced):', uploadError);
-        } else {
-          const { data } = apiClient.storage
-            .from('tickets')
-            .getPublicUrl(fileName);
-          arquivo_url = data.publicUrl;
-          console.log('Arquivo enviado com sucesso (advanced):', arquivo_url);
-        }
+        const { url } = await apiClient.postFormData<{ url: string }>(
+          '/api/upload_ticket_file.php',
+          formData
+        );
+        arquivo_url = url;
+        console.log('Arquivo enviado com sucesso (advanced):', arquivo_url);
       } catch (error) {
         console.error('Erro ao fazer upload do arquivo (advanced):', error);
         setError('Erro ao fazer upload do arquivo. O chamado será criado sem o anexo.');

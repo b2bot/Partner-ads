@@ -52,18 +52,13 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
       arquivo: File 
     }) => {
       // Upload do arquivo
-      const fileExt = data.arquivo.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await apiClient.storage
-        .from('criativos')
-        .upload(fileName, data.arquivo);
+      const formData = new FormData();
+      formData.append('file', data.arquivo);
 
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = apiClient.storage
-        .from('criativos')
-        .getPublicUrl(fileName);
+      const { url } = await apiClient.postFormData<{ url: string }>(
+        '/api/upload_creative_file.php',
+        formData
+      );
 
       // Criar registro do criativo
       const { error: insertError } = await apiClient
@@ -75,7 +70,7 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
           nome_criativo: data.nomeCriativo,
           titulo_anuncio: data.tituloAnuncio,
           descricao_anuncio: data.descricaoAnuncio,
-          arquivo_url: urlData.publicUrl,
+          arquivo_url: url,
           tipo_arquivo: data.arquivo.type,
           status: 'pendente',
         });
