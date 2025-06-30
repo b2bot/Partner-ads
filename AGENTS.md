@@ -53,3 +53,5 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
 - Atualizado `.env.local` com `VITE_API_URL` e removidas variáveis do Supabase.
 - Ajustados todos os imports para usar `apiClient`.
 - Removidos componentes antigos da pasta `ANTIGOS ANTES DA CORREÇÃO MANUS`.
+- Atualizados hooks de autenticação e formulários para consumir `/api/login.php`,
+  `/api/register.php` e `/api/logout.php` com token salvo no `localStorage`.

@@ -39,27 +39,15 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
       setIsCreating(true);
       
       try {
-        // Primeiro, criar usuário no Supabase Auth
-        console.log('Criando usuário no auth...', data.email);
-        
-        const { data: authData, error: authError } = await apiClient.auth.signUp({
+        // Primeiro, criar usuário
+        console.log('Criando usuário...', data.email);
+
+        const authData = await apiClient.post<{ user: { id: string } }>('/api/register.php', {
           email: data.email,
           password: data.senha,
-          options: {
-            data: {
-              nome: data.nome,
-              role: data.role,
-            },
-          },
+          nome: data.nome,
+          role: data.role,
         });
-
-        if (authError) {
-          console.error('Erro no auth signup:', authError);
-          if (authError.message.includes('rate limit') || authError.message.includes('40 seconds')) {
-            throw new Error('Muitas tentativas de cadastro. Aguarde alguns minutos antes de tentar novamente.');
-          }
-          throw authError;
-        }
 
         if (!authData.user) {
           throw new Error('Falha ao criar usuário - nenhum usuário retornado');

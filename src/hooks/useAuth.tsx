@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { User } from '@apiClient/apiClient-js';
-import { apiClient } from '@/integrations/apiClient';
+import { apiClient, setAuthToken } from '@/integrations/apiClient';
 import { useUserProfile } from './useUserProfile';
 import { useUserPermissions } from './useUserPermissions';
 import { useClientPermissions } from './useClientPermissions';
@@ -14,7 +14,34 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   const { data: profile, isLoading: profileLoading } = useUserProfile(user);
-  const { signIn, signUp, signOut } = useAuthActions();
+  const { signIn: rawSignIn, signUp: rawSignUp, signOut: rawSignOut } = useAuthActions();
+
+  const signIn = async (email: string, password: string) => {
+    const result = await rawSignIn(email, password);
+    if (result.data?.user) {
+      setUser(result.data.user);
+    }
+    return result;
+  };
+
+  const signUp = async (
+    email: string,
+    password: string,
+    nome: string,
+    role: 'admin' | 'cliente' = 'cliente'
+  ) => {
+    const result = await rawSignUp(email, password, nome, role);
+    if (result.data?.user) {
+      setUser(result.data.user);
+    }
+    return result;
+  };
+
+  const signOut = async () => {
+    const result = await rawSignOut();
+    setUser(null);
+    return result;
+  };
 
   const isRootAdmin = profile?.is_root_admin === true;
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
@@ -29,23 +56,17 @@ export function useAuth() {
   } = useClientPermissions(user, isCliente);
 
   useEffect(() => {
-    console.log('🚀 Inicializando useAuth...');
-    
-    apiClient.auth.getSession().then(({ data: { session } }) => {
-      console.log('📝 Sessão inicial:', session?.user ? 'Usuário logado' : 'Sem usuário');
-      setUser(session?.user ?? null);
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setAuthToken(token);
+      apiClient
+        .get<User>('/api/me.php')
+        .then((u) => setUser(u))
+        .catch(() => setUser(null))
+        .finally(() => setLoading(false));
+    } else {
       setLoading(false);
-    });
-
-  const { data: { subscription } } = apiClient.auth.onAuthStateChange(
-    async (_event, session) => {
-      console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário');
-      setUser(session?.user ?? null);
-      setLoading(false);
-      }
-    );
-
-  return () => subscription.unsubscribe();
+    }
   }, []);
 
   const hasPermission = (permission: Permission): boolean => {
