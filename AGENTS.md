@@ -56,3 +56,5 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
 - Atualizados hooks de autenticação e formulários para consumir `/api/login.php`,
   `/api/register.php` e `/api/logout.php` com token salvo no `localStorage`.
 - Hooks de dados migrados para consumir scripts PHP em `/api/*.php` em vez de consultas Supabase.
+
+- Criados scripts PHP na pasta `API/` com CRUD para todas as tabelas e endpoints de autenticacao (`login.php`, `register.php`, `logout.php`).
