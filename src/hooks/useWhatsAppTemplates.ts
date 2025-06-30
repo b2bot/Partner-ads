@@ -87,22 +87,7 @@ export function useWhatsAppTemplates() {
       setTemplates(approvedTemplates);
 
       // Sincronizar com banco local para cache
-      await apiClient
-        .from('whatsapp_templates')
-        .upsert(
-          approvedTemplates.map(template => ({
-            name: template.name,
-            language: template.language,
-            category: template.category,
-            status: template.status,
-            body_text: template.components.find(c => c.type === 'BODY')?.text || '',
-            header_text: template.components.find(c => c.type === 'HEADER')?.text,
-            footer_text: template.components.find(c => c.type === 'FOOTER')?.text,
-            variables: template.variables,
-            components: template.components,
-          })),
-          { onConflict: 'name' }
-        );
+      await apiClient.post('/api/whatsapp_templates.php', approvedTemplates);
 
     } catch (error: any) {
       console.error('Error fetching WhatsApp templates:', { 
@@ -124,13 +109,9 @@ export function useWhatsAppTemplates() {
 
   const fetchLocalTemplates = async () => {
     try {
-      const { data, error } = await apiClient
-        .from('whatsapp_templates')
-        .select('*')
-        .eq('status', 'APPROVED')
-        .order('name');
-
-      if (error) throw error;
+      const data = await apiClient.get<WhatsAppTemplate[]>(
+        '/api/whatsapp_templates.php?status=APPROVED'
+      );
 
       const localTemplates: WhatsAppTemplate[] = (data || []).map(template => ({
         id: template.id,

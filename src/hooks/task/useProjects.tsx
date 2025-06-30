@@ -7,21 +7,9 @@ export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
     queryFn: async (): Promise<ProjectWithDetails[]> => {
-      const { data, error } = await apiClient
-        .from('projects')
-        .select(`
-          *,
-          client:clientes(id, nome),
-          responsible:profiles!fk_projects_responsible(*),
-          creator:profiles!projects_created_by_fkey(id, nome),
-          tasks(*)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Erro ao buscar projetos:', error);
-        throw error;
-      }
+      const data = await apiClient.get<ProjectWithDetails[]>(
+        '/api/projects.php'
+      );
 
       return (data || []).map(project => ({
         ...project,
@@ -39,13 +27,7 @@ export const useCreateProject = () => {
 
   return useMutation({
     mutationFn: async (project: ProjectInsert) => {
-      const { data, error } = await apiClient
-        .from('projects')
-        .insert(project)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.post<Project>('/api/projects.php', project);
       return data;
     },
     onSuccess: () => {
@@ -71,14 +53,10 @@ export const useUpdateProject = () => {
   return useMutation({
     mutationFn: async (data: { id: string; name?: string; description?: string; status?: string }) => {
       const { id, ...updateData } = data;
-      const { data: result, error } = await apiClient
-        .from('projects')
-        .update(updateData)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const result = await apiClient.put<Project>(
+        `/api/projects.php?id=${id}`,
+        updateData
+      );
       return result;
     },
     onSuccess: () => {
@@ -100,12 +78,7 @@ export const useDeleteProject = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await apiClient
-        .from('projects')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      await apiClient.delete(`/api/projects.php?id=${id}`);
       return id;
     },
     onSuccess: () => {

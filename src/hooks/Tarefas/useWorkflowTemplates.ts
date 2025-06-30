@@ -8,12 +8,9 @@ export const useWorkflowTemplates = () => {
   return useQuery({
     queryKey: ['workflow-templates'],
     queryFn: async (): Promise<WorkflowTemplate[]> => {
-      const { data, error } = await apiClient
-        .from('workflow_templates')
-        .select('*')
-        .order('name');
-
-      if (error) throw error;
+      const data = await apiClient.get<WorkflowTemplate[]>(
+        '/api/workflow_templates.php'
+      );
       return data || [];
     },
   });
@@ -24,13 +21,9 @@ export const useCreateTasksFromTemplate = () => {
   
   return useMutation({
     mutationFn: async ({ templateId, projectId }: { templateId: string; projectId?: string }) => {
-      const { data: template, error: templateError } = await apiClient
-        .from('workflow_templates')
-        .select('*')
-        .eq('id', templateId)
-        .single();
-
-      if (templateError) throw templateError;
+      const template = await apiClient.get<WorkflowTemplate>(
+        `/api/workflow_templates.php?id=${templateId}`
+      );
 
       const steps = template.steps as any[];
       const tasksToCreate = steps.map((step, index) => ({
@@ -42,13 +35,8 @@ export const useCreateTasksFromTemplate = () => {
         status: 'backlog' as const
       }));
 
-      const { data, error } = await apiClient
-        .from('tasks')
-        .insert(tasksToCreate)
-        .select();
-
-      if (error) throw error;
-      return data;
+      const data = await apiClient.post('/api/tasks.php', tasksToCreate);
+      return data as any;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });

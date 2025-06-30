@@ -18,15 +18,9 @@ export function useUserPermissions(user: User | null, isRootAdmin: boolean) {
 
       console.log('🔄 Loading permissions for user:', user.id);
 
-      const { data, error } = await apiClient
-        .from('user_permissions')
-        .select('permission')
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('❌ Error loading user permissions:', error);
-        return [];
-      }
+      const data = await apiClient.get<{ permission: Permission }[]>(
+        `/api/user_permissions.php?user_id=${user.id}`
+      );
 
       const permissions = data.map(p => p.permission as Permission);
       console.log('✅ User permissions loaded:', permissions);

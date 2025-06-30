@@ -7,21 +7,9 @@ export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
     queryFn: async (): Promise<ProjectWithDetails[]> => {
-      const { data, error } = await apiClient
-        .from('projects')
-        .select(`
-          *,
-          client:clientes!projects_client_id_fkey(*),
-          responsible:profiles!fk_projects_responsible(*),
-          creator:profiles!projects_created_by_fkey(*),
-          tasks(*)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Erro ao buscar projetos:', error);
-        throw error;
-      }
+      const data = await apiClient.get<ProjectWithDetails[]>(
+        '/api/projects.php'
+      );
 
       console.log('Projetos carregados:', data);
 
@@ -41,13 +29,7 @@ export const useCreateProject = () => {
 
   return useMutation({
     mutationFn: async (project: ProjectInsert) => {
-      const { data, error } = await apiClient
-        .from('projects')
-        .insert(project)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.post<Project>('/api/projects.php', project);
       return data;
     },
     onSuccess: () => {
@@ -71,12 +53,7 @@ export const useUpdateProject = () => {
   return useMutation({
     mutationFn: async (project: ProjectUpdate) => {
       const { id, ...rest } = project;
-      const { error } = await apiClient
-        .from('projects')
-        .update(rest)
-        .eq('id', id);
-
-      if (error) throw error;
+      await apiClient.put(`/api/projects.php?id=${id}`, rest);
     },
   });
 };

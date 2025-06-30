@@ -7,12 +7,7 @@ export const useDeleteProject = () => {
 
   return useMutation({
     mutationFn: async (projectId: string) => {
-      const { error } = await apiClient
-        .from('projects')
-        .delete()
-        .eq('id', projectId);
-
-      if (error) throw error;
+      await apiClient.delete(`/api/projects.php?id=${projectId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });

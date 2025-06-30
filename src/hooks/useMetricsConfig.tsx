@@ -76,23 +76,13 @@ export function useMetricsConfig() {
     queryKey: ['metrics-config'],
     queryFn: async () => {
       try {
-        const { data, error } = await apiClient
-          .from('metrics_config')
-          .select('config')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        const data = await apiClient.get<{ config: Partial<MetricsConfig> }>(
+          '/api/metrics_config.php'
+        );
 
-        if (error && error.code !== 'PGRST116') {
-          console.error('Erro ao buscar config de métricas:', error);
-          return defaultConfig;
-        }
-
-        // Garantir formato correto e parse seguro
         if (!data || typeof data.config !== 'object') {
           return defaultConfig;
         }
-        // Garante que config tenha todas as chaves esperadas
         const parsedConfig = data.config as Partial<MetricsConfig>;
         return {
           dashboard: Array.isArray(parsedConfig.dashboard) ? parsedConfig.dashboard : defaultConfig.dashboard,
@@ -111,11 +101,7 @@ export function useMetricsConfig() {
     mutationFn: async (newConfig: MetricsConfig) => {
       try {
         // Serializa newConfig para JSON
-        const { error } = await apiClient
-          .from('metrics_config')
-          .upsert([{ config: JSON.parse(JSON.stringify(newConfig)) }], { onConflict: 'id' });
-
-        if (error) throw error;
+        await apiClient.post('/api/metrics_config.php', newConfig);
 
         await logActivity('metrics_config_updated', 'configuracoes', newConfig);
         return newConfig;

@@ -11,18 +11,15 @@ export function useUserAccess() {
     queryFn: async () => {
       if (!user?.id || isAdmin) return null;
       
-      const { data, error } = await apiClient
-        .from('clientes')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error loading cliente:', error);
+      try {
+        const data = await apiClient.get(
+          `/api/clientes.php?user_id=${user.id}`
+        );
+        return data as any;
+      } catch (err) {
+        console.error('Error loading cliente:', err);
         return null;
       }
-      
-      return data;
     },
     enabled: !!user?.id && !isAdmin,
   });
@@ -32,18 +29,15 @@ export function useUserAccess() {
     queryFn: async () => {
       if (!clienteData?.id) return [];
       
-      const { data, error } = await apiClient
-        .from('contas')
-        .select('*')
-        .eq('cliente_id', clienteData.id)
-        .eq('ativo', true);
-      
-      if (error) {
-        console.error('Error loading accounts:', error);
+      try {
+        const data = await apiClient.get(
+          `/api/contas.php?cliente_id=${clienteData.id}`
+        );
+        return data as any[];
+      } catch (err) {
+        console.error('Error loading accounts:', err);
         return [];
       }
-      
-      return data;
     },
     enabled: !!clienteData?.id,
   });

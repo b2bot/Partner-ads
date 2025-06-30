@@ -7,26 +7,9 @@ export const useTasks = (projectId?: string) => {
   return useQuery({
     queryKey: ['tasks', projectId],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      let query = apiClient
-        .from('tasks')
-        .select(`
-          *,
-          project:projects!tasks_project_id_fkey(*),
-          assigned_user:profiles!fk_tasks_assigned_to(*),
-          creator:profiles!tasks_created_by_fkey(*)
-        `)
-        .order('order_index', { ascending: true });
-
-      if (projectId) {
-        query = query.eq('project_id', projectId); // ✅ filtro aplicado se fornecido
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching tasks:', error);
-        throw error;
-      }
+      const data = await apiClient.get<TaskWithDetails[]>(
+        `/api/tasks.php${projectId ? `?project_id=${projectId}` : ''}`
+      );
 
       return (data || []).map(task => ({
         ...task,
@@ -50,13 +33,7 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
-      const { data, error } = await apiClient
-        .from('tasks')
-        .insert(task)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.post<Task>('/api/tasks.php', task);
       return data;
     },
     onSuccess: (_, variables) => {
@@ -84,14 +61,7 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: TaskUpdate }) => {
-      const { data, error } = await apiClient
-        .from('tasks')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.put<Task>(`/api/tasks.php?id=${id}`, updates);
       return data;
     },
     onSuccess: (_, variables) => {
@@ -119,12 +89,7 @@ export const useDeleteTask = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await apiClient
-        .from('tasks')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      await apiClient.delete(`/api/tasks.php?id=${id}`);
     },
     onSuccess: (_, id) => {
       // Remove tarefas em geral

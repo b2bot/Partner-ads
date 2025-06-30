@@ -10,20 +10,9 @@ export function useTaskSteps(taskId: string) {
   const { data: steps = [], isLoading } = useQuery({
     queryKey: ['task-steps', taskId],
     queryFn: async () => {
-      const { data, error } = await apiClient
-        .from('task_steps')
-        .select(`
-          *,
-          assignees:profiles(id, nome)
-        `)
-        .eq('task_id', taskId)
-        .order('order_index', { ascending: true });
-
-      if (error) {
-        console.error('Error loading task steps:', error);
-        throw error;
-      }
-
+      const data = await apiClient.get<TaskStep[]>(
+        `/api/task_steps.php?task_id=${taskId}`
+      );
       return data as TaskStep[];
     },
     enabled: !!taskId,
@@ -31,13 +20,10 @@ export function useTaskSteps(taskId: string) {
 
   const createStepMutation = useMutation({
     mutationFn: async (stepData: CreateTaskStepData) => {
-      const { data, error } = await apiClient
-        .from('task_steps')
-        .insert(stepData)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.post<TaskStep>(
+        '/api/task_steps.php',
+        stepData
+      );
       return data;
     },
     onSuccess: () => {
@@ -52,14 +38,10 @@ export function useTaskSteps(taskId: string) {
 
   const updateStepMutation = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<TaskStep> & { id: string }) => {
-      const { data, error } = await apiClient
-        .from('task_steps')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.put<TaskStep>(
+        `/api/task_steps.php?id=${id}`,
+        updates
+      );
       return data;
     },
     onSuccess: () => {
@@ -74,12 +56,7 @@ export function useTaskSteps(taskId: string) {
 
   const deleteStepMutation = useMutation({
     mutationFn: async (stepId: string) => {
-      const { error } = await apiClient
-        .from('task_steps')
-        .delete()
-        .eq('id', stepId);
-
-      if (error) throw error;
+      await apiClient.delete(`/api/task_steps.php?id=${stepId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task-steps', taskId] });

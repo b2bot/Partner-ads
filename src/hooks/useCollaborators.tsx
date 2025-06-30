@@ -21,13 +21,9 @@ export function useCollaborators() {
   const { data: collaborators, isLoading } = useQuery({
     queryKey: ['collaborators'],
     queryFn: async () => {
-      const { data, error } = await apiClient
-        .from('profiles')
-        .select('*')
-        .eq('is_root_admin', false)
-        .order('nome');
-      
-      if (error) throw error;
+      const data = await apiClient.get<Collaborator[]>(
+        '/api/collaborators.php'
+      );
       return data as Collaborator[];
     },
   });
@@ -35,12 +31,9 @@ export function useCollaborators() {
   // Mutation para desativar colaborador
   const deactivateCollaboratorMutation = useMutation({
     mutationFn: async (collaboratorId: string) => {
-      const { error } = await apiClient
-        .from('profiles')
-        .update({ status: 'inativo' })
-        .eq('id', collaboratorId);
-      
-      if (error) throw error;
+      await apiClient.put(`/api/collaborators.php?id=${collaboratorId}`, {
+        status: 'inativo',
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['collaborators'] });

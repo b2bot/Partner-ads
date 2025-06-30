@@ -67,34 +67,18 @@ export function useWhatsAppMessages() {
     contactId?: string;
   } = {}) => {
     try {
-      let query = apiClient
-        .from('whatsapp_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (filters.status) {
-        query = query.eq('status', filters.status);
-      }
-
-      if (filters.campaignId) {
-        query = query.eq('campaign_id', filters.campaignId);
-      }
-
-      if (filters.contactId) {
-        query = query.eq('contact_id', filters.contactId);
-      }
-
+      const params = new URLSearchParams();
+      if (filters.status) params.append('status', filters.status);
+      if (filters.campaignId) params.append('campaign_id', filters.campaignId);
+      if (filters.contactId) params.append('contact_id', filters.contactId);
       if (filters.dateRange) {
-        query = query
-          .gte('created_at', filters.dateRange[0].toISOString())
-          .lte('created_at', filters.dateRange[1].toISOString());
+        params.append('start', filters.dateRange[0].toISOString());
+        params.append('end', filters.dateRange[1].toISOString());
       }
+      const data = await apiClient.get<WhatsAppMessage[]>(
+        `/api/whatsapp_messages.php${params.toString() ? `?${params}` : ''}`
+      );
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      // Corrigir o tipo de template_variables para cada mensagem
       setMessages((data || []).map(fixTemplateVariables));
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -110,9 +94,9 @@ export function useWhatsAppMessages() {
 
   const sendMessage = async (params: SendMessageParams) => {
     try {
-      const { data, error } = await apiClient
-        .from('whatsapp_messages')
-        .insert({
+      const data = await apiClient.post<WhatsAppMessage>(
+        '/api/whatsapp_messages.php',
+        {
           phone_number: params.phoneNumber,
           message_type: 'template',
           template_name: params.templateName,
@@ -120,11 +104,8 @@ export function useWhatsAppMessages() {
           contact_id: params.contactId,
           campaign_id: params.campaignId,
           status: 'pending',
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+        }
+      );
 
       setMessages(prev => [fixTemplateVariables(data), ...prev]);
 
@@ -161,12 +142,10 @@ export function useWhatsAppMessages() {
         status: 'pending',
       }));
 
-      const { data, error } = await apiClient
-        .from('whatsapp_messages')
-        .insert(messages)
-        .select();
-
-      if (error) throw error;
+      const data = await apiClient.post<WhatsAppMessage[]>(
+        '/api/whatsapp_messages.php',
+        messages
+      );
 
       setMessages(prev => ([...(Array.isArray(data) ? data.map(fixTemplateVariables) : []), ...prev]));
 

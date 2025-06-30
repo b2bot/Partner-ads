@@ -18,24 +18,11 @@ export function useWhatsAppConfig() {
 
   const fetchConfig = async () => {
     try {
-      const { data, error } = await apiClient
-        .from('whatsapp_config')
-        .select('*')
-        .single();
+      const data = await apiClient.get<WhatsAppConfig | null>(
+        '/api/whatsapp_config.php'
+      );
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      // Força o fallback para tipagem local
-      setConfig(data ? {
-        id: data.id,
-        phone_number_id: data.phone_number_id,
-        access_token: data.access_token,
-        business_account_id: data.business_account_id ?? "",
-        status: (data.status === 'connected' || data.status === 'disconnected' || data.status === 'error') ? data.status : 'disconnected',
-        last_verified_at: data.last_verified_at ?? "",
-      } : null);
+      setConfig(data);
     } catch (error: any) {
       console.error('Error fetching WhatsApp config:', {
         message: error.message,
@@ -64,13 +51,10 @@ export function useWhatsAppConfig() {
         ...(configData.id && { id: configData.id }),
       };
 
-      const { data, error } = await apiClient
-        .from('whatsapp_config')
-        .upsert(upsertData)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.post<WhatsAppConfig>(
+        '/api/whatsapp_config.php',
+        upsertData
+      );
 
       setConfig(data ? {
         id: data.id,
