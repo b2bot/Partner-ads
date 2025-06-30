@@ -1,0 +1,580 @@
+table_schema,table_name,column_name,data_type,is_nullable,character_maximum_length,numeric_precision,numeric_scale
+auth,audit_log_entries,instance_id,uuid,YES,null,null,null
+auth,audit_log_entries,id,uuid,NO,null,null,null
+auth,audit_log_entries,payload,json,YES,null,null,null
+auth,audit_log_entries,created_at,timestamp with time zone,YES,null,null,null
+auth,audit_log_entries,ip_address,character varying,NO,64,null,null
+auth,flow_state,id,uuid,NO,null,null,null
+auth,flow_state,user_id,uuid,YES,null,null,null
+auth,flow_state,auth_code,text,NO,null,null,null
+auth,flow_state,code_challenge_method,USER-DEFINED,NO,null,null,null
+auth,flow_state,code_challenge,text,NO,null,null,null
+auth,flow_state,provider_type,text,NO,null,null,null
+auth,flow_state,provider_access_token,text,YES,null,null,null
+auth,flow_state,provider_refresh_token,text,YES,null,null,null
+auth,flow_state,created_at,timestamp with time zone,YES,null,null,null
+auth,flow_state,updated_at,timestamp with time zone,YES,null,null,null
+auth,flow_state,authentication_method,text,NO,null,null,null
+auth,flow_state,auth_code_issued_at,timestamp with time zone,YES,null,null,null
+auth,identities,provider_id,text,NO,null,null,null
+auth,identities,user_id,uuid,NO,null,null,null
+auth,identities,identity_data,jsonb,NO,null,null,null
+auth,identities,provider,text,NO,null,null,null
+auth,identities,last_sign_in_at,timestamp with time zone,YES,null,null,null
+auth,identities,created_at,timestamp with time zone,YES,null,null,null
+auth,identities,updated_at,timestamp with time zone,YES,null,null,null
+auth,identities,email,text,YES,null,null,null
+auth,identities,id,uuid,NO,null,null,null
+auth,instances,id,uuid,NO,null,null,null
+auth,instances,uuid,uuid,YES,null,null,null
+auth,instances,raw_base_config,text,YES,null,null,null
+auth,instances,created_at,timestamp with time zone,YES,null,null,null
+auth,instances,updated_at,timestamp with time zone,YES,null,null,null
+auth,mfa_amr_claims,session_id,uuid,NO,null,null,null
+auth,mfa_amr_claims,created_at,timestamp with time zone,NO,null,null,null
+auth,mfa_amr_claims,updated_at,timestamp with time zone,NO,null,null,null
+auth,mfa_amr_claims,authentication_method,text,NO,null,null,null
+auth,mfa_amr_claims,id,uuid,NO,null,null,null
+auth,mfa_challenges,id,uuid,NO,null,null,null
+auth,mfa_challenges,factor_id,uuid,NO,null,null,null
+auth,mfa_challenges,created_at,timestamp with time zone,NO,null,null,null
+auth,mfa_challenges,verified_at,timestamp with time zone,YES,null,null,null
+auth,mfa_challenges,ip_address,inet,NO,null,null,null
+auth,mfa_challenges,otp_code,text,YES,null,null,null
+auth,mfa_challenges,web_authn_session_data,jsonb,YES,null,null,null
+auth,mfa_factors,id,uuid,NO,null,null,null
+auth,mfa_factors,user_id,uuid,NO,null,null,null
+auth,mfa_factors,friendly_name,text,YES,null,null,null
+auth,mfa_factors,factor_type,USER-DEFINED,NO,null,null,null
+auth,mfa_factors,status,USER-DEFINED,NO,null,null,null
+auth,mfa_factors,created_at,timestamp with time zone,NO,null,null,null
+auth,mfa_factors,updated_at,timestamp with time zone,NO,null,null,null
+auth,mfa_factors,secret,text,YES,null,null,null
+auth,mfa_factors,phone,text,YES,null,null,null
+auth,mfa_factors,last_challenged_at,timestamp with time zone,YES,null,null,null
+auth,mfa_factors,web_authn_credential,jsonb,YES,null,null,null
+auth,mfa_factors,web_authn_aaguid,uuid,YES,null,null,null
+auth,one_time_tokens,id,uuid,NO,null,null,null
+auth,one_time_tokens,user_id,uuid,NO,null,null,null
+auth,one_time_tokens,token_type,USER-DEFINED,NO,null,null,null
+auth,one_time_tokens,token_hash,text,NO,null,null,null
+auth,one_time_tokens,relates_to,text,NO,null,null,null
+auth,one_time_tokens,created_at,timestamp without time zone,NO,null,null,null
+auth,one_time_tokens,updated_at,timestamp without time zone,NO,null,null,null
+auth,refresh_tokens,instance_id,uuid,YES,null,null,null
+auth,refresh_tokens,id,bigint,NO,null,64,0
+auth,refresh_tokens,token,character varying,YES,255,null,null
+auth,refresh_tokens,user_id,character varying,YES,255,null,null
+auth,refresh_tokens,revoked,boolean,YES,null,null,null
+auth,refresh_tokens,created_at,timestamp with time zone,YES,null,null,null
+auth,refresh_tokens,updated_at,timestamp with time zone,YES,null,null,null
+auth,refresh_tokens,parent,character varying,YES,255,null,null
+auth,refresh_tokens,session_id,uuid,YES,null,null,null
+auth,saml_providers,id,uuid,NO,null,null,null
+auth,saml_providers,sso_provider_id,uuid,NO,null,null,null
+auth,saml_providers,entity_id,text,NO,null,null,null
+auth,saml_providers,metadata_xml,text,NO,null,null,null
+auth,saml_providers,metadata_url,text,YES,null,null,null
+auth,saml_providers,attribute_mapping,jsonb,YES,null,null,null
+auth,saml_providers,created_at,timestamp with time zone,YES,null,null,null
+auth,saml_providers,updated_at,timestamp with time zone,YES,null,null,null
+auth,saml_providers,name_id_format,text,YES,null,null,null
+auth,saml_relay_states,id,uuid,NO,null,null,null
+auth,saml_relay_states,sso_provider_id,uuid,NO,null,null,null
+auth,saml_relay_states,request_id,text,NO,null,null,null
+auth,saml_relay_states,for_email,text,YES,null,null,null
+auth,saml_relay_states,redirect_to,text,YES,null,null,null
+auth,saml_relay_states,created_at,timestamp with time zone,YES,null,null,null
+auth,saml_relay_states,updated_at,timestamp with time zone,YES,null,null,null
+auth,saml_relay_states,flow_state_id,uuid,YES,null,null,null
+auth,schema_migrations,version,character varying,NO,255,null,null
+auth,sessions,id,uuid,NO,null,null,null
+auth,sessions,user_id,uuid,NO,null,null,null
+auth,sessions,created_at,timestamp with time zone,YES,null,null,null
+auth,sessions,updated_at,timestamp with time zone,YES,null,null,null
+auth,sessions,factor_id,uuid,YES,null,null,null
+auth,sessions,aal,USER-DEFINED,YES,null,null,null
+auth,sessions,not_after,timestamp with time zone,YES,null,null,null
+auth,sessions,refreshed_at,timestamp without time zone,YES,null,null,null
+auth,sessions,user_agent,text,YES,null,null,null
+auth,sessions,ip,inet,YES,null,null,null
+auth,sessions,tag,text,YES,null,null,null
+auth,sso_domains,id,uuid,NO,null,null,null
+auth,sso_domains,sso_provider_id,uuid,NO,null,null,null
+auth,sso_domains,domain,text,NO,null,null,null
+auth,sso_domains,created_at,timestamp with time zone,YES,null,null,null
+auth,sso_domains,updated_at,timestamp with time zone,YES,null,null,null
+auth,sso_providers,id,uuid,NO,null,null,null
+auth,sso_providers,resource_id,text,YES,null,null,null
+auth,sso_providers,created_at,timestamp with time zone,YES,null,null,null
+auth,sso_providers,updated_at,timestamp with time zone,YES,null,null,null
+auth,users,instance_id,uuid,YES,null,null,null
+auth,users,id,uuid,NO,null,null,null
+auth,users,aud,character varying,YES,255,null,null
+auth,users,role,character varying,YES,255,null,null
+auth,users,email,character varying,YES,255,null,null
+auth,users,encrypted_password,character varying,YES,255,null,null
+auth,users,email_confirmed_at,timestamp with time zone,YES,null,null,null
+auth,users,invited_at,timestamp with time zone,YES,null,null,null
+auth,users,confirmation_token,character varying,YES,255,null,null
+auth,users,confirmation_sent_at,timestamp with time zone,YES,null,null,null
+auth,users,recovery_token,character varying,YES,255,null,null
+auth,users,recovery_sent_at,timestamp with time zone,YES,null,null,null
+auth,users,email_change_token_new,character varying,YES,255,null,null
+auth,users,email_change,character varying,YES,255,null,null
+auth,users,email_change_sent_at,timestamp with time zone,YES,null,null,null
+auth,users,last_sign_in_at,timestamp with time zone,YES,null,null,null
+auth,users,raw_app_meta_data,jsonb,YES,null,null,null
+auth,users,raw_user_meta_data,jsonb,YES,null,null,null
+auth,users,is_super_admin,boolean,YES,null,null,null
+auth,users,created_at,timestamp with time zone,YES,null,null,null
+auth,users,updated_at,timestamp with time zone,YES,null,null,null
+auth,users,phone,text,YES,null,null,null
+auth,users,phone_confirmed_at,timestamp with time zone,YES,null,null,null
+auth,users,phone_change,text,YES,null,null,null
+auth,users,phone_change_token,character varying,YES,255,null,null
+auth,users,phone_change_sent_at,timestamp with time zone,YES,null,null,null
+auth,users,confirmed_at,timestamp with time zone,YES,null,null,null
+auth,users,email_change_token_current,character varying,YES,255,null,null
+auth,users,email_change_confirm_status,smallint,YES,null,16,0
+auth,users,banned_until,timestamp with time zone,YES,null,null,null
+auth,users,reauthentication_token,character varying,YES,255,null,null
+auth,users,reauthentication_sent_at,timestamp with time zone,YES,null,null,null
+auth,users,is_sso_user,boolean,NO,null,null,null
+auth,users,deleted_at,timestamp with time zone,YES,null,null,null
+auth,users,is_anonymous,boolean,NO,null,null,null
+extensions,pg_stat_statements,userid,oid,YES,null,null,null
+extensions,pg_stat_statements,dbid,oid,YES,null,null,null
+extensions,pg_stat_statements,toplevel,boolean,YES,null,null,null
+extensions,pg_stat_statements,queryid,bigint,YES,null,64,0
+extensions,pg_stat_statements,query,text,YES,null,null,null
+extensions,pg_stat_statements,plans,bigint,YES,null,64,0
+extensions,pg_stat_statements,total_plan_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,min_plan_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,max_plan_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,mean_plan_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,stddev_plan_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,calls,bigint,YES,null,64,0
+extensions,pg_stat_statements,total_exec_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,min_exec_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,max_exec_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,mean_exec_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,stddev_exec_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,rows,bigint,YES,null,64,0
+extensions,pg_stat_statements,shared_blks_hit,bigint,YES,null,64,0
+extensions,pg_stat_statements,shared_blks_read,bigint,YES,null,64,0
+extensions,pg_stat_statements,shared_blks_dirtied,bigint,YES,null,64,0
+extensions,pg_stat_statements,shared_blks_written,bigint,YES,null,64,0
+extensions,pg_stat_statements,local_blks_hit,bigint,YES,null,64,0
+extensions,pg_stat_statements,local_blks_read,bigint,YES,null,64,0
+extensions,pg_stat_statements,local_blks_dirtied,bigint,YES,null,64,0
+extensions,pg_stat_statements,local_blks_written,bigint,YES,null,64,0
+extensions,pg_stat_statements,temp_blks_read,bigint,YES,null,64,0
+extensions,pg_stat_statements,temp_blks_written,bigint,YES,null,64,0
+extensions,pg_stat_statements,shared_blk_read_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,shared_blk_write_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,local_blk_read_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,local_blk_write_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,temp_blk_read_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,temp_blk_write_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,wal_records,bigint,YES,null,64,0
+extensions,pg_stat_statements,wal_fpi,bigint,YES,null,64,0
+extensions,pg_stat_statements,wal_bytes,numeric,YES,null,null,null
+extensions,pg_stat_statements,jit_functions,bigint,YES,null,64,0
+extensions,pg_stat_statements,jit_generation_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,jit_inlining_count,bigint,YES,null,64,0
+extensions,pg_stat_statements,jit_inlining_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,jit_optimization_count,bigint,YES,null,64,0
+extensions,pg_stat_statements,jit_optimization_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,jit_emission_count,bigint,YES,null,64,0
+extensions,pg_stat_statements,jit_emission_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,jit_deform_count,bigint,YES,null,64,0
+extensions,pg_stat_statements,jit_deform_time,double precision,YES,null,53,null
+extensions,pg_stat_statements,stats_since,timestamp with time zone,YES,null,null,null
+extensions,pg_stat_statements,minmax_stats_since,timestamp with time zone,YES,null,null,null
+extensions,pg_stat_statements_info,dealloc,bigint,YES,null,64,0
+extensions,pg_stat_statements_info,stats_reset,timestamp with time zone,YES,null,null,null
+public,activity_logs,id,uuid,NO,null,null,null
+public,activity_logs,action,text,NO,null,null,null
+public,activity_logs,entity_type,text,NO,null,null,null
+public,activity_logs,entity_id,text,NO,null,null,null
+public,activity_logs,entity_name,text,NO,null,null,null
+public,activity_logs,user_id,uuid,YES,null,null,null
+public,activity_logs,user_name,text,NO,null,null,null
+public,activity_logs,details,jsonb,YES,null,null,null
+public,activity_logs,created_at,timestamp with time zone,NO,null,null,null
+public,chamados,id,uuid,NO,null,null,null
+public,chamados,cliente_id,uuid,NO,null,null,null
+public,chamados,titulo,text,NO,null,null,null
+public,chamados,mensagem,text,NO,null,null,null
+public,chamados,resposta,text,YES,null,null,null
+public,chamados,arquivo_url,text,YES,null,null,null
+public,chamados,respondido_por,uuid,YES,null,null,null
+public,chamados,created_at,timestamp with time zone,NO,null,null,null
+public,chamados,updated_at,timestamp with time zone,NO,null,null,null
+public,chamados,aberto_por,text,YES,null,null,null
+public,chamados,status_detalhado,text,YES,null,null,null
+public,chamados,categoria,text,YES,null,null,null
+public,chamados,prioridade,text,YES,null,null,null
+public,chamados,nota_interna,text,YES,null,null,null
+public,chamados,tempo_resposta_horas,integer,YES,null,32,0
+public,chamados,status,USER-DEFINED,NO,null,null,null
+public,chamados_anexos,id,uuid,NO,null,null,null
+public,chamados_anexos,chamado_id,uuid,YES,null,null,null
+public,chamados_anexos,nome_arquivo,text,NO,null,null,null
+public,chamados_anexos,url_arquivo,text,NO,null,null,null
+public,chamados_anexos,tipo_arquivo,text,NO,null,null,null
+public,chamados_anexos,tamanho_arquivo,bigint,YES,null,64,0
+public,chamados_anexos,created_at,timestamp with time zone,YES,null,null,null
+public,chamados_anexos,uploaded_by,uuid,YES,null,null,null
+public,chamados_historico,id,uuid,NO,null,null,null
+public,chamados_historico,chamado_id,uuid,NO,null,null,null
+public,chamados_historico,acao,text,NO,null,null,null
+public,chamados_historico,usuario_id,uuid,YES,null,null,null
+public,chamados_historico,usuario_nome,text,NO,null,null,null
+public,chamados_historico,detalhes,text,YES,null,null,null
+public,chamados_historico,data_acao,timestamp with time zone,NO,null,null,null
+public,chamados_mensagens,id,uuid,NO,null,null,null
+public,chamados_mensagens,chamado_id,uuid,NO,null,null,null
+public,chamados_mensagens,conteudo,text,NO,null,null,null
+public,chamados_mensagens,arquivo_url,text,YES,null,null,null
+public,chamados_mensagens,autor_id,uuid,YES,null,null,null
+public,chamados_mensagens,autor_nome,text,NO,null,null,null
+public,chamados_mensagens,autor_tipo,text,NO,null,null,null
+public,chamados_mensagens,created_at,timestamp with time zone,NO,null,null,null
+public,chamados_mensagens,metadata,jsonb,YES,null,null,null
+public,chamados_timeline,id,uuid,NO,null,null,null
+public,chamados_timeline,chamado_id,uuid,YES,null,null,null
+public,chamados_timeline,tipo,text,NO,null,null,null
+public,chamados_timeline,conteudo,text,YES,null,null,null
+public,chamados_timeline,autor_id,uuid,YES,null,null,null
+public,chamados_timeline,autor_nome,text,NO,null,null,null
+public,chamados_timeline,autor_tipo,text,NO,null,null,null
+public,chamados_timeline,created_at,timestamp with time zone,YES,null,null,null
+public,chamados_timeline,metadata,jsonb,YES,null,null,null
+public,client_permissions,id,uuid,NO,null,null,null
+public,client_permissions,client_id,uuid,NO,null,null,null
+public,client_permissions,module,USER-DEFINED,NO,null,null,null
+public,client_permissions,enabled,boolean,NO,null,null,null
+public,client_permissions,created_at,timestamp with time zone,YES,null,null,null
+public,client_permissions,updated_at,timestamp with time zone,YES,null,null,null
+public,client_report_permissions,id,uuid,NO,null,null,null
+public,client_report_permissions,client_id,uuid,NO,null,null,null
+public,client_report_permissions,report_type,USER-DEFINED,NO,null,null,null
+public,client_report_permissions,enabled,boolean,NO,null,null,null
+public,client_report_permissions,account_ids,ARRAY,YES,null,null,null
+public,client_report_permissions,created_at,timestamp with time zone,YES,null,null,null
+public,client_report_permissions,updated_at,timestamp with time zone,YES,null,null,null
+public,clientes,id,uuid,NO,null,null,null
+public,clientes,user_id,uuid,NO,null,null,null
+public,clientes,nome,text,NO,null,null,null
+public,clientes,tipo_acesso,USER-DEFINED,NO,null,null,null
+public,clientes,ativo,boolean,NO,null,null,null
+public,clientes,created_at,timestamp with time zone,NO,null,null,null
+public,clientes,updated_at,timestamp with time zone,NO,null,null,null
+public,clientes,email,text,YES,null,null,null
+public,clientes,telefone,text,YES,null,null,null
+public,clientes,empresa,text,YES,null,null,null
+public,clientes,observacoes_internas,text,YES,null,null,null
+public,clientes,responsavel_conta,uuid,YES,null,null,null
+public,clientes,contas_meta,ARRAY,YES,null,null,null
+public,contas,id,uuid,NO,null,null,null
+public,contas,cliente_id,uuid,NO,null,null,null
+public,contas,tipo,USER-DEFINED,NO,null,null,null
+public,contas,identificador,text,NO,null,null,null
+public,contas,nome,text,NO,null,null,null
+public,contas,ativo,boolean,NO,null,null,null
+public,contas,created_at,timestamp with time zone,NO,null,null,null
+public,criativos,id,uuid,NO,null,null,null
+public,criativos,cliente_id,uuid,NO,null,null,null
+public,criativos,titulo,text,NO,null,null,null
+public,criativos,descricao,text,YES,null,null,null
+public,criativos,arquivo_url,text,NO,null,null,null
+public,criativos,tipo_arquivo,text,NO,null,null,null
+public,criativos,status,USER-DEFINED,NO,null,null,null
+public,criativos,resposta,text,YES,null,null,null
+public,criativos,comentario_cliente,text,YES,null,null,null
+public,criativos,created_at,timestamp with time zone,NO,null,null,null
+public,criativos,updated_at,timestamp with time zone,NO,null,null,null
+public,criativos,campanha,text,YES,null,null,null
+public,criativos,nome_criativo,text,YES,null,null,null
+public,criativos,titulo_anuncio,text,YES,null,null,null
+public,criativos,descricao_anuncio,text,YES,null,null,null
+public,meta_api_credentials,id,uuid,NO,null,null,null
+public,meta_api_credentials,app_id,text,NO,null,null,null
+public,meta_api_credentials,app_secret,text,NO,null,null,null
+public,meta_api_credentials,access_token,text,NO,null,null,null
+public,meta_api_credentials,created_at,timestamp with time zone,YES,null,null,null
+public,metrics_config,id,uuid,NO,null,null,null
+public,metrics_config,created_at,timestamp with time zone,NO,null,null,null
+public,metrics_config,updated_at,timestamp with time zone,NO,null,null,null
+public,metrics_config,config,jsonb,NO,null,null,null
+public,permission_logs,id,uuid,NO,null,null,null
+public,permission_logs,target_user_id,uuid,YES,null,null,null
+public,permission_logs,changed_by,uuid,YES,null,null,null
+public,permission_logs,action,text,NO,null,null,null
+public,permission_logs,permission,USER-DEFINED,YES,null,null,null
+public,permission_logs,details,jsonb,YES,null,null,null
+public,permission_logs,created_at,timestamp with time zone,YES,null,null,null
+public,permission_templates,id,uuid,NO,null,null,null
+public,permission_templates,name,text,NO,null,null,null
+public,permission_templates,description,text,YES,null,null,null
+public,permission_templates,permissions,ARRAY,NO,null,null,null
+public,permission_templates,created_by,uuid,YES,null,null,null
+public,permission_templates,created_at,timestamp with time zone,YES,null,null,null
+public,permission_templates,updated_at,timestamp with time zone,YES,null,null,null
+public,profiles,id,uuid,NO,null,null,null
+public,profiles,nome,text,NO,null,null,null
+public,profiles,email,text,NO,null,null,null
+public,profiles,role,USER-DEFINED,NO,null,null,null
+public,profiles,ativo,boolean,NO,null,null,null
+public,profiles,created_at,timestamp with time zone,NO,null,null,null
+public,profiles,updated_at,timestamp with time zone,NO,null,null,null
+public,profiles,is_root_admin,boolean,YES,null,null,null
+public,profiles,foto_url,text,YES,null,null,null
+public,profiles,status,text,YES,null,null,null
+public,projects,id,uuid,NO,null,null,null
+public,projects,name,text,NO,null,null,null
+public,projects,description,text,YES,null,null,null
+public,projects,client_id,uuid,YES,null,null,null
+public,projects,created_by,uuid,NO,null,null,null
+public,projects,created_at,timestamp with time zone,YES,null,null,null
+public,projects,status,text,YES,null,null,null
+public,projects,responsible_id,uuid,YES,null,null,null
+public,projects,start_date,timestamp with time zone,YES,null,null,null
+public,projects,end_date,timestamp with time zone,YES,null,null,null
+public,sections,id,uuid,NO,null,null,null
+public,sections,name,text,NO,null,null,null
+public,sections,project_id,uuid,YES,null,null,null
+public,sections,order_index,integer,YES,null,32,0
+public,sections,created_at,timestamp with time zone,YES,null,null,null
+public,settings,id,bigint,NO,null,64,0
+public,settings,client_id,uuid,YES,null,null,null
+public,settings,data,jsonb,YES,null,null,null
+public,settings,created_at,timestamp with time zone,YES,null,null,null
+public,system_activity_logs,id,uuid,NO,null,null,null
+public,system_activity_logs,usuario_id,uuid,YES,null,null,null
+public,system_activity_logs,usuario_nome,text,NO,null,null,null
+public,system_activity_logs,acao,text,NO,null,null,null
+public,system_activity_logs,modulo,text,NO,null,null,null
+public,system_activity_logs,detalhes,jsonb,YES,null,null,null
+public,system_activity_logs,ip_address,inet,YES,null,null,null
+public,system_activity_logs,user_agent,text,YES,null,null,null
+public,system_activity_logs,created_at,timestamp with time zone,NO,null,null,null
+public,task_comments,id,uuid,NO,null,null,null
+public,task_comments,task_id,uuid,NO,null,null,null
+public,task_comments,author_id,uuid,NO,null,null,null
+public,task_comments,content,text,NO,null,null,null
+public,task_comments,created_at,timestamp with time zone,YES,null,null,null
+public,task_steps,id,uuid,NO,null,null,null
+public,task_steps,task_id,uuid,YES,null,null,null
+public,task_steps,content,text,YES,null,null,null
+public,task_steps,checked,boolean,YES,null,null,null
+public,task_steps,created_at,timestamp with time zone,YES,null,null,null
+public,tasks,id,uuid,NO,null,null,null
+public,tasks,title,text,NO,null,null,null
+public,tasks,description,text,YES,null,null,null
+public,tasks,status,text,YES,null,null,null
+public,tasks,priority,text,YES,null,null,null
+public,tasks,due_date,date,YES,null,null,null
+public,tasks,tags,ARRAY,YES,null,null,null
+public,tasks,project_id,uuid,YES,null,null,null
+public,tasks,owner_id,uuid,YES,null,null,null
+public,tasks,created_by,uuid,YES,null,null,null
+public,tasks,linked_ticket_id,uuid,YES,null,null,null
+public,tasks,created_at,timestamp with time zone,YES,null,null,null
+public,tasks,type,text,YES,null,null,null
+public,tasks,actual_hours,numeric,YES,null,null,null
+public,tasks,assigned_to,uuid,YES,null,null,null
+public,tasks,estimated_hours,numeric,YES,null,null,null
+public,tasks,order_index,integer,YES,null,32,0
+public,tasks,section_id,uuid,YES,null,null,null
+public,tasks,start_date,date,YES,null,null,null
+public,tasks,updated_at,timestamp with time zone,YES,null,null,null
+public,user_permissions,id,uuid,NO,null,null,null
+public,user_permissions,user_id,uuid,YES,null,null,null
+public,user_permissions,permission,USER-DEFINED,NO,null,null,null
+public,user_permissions,granted_by,uuid,YES,null,null,null
+public,user_permissions,created_at,timestamp with time zone,YES,null,null,null
+public,usuarios,id,uuid,NO,null,null,null
+public,usuarios,nome,text,YES,null,null,null
+public,usuarios,tipo,text,NO,null,null,null
+public,usuarios,criado_em,timestamp with time zone,YES,null,null,null
+public,whatsapp_campaign_executions,id,uuid,NO,null,null,null
+public,whatsapp_campaign_executions,campaign_id,uuid,YES,null,null,null
+public,whatsapp_campaign_executions,execution_date,timestamp with time zone,NO,null,null,null
+public,whatsapp_campaign_executions,status,text,NO,null,null,null
+public,whatsapp_campaign_executions,messages_sent,integer,YES,null,32,0
+public,whatsapp_campaign_executions,messages_delivered,integer,YES,null,32,0
+public,whatsapp_campaign_executions,messages_failed,integer,YES,null,32,0
+public,whatsapp_campaign_executions,execution_details,jsonb,YES,null,null,null
+public,whatsapp_campaign_executions,error_message,text,YES,null,null,null
+public,whatsapp_campaign_executions,created_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_campaign_executions,completed_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_campaigns,id,uuid,NO,null,null,null
+public,whatsapp_campaigns,name,text,NO,null,null,null
+public,whatsapp_campaigns,type,text,NO,null,null,null
+public,whatsapp_campaigns,template_id,uuid,YES,null,null,null
+public,whatsapp_campaigns,meta_account_id,text,YES,null,null,null
+public,whatsapp_campaigns,frequency,text,NO,null,null,null
+public,whatsapp_campaigns,day_of_week,integer,YES,null,32,0
+public,whatsapp_campaigns,send_time,time without time zone,NO,null,null,null
+public,whatsapp_campaigns,data_period_days,integer,YES,null,32,0
+public,whatsapp_campaigns,is_active,boolean,YES,null,null,null
+public,whatsapp_campaigns,contacts,ARRAY,YES,null,null,null
+public,whatsapp_campaigns,variables_mapping,jsonb,YES,null,null,null
+public,whatsapp_campaigns,created_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_campaigns,updated_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_campaigns,timezone,text,YES,null,null,null
+public,whatsapp_campaigns,next_execution,timestamp with time zone,YES,null,null,null
+public,whatsapp_campaigns,last_execution,timestamp with time zone,YES,null,null,null
+public,whatsapp_config,id,uuid,NO,null,null,null
+public,whatsapp_config,phone_number_id,text,NO,null,null,null
+public,whatsapp_config,access_token,text,NO,null,null,null
+public,whatsapp_config,business_account_id,text,YES,null,null,null
+public,whatsapp_config,webhook_verify_token,text,YES,null,null,null
+public,whatsapp_config,status,text,YES,null,null,null
+public,whatsapp_config,last_verified_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_config,created_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_config,updated_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_contacts,id,uuid,NO,null,null,null
+public,whatsapp_contacts,name,text,NO,null,null,null
+public,whatsapp_contacts,phone_number,text,NO,null,null,null
+public,whatsapp_contacts,client_id,uuid,YES,null,null,null
+public,whatsapp_contacts,tags,ARRAY,YES,null,null,null
+public,whatsapp_contacts,is_active,boolean,YES,null,null,null
+public,whatsapp_contacts,created_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_contacts,updated_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_contacts,meta_account_id,text,YES,null,null,null
+public,whatsapp_contacts,grupo,text,YES,null,null,null
+public,whatsapp_contacts,observacoes,text,YES,null,null,null
+public,whatsapp_message_logs,id,uuid,NO,null,null,null
+public,whatsapp_message_logs,message_id,uuid,YES,null,null,null
+public,whatsapp_message_logs,status,text,NO,null,null,null
+public,whatsapp_message_logs,whatsapp_message_id,text,YES,null,null,null
+public,whatsapp_message_logs,timestamp,timestamp with time zone,YES,null,null,null
+public,whatsapp_message_logs,error_details,jsonb,YES,null,null,null
+public,whatsapp_message_logs,webhook_data,jsonb,YES,null,null,null
+public,whatsapp_message_logs,created_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_messages,id,uuid,NO,null,null,null
+public,whatsapp_messages,campaign_id,uuid,YES,null,null,null
+public,whatsapp_messages,template_id,uuid,YES,null,null,null
+public,whatsapp_messages,contact_id,uuid,YES,null,null,null
+public,whatsapp_messages,phone_number,text,NO,null,null,null
+public,whatsapp_messages,message_type,text,NO,null,null,null
+public,whatsapp_messages,template_name,text,YES,null,null,null
+public,whatsapp_messages,template_variables,jsonb,YES,null,null,null
+public,whatsapp_messages,message_content,text,YES,null,null,null
+public,whatsapp_messages,whatsapp_message_id,text,YES,null,null,null
+public,whatsapp_messages,status,text,NO,null,null,null
+public,whatsapp_messages,error_message,text,YES,null,null,null
+public,whatsapp_messages,sent_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_messages,delivered_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_messages,read_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_messages,created_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_templates,id,uuid,NO,null,null,null
+public,whatsapp_templates,name,text,NO,null,null,null
+public,whatsapp_templates,language,text,NO,null,null,null
+public,whatsapp_templates,category,text,NO,null,null,null
+public,whatsapp_templates,status,text,NO,null,null,null
+public,whatsapp_templates,header_type,text,YES,null,null,null
+public,whatsapp_templates,header_text,text,YES,null,null,null
+public,whatsapp_templates,body_text,text,NO,null,null,null
+public,whatsapp_templates,footer_text,text,YES,null,null,null
+public,whatsapp_templates,variables,jsonb,YES,null,null,null
+public,whatsapp_templates,components,jsonb,NO,null,null,null
+public,whatsapp_templates,created_at,timestamp with time zone,YES,null,null,null
+public,whatsapp_templates,updated_at,timestamp with time zone,YES,null,null,null
+public,workflow_templates,id,uuid,NO,null,null,null
+public,workflow_templates,name,text,NO,null,null,null
+public,workflow_templates,description,text,YES,null,null,null
+public,workflow_templates,category,text,YES,null,null,null
+public,workflow_templates,icon,text,YES,null,null,null
+public,workflow_templates,steps,jsonb,NO,null,null,null
+public,workflow_templates,created_by,uuid,YES,null,null,null
+public,workflow_templates,is_public,boolean,YES,null,null,null
+public,workflow_templates,created_at,timestamp with time zone,YES,null,null,null
+realtime,messages,topic,text,NO,null,null,null
+realtime,messages,extension,text,NO,null,null,null
+realtime,messages,payload,jsonb,YES,null,null,null
+realtime,messages,event,text,YES,null,null,null
+realtime,messages,private,boolean,YES,null,null,null
+realtime,messages,updated_at,timestamp without time zone,NO,null,null,null
+realtime,messages,inserted_at,timestamp without time zone,NO,null,null,null
+realtime,messages,id,uuid,NO,null,null,null
+realtime,schema_migrations,version,bigint,NO,null,64,0
+realtime,schema_migrations,inserted_at,timestamp without time zone,YES,null,null,null
+realtime,subscription,id,bigint,NO,null,64,0
+realtime,subscription,subscription_id,uuid,NO,null,null,null
+realtime,subscription,entity,regclass,NO,null,null,null
+realtime,subscription,filters,ARRAY,NO,null,null,null
+realtime,subscription,claims,jsonb,NO,null,null,null
+realtime,subscription,claims_role,regrole,NO,null,null,null
+realtime,subscription,created_at,timestamp without time zone,NO,null,null,null
+storage,buckets,id,text,NO,null,null,null
+storage,buckets,name,text,NO,null,null,null
+storage,buckets,owner,uuid,YES,null,null,null
+storage,buckets,created_at,timestamp with time zone,YES,null,null,null
+storage,buckets,updated_at,timestamp with time zone,YES,null,null,null
+storage,buckets,public,boolean,YES,null,null,null
+storage,buckets,avif_autodetection,boolean,YES,null,null,null
+storage,buckets,file_size_limit,bigint,YES,null,64,0
+storage,buckets,allowed_mime_types,ARRAY,YES,null,null,null
+storage,buckets,owner_id,text,YES,null,null,null
+storage,migrations,id,integer,NO,null,32,0
+storage,migrations,name,character varying,NO,100,null,null
+storage,migrations,hash,character varying,NO,40,null,null
+storage,migrations,executed_at,timestamp without time zone,YES,null,null,null
+storage,objects,id,uuid,NO,null,null,null
+storage,objects,bucket_id,text,YES,null,null,null
+storage,objects,name,text,YES,null,null,null
+storage,objects,owner,uuid,YES,null,null,null
+storage,objects,created_at,timestamp with time zone,YES,null,null,null
+storage,objects,updated_at,timestamp with time zone,YES,null,null,null
+storage,objects,last_accessed_at,timestamp with time zone,YES,null,null,null
+storage,objects,metadata,jsonb,YES,null,null,null
+storage,objects,path_tokens,ARRAY,YES,null,null,null
+storage,objects,version,text,YES,null,null,null
+storage,objects,owner_id,text,YES,null,null,null
+storage,objects,user_metadata,jsonb,YES,null,null,null
+storage,s3_multipart_uploads,id,text,NO,null,null,null
+storage,s3_multipart_uploads,in_progress_size,bigint,NO,null,64,0
+storage,s3_multipart_uploads,upload_signature,text,NO,null,null,null
+storage,s3_multipart_uploads,bucket_id,text,NO,null,null,null
+storage,s3_multipart_uploads,key,text,NO,null,null,null
+storage,s3_multipart_uploads,version,text,NO,null,null,null
+storage,s3_multipart_uploads,owner_id,text,YES,null,null,null
+storage,s3_multipart_uploads,created_at,timestamp with time zone,NO,null,null,null
+storage,s3_multipart_uploads,user_metadata,jsonb,YES,null,null,null
+storage,s3_multipart_uploads_parts,id,uuid,NO,null,null,null
+storage,s3_multipart_uploads_parts,upload_id,text,NO,null,null,null
+storage,s3_multipart_uploads_parts,size,bigint,NO,null,64,0
+storage,s3_multipart_uploads_parts,part_number,integer,NO,null,32,0
+storage,s3_multipart_uploads_parts,bucket_id,text,NO,null,null,null
+storage,s3_multipart_uploads_parts,key,text,NO,null,null,null
+storage,s3_multipart_uploads_parts,etag,text,NO,null,null,null
+storage,s3_multipart_uploads_parts,owner_id,text,YES,null,null,null
+storage,s3_multipart_uploads_parts,version,text,NO,null,null,null
+storage,s3_multipart_uploads_parts,created_at,timestamp with time zone,NO,null,null,null
+supabase_migrations,schema_migrations,version,text,NO,null,null,null
+supabase_migrations,schema_migrations,statements,ARRAY,YES,null,null,null
+supabase_migrations,schema_migrations,name,text,YES,null,null,null
+supabase_migrations,schema_migrations,created_by,text,YES,null,null,null
+supabase_migrations,schema_migrations,idempotency_key,text,YES,null,null,null
+vault,decrypted_secrets,id,uuid,YES,null,null,null
+vault,decrypted_secrets,name,text,YES,null,null,null
+vault,decrypted_secrets,description,text,YES,null,null,null
+vault,decrypted_secrets,secret,text,YES,null,null,null
+vault,decrypted_secrets,decrypted_secret,text,YES,null,null,null
+vault,decrypted_secrets,key_id,uuid,YES,null,null,null
+vault,decrypted_secrets,nonce,bytea,YES,null,null,null
+vault,decrypted_secrets,created_at,timestamp with time zone,YES,null,null,null
+vault,decrypted_secrets,updated_at,timestamp with time zone,YES,null,null,null
+vault,secrets,id,uuid,NO,null,null,null
+vault,secrets,name,text,YES,null,null,null
+vault,secrets,description,text,NO,null,null,null
+vault,secrets,secret,text,NO,null,null,null
+vault,secrets,key_id,uuid,YES,null,null,null
+vault,secrets,nonce,bytea,YES,null,null,null
+vault,secrets,created_at,timestamp with time zone,NO,null,null,null
+vault,secrets,updated_at,timestamp with time zone,NO,null,null,null
