@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Lock, Eye, EyeOff } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { toast } from 'sonner';
 
 export function ResetPasswordForm() {
@@ -28,7 +28,7 @@ export function ResetPasswordForm() {
     
     if (accessToken && refreshToken) {
       // Definir a sessão com os tokens
-      supabase.auth.setSession({
+      apiClient.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken,
       });
@@ -53,7 +53,7 @@ export function ResetPasswordForm() {
       return;
     }
 
-    const { error } = await supabase.auth.updateUser({ 
+    const { error } = await apiClient.auth.updateUser({
       password: password 
     });
 

@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { TaskStep, CreateTaskStepData } from '@/types/task';
 import { toast } from 'sonner';
 
@@ -10,7 +10,7 @@ export function useTaskSteps(taskId: string) {
   const { data: steps = [], isLoading } = useQuery({
     queryKey: ['task-steps', taskId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('task_steps')
         .select(`
           *,
@@ -31,7 +31,7 @@ export function useTaskSteps(taskId: string) {
 
   const createStepMutation = useMutation({
     mutationFn: async (stepData: CreateTaskStepData) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('task_steps')
         .insert(stepData)
         .select()
@@ -52,7 +52,7 @@ export function useTaskSteps(taskId: string) {
 
   const updateStepMutation = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<TaskStep> & { id: string }) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('task_steps')
         .update(updates)
         .eq('id', id)
@@ -74,7 +74,7 @@ export function useTaskSteps(taskId: string) {
 
   const deleteStepMutation = useMutation({
     mutationFn: async (stepId: string) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('task_steps')
         .delete()
         .eq('id', stepId);

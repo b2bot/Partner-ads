@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { WorkflowTemplate } from '@/types/Tarefas';
 import { toast } from '@/hooks/use-toast';
 
@@ -8,7 +8,7 @@ export const useWorkflowTemplates = () => {
   return useQuery({
     queryKey: ['workflow-templates'],
     queryFn: async (): Promise<WorkflowTemplate[]> => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('workflow_templates')
         .select('*')
         .order('name');
@@ -24,7 +24,7 @@ export const useCreateTasksFromTemplate = () => {
   
   return useMutation({
     mutationFn: async ({ templateId, projectId }: { templateId: string; projectId?: string }) => {
-      const { data: template, error: templateError } = await supabase
+      const { data: template, error: templateError } = await apiClient
         .from('workflow_templates')
         .select('*')
         .eq('id', templateId)
@@ -42,7 +42,7 @@ export const useCreateTasksFromTemplate = () => {
         status: 'backlog' as const
       }));
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('tasks')
         .insert(tasksToCreate)
         .select();

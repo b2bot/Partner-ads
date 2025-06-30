@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useToast } from '@/hooks/use-toast';
 import { useWhatsAppConfig } from './useWhatsAppConfig';
 
@@ -87,7 +87,7 @@ export function useWhatsAppTemplates() {
       setTemplates(approvedTemplates);
 
       // Sincronizar com banco local para cache
-      await supabase
+      await apiClient
         .from('whatsapp_templates')
         .upsert(
           approvedTemplates.map(template => ({
@@ -124,7 +124,7 @@ export function useWhatsAppTemplates() {
 
   const fetchLocalTemplates = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_templates')
         .select('*')
         .eq('status', 'APPROVED')

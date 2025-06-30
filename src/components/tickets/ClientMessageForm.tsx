@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -28,7 +28,7 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
         throw new Error('Usuário não autenticado ou inválido');
       }
 
-      const { error: insertError } = await supabase
+      const { error: insertError } = await apiClient
         .from('chamados_mensagens')
         .insert({
           chamado_id: ticketId,
@@ -41,7 +41,7 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
 
       if (insertError) throw insertError;
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await apiClient
         .from('chamados')
         .update({ status: 'Aguardando equipe' })
         .eq('id', ticketId);
@@ -82,7 +82,7 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
         const fileExt = arquivo.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await apiClient.storage
           .from('tickets')
           .upload(fileName, arquivo);
 
@@ -90,7 +90,7 @@ export function ClientMessageForm({ ticketId, onSuccess, className }: ClientMess
           console.error('Erro no upload:', uploadError);
           setError('Erro ao fazer upload do arquivo. A mensagem será enviada sem o anexo.');
         } else {
-          const { data } = supabase.storage
+          const { data } = apiClient.storage
             .from('tickets')
             .getPublicUrl(fileName);
           arquivo_url = data.publicUrl;

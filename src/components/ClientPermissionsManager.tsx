@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -30,7 +30,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
   const { data: modulePermissions = [] } = useQuery({
     queryKey: ['client-module-permissions-admin', client.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('client_permissions')
         .select('*')
         .eq('client_id', client.id);
@@ -44,7 +44,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
   const { data: reportPermissions = [] } = useQuery({
     queryKey: ['client-report-permissions-admin', client.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('client_report_permissions')
         .select('*')
         .eq('client_id', client.id);
@@ -58,7 +58,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
   const { data: clientAccounts = [] } = useQuery({
     queryKey: ['client-accounts', client.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('contas')
         .select('*')
         .eq('cliente_id', client.id)
@@ -72,7 +72,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
 
   const updateModulePermission = useMutation({
     mutationFn: async ({ module, enabled }: { module: string; enabled: boolean }) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('client_permissions')
         .upsert({
           client_id: client.id,
@@ -94,7 +94,7 @@ export function ClientPermissionsManager({ client, open, onClose }: ClientPermis
 
   const updateReportPermission = useMutation({
     mutationFn: async ({ reportType, enabled, accountIds }: { reportType: string; enabled: boolean; accountIds?: string[] }) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('client_report_permissions')
         .upsert({
           client_id: client.id,

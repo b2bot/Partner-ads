@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useToast } from '@/hooks/use-toast';
 
 export interface WhatsAppMessage {
@@ -67,7 +67,7 @@ export function useWhatsAppMessages() {
     contactId?: string;
   } = {}) => {
     try {
-      let query = supabase
+      let query = apiClient
         .from('whatsapp_messages')
         .select('*')
         .order('created_at', { ascending: false });
@@ -110,7 +110,7 @@ export function useWhatsAppMessages() {
 
   const sendMessage = async (params: SendMessageParams) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_messages')
         .insert({
           phone_number: params.phoneNumber,
@@ -161,7 +161,7 @@ export function useWhatsAppMessages() {
         status: 'pending',
       }));
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_messages')
         .insert(messages)
         .select();

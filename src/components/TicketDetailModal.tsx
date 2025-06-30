@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -69,7 +69,7 @@ export function TicketDetailModal({ ticket, open, onClose }: TicketDetailModalPr
         console.log('Status validado para atualização:', validatedStatus);
       }
 
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('chamados')
         .update(updateData)
         .eq('id', ticket.id);

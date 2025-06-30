@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserAccess } from '@/hooks/useUserAccess';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,7 +58,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
       if (!isAdmin) return [];
       
       console.log('Buscando clientes para admin (advanced)...');
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .select('id, nome')
         .eq('ativo', true)
@@ -100,7 +100,7 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
 
       console.log('Dados validados para inserção (advanced):', insertData);
 
-      const { data: result, error } = await supabase
+      const { data: result, error } = await apiClient
         .from('chamados')
         .insert(insertData)
         .select()
@@ -176,14 +176,14 @@ export function CreateTicketModalAdvanced({ open, onClose }: CreateTicketModalAd
         const fileExt = arquivo.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await apiClient.storage
           .from('tickets')
           .upload(fileName, arquivo);
 
         if (uploadError) {
           console.error('Erro no upload (advanced):', uploadError);
         } else {
-          const { data } = supabase.storage
+          const { data } = apiClient.storage
             .from('tickets')
             .getPublicUrl(fileName);
           arquivo_url = data.publicUrl;

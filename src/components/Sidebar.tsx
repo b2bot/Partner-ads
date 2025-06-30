@@ -20,7 +20,7 @@ import {
   ClipboardList } from 'lucide-react'; 
 
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Permission } from '@/types/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -54,7 +54,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await apiClient.auth.signOut();
       window.location.reload();
     } catch (error) {
       console.error('Erro no logout:', error);

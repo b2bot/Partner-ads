@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Lock, Mail, User, ArrowLeft } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 export function LoginForm() {
   const { signIn, signUp } = useAuth();
@@ -71,7 +71,7 @@ export function LoginForm() {
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await apiClient.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 

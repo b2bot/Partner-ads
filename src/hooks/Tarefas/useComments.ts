@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { TaskComment, TaskCommentInsert } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
@@ -8,7 +8,7 @@ export const useTaskComments = (taskId: string) => {
   return useQuery({
     queryKey: ['task-comments', taskId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('task_comments')
         .select(`
           *,
@@ -36,7 +36,7 @@ export const useCreateComment = () => {
   
   return useMutation({
     mutationFn: async (comment: TaskCommentInsert) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('task_comments')
         .insert(comment)
         .select()

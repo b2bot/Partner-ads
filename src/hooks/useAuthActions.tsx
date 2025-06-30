@@ -1,9 +1,9 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 export function useAuthActions() {
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await apiClient.auth.signInWithPassword({
       email,
       password,
     });
@@ -16,7 +16,7 @@ export function useAuthActions() {
     nome: string,
     role: 'admin' | 'cliente' = 'cliente'
   ) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await apiClient.auth.signUp({
       email,
       password,
       options: {
@@ -30,7 +30,7 @@ export function useAuthActions() {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await apiClient.auth.signOut();
     return { error };
   };
 

@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 const META_API_BASE = 'https://graph.facebook.com/v18.0';
 

@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -130,7 +130,7 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       permissions: PermissionType[];
     }) => {
       // Criar usuário no Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await apiClient.auth.signUp({
         email: data.email,
         password: data.senha,
         options: {
@@ -145,7 +145,7 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       if (!authData.user) throw new Error('Falha ao criar usuário');
 
       // Criar perfil
-      const { error: profileError } = await supabase
+      const { error: profileError } = await apiClient
         .from('profiles')
         .insert({
           id: authData.user.id,
@@ -164,7 +164,7 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
 
       // Atribuir permissões
       for (const permission of data.permissions) {
-        const { error: permError } = await supabase
+        const { error: permError } = await apiClient
           .from('user_permissions')
           .insert({
             user_id: authData.user.id,

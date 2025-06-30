@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,7 +86,7 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
       contas: Array<{ id?: string; tipo: 'meta' | 'google'; identificador: string; nome: string }>;
     }) => {
       // Atualizar dados do cliente
-      const { error: clienteError } = await supabase
+      const { error: clienteError } = await apiClient
         .from('clientes')
         .update({
           nome: data.nome,
@@ -101,7 +101,7 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
       if (clienteError) throw clienteError;
 
       // Remover contas existentes
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await apiClient
         .from('contas')
         .delete()
         .eq('cliente_id', client.id);
@@ -117,7 +117,7 @@ export function EditClientModal({ client, open, onClose }: EditClientModalProps)
           nome: conta.nome,
         }));
 
-        const { error: contasError } = await supabase
+        const { error: contasError } = await apiClient
           .from('contas')
           .insert(contasToInsert);
 

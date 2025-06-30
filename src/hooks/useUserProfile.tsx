@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { User } from '@apiClient/apiClient-js';
+import { apiClient } from '@/integrations/apiClient';
 import { UserProfile } from '@/types/auth';
 
 export function useUserProfile(user: User | null) {
@@ -12,7 +12,7 @@ export function useUserProfile(user: User | null) {
 
       console.log('🔄 Loading profile for user:', user.id, user.email);
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('profiles')
         .select('*')
         .eq('id', user.id)
@@ -25,7 +25,7 @@ export function useUserProfile(user: User | null) {
         if (error.code === 'PGRST116') {
           console.log('🔧 Profile not found, creating default profile...');
           
-          const { data: newProfile, error: insertError } = await supabase
+          const { data: newProfile, error: insertError } = await apiClient
             .from('profiles')
             .insert({
               id: user.id,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useToast } from '@/hooks/use-toast';
 
 export interface WhatsAppConfig {
@@ -18,7 +18,7 @@ export function useWhatsAppConfig() {
 
   const fetchConfig = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_config')
         .select('*')
         .single();
@@ -64,7 +64,7 @@ export function useWhatsAppConfig() {
         ...(configData.id && { id: configData.id }),
       };
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_config')
         .upsert(upsertData)
         .select()

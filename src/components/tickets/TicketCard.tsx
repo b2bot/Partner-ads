@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -47,9 +47,9 @@ export function TicketCard({ ticket, isAdmin, onClick }: TicketCardProps) {
 
   const deleteTicketMutation = useMutation({
     mutationFn: async (ticketId: string) => {
-      await supabase.from('chamados_mensagens').delete().eq('chamado_id', ticketId);
-      await supabase.from('chamados_timeline').delete().eq('chamado_id', ticketId);
-      const { error } = await supabase.from('chamados').delete().eq('id', ticketId);
+      await apiClient.from('chamados_mensagens').delete().eq('chamado_id', ticketId);
+      await apiClient.from('chamados_timeline').delete().eq('chamado_id', ticketId);
+      const { error } = await apiClient.from('chamados').delete().eq('id', ticketId);
       if (error) throw error;
     },
     onSuccess: () => {

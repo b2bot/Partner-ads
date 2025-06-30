@@ -1,6 +1,6 @@
 import { Platform } from './@/hooks/dashboard_hooks/usePlatformNavigation';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 
 export interface PlatformConfig {
@@ -57,7 +57,7 @@ export const SettingsProvider = ({
     localStorage.setItem('dashboard-settings', JSON.stringify(settings));
 
     if (!clientId || !isValidUUID(clientId)) return;
-    supabase
+    apiClient
       .from('settings')
       .upsert({ client_id: clientId, data: settings })
       .then(({ error }) => {
@@ -72,7 +72,7 @@ export const SettingsProvider = ({
     if (!clientId || !isValidUUID(clientId)) return;
 
     const fetchSettings = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('settings')
         .select('data')
         .eq('client_id', clientId)
@@ -102,7 +102,7 @@ export const SettingsProvider = ({
     localStorage.setItem('dashboard-settings', JSON.stringify(data));
 
     if (clientId && isValidUUID(clientId)) {
-      const { error } = await supabase.from('settings').upsert({ client_id: clientId, data });
+      const { error } = await apiClient.from('settings').upsert({ client_id: clientId, data });
       if (error) {
         console.error('Erro ao salvar settings manualmente:', error.message);
       }

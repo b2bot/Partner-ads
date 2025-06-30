@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { toast } from 'sonner';
 
 interface Collaborator {
@@ -21,7 +21,7 @@ export function useCollaborators() {
   const { data: collaborators, isLoading } = useQuery({
     queryKey: ['collaborators'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('profiles')
         .select('*')
         .eq('is_root_admin', false)
@@ -35,7 +35,7 @@ export function useCollaborators() {
   // Mutation para desativar colaborador
   const deactivateCollaboratorMutation = useMutation({
     mutationFn: async (collaboratorId: string) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('profiles')
         .update({ status: 'inativo' })
         .eq('id', collaboratorId);

@@ -17,7 +17,7 @@ Sempre que novas tarefas forem concluídas ou surgirem informações relevantes,
 1. **Substituir o cliente Supabase por `apiClient`.**  
    - Criar `src/integrations/apiClient.ts` (fetch genérico para `${import.meta.env.VITE_API_URL}`).
    - Atualizar `.env.local` para `VITE_API_URL` e remover variáveis do Supabase.
-   - Ajustar imports de todo o código que utiliza `supabase`.
+   - Ajustar imports de todo o código que utiliza `apiClient`.
 
 2. **Refatorar hooks de autenticação.**  
    - `useAuth.tsx` e `useAuthActions.tsx` devem chamar `login.php`, `register.php`, `logout.php`.
@@ -31,7 +31,7 @@ Sempre que novas tarefas forem concluídas ou surgirem informações relevantes,
    - Cada hook de dados (`useClientes`, `useTasks`, `useWhatsApp*`, etc.) fará requisições REST para os scripts PHP correspondentes.
 
 5. **Remover dependências do Supabase.**  
-   - Excluir `@supabase/supabase-js` do `package.json`.
+   - Excluir `@apiClient/apiClient-js` do `package.json`.
    - Garantir que o build funcione apenas com o `apiClient`.
 
 6. **Atualizar este arquivo.**  
@@ -40,9 +40,16 @@ Sempre que novas tarefas forem concluídas ou surgirem informações relevantes,
 ## Informações Úteis
 
 - O código atual está escrito em React com Vite e Tailwind.  
-- Todas as migrações e estruturas de tabelas originais encontram-se em `supabase/migrations`.  
+- Todas as migrações e estruturas de tabelas originais encontram-se em `apiClient/migrations`.
 - Qualquer personalização de permissões ou triggers deverá ser reproduzida nos scripts PHP ou no banco MySQL.
 
 ---
 
 Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório (na raiz) e começar a atualizar à medida que as tarefas forem cumpridas.
+
+## Registro de Progresso
+
+- Substituído o cliente Supabase pelo novo `apiClient`.
+- Atualizado `.env.local` com `VITE_API_URL` e removidas variáveis do Supabase.
+- Ajustados todos os imports para usar `apiClient`.
+- Removidos componentes antigos da pasta `ANTIGOS ANTES DA CORREÇÃO MANUS`.

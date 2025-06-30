@@ -16,7 +16,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -36,7 +36,7 @@ export function ActivityLog() {
   const { data: logs, isLoading, refetch } = useQuery({
     queryKey: ['activity-logs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('activity_logs')
         .select('*')
         .order('created_at', { ascending: false })

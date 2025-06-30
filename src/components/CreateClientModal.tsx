@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,7 +42,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
         // Primeiro, criar usuário no Supabase Auth
         console.log('Criando usuário no auth...', data.email);
         
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data: authData, error: authError } = await apiClient.auth.signUp({
           email: data.email,
           password: data.senha,
           options: {
@@ -69,7 +69,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
 
         // Criar perfil na tabela profiles
         console.log('Criando perfil...');
-        const { error: profileError } = await supabase
+        const { error: profileError } = await apiClient
           .from('profiles')
           .insert({
             id: authData.user.id,
@@ -89,7 +89,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
 
         // Criar cliente
         console.log('Criando cliente...');
-        const { data: clienteData, error: clienteError } = await supabase
+        const { data: clienteData, error: clienteError } = await apiClient
           .from('clientes')
           .insert({
             user_id: authData.user.id,
@@ -118,7 +118,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
             ativo: true,
           }));
 
-          const { error: contasError } = await supabase
+          const { error: contasError } = await apiClient
             .from('contas')
             .insert(contasToInsert);
 

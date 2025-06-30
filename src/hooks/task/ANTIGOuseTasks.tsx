@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Task, CreateTaskData, UpdateTaskData } from '@/types/task';
 import { toast } from 'sonner';
 
@@ -11,7 +11,7 @@ export function useTasks(filters?: any) {
   const { data: tasks = [], isLoading, error } = useQuery({
     queryKey: ['tasks', filters],
     queryFn: async () => {
-      let query = supabase
+      let query = apiClient
         .from('tasks')
         .select(`
           *,
@@ -50,7 +50,7 @@ export function useTasks(filters?: any) {
   // Criar tarefa
   const createTaskMutation = useMutation({
     mutationFn: async (data: CreateTaskData) => {
-      const { data: result, error } = await supabase
+      const { data: result, error } = await apiClient
         .from('tasks')
         .insert([{
           ...data,
@@ -76,7 +76,7 @@ export function useTasks(filters?: any) {
   const updateTaskMutation = useMutation({
     mutationFn: async (data: UpdateTaskData) => {
       const { id, ...updateData } = data;
-      const { data: result, error } = await supabase
+      const { data: result, error } = await apiClient
         .from('tasks')
         .update(updateData)
         .eq('id', id)
@@ -99,7 +99,7 @@ export function useTasks(filters?: any) {
   // Deletar tarefa
   const deleteTaskMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('tasks')
         .delete()
         .eq('id', id);

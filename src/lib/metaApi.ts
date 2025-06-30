@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 export interface MetaCredentials {
   app_id: string;
@@ -76,7 +76,7 @@ export interface AdCreative {
 const META_API_BASE = 'https://graph.facebook.com/v18.0';
 
 export async function saveMetaCredentials(appId: string, appSecret: string, accessToken: string) {
-  const { data, error } = await supabase
+  const { data, error } = await apiClient
     .from('meta_api_credentials')
     .upsert([{ 
       app_id: appId, 
@@ -93,7 +93,7 @@ export async function saveMetaCredentials(appId: string, appSecret: string, acce
 }
 
 export async function getMetaCredentials(): Promise<MetaCredentials | null> {
-  const { data, error } = await supabase
+  const { data, error } = await apiClient
     .from('meta_api_credentials')
     .select('*')
     .order('created_at', { ascending: false })

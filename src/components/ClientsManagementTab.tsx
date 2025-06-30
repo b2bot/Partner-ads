@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,7 +54,7 @@ export function ClientsManagementTab() {
   const { data: clientes, isLoading } = useQuery({
     queryKey: ['clients-management'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .select(`
           *,
@@ -76,7 +76,7 @@ export function ClientsManagementTab() {
 
   const deleteClientMutation = useMutation({
     mutationFn: async (clientId: string) => {
-      const { error } = await supabase.from('clientes').delete().eq('id', clientId);
+      const { error } = await apiClient.from('clientes').delete().eq('id', clientId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -91,7 +91,7 @@ export function ClientsManagementTab() {
 
   const toggleClientStatus = useMutation({
     mutationFn: async ({ clientId, ativo }: { clientId: string; ativo: boolean }) => {
-      const { error } = await supabase.from('clientes').update({ ativo }).eq('id', clientId);
+      const { error } = await apiClient.from('clientes').update({ ativo }).eq('id', clientId);
       if (error) throw error;
     },
     onSuccess: () => {

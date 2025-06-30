@@ -1,16 +1,16 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Automation, AutomationLog, CreateAutomationRequest, UpdateAutomationRequest } from '../types/automations';
 
 export class AutomationService {
   // Buscar automações do usuário
   static async getAutomations(page: number = 1, pageSize: number = 20) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await apiClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const offset = (page - 1) * pageSize;
 
-    const { data, error, count } = await supabase
+    const { data, error, count } = await apiClient
       .from('mailbox_automations')
       .select('*', { count: 'exact' })
       .eq('user_id', user.id)
@@ -23,7 +23,7 @@ export class AutomationService {
 
   // Buscar uma automação específica
   static async getAutomation(id: string): Promise<Automation> {
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_automations')
       .select('*')
       .eq('id', id)
@@ -35,7 +35,7 @@ export class AutomationService {
 
   // Criar nova automação
   static async createAutomation(automation: CreateAutomationRequest): Promise<Automation> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await apiClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     // Calcular próxima execução
@@ -48,7 +48,7 @@ export class AutomationService {
       nextRun = automation.schedule_once;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_automations')
       .insert({
         user_id: user.id,
@@ -66,7 +66,7 @@ export class AutomationService {
   static async updateAutomation(automation: UpdateAutomationRequest): Promise<Automation> {
     const { id, ...updateData } = automation;
 
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_automations')
       .update(updateData)
       .eq('id', id)
@@ -79,7 +79,7 @@ export class AutomationService {
 
   // Deletar automação
   static async deleteAutomation(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await apiClient
       .from('mailbox_automations')
       .delete()
       .eq('id', id);
@@ -91,7 +91,7 @@ export class AutomationService {
   static async getAutomationLogs(automationId: string, page: number = 1, pageSize: number = 20) {
     const offset = (page - 1) * pageSize;
 
-    const { data, error, count } = await supabase
+    const { data, error, count } = await apiClient
       .from('mailbox_automation_logs')
       .select('*', { count: 'exact' })
       .eq('automation_id', automationId)
@@ -104,7 +104,7 @@ export class AutomationService {
 
   // Processar automações pendentes
   static async processAutomations() {
-    const { data, error } = await supabase.rpc('process_pending_automations');
+    const { data, error } = await apiClient.rpc('process_pending_automations');
     if (error) throw error;
     return data;
   }

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
+import { apiClient } from '@/integrations/apiClient';
+import { User } from '@apiClient/apiClient-js';
 
 export type ClientModule = 'dashboard' | 'chamados' | 'relatorios' | 'criativos';
 export type ReportType = 'campanhas' | 'conjuntos_anuncios' | 'anuncios' | 'criativos_performance' | 'whatsapp';
@@ -26,7 +26,7 @@ export function useClientPermissions(user: User | null, isCliente: boolean) {
     queryFn: async () => {
       if (!user?.id || !isCliente) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('client_permissions')
         .select(`
           *,
@@ -50,7 +50,7 @@ export function useClientPermissions(user: User | null, isCliente: boolean) {
     queryFn: async () => {
       if (!user?.id || !isCliente) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('client_report_permissions')
         .select(`
           *,

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useToast } from '@/hooks/use-toast';
 
 export interface WhatsAppContact {
@@ -24,7 +24,7 @@ export function useWhatsAppContacts() {
 
   const fetchContacts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_contacts')
         .select('*')
         .eq('is_active', true)
@@ -47,7 +47,7 @@ export function useWhatsAppContacts() {
 
   const createContact = async (contactData: Partial<WhatsAppContact>) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_contacts')
         .insert({
           name: contactData.name,
@@ -86,7 +86,7 @@ export function useWhatsAppContacts() {
 
   const updateContact = async (id: string, contactData: Partial<WhatsAppContact>) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_contacts')
         .update({
           ...contactData,
@@ -122,7 +122,7 @@ export function useWhatsAppContacts() {
 
   const deleteContact = async (id: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('whatsapp_contacts')
         .update({ is_active: false })
         .eq('id', id);

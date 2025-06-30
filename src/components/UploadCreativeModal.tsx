@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +31,7 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
   const { data: clientes } = useQuery({
     queryKey: ['clientes-for-creative'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .select('id, nome')
         .eq('ativo', true)
@@ -55,18 +55,18 @@ export function UploadCreativeModal({ open, onClose }: UploadCreativeModalProps)
       const fileExt = data.arquivo.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await apiClient.storage
         .from('criativos')
         .upload(fileName, data.arquivo);
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = apiClient.storage
         .from('criativos')
         .getPublicUrl(fileName);
 
       // Criar registro do criativo
-      const { error: insertError } = await supabase
+      const { error: insertError } = await apiClient
         .from('criativos')
         .insert({
           cliente_id: data.clienteId,

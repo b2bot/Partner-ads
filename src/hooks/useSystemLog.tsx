@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useAuth } from '@/hooks/useAuth';
 
 export const useSystemLog = () => {
@@ -15,7 +15,7 @@ export const useSystemLog = () => {
     try {
       if (!user) return;
 
-      const { error } = await supabase.rpc('log_system_activity', {
+      const { error } = await apiClient.rpc('log_system_activity', {
         p_acao: acao,
         p_modulo: modulo,
         p_detalhes: detalhes ? JSON.stringify(detalhes) : null,

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Client, ClientInsert } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
@@ -7,7 +7,7 @@ export const useClientes = () => {
   return useQuery({
     queryKey: ['clientes'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .select('id, nome'); // ajuste "name" conforme campo real
 
@@ -23,7 +23,7 @@ export const useCreateClient = () => {
   
   return useMutation({
     mutationFn: async (client: ClientInsert) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .insert(client)
         .select()

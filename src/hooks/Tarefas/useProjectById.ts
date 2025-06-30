@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 export function useProjectById(projectId: string | undefined) {
   const { data, error, isLoading } = useQuery({
@@ -7,7 +7,7 @@ export function useProjectById(projectId: string | undefined) {
     queryFn: async () => {
       if (!projectId) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('projects')
         .select(`
           *,

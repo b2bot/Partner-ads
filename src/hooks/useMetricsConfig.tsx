@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { toast } from 'sonner';
 import { useSystemLog } from '@/hooks/useSystemLog';
 
@@ -76,7 +76,7 @@ export function useMetricsConfig() {
     queryKey: ['metrics-config'],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await apiClient
           .from('metrics_config')
           .select('config')
           .order('created_at', { ascending: false })
@@ -111,7 +111,7 @@ export function useMetricsConfig() {
     mutationFn: async (newConfig: MetricsConfig) => {
       try {
         // Serializa newConfig para JSON
-        const { error } = await supabase
+        const { error } = await apiClient
           .from('metrics_config')
           .upsert([{ config: JSON.parse(JSON.stringify(newConfig)) }], { onConflict: 'id' });
 

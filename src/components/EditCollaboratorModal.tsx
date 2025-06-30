@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +47,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
   const { data: currentPermissions } = useQuery({
     queryKey: ['collaborator-permissions', collaborator.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('user_permissions')
         .select('permission')
         .eq('user_id', collaborator.id);
@@ -73,7 +73,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
       permissions: PermissionType[];
     }) => {
       // Atualizar dados básicos
-      const { error: profileError } = await supabase
+      const { error: profileError } = await apiClient
         .from('profiles')
         .update({
           nome: data.nome,
@@ -99,7 +99,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
       // Remover permissões
       for (const permission of toRemove) {
         try {
-          const { error } = await supabase
+          const { error } = await apiClient
             .from('user_permissions')
             .delete()
             .eq('user_id', collaborator.id)
@@ -116,7 +116,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
       // Adicionar permissões
       for (const permission of toAdd) {
         try {
-          const { error } = await supabase
+          const { error } = await apiClient
             .from('user_permissions')
             .insert({
               user_id: collaborator.id,

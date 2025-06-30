@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserAccess } from '@/hooks/useUserAccess';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Headphones, TrendingUp, Clock, CheckCircle, User, Eye, UserCheck, Play } from 'lucide-react';
@@ -48,7 +48,7 @@ export function TicketsTabAdvanced() {
     queryFn: async () => {
       console.log('Buscando tickets com filtros:', filters);
       
-      let query = supabase
+      let query = apiClient
         .from('chamados')
         .select(`
           *,
@@ -98,7 +98,7 @@ export function TicketsTabAdvanced() {
       if (!isAdmin) return [];
       
       console.log('Buscando lista de clientes...');
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .select('id, nome')
         .eq('ativo', true)

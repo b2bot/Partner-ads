@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { toast } from '@/hooks/use-toast';
 
 export const useDeleteProject = () => {
@@ -7,7 +7,7 @@ export const useDeleteProject = () => {
 
   return useMutation({
     mutationFn: async (projectId: string) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('projects')
         .delete()
         .eq('id', projectId);

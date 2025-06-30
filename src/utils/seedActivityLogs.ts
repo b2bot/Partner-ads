@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 export const seedActivityLogs = async () => {
   const sampleLogs = [
@@ -46,7 +46,7 @@ export const seedActivityLogs = async () => {
   ];
 
   try {
-    const { error } = await supabase
+    const { error } = await apiClient
       .from('activity_logs')
       .insert(sampleLogs);
 

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Clock, Users, Settings } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useToast } from '@/hooks/use-toast';
 
 // Permitir string para tipo custom vindo do-banco
@@ -76,7 +76,7 @@ export function CampaignList({ onNewCampaign }: CampaignListProps) {
 
   const fetchCampaigns = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('whatsapp_campaigns')
         .select('*')
         .order('created_at', { ascending: false });
@@ -99,7 +99,7 @@ export function CampaignList({ onNewCampaign }: CampaignListProps) {
 
   const toggleCampaign = async (id: string, isActive: boolean) => {
     try {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('whatsapp_campaigns')
         .update({ is_active: isActive })
         .eq('id', id);

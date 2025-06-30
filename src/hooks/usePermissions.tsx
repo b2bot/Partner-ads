@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Permission } from '@/types/auth';
@@ -51,7 +51,7 @@ export function usePermissions() {
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('user_permissions')
         .select('permission')
         .eq('user_id', user.id);
@@ -66,7 +66,7 @@ export function usePermissions() {
   const { data: userPermissionsList } = useQuery({
     queryKey: ['all-user-permissions'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('user_permissions')
         .select('*');
       
@@ -80,7 +80,7 @@ export function usePermissions() {
   const { data: permissionTemplates } = useQuery({
     queryKey: ['permission-templates'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('permission_templates')
         .select('*')
         .order('name');
@@ -94,7 +94,7 @@ export function usePermissions() {
   // Mutation para conceder permissão
   const grantPermissionMutation = useMutation({
     mutationFn: async ({ userId, permission }: { userId: string; permission: Permission }) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('user_permissions')
         .insert({
           user_id: userId,
@@ -117,7 +117,7 @@ export function usePermissions() {
   // Mutation para revogar permissão
   const revokePermissionMutation = useMutation({
     mutationFn: async ({ userId, permission }: { userId: string; permission: Permission }) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('user_permissions')
         .delete()
         .eq('user_id', userId)
@@ -138,7 +138,7 @@ export function usePermissions() {
   // Mutation para criar template de permissões
   const createTemplateMutation = useMutation({
     mutationFn: async (template: Omit<PermissionTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('permission_templates')
         .insert({
           ...template,

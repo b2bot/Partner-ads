@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 export function useUserAccess() {
   const { user, isAdmin } = useAuth();
@@ -11,7 +11,7 @@ export function useUserAccess() {
     queryFn: async () => {
       if (!user?.id || isAdmin) return null;
       
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .select('*')
         .eq('user_id', user.id)
@@ -32,7 +32,7 @@ export function useUserAccess() {
     queryFn: async () => {
       if (!clienteData?.id) return [];
       
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('contas')
         .select('*')
         .eq('cliente_id', clienteData.id)

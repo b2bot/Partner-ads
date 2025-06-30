@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { useAuth } from '@/hooks/useAuth';
 
 export const useActivityLog = () => {
@@ -18,7 +18,7 @@ export const useActivityLog = () => {
         return;
       }
 
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('activity_logs')
         .insert({
           action,

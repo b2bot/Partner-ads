@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Project, ProjectInsert, ProjectWithDetails } from '@/types/Tarefas';
 import { toast } from '@/hooks/use-toast';
 
@@ -7,7 +7,7 @@ export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
     queryFn: async (): Promise<ProjectWithDetails[]> => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('projects')
         .select(`
           *,
@@ -41,7 +41,7 @@ export const useCreateProject = () => {
 
   return useMutation({
     mutationFn: async (project: ProjectInsert) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('projects')
         .insert(project)
         .select()

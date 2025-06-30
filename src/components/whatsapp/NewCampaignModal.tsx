@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Plus } from 'lucide-react';
 import { TemplateSelector } from './TemplateSelector';
 import { WhatsAppTemplate } from '@/hooks/useWhatsAppTemplates';
@@ -48,7 +48,7 @@ export function NewCampaignModal({ open, onClose, onSuccess }: NewCampaignModalP
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('whatsapp_campaigns')
         .insert({
           name: formData.name,

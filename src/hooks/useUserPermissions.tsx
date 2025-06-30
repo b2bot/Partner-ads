@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { User } from '@apiClient/apiClient-js';
+import { apiClient } from '@/integrations/apiClient';
 import { Permission, ALL_PERMISSIONS } from '@/types/auth';
 
 export function useUserPermissions(user: User | null, isRootAdmin: boolean) {
@@ -18,7 +18,7 @@ export function useUserPermissions(user: User | null, isRootAdmin: boolean) {
 
       console.log('🔄 Loading permissions for user:', user.id);
 
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('user_permissions')
         .select('permission')
         .eq('user_id', user.id);

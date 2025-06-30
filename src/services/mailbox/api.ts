@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { 
   MailboxMessage, 
   MailboxThread, 
@@ -19,10 +19,10 @@ export class MailboxService {
     pageSize: number = 20,
     search?: string
   ) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await apiClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase.rpc('get_mailbox_messages', {
+    const { data, error } = await apiClient.rpc('get_mailbox_messages', {
       p_user_id: user.id,
       p_folder: folder,
       p_page: page,
@@ -36,7 +36,7 @@ export class MailboxService {
 
   // Buscar uma mensagem específica
   static async getMessage(id: string): Promise<MailboxMessage> {
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_messages')
       .select(`
         *,
@@ -51,7 +51,7 @@ export class MailboxService {
 
   // Enviar nova mensagem
   static async sendMessage(request: SendMessageRequest): Promise<MailboxMessage> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await apiClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const messageData = {
@@ -71,7 +71,7 @@ export class MailboxService {
       sent_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_messages')
       .insert(messageData)
       .select()
@@ -97,7 +97,7 @@ export class MailboxService {
       updateData.read_at = new Date().toISOString();
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_messages')
       .update(updateData)
       .eq('id', request.id)
@@ -110,7 +110,7 @@ export class MailboxService {
 
   // Deletar mensagem
   static async deleteMessage(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await apiClient
       .from('mailbox_messages')
       .delete()
       .eq('id', id);
@@ -120,10 +120,10 @@ export class MailboxService {
 
   // Buscar contadores por pasta
   static async getFolderCounts(): Promise<MailboxFolderCount[]> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await apiClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase.rpc('get_mailbox_folder_counts', {
+    const { data, error } = await apiClient.rpc('get_mailbox_folder_counts', {
       p_user_id: user.id
     });
 
@@ -133,10 +133,10 @@ export class MailboxService {
 
   // Buscar configurações do usuário
   static async getSettings(): Promise<MailboxSettings | null> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await apiClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_settings')
       .select('*')
       .eq('user_id', user.id)
@@ -148,10 +148,10 @@ export class MailboxService {
 
   // Salvar configurações
   static async saveSettings(settings: Partial<MailboxSettings>): Promise<MailboxSettings> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await apiClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    const { data, error } = await apiClient
       .from('mailbox_settings')
       .upsert({
         user_id: user.id,
@@ -168,12 +168,12 @@ export class MailboxService {
   // Buscar thread completa
   static async getThread(threadId: string): Promise<{ thread: MailboxThread; messages: MailboxMessage[] }> {
     const [threadResult, messagesResult] = await Promise.all([
-      supabase
+      apiClient
         .from('mailbox_threads')
         .select('*')
         .eq('id', threadId)
         .single(),
-      supabase
+      apiClient
         .from('mailbox_messages')
         .select(`
           *,

@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,12 +40,12 @@ export function ResetClientPasswordModal({ client, open, onClose }: ResetClientP
     mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
       console.log('Initiating password reset for user:', userId);
       
-      const { data: session } = await supabase.auth.getSession();
+      const { data: session } = await apiClient.auth.getSession();
       if (!session.session) {
         throw new Error('Usuário não autenticado');
       }
 
-      const { data, error } = await supabase.functions.invoke('reset-client-password', {
+      const { data, error } = await apiClient.functions.invoke('reset-client-password', {
         body: {
           userId: userId,
           newPassword: password,

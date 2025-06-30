@@ -8,7 +8,7 @@ import {
   TrendingUp,
   Calendar
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 
 interface DashboardMetrics {
   totalSent: number;
@@ -36,12 +36,12 @@ export function WhatsAppDashboard() {
 
   const fetchMetrics = async () => {
     try {
-      const { data: messages, error: messagesError } = await supabase
+      const { data: messages, error: messagesError } = await apiClient
         .from('whatsapp_messages')
         .select('status, sent_at');
       if (messagesError) throw messagesError;
 
-      const { data: campaigns, error: campaignsError } = await supabase
+      const { data: campaigns, error: campaignsError } = await apiClient
         .from('whatsapp_campaigns')
         .select('id')
         .eq('is_active', true);

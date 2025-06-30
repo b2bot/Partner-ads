@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Client, ClientInsert } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
@@ -8,7 +8,7 @@ export const useClients = () => {
   return useQuery({
     queryKey: ['clients'],
     queryFn: async (): Promise<Client[]> => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .select('*')
         .order('nome');
@@ -24,7 +24,7 @@ export const useCreateClient = () => {
   
   return useMutation({
     mutationFn: async (client: ClientInsert) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('clientes')
         .insert(client)
         .select()

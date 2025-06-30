@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +20,7 @@ export function MetaApiSettings() {
   const { data: credentials, isLoading } = useQuery({
     queryKey: ['meta-api-settings'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('meta_api_credentials')
         .select('*')
         .order('created_at', { ascending: false })
@@ -37,7 +37,7 @@ export function MetaApiSettings() {
 
   const updateCredentialsMutation = useMutation({
     mutationFn: async (data: { app_id: string; app_secret: string; access_token: string }) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('meta_api_credentials')
         .upsert(data, { 
           onConflict: 'id',

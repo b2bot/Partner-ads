@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -61,7 +61,7 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
   const { data: timelineData } = useQuery({
     queryKey: ['ticket-timeline', ticket.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('chamados_timeline')
         .select('*')
         .eq('chamado_id', ticket.id)
@@ -96,7 +96,7 @@ export function TicketDetailModalAdvanced({ ticket, open, onClose }: TicketDetai
       if (data.nota_interna !== undefined) {
         updateData.nota_interna = data.nota_interna;
       }
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('chamados')
         .update(updateData)
         .eq('id', ticket.id);

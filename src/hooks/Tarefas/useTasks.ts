@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/integrations/apiClient';
 import { Task, TaskInsert, TaskUpdate, TaskWithDetails } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
@@ -7,7 +7,7 @@ export const useTasks = (projectId?: string) => {
   return useQuery({
     queryKey: ['tasks', projectId],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      let query = supabase
+      let query = apiClient
         .from('tasks')
         .select(`
           *,
@@ -50,7 +50,7 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('tasks')
         .insert(task)
         .select()
@@ -84,7 +84,7 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: TaskUpdate }) => {
-      const { data, error } = await supabase
+      const { data, error } = await apiClient
         .from('tasks')
         .update(updates)
         .eq('id', id)
@@ -119,7 +119,7 @@ export const useDeleteTask = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { error } = await apiClient
         .from('tasks')
         .delete()
         .eq('id', id);
