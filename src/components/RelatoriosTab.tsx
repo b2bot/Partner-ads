@@ -12,6 +12,7 @@ import { DatePickerWithRange } from '@/components/ui/date-picker';
 import { ReportsMetricsCards } from '@/components/reports/ReportsMetricsCards';
 import { ReportsCharts } from '@/components/reports/ReportsCharts';
 import { ReportsTable } from '@/components/reports/ReportsTable';
+import FunnelVisualization from '@/components/reports/FunnelVisualization';
 
 interface Platform {
   id: string;
@@ -477,6 +478,8 @@ function RelatoriosContent() {
                       data={reportData.metrics} 
                       platform={platform.id}
                     />
+					
+					
                     
                     <ReportsCharts 
                       data={reportData.chartData} 

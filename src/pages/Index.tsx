@@ -7,7 +7,7 @@ import { CampaignsTab } from '@/components/CampaignsTab';
 import { AdSetsTab } from '@/components/AdSetsTab';
 import { AdsTab } from '@/components/AdsTab';
 import { RelatoriosTab } from '@/components/RelatoriosTab';
-import { ResultadosTab } from '@/components/ResultadosTab';
+import { MailboxTab } from '@/components/mailbox/mailbox/MailboxTab';
 import { WhatsAppReportsTab } from '@/components/WhatsAppReportsTab';
 import { MetricsObjectivesTab } from '@/components/MetricsObjectivesTab';
 import { SettingsTab } from '@/components/SettingsTab';
@@ -170,10 +170,10 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
             <p className="text-slate-500 dark:text-slate-400">Você não tem permissão para acessar Relatórios.</p>
           </div>
         );
-	  case 'resultados':
+	  case 'mailbox':
         return hasPermission('access_client_reports') ? (
           <div className={contentClasses}>
-		    <ResultadosTab />
+		    <MailboxTab />
 		  </div>
         ) : (
           <div className={`text-center py-20 ${contentClasses}`}>
@@ -287,10 +287,10 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
       'adsets': 'Conjuntos de Anúncios', 
       'ads': 'Anúncios',
 	  'relatorios': 'Relatórios',
-	  'resultados': 'Resultados',
       'whatsapp-reports': 'Relatórios WhatsApp',
       'metrics-objectives': 'Personalização de Métricas',
       'tickets': hasPermission('access_tasks') ? 'Gerenciar Chamados' : 'Meus Chamados',
+	  'mailbox': 'Caixa de Email',
       'tasks': 'Tarefas',
       'creatives': hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos',
       'activity-log': 'Log de Atividades',

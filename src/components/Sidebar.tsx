@@ -106,12 +106,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       icon: FileText,
       permission: 'access_client_reports' as Permission
     },
-	{ 
-      id: 'resultados', 
-      label: 'Resultados', 
-      icon: FileText,
-      permission: 'access_client_reports' as Permission
-    },
   ];
 
   const managementItems = [
@@ -132,6 +126,12 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       label: hasPermission('access_creatives') ? 'Gerenciar Criativos' : 'Meus Criativos', 
       icon: Palette,
       permission: 'access_creatives' as Permission
+    },
+    { 
+      id: 'mailbox', 
+      label: 'Caixa de E-mail', 
+      icon: Target,
+      permission: 'access_dashboard' as Permission
     },
     { 
       id: 'metrics-objectives', 
