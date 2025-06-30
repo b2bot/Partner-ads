@@ -31,12 +31,12 @@ export function SettingsTab() {
 
   return (
     <div className="space-y-4">
-      <div>
+      {/*<div>
         <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">Configurações</h1>
         <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
           Gerencie as configurações da plataforma e integrações
         </p>
-      </div>
+      </div>*/}
 
       <Tabs defaultValue={defaultTab} className="space-y-4">
         <TabsList className="text-xs">

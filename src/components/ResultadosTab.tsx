@@ -175,6 +175,10 @@ function ResultadosContent() {
       base.amountSpent = sum('amountSpent');
       base.actionMessagingConversationsStarted = sum('actionMessagingConversationsStarted');
       base.costPerActionMessagingConversations = sum('costPerActionMessagingConversations');
+      base.conversions = sum('conversions') || sum('actionMessagingConversationsStarted');
+      base.costPerConversion = rows.reduce((acc, r) => acc + (r.costPerConversion || r.costPerActionMessagingConversations || 0), 0) / rows.length;
+      base.callAdConversionAction = sum('callAdConversionAction');
+      base.conversionsFromInteractionsRate = rows.reduce((acc, r) => acc + (r.conversionsFromInteractionsRate || 0), 0) / rows.length;
       base.actionLinkClicks = sum('actionLinkClicks');
       base.reach = sum('reach');
       const uniqueDays = new Set(rows.map(r => r.day)).size || 1;
@@ -365,5 +369,3 @@ export function ResultadosTab() {
     </FiltersProvider>
   );
 }
-
- 

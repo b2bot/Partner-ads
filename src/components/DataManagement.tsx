@@ -11,8 +11,8 @@ export function DataManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-800">Gestão de Dados</h2>
-        <p className="text-slate-600 mt-2">
+        <h1 className="text-sm font-bold text-slate-800"></h1>
+        <p className="text-sm mt-2">
           Configure a conta de anúncios e personalize as métricas exibidas no sistema
         </p>
       </div>
@@ -22,7 +22,11 @@ export function DataManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-blue-600" />
-            Conta de Anúncios Principal
+			  <div>
+                <p className="text-lg mt-1">
+                 Conta de Anúncios Principal
+			    </p>
+			  </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -43,7 +47,11 @@ export function DataManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-green-600" />
-            Personalização de Métricas
+			  <div>
+                <p className="text-lg mt-1">
+                 Personalização de Métricas
+			    </p>
+			  </div>
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -136,8 +136,8 @@ export function ClientsManagementTab() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">Gerenciar Clientes</h1>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200"></h1>
+          <p className="text-sm mt-2">
             Cadastre e gerencie clientes, suas contas e permissões
           </p>
         </div>

@@ -22,12 +22,15 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   const totalImpressions = data.reduce((sum, row) => sum + (row.impressions || 0), 0);
   const totalClicks = data.reduce((sum, row) => sum + (row.clicks || 0), 0);
   const totalInvestment = data.reduce((sum, row) => sum + (row.amountSpent || 0), 0);
-  const totalConversions = data.reduce((sum, row) => sum + (row.actionMessagingConversationsStarted || row.conversions || 0), 0);
+  const totalConversions = data.reduce((sum, row) => sum + (row.conversions || row.actionMessagingConversationsStarted || 0), 0);
   const totalCostPerConversion = data.length > 0
-    ? data.reduce((sum, row) => sum + (row.costPerActionMessagingConversations || row.costPerConversion || 0), 0) / data.length
+    ? data.reduce((sum, row) => sum + (row.costPerConversion || row.costPerActionMessagingConversations || 0), 0) / data.length
     : 0;
   const totalActionLinkClicks = data.reduce((sum, row) => sum + (row.actionLinkClicks || row.landingPageClicks || 0), 0);
   const totalFrequency = data.reduce((sum, row) => sum + (row.frequency || 0), 0);
+  const totalConversionRate = data.length > 0
+    ? data.reduce((sum, row) => sum + (row.conversionsFromInteractionsRate || 0), 0) / data.length
+    : 0;
   const totalCallAdConversion = data.reduce((sum, row) => sum + (row.callAdConversionAction || 0), 0);
   const totalContatos = data.reduce((sum, row) => sum + (row.contatos || 0), 0);
   const totalAgendado = data.reduce((sum, row) => sum + (row.agendado || 0), 0);
@@ -39,6 +42,8 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   let conversionRate = 0;
   if (platform === 'relatorios') {
     conversionRate = totalAtendimento > 0 ? (totalVendas / totalAtendimento) * 100 : 0;
+  } else if (platform === 'google') {
+    conversionRate = totalConversionRate;
   } else {
     conversionRate = totalActionLinkClicks > 0 ? (totalConversions / totalActionLinkClicks) * 100 : 0;
   }
@@ -54,10 +59,10 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
     metrics = [
       { title: 'Impressões', value: formatNumber(totalImpressions), icon: Eye, color: 'text-blue-600', bgColor: 'bg-blue-50', trend: '', trendUp: true },
       { title: 'Cliques', value: formatNumber(totalClicks), icon: MousePointer, color: 'text-green-600', bgColor: 'bg-green-50', trend: '', trendUp: true },
-      { title: 'Custo', value: formatCurrency(totalInvestment), icon: DollarSign, color: 'text-red-600', bgColor: 'bg-red-50', trend: '', trendUp: true },
+      { title: 'Investimento', value: formatCurrency(totalInvestment), icon: DollarSign, color: 'text-red-600', bgColor: 'bg-red-50', trend: '', trendUp: true },
       { title: 'Conversões', value: formatNumber(totalConversions), icon: Target, color: 'text-purple-600', bgColor: 'bg-purple-50', trend: '', trendUp: true },
       { title: 'Custo/Conversão', value: formatCurrency(totalCostPerConversion), icon: Zap, color: 'text-orange-600', bgColor: 'bg-orange-50', trend: '', trendUp: true },
-      { title: 'Call Ad', value: formatNumber(totalCallAdConversion), icon: Users, color: 'text-indigo-600', bgColor: 'bg-indigo-50', trend: '', trendUp: true },
+      { title: 'Taxa de Conversão', value: formatPercentage(conversionRate), icon: Users, color: 'text-indigo-600', bgColor: 'bg-indigo-50', trend: '', trendUp: true },
     ];
   } else if (platform === 'linkedin') {
     metrics = [

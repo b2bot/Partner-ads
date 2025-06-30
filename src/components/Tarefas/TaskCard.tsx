@@ -1,10 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { TaskWithDetails } from '@/types/task';
-import { TaskStatusBadge } from './TaskStatusBadge';
-import { TaskPriorityBadge } from './TaskPriorityBadge';
-import { CalendarDays, MessageCircle, Paperclip, Trash } from 'lucide-react';
+import { Trash, CalendarDays, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useDeleteTask } from '@/hooks/Tarefas/useTasks';
@@ -16,96 +13,83 @@ interface TaskCardProps {
 }
 
 export const TaskCard = ({ task, onClick, compact = false }: TaskCardProps) => {
-  const assigneeName = task.assigned_user?.name ?? '??';
   const deleteTask = useDeleteTask();
+  const assigneeName = task.assigned_user?.name ?? '??';
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'Backlog':
+        return 'bg-gray-200 text-gray-800';
+      case 'Em Execução':
+        return 'bg-blue-200 text-blue-800';
+      case 'Em Revisão':
+        return 'bg-yellow-200 text-yellow-800';
+      default:
+        return 'bg-gray-200 text-gray-800';
+    }
+  };
+
+  const getPriorityStyle = (priority: string) => {
+    switch (priority) {
+      case 'Alta':
+        return 'bg-red-200 text-red-800';
+      case 'Média':
+        return 'bg-blue-100 text-blue-800';
+      case 'Baixa':
+        return 'bg-green-200 text-green-800';
+      default:
+        return 'bg-gray-200 text-gray-800';
+    }
+  };
+
+  const hasComments = Array.isArray(task.comments) && task.comments.length > 0;
 
   return (
-    <Card 
-      className="cursor-pointer hover:shadow-md transition-shadow"
-      onClick={onClick}
-    >
-      <CardContent className="p-4">
-        <div className="space-y-3">
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <h3 className="font-medium text-sm line-clamp-2">{task.title}</h3>
-            <div className="flex items-center gap-2">
-              <TaskPriorityBadge priority={task.priority} />
-              <Trash
-                className="h-4 w-4 text-red-500 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (confirm('Deseja excluir esta tarefa?')) {
-                    deleteTask.mutate(task.id);
-                  }
-                }}
-              />
-            </div>
+    <Card className="cursor-pointer hover:shadow-md transition-shadow border border-gray-200" onClick={onClick}>
+      <CardContent className="p-3 space-y-2">
+        {/* Título */}
+        <div className="flex justify-between items-start">
+          <h3 className="font-medium text-xs leading-snug line-clamp-2">{task.title}</h3>
+        </div>
+
+        {/* Badges */}
+        <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-1">
+            <span className={`px-2 py-[2px] rounded-full text-xs font-medium leading-none ${getStatusStyle(task.status)}`}>
+              {task.status}
+            </span>
           </div>
 
-          {/* Status */}
-          <TaskStatusBadge status={task.status} />
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1 mt-0">
+            <span className={`px-2 py-[2px] rounded-full text-xs font-medium leading-none ${getPriorityStyle(task.priority)}`}>
+              {task.priority}
+            </span>
+          </div>
+        </div>
 
-          {/* Assignee */}
-          {task.assigned_user && (
-            <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
+        {/* Rodapé: Data + Avatar + Comentário */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1 mt-0">
+            {task.due_date && (
+              <>
+                <CalendarDays className="h-3 w-3" />
+                {format(new Date(task.due_date), 'dd/MM', { locale: ptBR })}
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <MessageCircle
+              className={`h-3 w-3 ${hasComments ? 'text-blue-500' : 'text-gray-300'}`}
+            />
+            {task.assigned_user && (
+              <Avatar className="h-5 w-5">
                 <AvatarImage src={task.assigned_user.avatar_url || ''} />
-                <AvatarFallback className="text-xs">
+                <AvatarFallback className="text-[10px]">
                   {assigneeName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs text-muted-foreground">
-                {assigneeName}
-              </span>
-            </div>
-          )}
-
-          {/* Project */}
-          {task.project && (
-            <Badge variant="outline" className="text-xs">
-              {task.project.name}
-            </Badge>
-          )}
-
-          {/* Tags */}
-          {task.tags && task.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {task.tags.slice(0, 2).map((tag, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-              {task.tags.length > 2 && (
-                <Badge variant="secondary" className="text-xs">
-                  +{task.tags.length - 2}
-                </Badge>
-              )}
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            {task.due_date && (
-              <div className="flex items-center gap-1">
-                <CalendarDays className="h-3 w-3" />
-                {format(new Date(task.due_date), 'dd/MM', { locale: ptBR })}
-              </div>
             )}
-            <div className="flex items-center gap-2">
-              {task.comments?.length > 0 && (
-                <div className="flex items-center gap-1">
-                  <MessageCircle className="h-3 w-3" />
-                  {task.comments.length}
-                </div>
-              )}
-              {task.attachments?.length > 0 && (
-                <div className="flex items-center gap-1">
-                  <Paperclip className="h-3 w-3" />
-                  {task.attachments.length}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </CardContent>

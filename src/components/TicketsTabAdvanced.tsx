@@ -172,13 +172,13 @@ export function TicketsTabAdvanced() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+          <h1 className="text-lg font-bold text-gray-900 flex items-center gap-3">
             <Headphones className="h-7 w-7 text-blue-600" />
             {isAdmin ? 'Central de Suporte' : 'Meus Chamados'}
           </h1>
           <p className="text-gray-600 mt-1">
             {isAdmin 
-              ? 'Gerencie todos os chamados de suporte dos clientes'
+              ? ''
               : 'Abra chamados e acompanhe o status do seu atendimento'
             }
           </p>
@@ -195,25 +195,11 @@ export function TicketsTabAdvanced() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-caption text-muted-foreground font-medium">Total</p>
+                <p className="text-xl font-bold">{stats.total}</p>
               </div>
-              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Headphones className="h-5 w-5 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Novos</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.novo}</p>
-              </div>
-              <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
+              <div className="p-1.5 rounded-lg bg-purple-100">
+                <Headphones className="size-4 text-purple-600" />
               </div>
             </div>
           </CardContent>
@@ -223,25 +209,11 @@ export function TicketsTabAdvanced() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Aguard. Equipe</p>
-                <p className="text-2xl font-bold text-red-600">{stats.aguardandoEquipe}</p>
+                <p className="text-caption text-muted-foreground font-medium">Novos</p>
+                <p className="text-xl font-bold">{stats.novo}</p>
               </div>
-              <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <UserCheck className="h-5 w-5 text-red-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Em Análise</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.emAnalise}</p>
-              </div>
-              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Eye className="h-5 w-5 text-blue-600" />
+              <div className="p-1.5 rounded-lg bg-red-100">
+                <TrendingUp className="size-4 text-red-600" />
               </div>
             </div>
           </CardContent>
@@ -251,11 +223,11 @@ export function TicketsTabAdvanced() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Andamento</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.emAndamento}</p>
+                <p className="text-caption text-muted-foreground font-medium">Aguard. Equipe</p>
+                <p className="text-xl font-bold">{stats.aguardandoEquipe}</p>
               </div>
-              <div className="h-10 w-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <Play className="h-5 w-5 text-yellow-600" />
+              <div className="p-1.5 rounded-lg bg-yellow-100">
+                <UserCheck className="size-4 text-yellow-600" />
               </div>
             </div>
           </CardContent>
@@ -265,11 +237,39 @@ export function TicketsTabAdvanced() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Resolvidos</p>
-                <p className="text-2xl font-bold text-green-600">{stats.resolvidos}</p>
+                <p className="text-caption text-muted-foreground font-medium">Em Análise</p>
+                <p className="text-xl font-bold">{stats.emAnalise}</p>
               </div>
-              <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="p-1.5 rounded-lg bg-orange-100">
+                <Eye className="size-4 text-orange-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-caption text-muted-foreground font-medium">Andamento</p>
+                <p className="text-xl font-bold">{stats.emAndamento}</p>
+              </div>
+              <div className="p-1.5 rounded-lg bg-blue-100">
+                <Play className="size-4 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-caption text-muted-foreground font-medium">Resolvidos</p>
+                <p className="text-xl font-bold">{stats.resolvidos}</p>
+              </div>
+              <div className="p-1.5 rounded-lg bg-green-100">
+                <CheckCircle className="size-4 text-green-600" />
               </div>
             </div>
           </CardContent>

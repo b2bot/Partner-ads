@@ -117,8 +117,8 @@ export function MetaApiManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Gestão da API Meta</h1>
-        <p className="text-slate-600 mt-2">
+        <h1 className="text-3xl font-bold text-slate-800"></h1>
+        <p className="text-sm mt-2">
           Configure suas credenciais da Meta API e monitore o status da conexão
         </p>
       </div>
@@ -134,7 +134,11 @@ export function MetaApiManagement() {
                 ) : (
                   <XCircle className="h-5 w-5 text-red-500" />
                 )}
+			  <div>
+               <p className="text-lg mt-2">
                 Status da Conexão
+			   </p>
+              </div>
               </CardTitle>
               <CardDescription>
                 {isConnected 
@@ -278,7 +282,13 @@ export function MetaApiManagement() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Credenciais Configuradas</CardTitle>
+                <CardTitle>
+				 <div>
+                  <p className="text-lg mt-2">
+                   Credenciais Configuradas
+			      </p>
+				 </div>
+				</CardTitle>
                 <CardDescription>
                   Suas credenciais da Meta API estão configuradas e prontas para uso
                 </CardDescription>

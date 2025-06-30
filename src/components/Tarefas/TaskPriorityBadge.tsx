@@ -35,9 +35,10 @@ export const TaskPriorityBadge = ({ priority }: TaskPriorityBadgeProps) => {
   const Icon = config.icon;
   
   return (
-    <Badge className={`${config.className} flex items-center gap-1`}>
-      <Icon className="h-3 w-3" />
+	<div
+      className={`w-full h-full min-h-[37px] flex items-center gap-1 justify-center text-xs font-medium ${config.className}`}
+    >
       {config.label}
-    </Badge>
+    </div>
   );
 };

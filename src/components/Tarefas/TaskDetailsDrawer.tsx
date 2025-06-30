@@ -1,5 +1,5 @@
-
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTaskComments, useCreateComment } from '@/hooks/Tarefas/useComments';
 import { UserAvatarSelect } from '@/components/UserAvatarSelect';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -17,6 +17,7 @@ import { TaskStatusBadge } from './TaskStatusBadge';
 import { TaskPriorityBadge } from './TaskPriorityBadge';
 import { TaskWithDetails } from '@/types/task';
 import { useCollaborators } from '@/hooks/useCollaborators';
+import { useProjects } from '@/hooks/Tarefas/useProjects';
 import {
   MessageCircle,
   Paperclip,
@@ -29,29 +30,85 @@ import {
   Pencil
 } from 'lucide-react';
 
+interface EditTaskForm {
+  title: string;
+  status: string;
+  priority: string;
+  assigned_to: string;
+  project_id: string;
+  description: string;
+  due_date: string;
+  estimated_hours: number;
+}
+
 interface TaskDetailsDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   task: TaskWithDetails | null;
 }
-export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawerProps) => {
+
+export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
+  open,
+  onOpenChange,
+  task,
+}) => {
   const { profile } = useAuth();
   const { data: comments } = useTaskComments(task?.id || '');
   const createComment = useCreateComment();
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
-  const [tab, setTab] = useState('resumo');
+  const [tab, setTab] = useState<'resumo' | 'comentarios' | 'arquivos' | 'editar'>('resumo');
   const { collaborators } = useCollaborators();
-  
+  const { data: projects = [] } = useProjects();
   const [newComment, setNewComment] = useState('');
 
-  if (!task) return null;
-  
-  if (!task) return null;
 
+  const { register, handleSubmit, reset, setValue, watch } = useForm<EditTaskForm>({ 
+    defaultValues: {
+      title: task?.title || '',
+      status: task?.status || 'PENDING',
+      priority: task?.priority || 'MEDIUM',
+      assigned_to: task?.assigned_to  || '',
+      project_id: task?.project?.id || '',
+      description: task?.description || '',
+      due_date: task?.due_date?.slice(0, 10) || '',
+      estimated_hours: task?.estimated_hours || 0,
+    },
+  });
+
+  useEffect(() => {
+    if (task) {
+      reset({
+        title: task.title,
+        status: task.status,
+        priority: task.priority,
+        assigned_to: task.assigned_to || '',
+        project_id: task.project?.id || '',
+        description: task.description || '',
+        due_date: task.due_date?.slice(0, 10) || '',
+        estimated_hours: task.estimated_hours || 0,
+      });
+    }
+  }, [task, reset]);
+
+     const onSubmit = (data: EditTaskForm) => {
+       if (!task) return;
+       updateTask.mutate({
+         id: task.id,
+         updates: data,
+       });
+       onOpenChange(false);
+    };;
+  
+   // ─── Helper para formatar datas (pt-BR) ───
+  const formatDate = (date?: string | null) => {
+    if (!date) return 'Não definida';
+    return new Date(date).toLocaleDateString('pt-BR');
+  };
+  
+   // Função de enviar comentário
   const handleSendComment = async () => {
     if (!newComment.trim() || !profile) return;
-
     try {
       await createComment.mutateAsync({
         task_id: task.id,
@@ -60,36 +117,76 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
       });
       setNewComment('');
     } catch (error) {
-      console.error('Erro ao enviar comentário:', error);
+     console.error('Erro ao enviar comentário:', error);
     }
   };
-  
-  const formatDate = (date: string | null) => {
-    if (!date) return 'Não definida';
-    return new Date(date).toLocaleDateString('pt-BR');
-  };
 
+
+  // Helper para extrair iniciais de um nome
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+     .toUpperCase()
+      .slice(0, 2);
   };
 
+  if (!task) return null;
 
-  return (
+				
+    return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[600px] sm:max-w-[600px] overflow-y-auto">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4">{task?.titulo ?? 'Tarefa'}</h2>
+        <div className="p-2">
+          <h5 className="text-xl font-semibold mb-2">{task?.titulo ?? 'Informações da Tarefa '}</h5>
 
-          <Tabs defaultValue="resumo" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              <TabsTrigger value="resumo">Resumo</TabsTrigger>
-              <TabsTrigger value="comentarios">Comentários</TabsTrigger>
-              <TabsTrigger value="arquivos">Arquivos</TabsTrigger>
-              <TabsTrigger value="editar">Editar</TabsTrigger>
-            </TabsList>
+			<Tabs defaultValue="resumo" className="w-full">
+			  <TabsList className="grid w-full grid-cols-4 mb-1 bg-transparent border border-gray-200 rounded-lg shadow-none items-stretch">
+				<TabsTrigger
+				  value="resumo"
+				  className="flex-1 flex items-center justify-center bg-transparent text-gray-600
+							 data-[state=active]:bg-primary
+							 data-[state=active]:text-white
+							 data-[state=active]:shadow-none
+							 data-[state=active]:rounded-lg"
+				>
+				  Resumo
+				</TabsTrigger>
+				<TabsTrigger
+				  value="comentarios"
+				  className="flex-1 flex items-center justify-center p-0 bg-transparent text-gray-600
+							 data-[state=active]:bg-primary
+							 data-[state=active]:text-white
+							 data-[state=active]:shadow-none
+							 data-[state=active]:rounded-lg"
+				>
+				  Comentários
+				</TabsTrigger>
+				<TabsTrigger
+				  value="arquivos"
+				  className="flex-1 flex items-center justify-center p-0 bg-transparent text-gray-600
+							 data-[state=active]:bg-primary
+							 data-[state=active]:text-white
+							 data-[state=active]:shadow-none
+							 data-[state=active]:rounded-lg"
+				>
+				  Arquivos
+				</TabsTrigger>
+				<TabsTrigger
+				  value="editar"
+				  className="flex-1 flex items-center justify-center p-0 bg-transparent text-gray-600
+							 data-[state=active]:bg-primary
+							 data-[state=active]:text-white
+							 data-[state=active]:shadow-none
+							 data-[state=active]:rounded-lg"
+				>
+				  Editar
+				</TabsTrigger>
+			  </TabsList>
 
             <TabsContent value="resumo">
-              <SheetHeader className="space-y-4 pb-6 border-b">
+              <SheetHeader className="space-y-4 pb-4 border-b">
                 <SheetTitle className="text-left text-xl">{task.title}</SheetTitle>
 
                 <div className="flex items-center gap-3">
@@ -103,8 +200,9 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
                     <div className="flex items-center gap-2 text-sm">
                       <User className="h-4 w-4 text-gray-400" />
                       <span className="text-gray-600">Responsável:</span>
-                      <span>{task.assigned_user?.name || 'Não atribuído'}</span>
+                      <span>{task.assigned_user.nome || 'Não atribuído'}</span>
                   </div>
+
 
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="h-4 w-4 text-gray-400" />
@@ -128,56 +226,51 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
                   </div>
 				</div>  
 				
-				<div className="grid grid-cols-2 gap-4"> 
-				  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-gray-400" />
-                      <span className="text-gray-600">Projeto:</span>
-                      <span>{task?.projeto?.titulo}</span>
-                    </div>
-					<div className="flex items-center gap-2 text-sm">
-                      <Pencil className="h-4 w-4 text-gray-400" />
-                      <span className="text-gray-600">Descrição:</span>
-                      <span>{task?.descricao}</span>
-                    </div>
-                  </div>
-				</div>  	
-                		
-                {/* Tags */}
-                {task.tags && task.tags.length > 0 && (
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Tags</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {task.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
+				<div>
+				  <label className="text-sm font-medium">Projeto</label>
+				  <Select
+					{...register('project_id')}
+					onValueChange={(v) => setValue('project_id', v)}
+					value={watch('project_id')}
+				  >
+					<SelectTrigger>
+					  <SelectValue placeholder="Selecione o projeto" />
+					</SelectTrigger>
+					<SelectContent>
+					  {projects.map((proj: any) => (
+						<SelectItem key={proj.id} value={proj.id}>
+						  {proj.name}
+						</SelectItem>
+					  ))}
+					</SelectContent>
+				  </Select>
+				</div>
+				
+				<div className="space-y-3 mt-4">
+				  <div className="text-sm">
+					<div className="flex items-center gap-2">
+					  <Pencil className="h-4 w-4 text-gray-400" />
+					  <span className="text-gray-600">Descrição:</span>
+					</div>
+					<p className="text-sm text-gray-700 whitespace-pre-wrap">
+					  {task?.description || 'Sem descrição detalhada.'}
+					</p>
+				  </div>
+				</div>
 
                 {/* Subtarefas */}
-                {task.subtasks && task.subtasks.length > 0 && (
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Subtarefas</h3>
-                    <div className="space-y-2">
-                      {task.subtasks.map((subtask) => (
-                        <div key={subtask.id} className="flex items-center gap-2">
-                          <input
-                           type="checkbox"
-                           checked={subtask.completed}
-                           className="rounded"
-                           readOnly
-                          />
-                          <span className={subtask.completed ? 'line-through text-gray-500' : ''}>
-                            {subtask.title}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-			    )}
+				{task.tags && task.tags.length > 0 && (
+				  <div className="space-y-2 mt-6">
+					<h3 className="font-medium">Tags</h3>
+					<div className="flex flex-wrap gap-2">
+					  {task.tags.map((tag) => (
+						<Badge key={tag} variant="secondary">
+						  {tag}
+						</Badge>
+					  ))}
+					</div>
+				  </div>
+				)}
               </SheetHeader>
             </TabsContent>
 
@@ -245,50 +338,128 @@ export const TaskDetailsDrawer = ({ open, onOpenChange, task }: TaskDetailsDrawe
               <div className="text-muted-foreground">
                 📎 Em breve: upload de arquivos.
               </div>
-            </TabsContent>
+			</TabsContent>
+			 
+			<TabsContent value="editar">
+			  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-6">
+				{/* Título */}
+				<div>
+				  <label className="text-sm font-medium">Título</label>
+				  <Input {...register('title')} />
+				</div>
 
-            <TabsContent value="editar">
-              <div className="space-y-2">
-                
-			    <div className="space-y-4">
-                  <Input placeholder="Título da Tarefa" defaultValue={task?.titulo} />
-                  <Input placeholder="Observações" defaultValue={task?.descricao} />
+				{/* Status */}
+				<div>
+				  <label className="text-sm font-medium">Status</label>
+				  <Select onValueChange={v => setValue('status', v)} defaultValue={task?.status}>
+					<SelectTrigger>
+					  <SelectValue placeholder="Status" />
+					</SelectTrigger>
+					<SelectContent>
+					  <SelectItem value="Backlog">Backlog</SelectItem>
+					  <SelectItem value="em_execucao">Em Execução</SelectItem>
+					  <SelectItem value="em_revisao">Em Revisão</SelectItem>
+					  <SelectItem value="aguardando">Aguardando</SelectItem>
+					  <SelectItem value="finalizada">Finalizada</SelectItem>
+					</SelectContent>
+				  </Select>
+				</div>
 
-                  <Select defaultValue={task?.prioridade}>
-                    <SelectTrigger><SelectValue placeholder="Prioridade" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="baixa">Baixa</SelectItem>
-                      <SelectItem value="media">Média</SelectItem>
-                      <SelectItem value="alta">Alta</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+				{/* Prioridade */}
+				<div>
+				  <label className="text-sm font-medium">Prioridade</label>
+				  <Select onValueChange={v => setValue('priority', v)} defaultValue={task?.priority}>
+					<SelectTrigger>
+					  <SelectValue placeholder="Prioridade" />
+					</SelectTrigger>
+					<SelectContent>
+					  <SelectItem value="baixa">Baixa</SelectItem>
+					  <SelectItem value="media">Média</SelectItem>
+					  <SelectItem value="alta">Alta</SelectItem>
+					  <SelectItem value="urgente">Urgente</SelectItem>					  
+					</SelectContent>
+				  </Select>
+				</div>
+
+				{/* Responsável */}
+				<div>
+				  <label className="text-sm font-medium">Responsável</label>
+				  <Select
+					{...register('assigned_to')}
+					onValueChange={(v) => setValue('assigned_to', v)}
+					value={watch('assigned_to')}
+				  >
+					<SelectTrigger>
+					  <SelectValue placeholder="Selecione o responsável" />
+					</SelectTrigger>
+					<SelectContent>
+					  {collaborators.map((collab: any) => (
+						<SelectItem key={collab.id} value={collab.id}>
+						  {collab.nome}
+						</SelectItem>
+					  ))}
+					</SelectContent>
+				  </Select>
+				</div>
+
+				{/* Projeto */}
+				<div>
+				  <label className="text-sm font-medium">Projeto</label>
+				  <Select
+					{...register('project_id')}
+					onValueChange={(v) => setValue('project_id', v)}
+					value={watch('project_id')}
+				  >
+					<SelectTrigger>
+					  <SelectValue placeholder="Selecione o projeto" />
+					</SelectTrigger>
+					<SelectContent>
+					  {projects.map((proj: any) => (
+						<SelectItem key={proj.id} value={proj.id}>
+						  {proj.name}
+						</SelectItem>
+					  ))}
+					</SelectContent>
+				  </Select>
+				</div>
+				
+
+				{/* Data de Entrega */}
+				<div>
+				  <label className="text-sm font-medium">Data de entrega</label>
+				  <Input type="date" {...register('due_date')} />
+				</div>
+
+				{/* Horas Estimadas */}
+				<div>
+				  <label className="text-sm font-medium">Horas estimadas</label>
+				  <Input type="number" {...register('estimated_hours', { valueAsNumber: true })} />
+				</div>
+
+				{/* Descrição */}
+				<div>
+				  <label className="text-sm font-medium">Descrição</label>
+				  <Textarea rows={4} {...register('description')} />
+				</div>
+
+				{/* Botões */}
 				<div className="flex justify-end gap-2">
-                  <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-                    Cancelar
-                  </Button>
-                  <Button type="submit">Salvar</Button>
-                </div>            
-	            {/* Excluir tarefa */}
-                <div className="<br>border-t pt-6 mt-6">
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      if (task && confirm('Deseja realmente excluir esta tarefa?')) {
-                        deleteTask.mutate(task.id, {
-                          onSuccess: () => onOpenChange(false),
-                        });
-                      }
-                    }}
-                  >
-                    Excluir Tarefa
-                  </Button>
-                </div>
-              </div>				
-            </TabsContent>
+				  <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+					Cancelar
+				  </Button>
+				  <Button type="submit">Salvar</Button>
+				</div>
+			  </form>
+			</TabsContent>
           </Tabs>
         </div>
       </SheetContent>
     </Sheet>
   );
 };
+
+
+
+
+
+

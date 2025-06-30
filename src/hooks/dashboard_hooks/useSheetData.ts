@@ -109,6 +109,7 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               mappedRow.clicks = parseNumber(value);
               break;
             case 'spend (cost, amount spent)':
+            case 'cost (spend, amount spent)':
             case 'amount spent':
               mappedRow.amountSpent = parseNumber(value);
               break;

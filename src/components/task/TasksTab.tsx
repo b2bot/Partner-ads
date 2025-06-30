@@ -51,13 +51,13 @@ export function TasksTab() {
     <div className="bg-transparent border-none shadow-none p-0">
       <header className="p-0">
         <div className="w-full p-0 m-0 space-y-3">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1 mb-4">
            {/* <div>
               <h1 className="text-2xl font-bold">Sistema de Tarefas</h1>
               <p className="text-muted-foreground">
                 Gerencie suas tarefas e projetos de forma eficiente
               </p>
-            </div>*/}
+            </div> */}
 
             <div className="flex items-center gap-4">
               <Button onClick={() => setTaskModalOpen(true)}>
@@ -79,9 +79,9 @@ export function TasksTab() {
         </div>
       </header>
 
-      <main className="w-full p-0 m-0 space-y-1">
+      <main className="w-full p-0 m-0 space-y-1 overflow-x-hidden">
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)}>
-          <TabsList className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 px-1 py-1 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-full"> {/* aumentamos para 7 colunas */}
+          <TabsList className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 px-1 py-1 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-full mb-4"> {/* aumentamos para 7 colunas */}
             <TabsTrigger value="lista" className="flex items-center gap-2">
               <List className="h-4 w-4" />
               Lista
@@ -106,10 +106,10 @@ export function TasksTab() {
               <BarChart3 className="h-4 w-4" />
               Visão de Gestor
             </TabsTrigger>
-            <TabsTrigger value="tarefas" className="flex items-center gap-2"> {/* ✅ NOVA ABA */}
+            {/* <TabsTrigger value="tarefas" className="flex items-center gap-2">
               <List className="h-4 w-4" />
               Tarefas
-            </TabsTrigger>
+            </TabsTrigger>  */}
           </TabsList>
 
           <div className="mt-1">
@@ -117,9 +117,11 @@ export function TasksTab() {
               <ListView onTaskClick={handleTaskClick} />
             </TabsContent>
 
-            <TabsContent value="kanban">
-              <KanbanView onTaskClick={handleTaskClick} />
-            </TabsContent>
+            <TabsContent value="kanban" className="p-0 m-0">
+			  <div className="w-full overflow-x-auto">
+				<KanbanView onTaskClick={handleTaskClick} />
+			  </div>
+			</TabsContent>
 
             <TabsContent value="calendario">
               <CalendarView />
