@@ -104,8 +104,6 @@ export class AutomationService {
 
   // Processar automações pendentes
   static async processAutomations() {
-    const { data, error } = await apiClient.rpc('process_pending_automations');
-    if (error) throw error;
-    return data;
+    return apiClient.post('/process_automations.php');
   }
 }
