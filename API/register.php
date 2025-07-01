@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/db.php';
+
+// Headers CORS
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -13,26 +15,48 @@ try {
     $input = json_decode(file_get_contents('php://input'), true);
     
     $email = $input['email'] ?? '';
-    $password = password_hash($input['password'] ?? '', PASSWORD_DEFAULT);
     $nome = $input['nome'] ?? '';
     $role = $input['role'] ?? 'client';
     
-    // ✅ CORREÇÃO: Usar tabela 'profiles' em vez de 'users'
-    $stmt = $pdo->prepare('INSERT INTO profiles (email, nome, role) VALUES (?, ?, ?)');
+    // Verificar se email já existe
+    $stmt = $pdo->prepare('SELECT id FROM profiles WHERE email = ?');
+    $stmt->execute([$email]);
+    if ($stmt->fetch()) {
+        http_response_code(400);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Email já cadastrado'
+        ]);
+        exit;
+    }
+    
+    // Inserir novo usuário
+    $stmt = $pdo->prepare('INSERT INTO profiles (email, nome, role, ativo) VALUES (?, ?, ?, 1)');
     $stmt->execute([$email, $nome, $role]);
     
     $id = $pdo->lastInsertId();
     
+    // Buscar usuário criado
     $stmt = $pdo->prepare('SELECT * FROM profiles WHERE id = ?');
     $stmt->execute([$id]);
     $user = $stmt->fetch();
     
     $token = bin2hex(random_bytes(16));
     
-    echo json_encode(['success' => true, 'token' => $token, 'user' => $user]);
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Usuário criado com sucesso',
+        'token' => $token, 
+        'user' => $user
+    ]);
     
 } catch (Exception $e) {
-    http_response_code(500 );
-    echo json_encode(['error' => $e->getMessage()]);
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Erro interno do servidor',
+        'error' => $e->getMessage()
+    ]);
 }
 ?>
+
