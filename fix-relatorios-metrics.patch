@@ -1,6 +1,0 @@
-diff --git a/src/components/RelatoriosTab.tsx b/src/components/RelatoriosTab.tsx
-index 649d52caa612bd02377221ba146eb7fa66ade0d4..abe2c2bad8aed4665fc3631286487f581f7d978c 100644
---- a/src/components/RelatoriosTab.tsx
-+++ b/src/components/RelatoriosTab.tsx
-@@ -102,52 +102,227 @@ function RelatoriosContent() {
-... (TRUNCADO PARA BREVIDADE NO DISPLAY - será escrito completo no arquivo)
