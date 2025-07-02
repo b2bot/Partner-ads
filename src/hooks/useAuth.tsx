@@ -125,7 +125,8 @@ export function useAuth() {
     signUp,
     signOut,
     isAdmin,
-    isRootAdmin: profile?.is_root_admin ?? false,
+    isRootAdmin: profile?.is_root_admin === 1 || 
+    profile?.is_root_admin === true,
     isCliente,
     permissions: allPermissions,
     hasPermission,
