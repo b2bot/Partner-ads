@@ -12,6 +12,10 @@ function handle_get(PDO $pdo, string $table): void {
         $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE id = ?");
         $stmt->execute([$_GET['id']]);
         echo json_encode($stmt->fetch());
+    } elseif (isset($_GET['user_id'])) {
+        $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE user_id = ?");
+        $stmt->execute([$_GET['user_id']]);
+        echo json_encode($stmt->fetchAll());
     } else {
         $stmt = $pdo->query("SELECT * FROM `$table`");
         echo json_encode($stmt->fetchAll());

@@ -14,7 +14,7 @@ export function useUserProfile(user: User | null) {
 
       try {
         const data = await apiClient.get<UserProfile>(
-          `/api/profiles.php?id=${user.id}`
+          `/api/profiles.php?user_id=${user.id}`
         );
         console.log('✅ Profile loaded from DB:', data);
         return data as UserProfile;
