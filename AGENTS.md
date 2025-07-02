@@ -62,3 +62,6 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
 - Convertidas as edge functions `process-automations`, `send-email` e `receive-emails` para scripts PHP (`process_automations.php`, `send_email.php`, `receive_emails.php`).
 - `AutomationService.processAutomations` atualizado para chamar `/process_automations.php` via `apiClient`.
 - Removida dependência @supabase/supabase-js e arquivos associados.
+
+- Ajustado base_crud.php para aceitar consulta por `user_id`.
+- Hook useUserProfile atualizado para usar `user_id` ao buscar perfil.
