@@ -20,6 +20,7 @@ export function useAuth() {
     const result = await rawSignIn(email, password);
     if (result.data?.user) {
       setUser(result.data.user);
+      localStorage.setItem('authUser', JSON.stringify(result.data.user));
     }
     return result;
   };
@@ -33,6 +34,7 @@ export function useAuth() {
     const result = await rawSignUp(email, password, nome, role);
     if (result.data?.user) {
       setUser(result.data.user);
+      localStorage.setItem('authUser', JSON.stringify(result.data.user));
     }
     return result;
   };
@@ -40,6 +42,7 @@ export function useAuth() {
   const signOut = async () => {
     const result = await rawSignOut();
     setUser(null);
+    localStorage.removeItem('authUser');
     return result;
   };
 
@@ -57,16 +60,18 @@ export function useAuth() {
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
+    const userData = localStorage.getItem('authUser');
     if (token) {
       setAuthToken(token);
-      apiClient
-        .get<User>('/api/me.php')
-        .then((u) => setUser(u))
-        .catch(() => setUser(null))
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+      if (userData) {
+        try {
+          setUser(JSON.parse(userData));
+        } catch {
+          setUser(null);
+        }
+      }
     }
+    setLoading(false);
   }, []);
 
   const hasPermission = (permission: Permission): boolean => {

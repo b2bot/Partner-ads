@@ -9,6 +9,7 @@ export function useAuthActions() {
         password,
       });
       setAuthToken(data.token);
+      localStorage.setItem('authUser', JSON.stringify(data.user));
       return { data, error: null };
     } catch (error: any) {
       return { data: null, error };
@@ -29,6 +30,7 @@ export function useAuthActions() {
         role,
       });
       setAuthToken(data.token);
+      localStorage.setItem('authUser', JSON.stringify(data.user));
       return { data, error: null };
     } catch (error: any) {
       return { data: null, error };
@@ -40,6 +42,7 @@ export function useAuthActions() {
       await apiClient.post('/api/logout.php');
     } finally {
       setAuthToken(null);
+      localStorage.removeItem('authUser');
     }
     return { error: null };
   };

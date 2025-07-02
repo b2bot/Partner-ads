@@ -65,3 +65,7 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
 
 - Ajustado base_crud.php para aceitar consulta por `user_id`.
 - Hook useUserProfile atualizado para usar `user_id` ao buscar perfil.
+- Persistência do usuário adicionada em `localStorage` (`authUser`) para
+  evitar requisição a `/api/me.php`.
+- Hook `useUserProfile` voltou a buscar perfil por `id` para compatibilidade
+  com a tabela `profiles`.
