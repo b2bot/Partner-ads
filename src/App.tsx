@@ -6,7 +6,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { ResetPasswordForm } from '@/components/ResetPasswordForm';
 import Index from "./pages/Index";
-import Resultados from "./pages/Resultados";
 import NotFound from "./pages/NotFound";
 import { FiltersProvider } from "@/hooks/dashboard_hooks/useFilters";
 import { SettingsProvider } from "@/hooks/dashboard_hooks/useSettings";
@@ -27,7 +26,6 @@ function App() {
                   <SettingsProvider clientId="default">
                     <Routes>
                       <Route path="/" element={<Index />} />
-					  <Route path="/" element={<Resultados />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </SettingsProvider>
