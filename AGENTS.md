@@ -69,3 +69,5 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
   evitar requisição a `/api/me.php`.
 - Hook `useUserProfile` voltou a buscar perfil por `id` para compatibilidade
   com a tabela `profiles`.
+- Adicionado script `tools/convert_to_mysql.py` para converter `supabase_dump.sql`
+  em um schema MySQL (`supabase_dump_mysql.sql`).
