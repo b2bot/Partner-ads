@@ -1,5 +1,4 @@
-import re
-import sys
+
 
 infile = sys.argv[1]
 outfile = sys.argv[2]
@@ -26,9 +25,15 @@ skip_patterns = [
     r'^CREATE POLICY',
     r'^ALTER POLICY',
     r'^CREATE FUNCTION',
+
+    r'^CREATE TRIGGER',
+    r'^CREATE EVENT TRIGGER',
     r'^ALTER FUNCTION',
     r'^COMMENT ON FUNCTION',
     r'^CREATE OR REPLACE FUNCTION',
+    r'^ALTER TYPE',
+    r'^ALTER EVENT TRIGGER',
+
 ]
 
 pattern_compiled = [re.compile(p) for p in skip_patterns]
@@ -56,18 +61,3 @@ def transform_line(line: str) -> str:
     line = re.sub(r'::character varying', '', line)
     line = line.replace('public.', '')
     line = line.replace('auth.', '')
-    return line
-
-with open(infile) as f, open(outfile, 'w') as out:
-    skip_copy = False
-    for line in f:
-        if line.startswith('COPY '):
-            skip_copy = True
-            continue
-        if skip_copy:
-            if line.strip() == '\\.':
-                skip_copy = False
-            continue
-        if should_skip(line.strip()):
-            continue
-        out.write(transform_line(line))
