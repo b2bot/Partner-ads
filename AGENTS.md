@@ -71,4 +71,6 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
   com a tabela `profiles`.
 - Adicionado script `tools/convert_to_mysql.py` para converter `supabase_dump.sql`
   em um schema MySQL (`supabase_dump_mysql.sql`).
+
 - Script de conversao atualizado para substituir ENUMs por tipos compativeis, remover funcoes e triggers e gerar comandos INSERT a partir dos blocos COPY.
+

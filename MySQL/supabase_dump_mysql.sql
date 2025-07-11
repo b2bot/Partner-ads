@@ -1,273 +1,554 @@
---
--- PostgreSQL database dump
---
+ 
+  PostgreSQL database dump
+ 
 
 
 
---
--- Name: auth; Type: SCHEMA; Schema: -; Owner: supabase_admin
---
+ 
+  Name: auth; Type: SCHEMA; Schema: -; Owner: supabase_admin
+ 
 
 
 
 
---
--- Name: extensions; Type: SCHEMA; Schema: -; Owner: postgres
---
+ 
+  Name: extensions; Type: SCHEMA; Schema: -; Owner: postgres
+ 
 
 
 
 
---
--- Name: graphql; Type: SCHEMA; Schema: -; Owner: supabase_admin
---
+ 
+  Name: graphql; Type: SCHEMA; Schema: -; Owner: supabase_admin
+ 
 
 
 
 
---
--- Name: graphql_public; Type: SCHEMA; Schema: -; Owner: supabase_admin
---
+ 
+  Name: graphql_public; Type: SCHEMA; Schema: -; Owner: supabase_admin
+ 
 
 
 
 
---
--- Name: pgbouncer; Type: SCHEMA; Schema: -; Owner: pgbouncer
---
+ 
+  Name: pgbouncer; Type: SCHEMA; Schema: -; Owner: pgbouncer
+ 
 
 
 
 
---
--- Name: realtime; Type: SCHEMA; Schema: -; Owner: supabase_admin
---
+ 
+  Name: realtime; Type: SCHEMA; Schema: -; Owner: supabase_admin
+ 
 
 
 
 
---
--- Name: storage; Type: SCHEMA; Schema: -; Owner: supabase_admin
---
+ 
+  Name: storage; Type: SCHEMA; Schema: -; Owner: supabase_admin
+ 
 
 
 
 
---
--- Name: supabase_migrations; Type: SCHEMA; Schema: -; Owner: postgres
---
+ 
+  Name: supabase_migrations; Type: SCHEMA; Schema: -; Owner: postgres
+ 
 
 
 
 
---
--- Name: vault; Type: SCHEMA; Schema: -; Owner: supabase_admin
---
+ 
+  Name: vault; Type: SCHEMA; Schema: -; Owner: supabase_admin
+ 
 
 
 
 
---
--- Name: pg_graphql; Type: EXTENSION; Schema: -; Owner: -
---
+ 
+  Name: pg_graphql; Type: EXTENSION; Schema: -; Owner: -
+ 
 
 
 
---
--- Name: EXTENSION pg_graphql; Type: COMMENT; Schema: -; Owner: 
---
+ 
+  Name: EXTENSION pg_graphql; Type: COMMENT; Schema: -; Owner: 
+ 
 
 
 
---
--- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
---
+ 
+  Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
+ 
 
 
 
---
--- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: 
---
+ 
+  Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: 
+ 
 
 
 
---
--- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
---
+ 
+  Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+ 
 
 
 
---
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
---
+ 
+  Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+ 
 
 
 
---
--- Name: supabase_vault; Type: EXTENSION; Schema: -; Owner: -
---
+ 
+  Name: supabase_vault; Type: EXTENSION; Schema: -; Owner: -
+ 
 
 
 
---
--- Name: EXTENSION supabase_vault; Type: COMMENT; Schema: -; Owner: 
---
+ 
+  Name: EXTENSION supabase_vault; Type: COMMENT; Schema: -; Owner: 
+ 
 
 
 
---
--- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
---
+ 
+  Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+ 
 
 
 
---
--- Name: EXTENSION `uuid-ossp`; Type: COMMENT; Schema: -; Owner: 
---
+ 
+  Name: EXTENSION `uuid-ossp`; Type: COMMENT; Schema: -; Owner: 
+ 
 
 
 
---
--- Name: aal_level; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: aal_level; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 
 
+ 
+CREATE TYPE aal_level AS ENUM (
+    'aal1',
+    'aal2',
+    'aal3'
+);
 
---
--- Name: code_challenge_method; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
---
 
+ALTER TYPE aal_level OWNER TO supabase_auth_admin;
+ 
 
+ 
+  Name: code_challenge_method; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 
---
--- Name: factor_status; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
---
 
+ 
+CREATE TYPE code_challenge_method AS ENUM (
+    's256',
+    'plain'
+);
 
 
+ALTER TYPE code_challenge_method OWNER TO supabase_auth_admin;
+ 
 
---
--- Name: factor_type; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: factor_status; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 
 
+ 
+CREATE TYPE factor_status AS ENUM (
+    'unverified',
+    'verified'
+);
 
---
--- Name: one_time_token_type; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
---
 
+ALTER TYPE factor_status OWNER TO supabase_auth_admin;
+ 
 
+ 
+  Name: factor_type; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 
---
--- Name: access_type; Type: TYPE; Schema: public; Owner: postgres
---
 
+ 
+CREATE TYPE factor_type AS ENUM (
+    'totp',
+    'webauthn',
+    'phone'
+);
 
 
+ALTER TYPE factor_type OWNER TO supabase_auth_admin;
+ 
 
---
--- Name: account_type; Type: TYPE; Schema: public; Owner: postgres
---
+ 
+  Name: one_time_token_type; Type: TYPE; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 
 
+ 
+CREATE TYPE one_time_token_type AS ENUM (
+    'confirmation_token',
+    'reauthentication_token',
+    'recovery_token',
+    'email_change_token_new',
+    'email_change_token_current',
+    'phone_change_token'
+);
 
---
--- Name: client_module; Type: TYPE; Schema: public; Owner: postgres
---
 
+ALTER TYPE one_time_token_type OWNER TO supabase_auth_admin;
+ 
 
+ 
+  Name: access_type; Type: TYPE; Schema: public; Owner: postgres
+ 
 
+ 
 
---
--- Name: creative_status; Type: TYPE; Schema: public; Owner: postgres
---
 
+ 
+CREATE TYPE access_type AS ENUM (
+    'api',
+    'sheet'
+);
 
 
+ALTER TYPE access_type OWNER TO postgres;
+ 
 
---
--- Name: permission_type; Type: TYPE; Schema: public; Owner: postgres
---
+ 
+  Name: account_type; Type: TYPE; Schema: public; Owner: postgres
+ 
 
+ 
 
 
+ 
+CREATE TYPE account_type AS ENUM (
+    'meta',
+    'google'
+);
 
---
--- Name: report_type; Type: TYPE; Schema: public; Owner: postgres
---
 
+ALTER TYPE account_type OWNER TO postgres;
+ 
 
+ 
+  Name: client_module; Type: TYPE; Schema: public; Owner: postgres
+ 
 
+ 
 
---
--- Name: task_priority; Type: TYPE; Schema: public; Owner: postgres
---
 
+ 
+CREATE TYPE client_module AS ENUM (
+    'dashboard',
+    'chamados',
+    'relatorios',
+    'criativos'
+);
 
 
+ALTER TYPE client_module OWNER TO postgres;
+ 
 
---
--- Name: task_status; Type: TYPE; Schema: public; Owner: postgres
---
+ 
+  Name: creative_status; Type: TYPE; Schema: public; Owner: postgres
+ 
 
+ 
 
 
+ 
+CREATE TYPE creative_status AS ENUM (
+    'pendente',
+    'aprovado',
+    'reprovado',
+    'ajuste_solicitado'
+);
 
---
--- Name: task_type; Type: TYPE; Schema: public; Owner: postgres
---
 
+ALTER TYPE creative_status OWNER TO postgres;
+ 
 
+ 
+  Name: permission_type; Type: TYPE; Schema: public; Owner: postgres
+ 
 
+ 
 
---
--- Name: ticket_status; Type: TYPE; Schema: public; Owner: postgres
---
 
+ 
+CREATE TYPE permission_type AS ENUM (
+    'access_dashboard',
+    'access_whatsapp',
+    'create_campaigns',
+    'edit_campaigns',
+    'view_templates',
+    'send_messages',
+    'view_metrics',
+    'access_tasks',
+    'create_tasks',
+    'assign_tasks',
+    'finalize_tasks',
+    'edit_execution_time',
+    'access_calls',
+    'create_calls',
+    'finalize_calls',
+    'link_calls_to_tasks',
+    'access_creatives',
+    'create_edit_creatives',
+    'approve_creatives',
+    'view_change_history',
+    'access_paid_media',
+    'create_campaigns_media',
+    'view_metrics_media',
+    'access_reports',
+    'create_automatic_reports',
+    'manage_user_settings',
+    'manage_collaborators',
+    'manage_whatsapp_templates',
+    'manage_api_settings',
+    'manage_appearance_and_visual_identity',
+    'manage_external_integrations',
+    'manage_variables_and_pre_configurations',
+    'view_billing_settings',
+    'view_system_logs',
+    'access_client_reports',
+    'manage_clients',
+    'delete_campaigns',
+    'create_adsets',
+    'edit_adsets',
+    'delete_adsets',
+    'create_ads',
+    'edit_ads',
+    'delete_ads',
+    'export_data',
+    'manage_creatives',
+    'upload_creatives',
+    'edit_creatives',
+    'delete_creatives',
+    'view_tickets',
+    'create_tickets',
+    'edit_tickets',
+    'resolve_tickets',
+    'create_collaborators',
+    'edit_collaborators',
+    'delete_collaborators',
+    'create_campaigns_whatsapp',
+    'manage_contacts',
+    'edit_tasks',
+    'delete_tasks',
+    'manage_tasks'
+);
 
 
+ALTER TYPE permission_type OWNER TO postgres;
+ 
 
---
--- Name: user_role; Type: TYPE; Schema: public; Owner: postgres
---
+ 
+  Name: report_type; Type: TYPE; Schema: public; Owner: postgres
+ 
 
+ 
 
 
+ 
+CREATE TYPE report_type AS ENUM (
+    'campanhas',
+    'conjuntos_anuncios',
+    'anuncios',
+    'criativos_performance',
+    'whatsapp'
+);
 
---
--- Name: action; Type: TYPE; Schema: realtime; Owner: supabase_admin
---
 
+ALTER TYPE report_type OWNER TO postgres;
+ 
 
+ 
+  Name: task_priority; Type: TYPE; Schema: public; Owner: postgres
+ 
 
+ 
 
---
--- Name: equality_op; Type: TYPE; Schema: realtime; Owner: supabase_admin
---
 
+ 
+CREATE TYPE task_priority AS ENUM (
+    'baixa',
+    'media',
+    'alta',
+    'urgente'
+);
 
 
+ALTER TYPE task_priority OWNER TO postgres;
+ 
 
---
--- Name: user_defined_filter; Type: TYPE; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: task_status; Type: TYPE; Schema: public; Owner: postgres
+ 
+
+ 
+
+
+ 
+CREATE TYPE task_status AS ENUM (
+    'backlog',
+    'execucao',
+    'revisao',
+    'aguardando',
+    'finalizada',
+    'cancelada'
+);
+
+
+ALTER TYPE task_status OWNER TO postgres;
+ 
+
+ 
+  Name: task_type; Type: TYPE; Schema: public; Owner: postgres
+ 
+
+ 
+
+
+ 
+CREATE TYPE task_type AS ENUM (
+    'desenvolvimento',
+    'design',
+    'marketing',
+    'suporte',
+    'revisao',
+    'outros'
+);
+
+
+ALTER TYPE task_type OWNER TO postgres;
+ 
+
+ 
+  Name: ticket_status; Type: TYPE; Schema: public; Owner: postgres
+ 
+
+ 
+
+
+ 
+CREATE TYPE ticket_status AS ENUM (
+    'novo',
+    'aguardando_equipe',
+    'aguardando_cliente',
+    'em_analise',
+    'em_andamento',
+    'resolvido'
+);
+
+
+ALTER TYPE ticket_status OWNER TO postgres;
+ 
+
+ 
+  Name: user_role; Type: TYPE; Schema: public; Owner: postgres
+ 
+
+ 
+
+
+ 
+CREATE TYPE user_role AS ENUM (
+    'admin',
+    'cliente'
+);
+
+
+ALTER TYPE user_role OWNER TO postgres;
+ 
+
+ 
+  Name: action; Type: TYPE; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+
+
+ 
+CREATE TYPE realtime.action AS ENUM (
+    'INSERT',
+    'UPDATE',
+    'DELETE',
+    'TRUNCATE',
+    'ERROR'
+);
+
+
+ALTER TYPE realtime.action OWNER TO supabase_admin;
+ 
+
+ 
+  Name: equality_op; Type: TYPE; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+
+
+ 
+CREATE TYPE realtime.equality_op AS ENUM (
+    'eq',
+    'neq',
+    'lt',
+    'lte',
+    'gt',
+    'gte',
+    'in'
+);
+
+
+ALTER TYPE realtime.equality_op OWNER TO supabase_admin;
+ 
+
+ 
+  Name: user_defined_filter; Type: TYPE; Schema: realtime; Owner: supabase_admin
+ 
 
 CREATE TYPE realtime.user_defined_filter AS (
 	column_name text,
+ 
 	op realtime.ENUM('eq','neq','lt','lte','gt','gte','in'),
+ 
+	op realtime.equality_op,
+ 
 	value text
 );
 
 
+ 
+ 
+ALTER TYPE realtime.user_defined_filter OWNER TO supabase_admin;
+ 
 
---
--- Name: wal_column; Type: TYPE; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: wal_column; Type: TYPE; Schema: realtime; Owner: supabase_admin
+ 
 
 CREATE TYPE realtime.wal_column AS (
 	name text,
@@ -279,10 +560,14 @@ CREATE TYPE realtime.wal_column AS (
 );
 
 
+ 
+ 
+ALTER TYPE realtime.wal_column OWNER TO supabase_admin;
+ 
 
---
--- Name: wal_rls; Type: TYPE; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: wal_rls; Type: TYPE; Schema: realtime; Owner: supabase_admin
+ 
 
 CREATE TYPE realtime.wal_rls AS (
 	wal json,
@@ -292,74 +577,190 @@ CREATE TYPE realtime.wal_rls AS (
 );
 
 
+ 
+ 
+ALTER TYPE realtime.wal_rls OWNER TO supabase_admin;
+ 
 
---
--- Name: email(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: email(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+ 
 
-
-
-
---
--- Name: FUNCTION email(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
-
-
-
---
--- Name: jwt(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
---
-
-
-
-
---
--- Name: role(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
---
+ 
+ 
+    LANGUAGE sql STABLE
+    AS $$
+  select 
+  coalesce(
+    nullif(current_setting('request.jwt.claim.email', true), ''),
+    (nullif(current_setting('request.jwt.claims', true), '')->> 'email')
+  )
+$$;
+ 
 
 
 
-
---
--- Name: FUNCTION role(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
-
-
-
---
--- Name: uid(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: FUNCTION email(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
+ 
+  Name: jwt(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+ 
 
---
--- Name: FUNCTION uid(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
-
-
-
---
--- Name: grant_pg_cron_access(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
---
-
-
-
-
---
--- Name: FUNCTION grant_pg_cron_access(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
---
+ 
+ 
+    LANGUAGE sql STABLE
+    AS $$
+  select 
+    coalesce(
+        nullif(current_setting('request.jwt.claim', true), ''),
+        nullif(current_setting('request.jwt.claims', true), '')
+    )
+$$;
+ 
 
 
 
---
--- Name: grant_pg_graphql_access(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: role(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE
+    AS $$
+  select 
+  coalesce(
+    nullif(current_setting('request.jwt.claim.role', true), ''),
+    (nullif(current_setting('request.jwt.claims', true), '')->> 'role')
+  )
+$$;
+ 
 
 
-        -- This hook executes when `graphql.resolve` is created. That is not necessarily the last
-        -- function in the extension so we need to grant permissions on existing entities AND
-        -- update default permissions to any others that are created after `graphql.resolve`
+
+ 
+  Name: FUNCTION role(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
+
+
+
+ 
+  Name: uid(); Type: FUNCTION; Schema: auth; Owner: supabase_auth_admin
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE
+    AS $$
+  select 
+  coalesce(
+    nullif(current_setting('request.jwt.claim.sub', true), ''),
+    (nullif(current_setting('request.jwt.claims', true), '')->> 'sub')
+  )
+$$;
+ 
+
+
+
+ 
+  Name: FUNCTION uid(); Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
+
+
+
+ 
+  Name: grant_pg_cron_access(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF EXISTS (
+    SELECT
+    FROM pg_event_trigger_ddl_commands() AS ev
+    JOIN pg_extension AS ext
+    ON ev.objid = ext.oid
+    WHERE ext.extname = 'pg_cron'
+  )
+  THEN
+    grant usage on schema cron to postgres with grant option;
+
+    alter default privileges in schema cron grant all on tables to postgres with grant option;
+    alter default privileges in schema cron grant all on functions to postgres with grant option;
+    alter default privileges in schema cron grant all on sequences to postgres with grant option;
+
+    alter default privileges for user supabase_admin in schema cron grant all
+        on sequences to postgres with grant option;
+    alter default privileges for user supabase_admin in schema cron grant all
+        on tables to postgres with grant option;
+    alter default privileges for user supabase_admin in schema cron grant all
+        on functions to postgres with grant option;
+
+    grant all privileges on all tables in schema cron to postgres with grant option;
+    revoke all on table cron.job from postgres;
+    grant select on table cron.job to postgres with grant option;
+  END IF;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: FUNCTION grant_pg_cron_access(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
+ 
+
+
+
+ 
+  Name: grant_pg_graphql_access(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    func_is_graphql_resolve bool;
+BEGIN
+    func_is_graphql_resolve = (
+        SELECT n.proname = 'resolve'
+        FROM pg_event_trigger_ddl_commands() AS ev
+        LEFT JOIN pg_catalog.pg_proc AS n
+        ON ev.objid = n.oid
+    );
+
+    IF func_is_graphql_resolve
+    THEN
+          Update public wrapper to pass all arguments through to the pg_graphql resolve func
+        DROP FUNCTION IF EXISTS graphql_graphql;
+        create or replace function graphql_graphql(
+            `operationName` text default null,
+            query text default null,
+            variables json default null,
+            extensions json default null
+        )
+            returns json
+            language sql
+        as $$
+            select graphql.resolve(
+                query := query,
+                variables := coalesce(variables, '{}'),
+                `operationName` := `operationName`,
+                extensions := extensions
+            );
+        $$;
+ 
+
+          This hook executes when `graphql.resolve` is created. That is not necessarily the last
+          function in the extension so we need to grant permissions on existing entities AND
+          update default permissions to any others that are created after `graphql.resolve`
         grant usage on schema graphql to postgres, anon, authenticated, service_role;
         grant select on all tables in schema graphql to postgres, anon, authenticated, service_role;
         grant execute on all functions in schema graphql to postgres, anon, authenticated, service_role;
@@ -368,7 +769,7 @@ CREATE TYPE realtime.wal_rls AS (
         alter default privileges in schema graphql grant all on functions to postgres, anon, authenticated, service_role;
         alter default privileges in schema graphql grant all on sequences to postgres, anon, authenticated, service_role;
 
-        -- Allow postgres role to allow granting usage on graphql and graphql_public schemas to custom roles
+          Allow postgres role to allow granting usage on graphql and graphql_public schemas to custom roles
         grant usage on schema graphql_public to postgres with grant option;
         grant usage on schema graphql to postgres with grant option;
     END IF;
@@ -378,43 +779,190 @@ $_$;
 
 
 
---
--- Name: FUNCTION grant_pg_graphql_access(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION grant_pg_graphql_access(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
---
--- Name: grant_pg_net_access(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: grant_pg_net_access(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_event_trigger_ddl_commands() AS ev
+    JOIN pg_extension AS ext
+    ON ev.objid = ext.oid
+    WHERE ext.extname = 'pg_net'
+  )
+  THEN
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_roles
+      WHERE rolname = 'supabase_functions_admin'
+    )
+    THEN
+      CREATE USER supabase_functions_admin NOINHERIT CREATEROLE LOGIN NOREPLICATION;
+    END IF;
+
+
+    IF EXISTS (
+      SELECT FROM pg_extension
+      WHERE extname = 'pg_net'
+        all versions in use on existing projects as of 2025-02-20
+        version 0.12.0 onwards don't need these applied
+      AND extversion IN ('0.2', '0.6', '0.7', '0.7.1', '0.8', '0.10.0', '0.11.0')
+    ) THEN
+      ALTER function net.http_get(url text, params json, headers json, timeout_milliseconds integer) SECURITY DEFINER;
+      ALTER function net.http_post(url text, body json, params json, headers json, timeout_milliseconds integer) SECURITY DEFINER;
+
+      ALTER function net.http_get(url text, params json, headers json, timeout_milliseconds integer) SET search_path = net;
+      ALTER function net.http_post(url text, body json, params json, headers json, timeout_milliseconds integer) SET search_path = net;
+
+
+    END IF;
+  END IF;
+END;
+$$;
+ 
 
 
 
-
---
--- Name: FUNCTION grant_pg_net_access(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
---
-
-
-
---
--- Name: pgrst_ddl_watch(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION grant_pg_net_access(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
+ 
+  Name: pgrst_ddl_watch(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+ 
 
---
--- Name: pgrst_drop_watch(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
---
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  cmd record;
+BEGIN
+  FOR cmd IN SELECT * FROM pg_event_trigger_ddl_commands()
+  LOOP
+    IF cmd.command_tag IN (
+      'CREATE SCHEMA', 'ALTER SCHEMA'
+    , 'CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO', 'ALTER TABLE'
+    , 'CREATE FOREIGN TABLE', 'ALTER FOREIGN TABLE'
+    , 'CREATE VIEW', 'ALTER VIEW'
+    , 'CREATE MATERIALIZED VIEW', 'ALTER MATERIALIZED VIEW'
+    , 'CREATE FUNCTION', 'ALTER FUNCTION'
+    , 'CREATE TRIGGER'
+    , 'CREATE TYPE', 'ALTER TYPE'
+    , 'CREATE RULE'
+    , 'COMMENT'
+    )
+      don't notify in case of CREATE TEMP table or other objects created on pg_temp
+    AND cmd.schema_name is distinct from 'pg_temp'
+    THEN
+      NOTIFY pgrst, 'reload schema';
+    END IF;
+  END LOOP;
+END; $$;
+ 
 
 
 
+ 
+  Name: pgrst_drop_watch(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+ 
 
---
--- Name: set_graphql_placeholder(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
---
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  obj record;
+BEGIN
+  FOR obj IN SELECT * FROM pg_event_trigger_dropped_objects()
+  LOOP
+    IF obj.object_type IN (
+      'schema'
+    , 'table'
+    , 'foreign table'
+    , 'view'
+    , 'materialized view'
+    , 'function'
+    , 'trigger'
+    , 'type'
+    , 'rule'
+    )
+    AND obj.is_temporary IS false   no pg_temp objects
+    THEN
+      NOTIFY pgrst, 'reload schema';
+    END IF;
+  END LOOP;
+END; $$;
+ 
 
+
+
+ 
+  Name: set_graphql_placeholder(); Type: FUNCTION; Schema: extensions; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $_$
+    DECLARE
+    graphql_is_dropped bool;
+    BEGIN
+    graphql_is_dropped = (
+        SELECT ev.schema_name = 'graphql_public'
+        FROM pg_event_trigger_dropped_objects() AS ev
+        WHERE ev.schema_name = 'graphql_public'
+    );
+
+    IF graphql_is_dropped
+    THEN
+        create or replace function graphql_graphql(
+            `operationName` text default null,
+            query text default null,
+            variables json default null,
+            extensions json default null
+        )
+            returns json
+            language plpgsql
+        as $$
+            DECLARE
+                server_version float;
+            BEGIN
+                server_version = (SELECT (SPLIT_PART((select version()), ' ', 2)));
+
+                IF server_version >= 14 THEN
+                    RETURN json_build_object(
+                        'errors', json_build_array(
+                            json_build_object(
+                                'message', 'pg_graphql extension is not enabled.'
+                            )
+                        )
+                    );
+                ELSE
+                    RETURN json_build_object(
+                        'errors', json_build_array(
+                            json_build_object(
+                                'message', 'pg_graphql is only available on projects running Postgres 14 onwards.'
+                            )
+                        )
+                    );
+                END IF;
+            END;
+        $$;
+ 
     END IF;
 
     END;
@@ -422,311 +970,1634 @@ $_$;
 
 
 
---
--- Name: FUNCTION set_graphql_placeholder(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
---
-
-
-
---
--- Name: get_auth(text); Type: FUNCTION; Schema: pgbouncer; Owner: supabase_admin
---
-
-
-
-
---
--- Name: assign_default_permissions(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: auto_start_task_timer(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: check_is_root_admin(uuid); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: client_has_module_permission(uuid, client_module); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: client_has_report_permission(uuid, report_type); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: create_chamado_historico(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: create_default_client_permissions(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: create_task_activity(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: create_ticket_timeline_entry(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: get_user_cliente_id(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: get_user_permissions(uuid); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: handle_new_user(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: has_permission(uuid, permission_type); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: is_admin(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: log_permission_changes(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: log_system_activity(text, text, json, inet, text); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: update_ticket_detailed_status(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: update_ticket_status_on_message(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: update_updated_at_column(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-
-
-
---
--- Name: apply_rls(json, integer); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: broadcast_changes(text, text, text, text, text, record, record, text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: build_prepared_statement_sql(text, regclass, realtime.wal_column[]); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: cast(text, regtype); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: check_equality_op(realtime.equality_op, regtype, text, text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: is_visible_through_filters(realtime.wal_column[], realtime.user_defined_filter[]); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: list_changes(name, name, integer, integer); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: quote_wal2json(regclass); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: send(json, text, text, boolean); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: subscription_check_filters(); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: to_regrole(text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
---
-
-
-
-
---
--- Name: topic(); Type: FUNCTION; Schema: realtime; Owner: supabase_realtime_admin
---
-
-
-
-
---
--- Name: can_insert_object(text, text, uuid, json); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: extension(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: filename(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: foldername(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: get_size_by_bucket(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: list_multipart_uploads_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: list_objects_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: operation(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: search(text, text, integer, integer, integer, text, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
---
--- Name: update_updated_at_column(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
-
-
-
---
--- Name: audit_log_entries; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: FUNCTION set_graphql_placeholder(); Type: COMMENT; Schema: extensions; Owner: supabase_admin
+ 
+
+
+
+ 
+  Name: get_auth(text); Type: FUNCTION; Schema: pgbouncer; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $_$
+begin
+    raise debug 'PgBouncer auth request: %', p_usename;
+
+    return query
+    select 
+        rolname, 
+        case when rolvaliduntil < CURRENT_TIMESTAMP 
+            then null 
+            else rolpassword
+        end 
+    from pg_authid 
+    where rolname=$1 and rolcanlogin;
+end;
+$_$;
+ 
+
+
+
+ 
+  Name: assign_default_permissions(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
+BEGIN
+    Atribuir permissão básica de acesso a tarefas para novos usuários
+  INSERT INTO user_permissions (user_id, permission)
+  VALUES (NEW.id, 'access_tasks');
+  
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: auto_start_task_timer(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    Se mudou para execução e não tinha data_inicio, definir agora
+  IF NEW.status = 'execucao' AND OLD.status != 'execucao' AND NEW.data_inicio IS NULL THEN
+    NEW.data_inicio = CURRENT_TIMESTAMP;
+  END IF;
+  
+    Se finalizou, definir data_conclusao
+  IF NEW.status = 'finalizada' AND OLD.status != 'finalizada' THEN
+    NEW.data_conclusao = CURRENT_TIMESTAMP;
+  END IF;
+  
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: check_is_root_admin(uuid); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE SECURITY DEFINER
+    AS $$
+  SELECT COALESCE(
+    (SELECT is_root_admin FROM profiles WHERE id = user_id LIMIT 1),
+    false
+  );
+$$;
+ 
+
+
+
+ 
+  Name: client_has_module_permission(uuid, client_module); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE SECURITY DEFINER
+    AS $$
+  SELECT EXISTS (
+    SELECT 1 
+    FROM client_permissions cp
+    JOIN clientes c ON c.id = cp.client_id
+    WHERE c.user_id = client_user_id 
+    AND cp.module = module_name 
+    AND cp.enabled = true
+  );
+$$;
+ 
+
+
+
+ 
+  Name: client_has_report_permission(uuid, report_type); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE SECURITY DEFINER
+    AS $$
+  SELECT EXISTS (
+    SELECT 1 
+    FROM client_report_permissions crp
+    JOIN clientes c ON c.id = crp.client_id
+    WHERE c.user_id = client_user_id 
+    AND crp.report_type = report_name 
+    AND crp.enabled = true
+  );
+$$;
+ 
+
+
+
+ 
+  Name: create_chamado_historico(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    Inserir histórico quando chamado é criado
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)
+    VALUES (
+      NEW.id, 
+      'criado', 
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      'Chamado criado: ' || NEW.titulo
+    );
+    RETURN NEW;
+  END IF;
+  
+    Inserir histórico quando status muda
+  IF TG_OP = 'UPDATE' AND OLD.status != NEW.status THEN
+    INSERT INTO chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)
+    VALUES (
+      NEW.id, 
+      'status_alterado', 
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      'Status alterado de `' || OLD.status || '` para `' || NEW.status || '`'
+    );
+  END IF;
+  
+    Inserir histórico quando resposta é adicionada
+  IF TG_OP = 'UPDATE' AND (OLD.resposta IS NULL OR OLD.resposta = '') AND NEW.resposta IS NOT NULL AND NEW.resposta != '' THEN
+    INSERT INTO chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)
+    VALUES (
+      NEW.id, 
+      'respondido', 
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      'Nova resposta adicionada'
+    );
+  END IF;
+  
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: create_default_client_permissions(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    Inserir permissões padrão para módulos básicos
+  INSERT INTO client_permissions (client_id, module, enabled) VALUES
+    (NEW.id, 'dashboard', true),
+    (NEW.id, 'chamados', true),
+    (NEW.id, 'criativos', true);
+  
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: create_task_activity(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    Criar atividade para criação
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO task_activities (
+      tarefa_id, usuario_id, usuario_nome, tipo, conteudo, metadata
+    ) VALUES (
+      NEW.id,
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      'criacao',
+      'Tarefa criada: ' || NEW.titulo,
+      json_build_object('prioridade', NEW.prioridade, 'tipo', NEW.tipo)
+    );
+    RETURN NEW;
+  END IF;
+  
+    Criar atividade para mudança de status
+  IF TG_OP = 'UPDATE' AND OLD.status != NEW.status THEN
+    INSERT INTO task_activities (
+      tarefa_id, usuario_id, usuario_nome, tipo, conteudo,
+      status_anterior, status_novo
+    ) VALUES (
+      NEW.id,
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      'status_change',
+      'Status alterado de `' || OLD.status || '` para `' || NEW.status || '`',
+      OLD.status,
+      NEW.status
+    );
+  END IF;
+  
+    Criar atividade para mudança de responsável
+  IF TG_OP = 'UPDATE' AND OLD.responsavel_id != NEW.responsavel_id THEN
+    INSERT INTO task_activities (
+      tarefa_id, usuario_id, usuario_nome, tipo, conteudo, metadata
+    ) VALUES (
+      NEW.id,
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      'assignment',
+      'Responsável alterado',
+      json_build_object(
+        'responsavel_anterior', OLD.responsavel_id,
+        'responsavel_novo', NEW.responsavel_id
+      )
+    );
+  END IF;
+  
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: create_ticket_timeline_entry(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    Entrada para criação do chamado
+  IF TG_OP = 'INSERT' AND TG_TABLE_NAME = 'chamados' THEN
+    INSERT INTO chamados_timeline (
+      chamado_id, 
+      tipo, 
+      conteudo, 
+      autor_id, 
+      autor_nome, 
+      autor_tipo,
+      metadata
+    ) VALUES (
+      NEW.id,
+      'criacao',
+      NEW.mensagem,
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      NEW.aberto_por,
+      json_build_object('titulo', NEW.titulo, 'categoria', NEW.categoria, 'prioridade', NEW.prioridade)
+    );
+  END IF;
+
+    Entrada para nova mensagem
+  IF TG_OP = 'INSERT' AND TG_TABLE_NAME = 'chamados_mensagens' THEN
+    INSERT INTO chamados_timeline (
+      chamado_id,
+      tipo,
+      conteudo,
+      autor_id,
+      autor_nome,
+      autor_tipo,
+      metadata
+    ) VALUES (
+      NEW.chamado_id,
+      'mensagem',
+      NEW.conteudo,
+      NEW.autor_id,
+      NEW.autor_nome,
+      NEW.autor_tipo,
+      NEW.metadata
+    );
+  END IF;
+
+    Entrada para mudança de status
+  IF TG_OP = 'UPDATE' AND TG_TABLE_NAME = 'chamados' AND OLD.status != NEW.status THEN
+    INSERT INTO chamados_timeline (
+      chamado_id,
+      tipo,
+      conteudo,
+      autor_id,
+      autor_nome,
+      autor_tipo,
+      metadata
+    ) VALUES (
+      NEW.id,
+      'status_change',
+      'Status alterado de `' || OLD.status || '` para `' || NEW.status || '`',
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      CASE WHEN is_admin() THEN 'admin' ELSE 'cliente' END,
+      json_build_object('status_anterior', OLD.status, 'status_novo', NEW.status)
+    );
+  END IF;
+
+    Entrada para nova resposta (campo resposta)
+  IF TG_OP = 'UPDATE' AND TG_TABLE_NAME = 'chamados' AND (OLD.resposta IS NULL OR OLD.resposta = '') AND NEW.resposta IS NOT NULL AND NEW.resposta != '' THEN
+    INSERT INTO chamados_timeline (
+      chamado_id,
+      tipo,
+      conteudo,
+      autor_id,
+      autor_nome,
+      autor_tipo
+    ) VALUES (
+      NEW.id,
+      'resposta',
+      NEW.resposta,
+      uid(),
+      COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+      CASE WHEN is_admin() THEN 'admin' ELSE 'cliente' END
+    );
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: get_user_cliente_id(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE SECURITY DEFINER
+    AS $$
+  SELECT c.id FROM clientes c
+  WHERE c.user_id = uid();
+$$;
+ 
+
+
+
+ 
+  Name: get_user_permissions(uuid); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE SECURITY DEFINER
+    AS $$
+  SELECT COALESCE(array_agg(permission), '{}') 
+  FROM user_permissions 
+  WHERE user_permissions.user_id = get_user_permissions.user_id;
+$$;
+ 
+
+
+
+ 
+  Name: handle_new_user(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
+begin
+  insert into usuarios (id, nome)
+  values (new.id, new.raw_user_meta_data->>'name');
+  return new;
+end;
+$$;
+ 
+
+
+
+ 
+  Name: has_permission(uuid, permission_type); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE SECURITY DEFINER
+    AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM user_permissions 
+    WHERE user_permissions.user_id = has_permission.user_id 
+    AND permission = required_permission
+  ) OR EXISTS (
+    SELECT 1 FROM profiles 
+    WHERE id = has_permission.user_id 
+    AND is_root_admin = TRUE
+  );
+$$;
+ 
+
+
+
+ 
+  Name: is_admin(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE SECURITY DEFINER
+    AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = uid() AND role = 'admin'
+  );
+$$;
+ 
+
+
+
+ 
+  Name: log_permission_changes(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO permission_logs (target_user_id, changed_by, action, permission, details)
+    VALUES (NEW.user_id, uid(), 'granted', NEW.permission, 
+            json_build_object('timestamp', NOW()));
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    INSERT INTO permission_logs (target_user_id, changed_by, action, permission, details)
+    VALUES (OLD.user_id, uid(), 'revoked', OLD.permission, 
+            json_build_object('timestamp', NOW()));
+    RETURN OLD;
+  END IF;
+  RETURN NULL;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: log_system_activity(text, text, json, inet, text); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
+DECLARE
+  log_id UUID;
+BEGIN
+  INSERT INTO system_activity_logs (
+    usuario_id, 
+    usuario_nome, 
+    acao, 
+    modulo, 
+    detalhes, 
+    ip_address, 
+    user_agent
+  ) VALUES (
+    uid(),
+    COALESCE((SELECT nome FROM profiles WHERE id = uid()), 'Sistema'),
+    p_acao,
+    p_modulo,
+    p_detalhes,
+    p_ip_address,
+    p_user_agent
+  ) RETURNING id INTO log_id;
+  
+  RETURN log_id;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: update_ticket_detailed_status(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    Definir status detalhado baseado no status e outras condições
+  IF NEW.status = 'novo' AND NEW.aberto_por = 'admin' THEN
+    NEW.status_detalhado = 'Novo - Aberto pela Equipe';
+  ELSIF NEW.status = 'novo' AND NEW.aberto_por = 'cliente' THEN
+    NEW.status_detalhado = 'Novo - Aberto pelo Cliente';
+  ELSIF NEW.status = 'aguardando_equipe' THEN
+    NEW.status_detalhado = 'Aguardando resposta da equipe';
+  ELSIF NEW.status = 'aguardando_cliente' THEN
+    NEW.status_detalhado = 'Aguardando resposta do cliente';
+  ELSIF NEW.status = 'em_analise' THEN
+    NEW.status_detalhado = 'Em análise pela equipe';
+  ELSIF NEW.status = 'em_andamento' THEN
+    NEW.status_detalhado = 'Em andamento';
+  ELSIF NEW.status = 'resolvido' THEN
+    NEW.status_detalhado = 'Resolvido';
+  ELSE
+    NEW.status_detalhado = NEW.status;
+  END IF;
+  
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: update_ticket_status_on_message(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    Se é uma mensagem de cliente, alterar status para 'aguardando_equipe'
+  IF NEW.autor_tipo = 'cliente' THEN
+    UPDATE chamados 
+    WHERE id = NEW.chamado_id;
+  END IF;
+  
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: update_updated_at_column(); Type: FUNCTION; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: apply_rls(json, integer); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+declare
+  Regclass of the table e.g. notes
+entity_ regclass = (quote_ident(wal ->> 'schema') || '.' || quote_ident(wal ->> 'table'));
+
+  I, U, D, T: insert, update ...
+action realtime.action = (
+    case wal ->> 'action'
+        when 'I' then 'INSERT'
+        when 'U' then 'UPDATE'
+        when 'D' then 'DELETE'
+        else 'ERROR'
+    end
+);
+
+  Is row level security enabled for the table
+is_rls_enabled bool = relrowsecurity from pg_class where oid = entity_;
+
+subscriptions realtime.subscription[] = array_agg(subs)
+    from
+        realtime.subscription subs
+    where
+        subs.entity = entity_;
+
+  Subscription vars
+roles regrole[] = array_agg(distinct us.claims_role)
+    from
+        unnest(subscriptions) us;
+
+working_role regrole;
+claimed_role regrole;
+claims json;
+
+subscription_id char(36);
+subscription_has_access bool;
+visible_to_subscription_ids json = '{}';
+
+  structured info for wal's columns
+columns realtime.wal_column[];
+  previous identity values for update/delete
+old_columns realtime.wal_column[];
+
+error_record_exceeds_max_size tinyint(1) = octet_length(wal) > max_record_bytes;
+
+  Primary json output for record
+output json;
+
+begin
+perform set_config('role', null, true);
+
+columns =
+    array_agg(
+        (
+            x->>'name',
+            x->>'type',
+            x->>'typeoid',
+            realtime.cast(
+                (x->'value') #>> '{}',
+                coalesce(
+                    (x->>'typeoid'),   null when wal2json version <= 2.4
+                    (x->>'type')
+                )
+            ),
+            (pks ->> 'name') is not null,
+            true
+        ).wal_column
+    )
+    from
+        json_array_elements(wal -> 'columns') x
+        left join json_array_elements(wal -> 'pk') pks
+            on (x ->> 'name') = (pks ->> 'name');
+
+old_columns =
+    array_agg(
+        (
+            x->>'name',
+            x->>'type',
+            x->>'typeoid',
+            realtime.cast(
+                (x->'value') #>> '{}',
+                coalesce(
+                    (x->>'typeoid'),   null when wal2json version <= 2.4
+                    (x->>'type')
+                )
+            ),
+            (pks ->> 'name') is not null,
+            true
+        ).wal_column
+    )
+    from
+        json_array_elements(wal -> 'identity') x
+        left join json_array_elements(wal -> 'pk') pks
+            on (x ->> 'name') = (pks ->> 'name');
+
+for working_role in select * from unnest(roles) loop
+
+      Update `is_selectable` for columns and old_columns
+    columns =
+        array_agg(
+            (
+                c.name,
+                c.type_name,
+                c.type_oid,
+                c.value,
+                c.is_pkey,
+                pg_catalog.has_column_privilege(working_role, entity_, c.name, 'SELECT')
+            ).wal_column
+        )
+        from
+            unnest(columns) c;
+
+    old_columns =
+            array_agg(
+                (
+                    c.name,
+                    c.type_name,
+                    c.type_oid,
+                    c.value,
+                    c.is_pkey,
+                    pg_catalog.has_column_privilege(working_role, entity_, c.name, 'SELECT')
+                ).wal_column
+            )
+            from
+                unnest(old_columns) c;
+
+    if action <> 'DELETE' and count(1) = 0 from unnest(columns) c where c.is_pkey then
+        return next (
+            json_build_object(
+                'schema', wal ->> 'schema',
+                'table', wal ->> 'table',
+                'type', action
+            ),
+            is_rls_enabled,
+              subscriptions is already filtered by entity
+            (select array_agg(s.subscription_id) from unnest(subscriptions) as s where claims_role = working_role),
+            array['Error 400: Bad Request, no primary key']
+        ).wal_rls;
+
+      The claims role does not have SELECT permission to the primary key of entity
+    elsif action <> 'DELETE' and sum(c.is_selectable) <> count(1) from unnest(columns) c where c.is_pkey then
+        return next (
+            json_build_object(
+                'schema', wal ->> 'schema',
+                'table', wal ->> 'table',
+                'type', action
+            ),
+            is_rls_enabled,
+            (select array_agg(s.subscription_id) from unnest(subscriptions) as s where claims_role = working_role),
+            array['Error 401: Unauthorized']
+        ).wal_rls;
+
+    else
+        output = json_build_object(
+            'schema', wal ->> 'schema',
+            'table', wal ->> 'table',
+            'type', action,
+            'commit_timestamp', to_char(
+                ((wal ->> 'timestamp')'utc'),
+                'YYYY-MM-DD`T`HH24:MI:SS.MS`Z`'
+            ),
+            'columns', (
+                select
+                    json_agg(
+                        json_build_object(
+                            'name', pa.attname,
+                            'type', pt.typname
+                        )
+                        order by pa.attnum asc
+                    )
+                from
+                    pg_attribute pa
+                    join pg_type pt
+                        on pa.atttypid = pt.oid
+                where
+                    attrelid = entity_
+                    and attnum > 0
+                    and pg_catalog.has_column_privilege(working_role, entity_, pa.attname, 'SELECT')
+            )
+        )
+          Add `record` key for insert and update
+        || case
+            when action in ('INSERT', 'UPDATE') then
+                json_build_object(
+                    'record',
+                    (
+                        select
+                            json_object_agg(
+                                  if unchanged toast, get column name and value from old record
+                                coalesce((c).name, (oc).name),
+                                case
+                                    when (c).name is null then (oc).value
+                                    else (c).value
+                                end
+                            )
+                        from
+                            unnest(columns) c
+                            full outer join unnest(old_columns) oc
+                                on (c).name = (oc).name
+                        where
+                            coalesce((c).is_selectable, (oc).is_selectable)
+                            and ( not error_record_exceeds_max_size or (octet_length((c).value) <= 64))
+                    )
+                )
+            else '{}'
+        end
+          Add `old_record` key for update and delete
+        || case
+            when action = 'UPDATE' then
+                json_build_object(
+                        'old_record',
+                        (
+                            select json_object_agg((c).name, (c).value)
+                            from unnest(old_columns) c
+                            where
+                                (c).is_selectable
+                                and ( not error_record_exceeds_max_size or (octet_length((c).value) <= 64))
+                        )
+                    )
+            when action = 'DELETE' then
+                json_build_object(
+                    'old_record',
+                    (
+                        select json_object_agg((c).name, (c).value)
+                        from unnest(old_columns) c
+                        where
+                            (c).is_selectable
+                            and ( not error_record_exceeds_max_size or (octet_length((c).value) <= 64))
+                            and ( not is_rls_enabled or (c).is_pkey )   if RLS enabled, we can't secure deletes so filter to pkey
+                    )
+                )
+            else '{}'
+        end;
+
+          Create the prepared statement
+        if is_rls_enabled and action <> 'DELETE' then
+            if (select 1 from pg_prepared_statements where name = 'walrus_rls_stmt' limit 1) > 0 then
+                deallocate walrus_rls_stmt;
+            end if;
+            execute realtime.build_prepared_statement_sql('walrus_rls_stmt', entity_, columns);
+        end if;
+
+        visible_to_subscription_ids = '{}';
+
+        for subscription_id, claims in (
+                select
+                    subs.subscription_id,
+                    subs.claims
+                from
+                    unnest(subscriptions) subs
+                where
+                    subs.entity = entity_
+                    and subs.claims_role = working_role
+                    and (
+                        realtime.is_visible_through_filters(columns, subs.filters)
+                        or (
+                          action = 'DELETE'
+                          and realtime.is_visible_through_filters(old_columns, subs.filters)
+                        )
+                    )
+        ) loop
+
+            if not is_rls_enabled or action = 'DELETE' then
+                visible_to_subscription_ids = visible_to_subscription_ids || subscription_id;
+            else
+                  Check if RLS allows the role to see the record
+                perform
+                      Trim leading and trailing quotes from working_role because set_config
+                      doesn't recognize the role as valid if they are included
+                    set_config('role', trim(both '`' from working_role), true),
+                    set_config('request.jwt.claims', claims, true);
+
+                execute 'execute walrus_rls_stmt' into subscription_has_access;
+
+                if subscription_has_access then
+                    visible_to_subscription_ids = visible_to_subscription_ids || subscription_id;
+                end if;
+            end if;
+        end loop;
+
+        perform set_config('role', null, true);
+
+        return next (
+            output,
+            is_rls_enabled,
+            visible_to_subscription_ids,
+            case
+                when error_record_exceeds_max_size then array['Error 413: Payload Too Large']
+                else '{}'
+            end
+        ).wal_rls;
+
+    end if;
+end loop;
+
+perform set_config('role', null, true);
+end;
+$$;
+ 
+
+
+
+ 
+  Name: broadcast_changes(text, text, text, text, text, record, record, text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+      Declare a variable to hold the JSONB representation of the row
+    row_data json := '{}';
+BEGIN
+    IF level = 'STATEMENT' THEN
+        RAISE EXCEPTION 'function can only be triggered for each row, not for each statement';
+    END IF;
+      Check the operation type and handle accordingly
+    IF operation = 'INSERT' OR operation = 'UPDATE' OR operation = 'DELETE' THEN
+        row_data := json_build_object('old_record', OLD, 'record', NEW, 'operation', operation, 'table', table_name, 'schema', table_schema);
+        PERFORM realtime.send (row_data, event_name, topic_name);
+    ELSE
+        RAISE EXCEPTION 'Unexpected operation type: %', operation;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Failed to process the row: %', SQLERRM;
+END;
+
+$$;
+ 
+
+
+
+ 
+  Name: build_prepared_statement_sql(text, regclass, realtime.wal_column[]); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE sql
+    AS $$
+      /*
+      Builds a sql string that, if executed, creates a prepared statement to
+      tests retrive a row from *entity* by its primary key columns.
+      Example
+          select realtime.build_prepared_statement_sql('notes', '{`id`}'[], '{`bigint`}'[])
+      */
+          select
+      'prepare ' || prepared_statement_name || ' as
+          select
+              exists(
+                  select
+                      1
+                  from
+                      ' || entity || '
+                  where
+                      ' || string_agg(quote_ident(pkc.name) || '=' || quote_nullable(pkc.value #>> '{}') , ' and ') || '
+              )'
+          from
+              unnest(columns) pkc
+          where
+              pkc.is_pkey
+          group by
+              entity
+      $$;
+ 
+
+
+
+ 
+  Name: cast(text, regtype); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    declare
+      res json;
+    begin
+      execute format('select to_json(%L::'|| type_|| ')', val)  into res;
+      return res;
+    end
+    $$;
+ 
+
+
+
+ 
+  Name: check_equality_op(realtime.equality_op, regtype, text, text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+      /*
+      Casts *val_1* and *val_2* as type *type_* and check the *op* condition for truthiness
+      */
+      declare
+          op_symbol text = (
+              case
+                  when op = 'eq' then '='
+                  when op = 'neq' then '!='
+                  when op = 'lt' then '<'
+                  when op = 'lte' then '<='
+                  when op = 'gt' then '>'
+                  when op = 'gte' then '>='
+                  when op = 'in' then '= any'
+                  else 'UNKNOWN OP'
+              end
+          );
+          res tinyint(1);
+      begin
+          execute format(
+              'select %L::'|| type_|| ' ' || op_symbol
+              || ' ( %L::'
+              || (
+                  case
+                      when op = 'in' then type_|| '[]'
+                      else type_
+              )
+              || ')', val_1, val_2) into res;
+          return res;
+      end;
+      $$;
+ 
+
+
+
+ 
+  Name: is_visible_through_filters(realtime.wal_column[], realtime.user_defined_filter[]); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE sql IMMUTABLE
+    AS $_$
+    /*
+    Should the record be visible (true) or filtered out (false) after *filters* are applied
+    */
+        select
+              Default to allowed when no filters present
+            $2 is null   no filters. this should not happen because subscriptions has a default
+            or array_length($2, 1) is null   array length of an empty array is null
+            or bool_and(
+                coalesce(
+                    realtime.check_equality_op(
+                        op:=f.op,
+                        type_:=coalesce(
+                            col.type_oid,   null when wal2json version <= 2.4
+                            col.type_name
+                        ),
+                          cast json to text
+                        val_1:=col.value #>> '{}',
+                        val_2:=f.value
+                    ),
+                    false   if null, filter does not match
+                )
+            )
+        from
+            unnest(filters) f
+            join unnest(columns) col
+                on f.column_name = col.name;
+    $_$;
+ 
+
+
+
+ 
+  Name: list_changes(name, name, integer, integer); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE sql
+    AS $$
+      with pub as (
+        select
+          concat_ws(
+            ',',
+            case when bool_or(pubinsert) then 'insert' else null end,
+            case when bool_or(pubupdate) then 'update' else null end,
+            case when bool_or(pubdelete) then 'delete' else null end
+          ) as w2j_actions,
+          coalesce(
+            string_agg(
+              realtime.quote_wal2json(format('%I.%I', schemaname, tablename)),
+              ','
+            ) filter (where ppt.tablename is not null and ppt.tablename not like '% %'),
+            ''
+          ) w2j_add_tables
+        from
+          pg_publication pp
+          left join pg_publication_tables ppt
+            on pp.pubname = ppt.pubname
+        where
+          pp.pubname = publication
+        group by
+          pp.pubname
+        limit 1
+      ),
+      w2j as (
+        select
+          x.*, pub.w2j_add_tables
+        from
+          pub,
+          pg_logical_slot_get_changes(
+            slot_name, null, max_changes,
+            'include-pk', 'true',
+            'include-transaction', 'false',
+            'include-timestamp', 'true',
+            'include-type-oids', 'true',
+            'format-version', '2',
+            'actions', pub.w2j_actions,
+            'add-tables', pub.w2j_add_tables
+          ) x
+      )
+      select
+        xyz.wal,
+        xyz.is_rls_enabled,
+        xyz.subscription_ids,
+        xyz.errors
+      from
+        w2j,
+        realtime.apply_rls(
+          wal := w2j.data,
+          max_record_bytes := max_record_bytes
+        ) xyz(wal, is_rls_enabled, subscription_ids, errors)
+      where
+        w2j.w2j_add_tables <> ''
+        and xyz.subscription_ids[1] is not null
+    $$;
+ 
+
+
+
+ 
+  Name: quote_wal2json(regclass); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE sql IMMUTABLE STRICT
+    AS $$
+      select
+        (
+          select string_agg('' || ch,'')
+          from unnest(string_to_array(nsp.nspname, null)) with ordinality x(ch, idx)
+          where
+            not (x.idx = 1 and x.ch = '`')
+            and not (
+              x.idx = array_length(string_to_array(nsp.nspname, null), 1)
+              and x.ch = '`'
+            )
+        )
+        || '.'
+        || (
+          select string_agg('' || ch,'')
+          from unnest(string_to_array(pc.relname, null)) with ordinality x(ch, idx)
+          where
+            not (x.idx = 1 and x.ch = '`')
+            and not (
+              x.idx = array_length(string_to_array(nsp.nspname, null), 1)
+              and x.ch = '`'
+            )
+          )
+      from
+        pg_class pc
+        join pg_namespace nsp
+          on pc.relnamespace = nsp.oid
+      where
+        pc.oid = entity
+    $$;
+ 
+
+
+
+ 
+  Name: send(json, text, text, boolean); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  BEGIN
+      Set the topic configuration
+    EXECUTE format('SET LOCAL realtime.topic TO %L', topic);
+
+      Attempt to insert the message
+    INSERT INTO realtime.messages (payload, event, topic, private, extension)
+    VALUES (payload, event, topic, private, 'broadcast');
+  EXCEPTION
+    WHEN OTHERS THEN
+        Capture and notify the error
+      PERFORM pg_notify(
+          'realtime:system',
+          json_build_object(
+              'error', SQLERRM,
+              'function', 'realtime.send',
+              'event', event,
+              'topic', topic,
+              'private', private
+          )
+      );
+  END;
+END;
+$$;
+ 
+
+
+
+ 
+  Name: subscription_check_filters(); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+    /*
+    Validates that the user defined filters for a subscription:
+    - refer to valid columns that the claimed role may access
+    - values are coercable to the correct column type
+    */
+    declare
+        col_names text[] = coalesce(
+                array_agg(c.column_name order by c.ordinal_position),
+                '{}'[]
+            )
+            from
+                information_schema.columns c
+            where
+                format('%I.%I', c.table_schema, c.table_name)= new.entity
+                and pg_catalog.has_column_privilege(
+                    (new.claims ->> 'role'),
+                    format('%I.%I', c.table_schema, c.table_name),
+                    c.column_name,
+                    'SELECT'
+                );
+        filter realtime.user_defined_filter;
+        col_type regtype;
+
+        in_val json;
+    begin
+        for filter in select * from unnest(new.filters) loop
+              Filtered column is valid
+            if not filter.column_name = any(col_names) then
+                raise exception 'invalid column for filter %', filter.column_name;
+            end if;
+
+              Type is sanitized and safe for string interpolation
+            col_type = (
+                select atttypid
+                from pg_catalog.pg_attribute
+                where attrelid = new.entity
+                      and attname = filter.column_name
+            );
+            if col_type is null then
+                raise exception 'failed to lookup type for column %', filter.column_name;
+            end if;
+
+              Set maximum number of entries for in filter
+            if filter.op = 'in'.equality_op then
+                in_val = realtime.cast(filter.value, (col_type|| '[]'));
+                if coalesce(json_array_length(in_val), 0) > 100 then
+                    raise exception 'too many values for `in` filter. Maximum 100';
+                end if;
+            else
+                  raises an exception if value is not coercable to type
+                perform realtime.cast(filter.value, col_type);
+            end if;
+
+        end loop;
+
+          Apply consistent order to filters so the unique constraint on
+          (subscription_id, entity, filters) can't be tricked by a different filter order
+        new.filters = coalesce(
+            array_agg(f order by f.column_name, f.op, f.value),
+            '{}'
+        ) from unnest(new.filters) f;
+
+        return new;
+    end;
+    $$;
+ 
+
+
+
+ 
+  Name: to_regrole(text); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+    LANGUAGE sql IMMUTABLE
+    AS $$ select role_name$$;
+ 
+
+
+
+ 
+  Name: topic(); Type: FUNCTION; Schema: realtime; Owner: supabase_realtime_admin
+ 
+
+ 
+ 
+    LANGUAGE sql STABLE
+    AS $$
+select nullif(current_setting('realtime.topic', true), '');
+$$;
+ 
+
+
+
+ 
+  Name: can_insert_object(text, text, uuid, json); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  INSERT INTO `storage`.`objects` (`bucket_id`, `name`, `owner`, `metadata`) VALUES (bucketid, name, owner, metadata);
+    hack to rollback the successful insert
+  RAISE sqlstate 'PT200' using
+  message = 'ROLLBACK',
+  detail = 'rollback successful insert';
+END
+$$;
+ 
+
+
+
+ 
+  Name: extension(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+_parts text[];
+_filename text;
+BEGIN
+	select string_to_array(name, '/') into _parts;
+	select _parts[array_length(_parts,1)] into _filename;
+	  @todo return the last part instead of 2
+	return reverse(split_part(reverse(_filename), '.', 1));
+END
+$$;
+ 
+
+
+
+ 
+  Name: filename(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+_parts text[];
+BEGIN
+	select string_to_array(name, '/') into _parts;
+	return _parts[array_length(_parts,1)];
+END
+$$;
+ 
+
+
+
+ 
+  Name: foldername(text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+_parts text[];
+BEGIN
+	select string_to_array(name, '/') into _parts;
+	return _parts[1:array_length(_parts,1)-1];
+END
+$$;
+ 
+
+
+
+ 
+  Name: get_size_by_bucket(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    return query
+        select sum((metadata->>'size')) as size, obj.bucket_id
+        from `storage`.objects as obj
+        group by obj.bucket_id;
+END
+$$;
+ 
+
+
+
+ 
+  Name: list_multipart_uploads_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $_$
+BEGIN
+    RETURN QUERY EXECUTE
+        'SELECT DISTINCT ON(key COLLATE `C`) * from (
+            SELECT
+                CASE
+                    WHEN position($2 IN substring(key from length($1) + 1)) > 0 THEN
+                        substring(key from 1 for length($1) + position($2 IN substring(key from length($1) + 1)))
+                    ELSE
+                        key
+                END AS key, id, created_at
+            FROM
+                storage.s3_multipart_uploads
+            WHERE
+                bucket_id = $5 AND
+                key ILIKE $1 || ''%'' AND
+                CASE
+                    WHEN $4 != '''' AND $6 = '''' THEN
+                        CASE
+                            WHEN position($2 IN substring(key from length($1) + 1)) > 0 THEN
+                                substring(key from 1 for length($1) + position($2 IN substring(key from length($1) + 1))) COLLATE `C` > $4
+                            ELSE
+                                key COLLATE `C` > $4
+                            END
+                    ELSE
+                        true
+                END AND
+                CASE
+                    WHEN $6 != '''' THEN
+                        id COLLATE `C` > $6
+                    ELSE
+                        true
+                    END
+            ORDER BY
+                key COLLATE `C` ASC, created_at ASC) as e order by key COLLATE `C` LIMIT $3'
+        USING prefix_param, delimiter_param, max_keys, next_key_token, bucket_id, next_upload_token;
+END;
+$_$;
+ 
+
+
+
+ 
+  Name: list_objects_with_delimiter(text, text, text, integer, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $_$
+BEGIN
+    RETURN QUERY EXECUTE
+        'SELECT DISTINCT ON(name COLLATE `C`) * from (
+            SELECT
+                CASE
+                    WHEN position($2 IN substring(name from length($1) + 1)) > 0 THEN
+                        substring(name from 1 for length($1) + position($2 IN substring(name from length($1) + 1)))
+                    ELSE
+                        name
+                END AS name, id, metadata, updated_at
+            FROM
+                storage.objects
+            WHERE
+                bucket_id = $5 AND
+                name ILIKE $1 || ''%'' AND
+                CASE
+                    WHEN $6 != '''' THEN
+                    name COLLATE `C` > $6
+                ELSE true END
+                AND CASE
+                    WHEN $4 != '''' THEN
+                        CASE
+                            WHEN position($2 IN substring(name from length($1) + 1)) > 0 THEN
+                                substring(name from 1 for length($1) + position($2 IN substring(name from length($1) + 1))) COLLATE `C` > $4
+                            ELSE
+                                name COLLATE `C` > $4
+                            END
+                    ELSE
+                        true
+                END
+            ORDER BY
+                name COLLATE `C` ASC) as e order by name COLLATE `C` LIMIT $3'
+        USING prefix_param, delimiter_param, max_keys, next_token, bucket_id, start_after;
+END;
+$_$;
+ 
+
+
+
+ 
+  Name: operation(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql STABLE
+    AS $$
+BEGIN
+    RETURN current_setting('storage.operation', true);
+END;
+$$;
+ 
+
+
+
+ 
+  Name: search(text, text, integer, integer, integer, text, text, text); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql STABLE
+    AS $_$
+declare
+  v_order_by text;
+  v_sort_order text;
+begin
+  case
+    when sortcolumn = 'name' then
+      v_order_by = 'name';
+    when sortcolumn = 'updated_at' then
+      v_order_by = 'updated_at';
+    when sortcolumn = 'created_at' then
+      v_order_by = 'created_at';
+    when sortcolumn = 'last_accessed_at' then
+      v_order_by = 'last_accessed_at';
+    else
+      v_order_by = 'name';
+  end case;
+
+  case
+    when sortorder = 'asc' then
+      v_sort_order = 'asc';
+    when sortorder = 'desc' then
+      v_sort_order = 'desc';
+    else
+      v_sort_order = 'asc';
+  end case;
+
+  v_order_by = v_order_by || ' ' || v_sort_order;
+
+  return query execute
+    'with folders as (
+       select path_tokens[$1] as folder
+       from storage.objects
+         where objects.name ilike $2 || $3 || ''%''
+           and bucket_id = $4
+           and array_length(objects.path_tokens, 1) <> $1
+       group by folder
+       order by folder ' || v_sort_order || '
+     )
+     (select folder as `name`,
+            null as id,
+            null as updated_at,
+            null as created_at,
+            null as last_accessed_at,
+            null as metadata from folders)
+     union all
+     (select path_tokens[$1] as `name`,
+            id,
+            updated_at,
+            created_at,
+            last_accessed_at,
+            metadata
+     from storage.objects
+     where objects.name ilike $2 || $3 || ''%''
+       and bucket_id = $4
+       and array_length(objects.path_tokens, 1) = $1
+     order by ' || v_order_by || ')
+     limit $5
+     offset $6' using levels, prefix, search, bucketname, limits, offsets;
+end;
+$_$;
+ 
+
+
+
+ 
+  Name: update_updated_at_column(); Type: FUNCTION; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW; 
+END;
+$$;
+ 
+
+
+
+
+
+ 
+  Name: audit_log_entries; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE audit_log_entries (
     instance_id char(36),
@@ -738,21 +2609,25 @@ CREATE TABLE audit_log_entries (
 
 
 
---
--- Name: TABLE audit_log_entries; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE audit_log_entries; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: flow_state; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: flow_state; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE flow_state (
     id char(36) NOT NULL,
     user_id char(36),
     auth_code text NOT NULL,
+ 
     ENUM('s256','plain') ENUM('s256','plain') NOT NULL,
+ 
+    code_challenge_method code_challenge_method NOT NULL,
+ 
     code_challenge text NOT NULL,
     provider_type text NOT NULL,
     provider_access_token text,
@@ -765,15 +2640,15 @@ CREATE TABLE flow_state (
 
 
 
---
--- Name: TABLE flow_state; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE flow_state; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: identities; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: identities; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE identities (
     provider_id text NOT NULL,
@@ -784,26 +2659,30 @@ CREATE TABLE identities (
     created_at timestamp,
     updated_at timestamp,
     email text GENERATED ALWAYS AS (lower((identity_data ->> 'email'))) STORED,
+ 
     id char(36) DEFAULT UUID() NOT NULL
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL
+ 
 );
 
 
 
---
--- Name: TABLE identities; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE identities; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: COLUMN identities.email; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: COLUMN identities.email; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: instances; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: instances; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE instances (
     id char(36) NOT NULL,
@@ -815,15 +2694,15 @@ CREATE TABLE instances (
 
 
 
---
--- Name: TABLE instances; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE instances; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: mfa_amr_claims; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_amr_claims; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE mfa_amr_claims (
     session_id char(36) NOT NULL,
@@ -835,15 +2714,15 @@ CREATE TABLE mfa_amr_claims (
 
 
 
---
--- Name: TABLE mfa_amr_claims; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE mfa_amr_claims; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: mfa_challenges; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_challenges; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE mfa_challenges (
     id char(36) NOT NULL,
@@ -857,22 +2736,27 @@ CREATE TABLE mfa_challenges (
 
 
 
---
--- Name: TABLE mfa_challenges; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE mfa_challenges; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: mfa_factors; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_factors; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE mfa_factors (
     id char(36) NOT NULL,
     user_id char(36) NOT NULL,
     friendly_name text,
+ 
     ENUM('totp','webauthn','phone') ENUM('totp','webauthn','phone') NOT NULL,
     status ENUM('unverified','verified') NOT NULL,
+ 
+    factor_type factor_type NOT NULL,
+    status factor_status NOT NULL,
+ 
     created_at timestamp NOT NULL,
     updated_at timestamp NOT NULL,
     secret text,
@@ -884,20 +2768,24 @@ CREATE TABLE mfa_factors (
 
 
 
---
--- Name: TABLE mfa_factors; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE mfa_factors; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: one_time_tokens; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: one_time_tokens; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE one_time_tokens (
     id char(36) NOT NULL,
     user_id char(36) NOT NULL,
+ 
     token_type ENUM('confirmation_token','reauthentication_token','recovery_token','email_change_token_new','email_change_token_current','phone_change_token') NOT NULL,
+ 
+    token_type one_time_token_type NOT NULL,
+ 
     token_hash text NOT NULL,
     relates_to text NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -907,9 +2795,9 @@ CREATE TABLE one_time_tokens (
 
 
 
---
--- Name: refresh_tokens; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE refresh_tokens (
     instance_id char(36),
@@ -925,15 +2813,15 @@ CREATE TABLE refresh_tokens (
 
 
 
---
--- Name: TABLE refresh_tokens; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE refresh_tokens; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: refresh_tokens_id_seq; Type: SEQUENCE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens_id_seq; Type: SEQUENCE; Schema: auth; Owner: supabase_auth_admin
+ 
 
     START WITH 1
     INCREMENT BY 1
@@ -943,15 +2831,15 @@ CREATE TABLE refresh_tokens (
 
 
 
---
--- Name: refresh_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: saml_providers; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_providers; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE saml_providers (
     id char(36) NOT NULL,
@@ -970,15 +2858,15 @@ CREATE TABLE saml_providers (
 
 
 
---
--- Name: TABLE saml_providers; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE saml_providers; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: saml_relay_states; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE saml_relay_states (
     id char(36) NOT NULL,
@@ -994,15 +2882,15 @@ CREATE TABLE saml_relay_states (
 
 
 
---
--- Name: TABLE saml_relay_states; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE saml_relay_states; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: schema_migrations; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: schema_migrations; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE schema_migrations (
     version character varying(255) NOT NULL
@@ -1010,15 +2898,15 @@ CREATE TABLE schema_migrations (
 
 
 
---
--- Name: TABLE schema_migrations; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE schema_migrations; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: sessions; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sessions; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE sessions (
     id char(36) NOT NULL,
@@ -1026,7 +2914,11 @@ CREATE TABLE sessions (
     created_at timestamp,
     updated_at timestamp,
     factor_id char(36),
+ 
     aal ENUM('aal1','aal2','aal3'),
+ 
+    aal aal_level,
+ 
     not_after timestamp,
     refreshed_at timestamp,
     user_agent text,
@@ -1036,21 +2928,21 @@ CREATE TABLE sessions (
 
 
 
---
--- Name: TABLE sessions; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE sessions; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: COLUMN sessions.not_after; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: COLUMN sessions.not_after; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: sso_domains; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_domains; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE sso_domains (
     id char(36) NOT NULL,
@@ -1063,15 +2955,15 @@ CREATE TABLE sso_domains (
 
 
 
---
--- Name: TABLE sso_domains; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE sso_domains; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: sso_providers; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_providers; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE sso_providers (
     id char(36) NOT NULL,
@@ -1083,21 +2975,21 @@ CREATE TABLE sso_providers (
 
 
 
---
--- Name: TABLE sso_providers; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE sso_providers; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: COLUMN sso_providers.resource_id; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: COLUMN sso_providers.resource_id; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: users; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE TABLE users (
     instance_id char(36),
@@ -1140,25 +3032,30 @@ CREATE TABLE users (
 
 
 
---
--- Name: TABLE users; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE users; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: COLUMN users.is_sso_user; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: COLUMN users.is_sso_user; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: activity_logs; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: activity_logs; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE activity_logs (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     ENUM('INSERT','UPDATE','DELETE','TRUNCATE','ERROR') text NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    action text NOT NULL,
+ 
     entity_type text NOT NULL,
     entity_id text NOT NULL,
     entity_name text NOT NULL,
@@ -1170,12 +3067,16 @@ CREATE TABLE activity_logs (
 
 
 
---
--- Name: chamados; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: chamados; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE chamados (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     cliente_id char(36) NOT NULL,
     titulo text NOT NULL,
     mensagem text NOT NULL,
@@ -1190,17 +3091,25 @@ CREATE TABLE chamados (
     prioridade text DEFAULT 'media',
     nota_interna text,
     tempo_resposta_horas integer,
+ 
     status ENUM('novo','aguardando_equipe','aguardando_cliente','em_analise','em_andamento','resolvido') DEFAULT 'novo' NOT NULL
+ 
+    status ticket_status DEFAULT 'novo'.ticket_status NOT NULL
+ 
 );
 
 
 
---
--- Name: chamados_anexos; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_anexos; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE chamados_anexos (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     chamado_id char(36),
     nome_arquivo text NOT NULL,
     url_arquivo text NOT NULL,
@@ -1212,12 +3121,16 @@ CREATE TABLE chamados_anexos (
 
 
 
---
--- Name: chamados_historico; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_historico; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE chamados_historico (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     chamado_id char(36) NOT NULL,
     acao text NOT NULL,
     usuario_id char(36),
@@ -1228,12 +3141,16 @@ CREATE TABLE chamados_historico (
 
 
 
---
--- Name: chamados_mensagens; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_mensagens; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE chamados_mensagens (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     chamado_id char(36) NOT NULL,
     conteudo text NOT NULL,
     arquivo_url text,
@@ -1247,12 +3164,16 @@ CREATE TABLE chamados_mensagens (
 
 
 
---
--- Name: chamados_timeline; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_timeline; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE chamados_timeline (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     chamado_id char(36),
     tipo text DEFAULT 'mensagem',
     conteudo text,
@@ -1265,14 +3186,20 @@ CREATE TABLE chamados_timeline (
 
 
 
---
--- Name: client_permissions; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: client_permissions; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE client_permissions (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     client_id char(36) NOT NULL,
     module ENUM('dashboard','chamados','relatorios','criativos') NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    client_id char(36) NOT NULL,
+    module client_module NOT NULL,
+ 
     enabled tinyint(1) DEFAULT true NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
@@ -1280,14 +3207,20 @@ CREATE TABLE client_permissions (
 
 
 
---
--- Name: client_report_permissions; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: client_report_permissions; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE client_report_permissions (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     client_id char(36) NOT NULL,
     ENUM('campanhas','conjuntos_anuncios','anuncios','criativos_performance','whatsapp') ENUM('campanhas','conjuntos_anuncios','anuncios','criativos_performance','whatsapp') NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    client_id char(36) NOT NULL,
+    report_type report_type NOT NULL,
+ 
     enabled tinyint(1) DEFAULT true NOT NULL,
     account_ids text[] DEFAULT '{}'[],
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1296,15 +3229,22 @@ CREATE TABLE client_report_permissions (
 
 
 
---
--- Name: clientes; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: clientes; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE clientes (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     user_id char(36) NOT NULL,
     nome text NOT NULL,
     tipo_acesso ENUM('api','sheet') DEFAULT 'api' NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    user_id char(36) NOT NULL,
+    nome text NOT NULL,
+    tipo_acesso access_type DEFAULT 'api'.access_type NOT NULL,
+ 
     ativo tinyint(1) DEFAULT true NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -1318,14 +3258,20 @@ CREATE TABLE clientes (
 
 
 
---
--- Name: contas; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: contas; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE contas (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     cliente_id char(36) NOT NULL,
     tipo ENUM('meta','google') NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    cliente_id char(36) NOT NULL,
+    tipo account_type NOT NULL,
+ 
     identificador text NOT NULL,
     nome text NOT NULL,
     ativo tinyint(1) DEFAULT true NOT NULL,
@@ -1334,18 +3280,26 @@ CREATE TABLE contas (
 
 
 
---
--- Name: criativos; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: criativos; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE criativos (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     cliente_id char(36) NOT NULL,
     titulo text NOT NULL,
     descricao text,
     arquivo_url text NOT NULL,
     tipo_arquivo text NOT NULL,
+ 
     status ENUM('pendente','aprovado','reprovado','ajuste_solicitado') DEFAULT 'pendente' NOT NULL,
+ 
+    status creative_status DEFAULT 'pendente'.creative_status NOT NULL,
+ 
     resposta text,
     comentario_cliente text,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -1358,12 +3312,16 @@ CREATE TABLE criativos (
 
 
 
---
--- Name: meta_api_credentials; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: meta_api_credentials; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE meta_api_credentials (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     app_id text NOT NULL,
     app_secret text NOT NULL,
     access_token text NOT NULL,
@@ -1372,12 +3330,16 @@ CREATE TABLE meta_api_credentials (
 
 
 
---
--- Name: metrics_config; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: metrics_config; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE metrics_config (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     config json DEFAULT '{`ads`: [`impressions`, `clicks`, `spend`, `ctr`, `cpc`], `adsets`: [`impressions`, `clicks`, `spend`, `ctr`, `cpc`], `campaigns`: [`impressions`, `clicks`, `spend`, `ctr`, `cpc`, `reach`], `dashboard`: [`impressions`, `clicks`, `spend`, `ctr`, `cpc`]}'
@@ -1385,31 +3347,46 @@ CREATE TABLE metrics_config (
 
 
 
---
--- Name: permission_logs; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE permission_logs (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     target_user_id char(36),
     changed_by char(36),
     ENUM('INSERT','UPDATE','DELETE','TRUNCATE','ERROR') text NOT NULL,
     permission ENUM('access_dashboard','access_whatsapp','create_campaigns','edit_campaigns','view_templates','send_messages','view_metrics','access_tasks','create_tasks','assign_tasks','finalize_tasks','edit_execution_time','access_calls','create_calls','finalize_calls','link_calls_to_tasks','access_creatives','create_edit_creatives','approve_creatives','view_change_history','access_paid_media','create_campaigns_media','view_metrics_media','access_reports','create_automatic_reports','manage_user_settings','manage_collaborators','manage_whatsapp_templates','manage_api_settings','manage_appearance_and_visual_identity','manage_external_integrations','manage_variables_and_pre_configurations','view_billing_settings','view_system_logs','access_client_reports','manage_clients','delete_campaigns','create_adsets','edit_adsets','delete_adsets','create_ads','edit_ads','delete_ads','export_data','manage_creatives','upload_creatives','edit_creatives','delete_creatives','view_tickets','create_tickets','edit_tickets','resolve_tickets','create_collaborators','edit_collaborators','delete_collaborators','create_campaigns_whatsapp','manage_contacts','edit_tasks','delete_tasks','manage_tasks'),
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    target_user_id char(36),
+    changed_by char(36),
+    action text NOT NULL,
+    permission permission_type,
+ 
     details json,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 
 
---
--- Name: permission_templates; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: permission_templates; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE permission_templates (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     name text NOT NULL,
     description text,
     permissions ENUM('access_dashboard','access_whatsapp','create_campaigns','edit_campaigns','view_templates','send_messages','view_metrics','access_tasks','create_tasks','assign_tasks','finalize_tasks','edit_execution_time','access_calls','create_calls','finalize_calls','link_calls_to_tasks','access_creatives','create_edit_creatives','approve_creatives','view_change_history','access_paid_media','create_campaigns_media','view_metrics_media','access_reports','create_automatic_reports','manage_user_settings','manage_collaborators','manage_whatsapp_templates','manage_api_settings','manage_appearance_and_visual_identity','manage_external_integrations','manage_variables_and_pre_configurations','view_billing_settings','view_system_logs','access_client_reports','manage_clients','delete_campaigns','create_adsets','edit_adsets','delete_adsets','create_ads','edit_ads','delete_ads','export_data','manage_creatives','upload_creatives','edit_creatives','delete_creatives','view_tickets','create_tickets','edit_tickets','resolve_tickets','create_collaborators','edit_collaborators','delete_collaborators','create_campaigns_whatsapp','manage_contacts','edit_tasks','delete_tasks','manage_tasks')[] DEFAULT '{}'[] NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    name text NOT NULL,
+    description text,
+    permissions permission_type[] DEFAULT '{}'.permission_type[] NOT NULL,
+ 
     created_by char(36),
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
@@ -1417,15 +3394,19 @@ CREATE TABLE permission_templates (
 
 
 
---
--- Name: profiles; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: profiles; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE profiles (
     id char(36) NOT NULL,
     nome text NOT NULL,
     email text NOT NULL,
+ 
     role ENUM('admin','cliente') DEFAULT 'admin' NOT NULL,
+ 
+    role user_role DEFAULT 'admin'.user_role NOT NULL,
+ 
     ativo tinyint(1) DEFAULT true NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -1436,12 +3417,16 @@ CREATE TABLE profiles (
 
 
 
---
--- Name: projects; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: projects; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE projects (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     name text NOT NULL,
     description text,
     client_id char(36),
@@ -1455,12 +3440,16 @@ CREATE TABLE projects (
 
 
 
---
--- Name: sections; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: sections; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE sections (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     name text NOT NULL,
     project_id char(36),
     order_index integer,
@@ -1469,9 +3458,9 @@ CREATE TABLE sections (
 
 
 
---
--- Name: settings; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: settings; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE settings (
     id bigint NOT NULL,
@@ -1482,9 +3471,9 @@ CREATE TABLE settings (
 
 
 
---
--- Name: settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
+ 
+  Name: settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE settings ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME settings_id_seq
@@ -1496,12 +3485,16 @@ ALTER TABLE settings ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 );
 
 
---
--- Name: system_activity_logs; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: system_activity_logs; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE system_activity_logs (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     usuario_id char(36),
     usuario_nome text NOT NULL,
     acao text NOT NULL,
@@ -1514,12 +3507,16 @@ CREATE TABLE system_activity_logs (
 
 
 
---
--- Name: task_comments; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: task_comments; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE task_comments (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     task_id char(36) NOT NULL,
     author_id char(36) NOT NULL,
     content text NOT NULL,
@@ -1528,12 +3525,16 @@ CREATE TABLE task_comments (
 
 
 
---
--- Name: task_steps; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: task_steps; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE task_steps (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     task_id char(36),
     content text,
     checked tinyint(1) DEFAULT false,
@@ -1542,12 +3543,16 @@ CREATE TABLE task_steps (
 
 
 
---
--- Name: tasks; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: tasks; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE tasks (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     title text NOT NULL,
     description text,
     status text,
@@ -1571,23 +3576,29 @@ CREATE TABLE tasks (
 
 
 
---
--- Name: user_permissions; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE user_permissions (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
     user_id char(36),
     permission ENUM('access_dashboard','access_whatsapp','create_campaigns','edit_campaigns','view_templates','send_messages','view_metrics','access_tasks','create_tasks','assign_tasks','finalize_tasks','edit_execution_time','access_calls','create_calls','finalize_calls','link_calls_to_tasks','access_creatives','create_edit_creatives','approve_creatives','view_change_history','access_paid_media','create_campaigns_media','view_metrics_media','access_reports','create_automatic_reports','manage_user_settings','manage_collaborators','manage_whatsapp_templates','manage_api_settings','manage_appearance_and_visual_identity','manage_external_integrations','manage_variables_and_pre_configurations','view_billing_settings','view_system_logs','access_client_reports','manage_clients','delete_campaigns','create_adsets','edit_adsets','delete_adsets','create_ads','edit_ads','delete_ads','export_data','manage_creatives','upload_creatives','edit_creatives','delete_creatives','view_tickets','create_tickets','edit_tickets','resolve_tickets','create_collaborators','edit_collaborators','delete_collaborators','create_campaigns_whatsapp','manage_contacts','edit_tasks','delete_tasks','manage_tasks') NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+    user_id char(36),
+    permission permission_type NOT NULL,
+ 
     granted_by char(36),
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 
 
---
--- Name: usuarios; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: usuarios; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE usuarios (
     id char(36) NOT NULL,
@@ -1599,12 +3610,16 @@ CREATE TABLE usuarios (
 
 
 
---
--- Name: whatsapp_campaign_executions; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaign_executions; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE whatsapp_campaign_executions (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     campaign_id char(36),
     execution_date timestamp NOT NULL,
     status text DEFAULT 'pending',
@@ -1619,12 +3634,16 @@ CREATE TABLE whatsapp_campaign_executions (
 
 
 
---
--- Name: whatsapp_campaigns; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaigns; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE whatsapp_campaigns (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     name text NOT NULL,
     type text NOT NULL,
     template_id char(36),
@@ -1648,12 +3667,16 @@ CREATE TABLE whatsapp_campaigns (
 
 
 
---
--- Name: whatsapp_config; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_config; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE whatsapp_config (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     phone_number_id text NOT NULL,
     access_token text NOT NULL,
     business_account_id text,
@@ -1667,12 +3690,16 @@ CREATE TABLE whatsapp_config (
 
 
 
---
--- Name: whatsapp_contacts; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_contacts; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE whatsapp_contacts (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     name text NOT NULL,
     phone_number text NOT NULL,
     client_id char(36),
@@ -1687,12 +3714,16 @@ CREATE TABLE whatsapp_contacts (
 
 
 
---
--- Name: whatsapp_message_logs; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_message_logs; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE whatsapp_message_logs (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     message_id char(36),
     status text DEFAULT 'sent',
     whatsapp_message_id text,
@@ -1704,12 +3735,16 @@ CREATE TABLE whatsapp_message_logs (
 
 
 
---
--- Name: whatsapp_messages; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE whatsapp_messages (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     campaign_id char(36),
     template_id char(36),
     contact_id char(36),
@@ -1731,12 +3766,16 @@ CREATE TABLE whatsapp_messages (
 
 
 
---
--- Name: whatsapp_templates; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_templates; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE whatsapp_templates (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     name text NOT NULL,
     language text DEFAULT 'pt_BR',
     category text NOT NULL,
@@ -1756,12 +3795,16 @@ CREATE TABLE whatsapp_templates (
 
 
 
---
--- Name: workflow_templates; Type: TABLE; Schema: public; Owner: postgres
---
+ 
+  Name: workflow_templates; Type: TABLE; Schema: public; Owner: postgres
+ 
 
 CREATE TABLE workflow_templates (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     name text NOT NULL,
     description text,
     category text,
@@ -1774,9 +3817,9 @@ CREATE TABLE workflow_templates (
 
 
 
---
--- Name: messages; Type: TABLE; Schema: realtime; Owner: supabase_realtime_admin
---
+ 
+  Name: messages; Type: TABLE; Schema: realtime; Owner: supabase_realtime_admin
+ 
 
 CREATE TABLE realtime.messages (
     topic text NOT NULL,
@@ -1786,15 +3829,19 @@ CREATE TABLE realtime.messages (
     private tinyint(1) DEFAULT false,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     inserted_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+ 
     id char(36) DEFAULT UUID() NOT NULL
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL
+ 
 )
 PARTITION BY RANGE (inserted_at);
 
 
 
---
--- Name: schema_migrations; Type: TABLE; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: schema_migrations; Type: TABLE; Schema: realtime; Owner: supabase_admin
+ 
 
 CREATE TABLE realtime.schema_migrations (
     version bigint NOT NULL,
@@ -1803,9 +3850,9 @@ CREATE TABLE realtime.schema_migrations (
 
 
 
---
--- Name: subscription; Type: TABLE; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: subscription; Type: TABLE; Schema: realtime; Owner: supabase_admin
+ 
 
 CREATE TABLE realtime.subscription (
     id bigint NOT NULL,
@@ -1819,9 +3866,9 @@ CREATE TABLE realtime.subscription (
 
 
 
---
--- Name: subscription_id_seq; Type: SEQUENCE; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: subscription_id_seq; Type: SEQUENCE; Schema: realtime; Owner: supabase_admin
+ 
 
 ALTER TABLE realtime.subscription ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME realtime.subscription_id_seq
@@ -1833,9 +3880,9 @@ ALTER TABLE realtime.subscription ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTI
 );
 
 
---
--- Name: buckets; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: buckets; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE TABLE storage.buckets (
     id text NOT NULL,
@@ -1852,15 +3899,15 @@ CREATE TABLE storage.buckets (
 
 
 
---
--- Name: COLUMN buckets.owner; Type: COMMENT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: COLUMN buckets.owner; Type: COMMENT; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Name: migrations; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: migrations; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE TABLE storage.migrations (
     id integer NOT NULL,
@@ -1871,12 +3918,16 @@ CREATE TABLE storage.migrations (
 
 
 
---
--- Name: objects; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: objects; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE TABLE storage.objects (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     bucket_id text,
     name text,
     owner char(36),
@@ -1892,15 +3943,15 @@ CREATE TABLE storage.objects (
 
 
 
---
--- Name: COLUMN objects.owner; Type: COMMENT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: COLUMN objects.owner; Type: COMMENT; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Name: s3_multipart_uploads; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE TABLE storage.s3_multipart_uploads (
     id text NOT NULL,
@@ -1916,12 +3967,16 @@ CREATE TABLE storage.s3_multipart_uploads (
 
 
 
---
--- Name: s3_multipart_uploads_parts; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads_parts; Type: TABLE; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE TABLE storage.s3_multipart_uploads_parts (
+ 
     id char(36) DEFAULT UUID() NOT NULL,
+ 
+    id char(36) DEFAULT gen_random_uuid() NOT NULL,
+ 
     upload_id text NOT NULL,
     size bigint DEFAULT 0 NOT NULL,
     part_number integer NOT NULL,
@@ -1935,9 +3990,9 @@ CREATE TABLE storage.s3_multipart_uploads_parts (
 
 
 
---
--- Name: schema_migrations; Type: TABLE; Schema: supabase_migrations; Owner: postgres
---
+ 
+  Name: schema_migrations; Type: TABLE; Schema: supabase_migrations; Owner: postgres
+ 
 
 CREATE TABLE supabase_migrations.schema_migrations (
     version text NOT NULL,
@@ -1949,16 +4004,17 @@ CREATE TABLE supabase_migrations.schema_migrations (
 
 
 
---
--- Name: refresh_tokens id; Type: DEFAULT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens id; Type: DEFAULT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Data for Name: audit_log_entries; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: audit_log_entries; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 INSERT INTO audit_log_entries (instance_id, id, payload, created_at, ip_address) VALUES ('00000000-0000-0000-0000-000000000000', '43d29ca7-fa98-4834-9f3b-0b340f02c11c', '{"action":"user_confirmation_requested","actor_id":"8c858fa0-380a-4940-bee7-2b302753e6f2","actor_username":"vagner@leadclinic.com.br","actor_via_sso":false,"log_type":"user","traits":{"provider":"email"}}', '2025-06-13 12:14:10.694228+00', '');
 INSERT INTO audit_log_entries (instance_id, id, payload, created_at, ip_address) VALUES ('00000000-0000-0000-0000-000000000000', '44e5c8d9-506d-46d4-b38b-3f3afd403842', '{"action":"user_recovery_requested","actor_id":"8c858fa0-380a-4940-bee7-2b302753e6f2","actor_username":"vagner@leadclinic.com.br","actor_via_sso":false,"log_type":"user"}', '2025-06-13 12:15:28.229193+00', '');
 INSERT INTO audit_log_entries (instance_id, id, payload, created_at, ip_address) VALUES ('00000000-0000-0000-0000-000000000000', '4c869dab-eec9-4055-9deb-c3a036f7f9e8', '{"action":"user_signedup","actor_id":"8c858fa0-380a-4940-bee7-2b302753e6f2","actor_username":"vagner@leadclinic.com.br","actor_via_sso":false,"log_type":"team"}', '2025-06-13 12:15:51.35603+00', '');
@@ -2957,18 +5013,21 @@ INSERT INTO audit_log_entries (instance_id, id, payload, created_at, ip_address)
 INSERT INTO audit_log_entries (instance_id, id, payload, created_at, ip_address) VALUES ('00000000-0000-0000-0000-000000000000', 'c132397e-765c-4832-b06e-a7ea446aa543', '{"action":"token_revoked","actor_id":"8c858fa0-380a-4940-bee7-2b302753e6f2","actor_username":"vagner@leadclinic.com.br","actor_via_sso":false,"log_type":"token"}', '2025-06-30 21:07:15.004189+00', '');
 INSERT INTO audit_log_entries (instance_id, id, payload, created_at, ip_address) VALUES ('00000000-0000-0000-0000-000000000000', 'b0e31c9d-377b-4f36-8d99-d81308adabb5', '{"action":"login","actor_id":"8c858fa0-380a-4940-bee7-2b302753e6f2","actor_username":"vagner@leadclinic.com.br","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-07-04 08:40:41.834207+00', '');
 INSERT INTO audit_log_entries (instance_id, id, payload, created_at, ip_address) VALUES ('00000000-0000-0000-0000-000000000000', '0bafa82b-1a1f-4c45-b854-18b335e47fff', '{"action":"login","actor_id":"8c858fa0-380a-4940-bee7-2b302753e6f2","actor_username":"vagner@leadclinic.com.br","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-07-04 08:41:37.94605+00', '');
+ 
+ 
 
 
---
--- Data for Name: flow_state; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: flow_state; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Data for Name: identities; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: identities; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 INSERT INTO identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at, id) VALUES ('8c858fa0-380a-4940-bee7-2b302753e6f2', '8c858fa0-380a-4940-bee7-2b302753e6f2', '{"sub": "8c858fa0-380a-4940-bee7-2b302753e6f2", "nome": "Vagner", "role": "cliente", "email": "vagner@leadclinic.com.br", "email_verified": true, "phone_verified": false}', 'email', '2025-06-13 12:14:10.687832+00', '2025-06-13 12:14:10.687901+00', '2025-06-13 12:14:10.687901+00', '7c15f644-ed14-4bbf-b870-ce8a54b7e359');
 INSERT INTO identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at, id) VALUES ('3a307fc7-353f-4ae6-bac9-18029f367487', '3a307fc7-353f-4ae6-bac9-18029f367487', '{"sub": "3a307fc7-353f-4ae6-bac9-18029f367487", "nome": "Cliente Teste", "role": "cliente", "email": "teste@teste.com", "email_verified": false, "phone_verified": false}', 'email', '2025-06-24 13:01:58.433237+00', '2025-06-24 13:01:58.433296+00', '2025-06-24 13:01:58.433296+00', '3a9c4e25-4d47-4f14-80fb-611b67af5f56');
 INSERT INTO identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at, id) VALUES ('70b54462-828c-4d86-85da-9be4040e93d7', '70b54462-828c-4d86-85da-9be4040e93d7', '{"sub": "70b54462-828c-4d86-85da-9be4040e93d7", "nome": "Cliente 2", "role": "cliente", "email": "cliente@gmail.com", "email_verified": false, "phone_verified": false}', 'email', '2025-06-24 13:42:48.164583+00', '2025-06-24 13:42:48.164638+00', '2025-06-24 13:42:48.164638+00', '288d2d34-35fc-4317-a4dc-8228f9c7a402');
@@ -2976,18 +5035,21 @@ INSERT INTO identities (provider_id, user_id, identity_data, provider, last_sign
 INSERT INTO identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at, id) VALUES ('2154728e-4e56-4530-be02-f009f40de0a6', '2154728e-4e56-4530-be02-f009f40de0a6', '{"sub": "2154728e-4e56-4530-be02-f009f40de0a6", "nome": "cliente teste", "role": "cliente", "email": "teste@hotmail.com", "email_verified": false, "phone_verified": false}', 'email', '2025-06-24 14:37:23.07559+00', '2025-06-24 14:37:23.075641+00', '2025-06-24 14:37:23.075641+00', '5a8988f1-705a-4d6c-922f-9e6cac7019c6');
 INSERT INTO identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at, id) VALUES ('29a1ac70-4c32-449e-bc92-40e54aab300b', '29a1ac70-4c32-449e-bc92-40e54aab300b', '{"sub": "29a1ac70-4c32-449e-bc92-40e54aab300b", "email": "suporte.tecnico@leadclinic.com.br", "email_verified": false, "phone_verified": false}', 'email', '2025-06-30 11:53:31.021549+00', '2025-06-30 11:53:31.021629+00', '2025-06-30 11:53:31.021629+00', '3517d841-3ac5-4dfc-b03b-80f29f949333');
 INSERT INTO identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at, id) VALUES ('331154a6-c85f-464b-b840-74448443e470', '331154a6-c85f-464b-b840-74448443e470', '{"sub": "331154a6-c85f-464b-b840-74448443e470", "nome": "Suporte Técnico", "role": "admin", "email": "suporte25@leadclinic.com.br", "email_verified": false, "phone_verified": false}', 'email', '2025-06-30 11:57:49.36962+00', '2025-06-30 11:57:49.369678+00', '2025-06-30 11:57:49.369678+00', '44a9daac-ab81-4298-b4bd-cdab7316d87f');
+ 
+ 
 
 
---
--- Data for Name: instances; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: instances; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Data for Name: mfa_amr_claims; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: mfa_amr_claims; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 INSERT INTO mfa_amr_claims (session_id, created_at, updated_at, authentication_method, id) VALUES ('5f918606-3bb5-441c-83fb-70f9764bf803', '2025-06-30 11:51:30.786955+00', '2025-06-30 11:51:30.786955+00', 'password', 'ada1329d-f3f2-429f-bb90-4501dcdd8167');
 INSERT INTO mfa_amr_claims (session_id, created_at, updated_at, authentication_method, id) VALUES ('cbfea49b-e650-460c-8c2e-3dd2cfb3273d', '2025-06-30 11:59:16.605172+00', '2025-06-30 11:59:16.605172+00', 'password', '9965f52a-e447-4684-adc4-2280e8c409d0');
 INSERT INTO mfa_amr_claims (session_id, created_at, updated_at, authentication_method, id) VALUES ('afceb9e5-005e-4997-bd9d-5c7687778855', '2025-06-30 11:59:45.82601+00', '2025-06-30 11:59:45.82601+00', 'password', 'c6e1bbf9-db7a-45c2-bbbf-59955c371555');
@@ -2995,35 +5057,41 @@ INSERT INTO mfa_amr_claims (session_id, created_at, updated_at, authentication_m
 INSERT INTO mfa_amr_claims (session_id, created_at, updated_at, authentication_method, id) VALUES ('bd563438-0832-4abc-a103-cdfc4a2183d3', '2025-06-30 12:32:36.351242+00', '2025-06-30 12:32:36.351242+00', 'password', 'ef784d81-2fda-460b-92e9-4cb89ecf5078');
 INSERT INTO mfa_amr_claims (session_id, created_at, updated_at, authentication_method, id) VALUES ('2ca19259-c346-4374-a192-035ae4f2a32d', '2025-07-04 08:40:41.915084+00', '2025-07-04 08:40:41.915084+00', 'password', '4ef68447-b3ba-4b28-a1ff-5ce2e598b409');
 INSERT INTO mfa_amr_claims (session_id, created_at, updated_at, authentication_method, id) VALUES ('edb38c4f-5f45-42d0-be70-e1dd6df393fb', '2025-07-04 08:41:37.958386+00', '2025-07-04 08:41:37.958386+00', 'password', '918f533b-909a-417a-bdc6-1cf6bd8278ba');
+ 
+ 
 
 
---
--- Data for Name: mfa_challenges; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
-
-
-
---
--- Data for Name: mfa_factors; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: mfa_challenges; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Data for Name: one_time_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: mfa_factors; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+
+
+ 
+  Data for Name: one_time_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
+
+ 
 INSERT INTO one_time_tokens (id, user_id, token_type, token_hash, relates_to, created_at, updated_at) VALUES ('0c182569-347a-4e61-9fd4-6fc663eaef7e', '3a307fc7-353f-4ae6-bac9-18029f367487', 'confirmation_token', '6dd0760542f42ce7349563ced46daf0f191121396a1d0edd5d5b1ce7', 'teste@teste.com', '2025-06-24 13:02:00.624084', '2025-06-24 13:02:00.624084');
 INSERT INTO one_time_tokens (id, user_id, token_type, token_hash, relates_to, created_at, updated_at) VALUES ('a25e19a7-50cc-4fca-a785-a133e348d49c', '70b54462-828c-4d86-85da-9be4040e93d7', 'confirmation_token', '09941757abc440e48fa769ec0f5e654b0af9d45d49a8e9ebeba3bd69', 'cliente@gmail.com', '2025-06-24 13:42:50.15661', '2025-06-24 13:42:50.15661');
 INSERT INTO one_time_tokens (id, user_id, token_type, token_hash, relates_to, created_at, updated_at) VALUES ('69bcebf1-e9c6-4433-8b78-4462d50a315e', '536b84a9-6191-430b-ae30-f04bbfd76ebd', 'confirmation_token', '3841f558df51a728258016db1b1c58ffdc2e98aef6bab57cfe046187', 'leadclinic@gmail.com', '2025-06-24 14:36:44.331275', '2025-06-24 14:36:44.331275');
 INSERT INTO one_time_tokens (id, user_id, token_type, token_hash, relates_to, created_at, updated_at) VALUES ('ef813374-8b53-4237-80b8-1a10e5cd8e06', '2154728e-4e56-4530-be02-f009f40de0a6', 'confirmation_token', 'e4d5be18c0558dd9ab6211fa49b8bc639b04882e4bcc230f67d9e009', 'teste@hotmail.com', '2025-06-24 14:37:25.106467', '2025-06-24 14:37:25.106467');
 INSERT INTO one_time_tokens (id, user_id, token_type, token_hash, relates_to, created_at, updated_at) VALUES ('3014b929-6a9c-4fe6-a457-897a215821e7', '331154a6-c85f-464b-b840-74448443e470', 'confirmation_token', '270304015798924b6eaeb11205d67b732f8f1943cbcf12f0623e8b1e', 'suporte25@leadclinic.com.br', '2025-06-30 11:57:51.545283', '2025-06-30 11:57:51.545283');
+ 
+ 
 
 
---
--- Data for Name: refresh_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: refresh_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 INSERT INTO refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id) VALUES ('00000000-0000-0000-0000-000000000000', '548', 'ftrioernjnhr', '29a1ac70-4c32-449e-bc92-40e54aab300b', 'f', '2025-06-30 11:59:16.602228+00', '2025-06-30 11:59:16.602228+00', NULL, 'cbfea49b-e650-460c-8c2e-3dd2cfb3273d');
 INSERT INTO refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id) VALUES ('00000000-0000-0000-0000-000000000000', '549', '6nkyd4svhkyj', '29a1ac70-4c32-449e-bc92-40e54aab300b', 'f', '2025-06-30 11:59:45.824768+00', '2025-06-30 11:59:45.824768+00', NULL, 'afceb9e5-005e-4997-bd9d-5c7687778855');
 INSERT INTO refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id) VALUES ('00000000-0000-0000-0000-000000000000', '550', 'd64tnzskj2cv', '29a1ac70-4c32-449e-bc92-40e54aab300b', 'f', '2025-06-30 12:00:29.43744+00', '2025-06-30 12:00:29.43744+00', NULL, '4740f2fd-0e14-43be-8434-aea1a52d588a');
@@ -3039,24 +5107,27 @@ INSERT INTO refresh_tokens (instance_id, id, token, user_id, revoked, created_at
 INSERT INTO refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id) VALUES ('00000000-0000-0000-0000-000000000000', '559', 'q3z2i6w3dhmk', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'f', '2025-06-30 21:07:15.013745+00', '2025-06-30 21:07:15.013745+00', '3cjw5j5eqeyh', '5f918606-3bb5-441c-83fb-70f9764bf803');
 INSERT INTO refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id) VALUES ('00000000-0000-0000-0000-000000000000', '560', 'nepiggvpdsfb', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'f', '2025-07-04 08:40:41.874659+00', '2025-07-04 08:40:41.874659+00', NULL, '2ca19259-c346-4374-a192-035ae4f2a32d');
 INSERT INTO refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id) VALUES ('00000000-0000-0000-0000-000000000000', '561', 'mxs5wf3j5x6f', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'f', '2025-07-04 08:41:37.953593+00', '2025-07-04 08:41:37.953593+00', NULL, 'edb38c4f-5f45-42d0-be70-e1dd6df393fb');
+ 
+ 
 
 
---
--- Data for Name: saml_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
-
-
-
---
--- Data for Name: saml_relay_states; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: saml_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: saml_relay_states; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+
+
+ 
+  Data for Name: schema_migrations; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
+
+ 
 INSERT INTO schema_migrations (version) VALUES ('20171026211738');
 INSERT INTO schema_migrations (version) VALUES ('20171026211808');
 INSERT INTO schema_migrations (version) VALUES ('20171026211834');
@@ -3118,12 +5189,15 @@ INSERT INTO schema_migrations (version) VALUES ('20240729123726');
 INSERT INTO schema_migrations (version) VALUES ('20240802193726');
 INSERT INTO schema_migrations (version) VALUES ('20240806073726');
 INSERT INTO schema_migrations (version) VALUES ('20241009103726');
+ 
+ 
 
 
---
--- Data for Name: sessions; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: sessions; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+ 
 INSERT INTO sessions (id, user_id, created_at, updated_at, factor_id, aal, not_after, refreshed_at, user_agent, ip, tag) VALUES ('cbfea49b-e650-460c-8c2e-3dd2cfb3273d', '29a1ac70-4c32-449e-bc92-40e54aab300b', '2025-06-30 11:59:16.599283+00', '2025-06-30 11:59:16.599283+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '177.183.99.216', NULL);
 INSERT INTO sessions (id, user_id, created_at, updated_at, factor_id, aal, not_after, refreshed_at, user_agent, ip, tag) VALUES ('afceb9e5-005e-4997-bd9d-5c7687778855', '29a1ac70-4c32-449e-bc92-40e54aab300b', '2025-06-30 11:59:45.82283+00', '2025-06-30 11:59:45.82283+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '177.183.99.216', NULL);
 INSERT INTO sessions (id, user_id, created_at, updated_at, factor_id, aal, not_after, refreshed_at, user_agent, ip, tag) VALUES ('4740f2fd-0e14-43be-8434-aea1a52d588a', '29a1ac70-4c32-449e-bc92-40e54aab300b', '2025-06-30 12:00:29.436787+00', '2025-06-30 12:00:29.436787+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '177.183.99.216', NULL);
@@ -3131,24 +5205,27 @@ INSERT INTO sessions (id, user_id, created_at, updated_at, factor_id, aal, not_a
 INSERT INTO sessions (id, user_id, created_at, updated_at, factor_id, aal, not_after, refreshed_at, user_agent, ip, tag) VALUES ('edb38c4f-5f45-42d0-be70-e1dd6df393fb', '8c858fa0-380a-4940-bee7-2b302753e6f2', '2025-07-04 08:41:37.950919+00', '2025-07-04 08:41:37.950919+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '177.183.99.216', NULL);
 INSERT INTO sessions (id, user_id, created_at, updated_at, factor_id, aal, not_after, refreshed_at, user_agent, ip, tag) VALUES ('bd563438-0832-4abc-a103-cdfc4a2183d3', '29a1ac70-4c32-449e-bc92-40e54aab300b', '2025-06-30 12:32:36.339566+00', '2025-06-30 12:32:36.339566+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '177.183.99.216', NULL);
 INSERT INTO sessions (id, user_id, created_at, updated_at, factor_id, aal, not_after, refreshed_at, user_agent, ip, tag) VALUES ('5f918606-3bb5-441c-83fb-70f9764bf803', '8c858fa0-380a-4940-bee7-2b302753e6f2', '2025-06-30 11:51:30.775099+00', '2025-06-30 21:07:15.019315+00', NULL, 'aal1', NULL, '2025-06-30 21:07:15.019238', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '177.183.99.216', NULL);
+ 
+ 
 
 
---
--- Data for Name: sso_domains; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
-
-
-
---
--- Data for Name: sso_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: sso_domains; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: sso_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
 
+
+
+ 
+  Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+ 
+
+ 
 INSERT INTO users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at, confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at, email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, phone, phone_confirmed_at, phone_change, phone_change_token, phone_change_sent_at, email_change_token_current, email_change_confirm_status, banned_until, reauthentication_token, reauthentication_sent_at, is_sso_user, deleted_at, is_anonymous) VALUES ('00000000-0000-0000-0000-000000000000', '331154a6-c85f-464b-b840-74448443e470', 'authenticated', 'authenticated', 'suporte25@leadclinic.com.br', '$2a$10$bCRf94yZ86i2TbDtbF3bYuv1CJqia0Vp6pS5mIK7zowHG9FH/0XxW', NULL, NULL, '270304015798924b6eaeb11205d67b732f8f1943cbcf12f0623e8b1e', '2025-06-30 11:57:49.3808+00', '', NULL, '', '', NULL, NULL, '{"provider": "email", "providers": ["email"]}', '{"sub": "331154a6-c85f-464b-b840-74448443e470", "nome": "Suporte Técnico", "role": "admin", "email": "suporte25@leadclinic.com.br", "email_verified": false, "phone_verified": false}', NULL, '2025-06-30 11:57:49.354483+00', '2025-06-30 11:57:51.541526+00', NULL, NULL, '', '', NULL, '', '0', NULL, '', NULL, 'f', NULL, 'f');
 INSERT INTO users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at, confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at, email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, phone, phone_confirmed_at, phone_change, phone_change_token, phone_change_sent_at, email_change_token_current, email_change_confirm_status, banned_until, reauthentication_token, reauthentication_sent_at, is_sso_user, deleted_at, is_anonymous) VALUES ('00000000-0000-0000-0000-000000000000', '29a1ac70-4c32-449e-bc92-40e54aab300b', 'authenticated', 'authenticated', 'suporte.tecnico@leadclinic.com.br', '$2a$10$db3TkNmQtPtb1Zn/8vXiJ.53EQJ/yYrliEpbcGdmIi8FXZ2cfBPmG', '2025-06-30 11:53:31.026232+00', NULL, '', NULL, '', NULL, '', '', NULL, '2025-06-30 12:32:36.339477+00', '{"provider": "email", "providers": ["email"]}', '{"email_verified": true}', NULL, '2025-06-30 11:53:31.006274+00', '2025-06-30 12:32:36.350473+00', NULL, NULL, '', '', NULL, '', '0', NULL, '', NULL, 'f', NULL, 'f');
 INSERT INTO users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at, confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at, email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, phone, phone_confirmed_at, phone_change, phone_change_token, phone_change_sent_at, email_change_token_current, email_change_confirm_status, banned_until, reauthentication_token, reauthentication_sent_at, is_sso_user, deleted_at, is_anonymous) VALUES ('00000000-0000-0000-0000-000000000000', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'authenticated', 'authenticated', 'vagner@leadclinic.com.br', '$2a$10$vr5Jtseg9U/k241YhEjfUeSYOnJ2ZJK.Mi4L4D0UaD92UMIZTY9Rm', '2025-06-13 12:15:51.357219+00', NULL, '', NULL, '', '2025-06-24 10:49:22.705325+00', '', '', NULL, '2025-07-04 08:41:37.95083+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "8c858fa0-380a-4940-bee7-2b302753e6f2", "nome": "Vagner", "role": "is_root_admin", "email": "vagner@leadclinic.com.br", "email_verified": true, "phone_verified": false}', 't', '2025-06-13 12:14:10.668016+00', '2025-07-04 08:41:37.958039+00', NULL, NULL, '', '', NULL, '', '0', NULL, '', NULL, 'f', NULL, 'f');
@@ -3156,57 +5233,69 @@ INSERT INTO users (instance_id, id, aud, role, email, encrypted_password, email_
 INSERT INTO users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at, confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at, email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, phone, phone_confirmed_at, phone_change, phone_change_token, phone_change_sent_at, email_change_token_current, email_change_confirm_status, banned_until, reauthentication_token, reauthentication_sent_at, is_sso_user, deleted_at, is_anonymous) VALUES ('00000000-0000-0000-0000-000000000000', '3a307fc7-353f-4ae6-bac9-18029f367487', 'authenticated', 'authenticated', 'teste@teste.com', '$2a$10$NodONiePnf/xz9YFmNy8vOjL0uK/.DCS8XOAqNhaBB/GvJBLVf57G', NULL, NULL, '6dd0760542f42ce7349563ced46daf0f191121396a1d0edd5d5b1ce7', '2025-06-24 13:01:58.440534+00', '', NULL, '', '', NULL, NULL, '{"provider": "email", "providers": ["email"]}', '{"sub": "3a307fc7-353f-4ae6-bac9-18029f367487", "nome": "Cliente Teste", "role": "cliente", "email": "teste@teste.com", "email_verified": false, "phone_verified": false}', NULL, '2025-06-24 13:01:58.414227+00', '2025-06-24 13:02:00.620958+00', NULL, NULL, '', '', NULL, '', '0', NULL, '', NULL, 'f', NULL, 'f');
 INSERT INTO users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at, confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at, email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, phone, phone_confirmed_at, phone_change, phone_change_token, phone_change_sent_at, email_change_token_current, email_change_confirm_status, banned_until, reauthentication_token, reauthentication_sent_at, is_sso_user, deleted_at, is_anonymous) VALUES ('00000000-0000-0000-0000-000000000000', '70b54462-828c-4d86-85da-9be4040e93d7', 'authenticated', 'authenticated', 'cliente@gmail.com', '$2a$10$bw7ZRqAFG2S6DMUpruJin.4/60cSKDPsX1ywR.a68WFEHBLc6xW3m', NULL, NULL, '09941757abc440e48fa769ec0f5e654b0af9d45d49a8e9ebeba3bd69', '2025-06-24 13:42:48.172361+00', '', NULL, '', '', NULL, NULL, '{"provider": "email", "providers": ["email"]}', '{"sub": "70b54462-828c-4d86-85da-9be4040e93d7", "nome": "Cliente 2", "role": "cliente", "email": "cliente@gmail.com", "email_verified": false, "phone_verified": false}', NULL, '2025-06-24 13:42:48.157178+00', '2025-06-24 13:42:50.153217+00', NULL, NULL, '', '', NULL, '', '0', NULL, '', NULL, 'f', NULL, 'f');
 INSERT INTO users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at, confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at, email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, phone, phone_confirmed_at, phone_change, phone_change_token, phone_change_sent_at, email_change_token_current, email_change_confirm_status, banned_until, reauthentication_token, reauthentication_sent_at, is_sso_user, deleted_at, is_anonymous) VALUES ('00000000-0000-0000-0000-000000000000', '536b84a9-6191-430b-ae30-f04bbfd76ebd', 'authenticated', 'authenticated', 'leadclinic@gmail.com', '$2a$10$Z79OR8ILSHGO0FsgtUXszO6PkWdCWXs37oHfdlDvBVmF5LJqWiRJS', NULL, NULL, '3841f558df51a728258016db1b1c58ffdc2e98aef6bab57cfe046187', '2025-06-24 14:36:42.395434+00', '', NULL, '', '', NULL, NULL, '{"provider": "email", "providers": ["email"]}', '{"sub": "536b84a9-6191-430b-ae30-f04bbfd76ebd", "nome": "Vagner", "role": "admin", "email": "leadclinic@gmail.com", "email_verified": false, "phone_verified": false}', NULL, '2025-06-24 14:36:42.389632+00', '2025-06-24 14:36:44.32942+00', NULL, NULL, '', '', NULL, '', '0', NULL, '', NULL, 'f', NULL, 'f');
+ 
+ 
 
 
---
--- Data for Name: activity_logs; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: activity_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: chamados; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: chamados; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO chamados (id, cliente_id, titulo, mensagem, resposta, arquivo_url, respondido_por, created_at, updated_at, aberto_por, status_detalhado, categoria, prioridade, nota_interna, tempo_resposta_horas, status) VALUES ('cad04c86-c239-44cd-bd61-28985c75c788', 'dde48b88-3536-43f4-a1d6-73f4f6695410', 'Chamado Teste', 'rr', 'Teste', NULL, '8c858fa0-380a-4940-bee7-2b302753e6f2', '2025-06-24 14:13:24.450573+00', '2025-06-25 17:46:29.336438+00', 'admin', 'Aguardando resposta do cliente', 'hospedagem', 'media', NULL, NULL, 'aguardando_cliente');
+ 
+ 
 
 
---
--- Data for Name: chamados_anexos; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: chamados_anexos; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: chamados_historico; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: chamados_historico; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO chamados_historico (id, chamado_id, acao, usuario_id, usuario_nome, detalhes, data_acao) VALUES ('6e00ce64-b249-4034-855f-2af8ce7c31c7', 'cad04c86-c239-44cd-bd61-28985c75c788', 'criado', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'Chamado criado: Chamado Teste', '2025-06-24 14:13:24.450573+00');
 INSERT INTO chamados_historico (id, chamado_id, acao, usuario_id, usuario_nome, detalhes, data_acao) VALUES ('a7aba9ad-fc26-47fd-a50d-438296fbbd6c', 'cad04c86-c239-44cd-bd61-28985c75c788', 'status_alterado', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'Status alterado de "novo" para "aguardando_equipe"', '2025-06-24 14:37:55.452473+00');
 INSERT INTO chamados_historico (id, chamado_id, acao, usuario_id, usuario_nome, detalhes, data_acao) VALUES ('5d7e5331-5058-49da-b18c-99f1fa4ba730', 'cad04c86-c239-44cd-bd61-28985c75c788', 'respondido', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'Nova resposta adicionada', '2025-06-24 14:37:55.452473+00');
 INSERT INTO chamados_historico (id, chamado_id, acao, usuario_id, usuario_nome, detalhes, data_acao) VALUES ('dfb344d9-f9af-4e56-b806-2c34ebe0baf3', 'cad04c86-c239-44cd-bd61-28985c75c788', 'status_alterado', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'Status alterado de "aguardando_equipe" para "aguardando_cliente"', '2025-06-25 17:46:29.336438+00');
+ 
+ 
 
 
---
--- Data for Name: chamados_mensagens; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: chamados_mensagens; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: chamados_timeline; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: chamados_timeline; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO chamados_timeline (id, chamado_id, tipo, conteudo, autor_id, autor_nome, autor_tipo, created_at, metadata) VALUES ('398a5a5e-930e-4bfe-a7ff-082929ca58ed', 'cad04c86-c239-44cd-bd61-28985c75c788', 'criacao', 'rr', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'admin', '2025-06-24 14:13:24.450573+00', '{"titulo": "Chamado Teste", "categoria": "hospedagem", "prioridade": "media"}');
 INSERT INTO chamados_timeline (id, chamado_id, tipo, conteudo, autor_id, autor_nome, autor_tipo, created_at, metadata) VALUES ('4a4e5d1d-68aa-4e27-a931-8f740d1480d5', 'cad04c86-c239-44cd-bd61-28985c75c788', 'status_change', 'Status alterado de "novo" para "aguardando_equipe"', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'admin', '2025-06-24 14:37:55.452473+00', '{"status_novo": "aguardando_equipe", "status_anterior": "novo"}');
 INSERT INTO chamados_timeline (id, chamado_id, tipo, conteudo, autor_id, autor_nome, autor_tipo, created_at, metadata) VALUES ('ce24cacf-942e-45bd-9783-21b8890e596a', 'cad04c86-c239-44cd-bd61-28985c75c788', 'resposta', 'ggg', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'admin', '2025-06-24 14:37:55.452473+00', '{}');
 INSERT INTO chamados_timeline (id, chamado_id, tipo, conteudo, autor_id, autor_nome, autor_tipo, created_at, metadata) VALUES ('973b3af4-dbc7-42dd-97c4-1f4df2eff460', 'cad04c86-c239-44cd-bd61-28985c75c788', 'status_change', 'Status alterado de "aguardando_equipe" para "aguardando_cliente"', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'admin', '2025-06-25 17:46:29.336438+00', '{"status_novo": "aguardando_cliente", "status_anterior": "aguardando_equipe"}');
+ 
+ 
 
 
---
--- Data for Name: client_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: client_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO client_permissions (id, client_id, module, enabled, created_at, updated_at) VALUES ('6c017ac1-91d9-4954-8122-d14d01f4d566', '54799458-7dc0-4eb0-a742-284e67f2ff2f', 'dashboard', 't', '2025-06-24 13:02:01.854146+00', '2025-06-24 13:02:01.854146+00');
 INSERT INTO client_permissions (id, client_id, module, enabled, created_at, updated_at) VALUES ('a4532849-2204-4512-a040-535388776439', '54799458-7dc0-4eb0-a742-284e67f2ff2f', 'chamados', 't', '2025-06-24 13:02:01.854146+00', '2025-06-24 13:02:01.854146+00');
 INSERT INTO client_permissions (id, client_id, module, enabled, created_at, updated_at) VALUES ('c30ed60f-2583-4b15-b168-1d606d6babe4', '54799458-7dc0-4eb0-a742-284e67f2ff2f', 'criativos', 't', '2025-06-24 13:02:01.854146+00', '2025-06-24 13:02:01.854146+00');
@@ -3217,39 +5306,45 @@ INSERT INTO client_permissions (id, client_id, module, enabled, created_at, upda
 INSERT INTO client_permissions (id, client_id, module, enabled, created_at, updated_at) VALUES ('56396a26-78a1-4451-b2d5-c80c43723680', '412e6c31-cef0-4051-aba1-db8867c1fdd9', 'dashboard', 't', '2025-06-24 14:37:26.357996+00', '2025-06-24 14:37:26.357996+00');
 INSERT INTO client_permissions (id, client_id, module, enabled, created_at, updated_at) VALUES ('05bcc6be-9867-4564-9143-9851d774c067', '412e6c31-cef0-4051-aba1-db8867c1fdd9', 'chamados', 't', '2025-06-24 14:37:26.357996+00', '2025-06-24 14:37:26.357996+00');
 INSERT INTO client_permissions (id, client_id, module, enabled, created_at, updated_at) VALUES ('5d7dc736-3b02-4882-b9db-f28c682ad2b8', '412e6c31-cef0-4051-aba1-db8867c1fdd9', 'criativos', 't', '2025-06-24 14:37:26.357996+00', '2025-06-24 14:37:26.357996+00');
+ 
+ 
 
 
---
--- Data for Name: client_report_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: client_report_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: clientes; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: clientes; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO clientes (id, user_id, nome, tipo_acesso, ativo, created_at, updated_at, email, telefone, empresa, observacoes_internas, responsavel_conta, contas_meta) VALUES ('54799458-7dc0-4eb0-a742-284e67f2ff2f', '3a307fc7-353f-4ae6-bac9-18029f367487', 'Cliente Teste', 'api', 't', '2025-06-24 13:02:01.854146+00', '2025-06-24 13:02:01.854146+00', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO clientes (id, user_id, nome, tipo_acesso, ativo, created_at, updated_at, email, telefone, empresa, observacoes_internas, responsavel_conta, contas_meta) VALUES ('dde48b88-3536-43f4-a1d6-73f4f6695410', '70b54462-828c-4d86-85da-9be4040e93d7', 'Cliente 2', 'api', 't', '2025-06-24 13:42:51.510085+00', '2025-06-24 13:42:51.510085+00', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO clientes (id, user_id, nome, tipo_acesso, ativo, created_at, updated_at, email, telefone, empresa, observacoes_internas, responsavel_conta, contas_meta) VALUES ('412e6c31-cef0-4051-aba1-db8867c1fdd9', '2154728e-4e56-4530-be02-f009f40de0a6', 'cliente teste', 'api', 't', '2025-06-24 14:37:26.357996+00', '2025-06-24 14:37:26.357996+00', NULL, NULL, NULL, NULL, NULL, NULL);
+ 
+ 
 
 
---
--- Data for Name: contas; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
---
--- Data for Name: criativos; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: contas; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: meta_api_credentials; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: criativos; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+
+
+ 
+  Data for Name: meta_api_credentials; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
+
+ 
 INSERT INTO meta_api_credentials (id, app_id, app_secret, access_token, created_at) VALUES ('5fab3b9a-a923-43fc-a32c-5500b10e00a6', '585774567328419', '14e544441b9b2262068a0b6443b30680', 'EAAIUwkUBCqMBO0HzysXppOB8N6bBDgG8EX07Sc135bmZB9LIKckM3iExCjV1pqb0Fc74OI0NZCZCugEfZCQRcwlZBb9jDuC4k8GUfrf9LNBEcOH8TaQ6Cn8dgvcyS1vZC5EUo0X58ohA1dmjjxW1PTco5glOVPcQ7LEu5JnbNWYOZCymBlh4qvYeoukYX541MqQpgfg7tdGNGmnPvOpGfmpfDodWuMFAg77Bmi6\n', '2025-06-10 16:37:22.420247+00');
 INSERT INTO meta_api_credentials (id, app_id, app_secret, access_token, created_at) VALUES ('30e68ffa-3e04-4109-801e-2c03389b2de3', '585774567328419', '14e544441b9b2262068a0b6443b30680', 'EAAIUwkUBCqMBO0HzysXppOB8N6bBDgG8EX07Sc135bmZB9LIKckM3iExCjV1pqb0Fc74OI0NZCZCugEfZCQRcwlZBb9jDuC4k8GUfrf9LNBEcOH8TaQ6Cn8dgvcyS1vZC5EUo0X58ohA1dmjjxW1PTco5glOVPcQ7LEu5JnbNWYOZCymBlh4qvYeoukYX541MqQpgfg7tdGNGmnPvOpGfmpfDodWuMFAg77Bmi6\n', '2025-06-10 16:44:37.832389+00');
 INSERT INTO meta_api_credentials (id, app_id, app_secret, access_token, created_at) VALUES ('c9822057-c3f9-4e2a-bf96-4d4a194ef0c0', '585774567328419', '14e544441b9b2262068a0b6443b30680', 'EAAIUwkUBCqMBO3LEtSOXkhX2jIpczWEntqfgsdvHujTQJ8N91f5W6GmZBF8K2AAZCaSnEvrqESZCFd3ioGpj3IoCmReuDeD4ngI5fqmPovTn5UXlO6eNE0GSi5gXL37TOuCfwbPNv4NRUtgwGzIhCZCHUoNE3plQ7xuJEPv7TYzJoVVEHUeN3ZAow8JTt\n', '2025-06-10 16:45:45.483655+00');
@@ -3267,12 +5362,15 @@ INSERT INTO meta_api_credentials (id, app_id, app_secret, access_token, created_
 INSERT INTO meta_api_credentials (id, app_id, app_secret, access_token, created_at) VALUES ('fab13020-cfe2-4158-9af7-c521e157a762', '585774567328419', '14e544441b9b2262068a0b6443b30680', 'EAAIUwkUBCqMBOx19xt908fm3C2Iy0bY6kFI3yJQSZBjsNzIVmyXJCjadQRY7dHk49PDa5uiaudXXTnZCuHb0x9jWPBZAYAsEK8bL9Q4PLZAMMISIazF1NZBgAPNpVlHabrCBU8JgOoR0X6GntGyxaosuk2htvyYdcKKTg2gzZALVdvfgODqVTifVMZBlcAHXMn8QctZB', '2025-06-13 19:50:42.990228+00');
 INSERT INTO meta_api_credentials (id, app_id, app_secret, access_token, created_at) VALUES ('7d6cc078-1c93-4c2c-b1f3-f1fe63520280', '585774567328419', '14e544441b9b2262068a0b6443b30680', 'EAAIUwkUBCqMBOx19xt908fm3C2Iy0bY6kFI3yJQSZBjsNzIVmyXJCjadQRY7dHk49PDa5uiaudXXTnZCuHb0x9jWPBZAYAsEK8bL9Q4PLZAMMISIazF1NZBgAPNpVlHabrCBU8JgOoR0X6GntGyxaosuk2htvyYdcKKTg2gzZALVdvfgODqVTifVMZBlcAHXMn8QctZB', '2025-06-13 19:55:54.751227+00');
 INSERT INTO meta_api_credentials (id, app_id, app_secret, access_token, created_at) VALUES ('3983971d-cefe-4ba8-96d5-24efb7f4bf13', '585774567328419', '14e544441b9b2262068a0b6443b30680', 'EAAIUwkUBCqMBO6nA8OlDuZCLJrb7MeBLQ4COZB579TY25V6d9ZBIozDkDrUKjGm9NTKQowTBpIoc1zFCq0q5Ko3M8GZCRm7yGwVhxBdsFxJEKXxoAMocuZAhAELwpS32ZAFIdaffIZBNYGYx2ZCgJnG4I47syoEcxSqRMoZCJBhFs6hw9vZCyG4myARVDZAddzvXgZDZD', '2025-06-16 09:11:53.723671+00');
+ 
+ 
 
 
---
--- Data for Name: metrics_config; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: metrics_config; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO metrics_config (id, created_at, updated_at, config) VALUES ('9864ca6d-ab60-4704-9918-33166c8c290e', '2025-06-12 17:27:30.352713+00', '2025-06-12 17:27:30.352713+00', '"{\\"dashboard\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"campaigns\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\",\\"reach\\",\\"frequency\\"],\\"adsets\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"ads\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"]}"');
 INSERT INTO metrics_config (id, created_at, updated_at, config) VALUES ('433e9979-c932-4861-b5e7-3fd6106750df', '2025-06-12 17:27:35.474572+00', '2025-06-12 17:27:35.474572+00', '"{\\"dashboard\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"campaigns\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\",\\"reach\\",\\"frequency\\",\\"conversions\\"],\\"adsets\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"ads\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"]}"');
 INSERT INTO metrics_config (id, created_at, updated_at, config) VALUES ('8659a09e-7aa5-44f5-ac50-df5b9f3dfead', '2025-06-12 17:27:36.656368+00', '2025-06-12 17:27:36.656368+00', '"{\\"dashboard\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"campaigns\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\",\\"reach\\",\\"frequency\\",\\"conversions\\"],\\"adsets\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"ads\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"]}"');
@@ -3322,12 +5420,15 @@ INSERT INTO metrics_config (id, created_at, updated_at, config) VALUES ('6719c2c
 INSERT INTO metrics_config (id, created_at, updated_at, config) VALUES ('53424434-62bc-49ae-aae5-33b6b25a6a66', '2025-06-16 09:23:07.164796+00', '2025-06-16 09:23:07.164796+00', '{"ads": ["impressions", "frequency", "results", "cost_per_result", "ctr"], "adsets": ["impressions", "clicks", "results", "cost_per_result", "link_clicks", "frequency", "spend"], "campaigns": ["impressions", "clicks", "results", "cost_per_result"], "dashboard": ["impressions", "clicks", "results", "cost_per_result"]}');
 INSERT INTO metrics_config (id, created_at, updated_at, config) VALUES ('47268afa-333c-4db2-bfdd-48b8e1391106', '2025-06-16 09:23:44.513615+00', '2025-06-16 09:23:44.513615+00', '{"ads": ["impressions", "frequency", "results", "cost_per_result", "ctr"], "adsets": ["impressions", "clicks", "link_clicks", "frequency", "spend", "conversions", "leads", "cost_per_conversion"], "campaigns": ["impressions", "clicks", "results", "cost_per_result"], "dashboard": ["impressions", "clicks", "results", "cost_per_result"]}');
 INSERT INTO metrics_config (id, created_at, updated_at, config) VALUES ('315c1ca2-f985-4f9a-97b4-62484a999bd4', '2025-06-16 09:24:51.472563+00', '2025-06-16 09:24:51.472563+00', '{"ads": ["impressions", "frequency", "results", "cost_per_result", "ctr"], "adsets": ["impressions", "clicks", "link_clicks", "frequency", "spend", "results"], "campaigns": ["impressions", "clicks", "reach", "spend"], "dashboard": ["impressions", "clicks", "reach", "spend"]}');
+ 
+ 
 
 
---
--- Data for Name: permission_logs; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: permission_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO permission_logs (id, target_user_id, changed_by, action, permission, details, created_at) VALUES ('63927094-9dce-4235-8f6e-03240a68e3cf', '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, 'granted', 'access_dashboard', '{"timestamp": "2025-06-16T13:00:32.885459+00:00"}', '2025-06-16 13:00:32.885459+00');
 INSERT INTO permission_logs (id, target_user_id, changed_by, action, permission, details, created_at) VALUES ('efe5d9bb-b0e1-4d3e-91a4-f5f050045c51', '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, 'granted', 'access_whatsapp', '{"timestamp": "2025-06-16T13:00:32.885459+00:00"}', '2025-06-16 13:00:32.885459+00');
 INSERT INTO permission_logs (id, target_user_id, changed_by, action, permission, details, created_at) VALUES ('49a36857-7b0d-4d76-8b9d-ce590963d5fc', '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, 'granted', 'create_campaigns', '{"timestamp": "2025-06-16T13:00:32.885459+00:00"}', '2025-06-16 13:00:32.885459+00');
@@ -3363,49 +5464,58 @@ INSERT INTO permission_logs (id, target_user_id, changed_by, action, permission,
 INSERT INTO permission_logs (id, target_user_id, changed_by, action, permission, details, created_at) VALUES ('47a45ecc-fabc-4f38-af23-0046a027013f', '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, 'granted', 'view_billing_settings', '{"timestamp": "2025-06-16T13:00:32.885459+00:00"}', '2025-06-16 13:00:32.885459+00');
 INSERT INTO permission_logs (id, target_user_id, changed_by, action, permission, details, created_at) VALUES ('53389fed-3c67-47e0-99c8-96595c872d1c', '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, 'granted', 'view_system_logs', '{"timestamp": "2025-06-16T13:00:32.885459+00:00"}', '2025-06-16 13:00:32.885459+00');
 INSERT INTO permission_logs (id, target_user_id, changed_by, action, permission, details, created_at) VALUES ('50622b7e-7daa-4afb-9ab6-00df545aa785', '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, 'granted', 'manage_clients', '{"timestamp": "2025-06-23T13:18:10.490007+00:00"}', '2025-06-23 13:18:10.490007+00');
+ 
+ 
 
 
---
--- Data for Name: permission_templates; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: permission_templates; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: profiles; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: profiles; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO profiles (id, nome, email, role, ativo, created_at, updated_at, is_root_admin, foto_url, status) VALUES ('8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner Admin', 'vagner@leadclinic.com.br', 'admin', 't', '2025-06-13 14:42:03.908398+00', '2025-06-16 18:30:51.82025+00', 't', NULL, 'ativo');
 INSERT INTO profiles (id, nome, email, role, ativo, created_at, updated_at, is_root_admin, foto_url, status) VALUES ('536b84a9-6191-430b-ae30-f04bbfd76ebd', 'Vagner', 'leadclinic@gmail.com', 'admin', 't', '2025-06-24 14:36:44.492371+00', '2025-06-24 14:36:44.492371+00', 'f', NULL, 'ativo');
 INSERT INTO profiles (id, nome, email, role, ativo, created_at, updated_at, is_root_admin, foto_url, status) VALUES ('2154728e-4e56-4530-be02-f009f40de0a6', 'cliente teste', 'teste@hotmail.com', 'cliente', 't', '2025-06-24 14:37:25.182272+00', '2025-06-24 14:37:25.182272+00', 'f', NULL, 'ativo');
 INSERT INTO profiles (id, nome, email, role, ativo, created_at, updated_at, is_root_admin, foto_url, status) VALUES ('3a307fc7-353f-4ae6-bac9-18029f367487', 'Cliente Teste', 'teste@teste.com', 'admin', 't', '2025-06-24 13:02:00.735531+00', '2025-06-24 14:52:21.725479+00', 'f', NULL, 'ativo');
 INSERT INTO profiles (id, nome, email, role, ativo, created_at, updated_at, is_root_admin, foto_url, status) VALUES ('70b54462-828c-4d86-85da-9be4040e93d7', 'Cliente 2', 'cliente@gmail.com', 'cliente', 'f', '2025-06-24 13:42:50.299668+00', '2025-06-30 12:46:23.937746+00', 'f', NULL, 'inativo');
 INSERT INTO profiles (id, nome, email, role, ativo, created_at, updated_at, is_root_admin, foto_url, status) VALUES ('331154a6-c85f-464b-b840-74448443e470', 'Suporte Técnico', 'suporte.tecnico@leadclinic.com.br', 'admin', 't', '2025-06-30 11:57:51.61769+00', '2025-06-30 13:01:41.085209+00', 'f', NULL, 'ativo');
+ 
+ 
 
 
---
--- Data for Name: projects; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: projects; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO projects (id, name, description, client_id, created_by, created_at, status, responsible_id, start_date, end_date) VALUES ('f2fa808e-deeb-4f24-88bd-1764aa7e1cea', 'Projeto Teste', 'Projeto Teste', 'dde48b88-3536-43f4-a1d6-73f4f6695410', '8c858fa0-380a-4940-bee7-2b302753e6f2', '2025-06-24 14:38:45.224663+00', 'ativo', '536b84a9-6191-430b-ae30-f04bbfd76ebd', '2025-06-26 00:00:00+00', '2025-06-28 00:00:00+00');
+ 
+ 
 
 
---
--- Data for Name: sections; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
---
--- Data for Name: settings; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: sections; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: system_activity_logs; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: settings; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+
+
+ 
+  Data for Name: system_activity_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
+
+ 
 INSERT INTO system_activity_logs (id, usuario_id, usuario_nome, acao, modulo, detalhes, ip_address, user_agent, created_at) VALUES ('f6bff369-0eac-4aa5-9ffb-cbf37285316b', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner', 'metrics_config_updated', 'configuracoes', '"{\\"dashboard\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"campaigns\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\",\\"reach\\"],\\"adsets\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"ads\\":[\\"impressions\\",\\"reach\\",\\"clicks\\",\\"unique_clicks\\",\\"spend\\",\\"ctr\\",\\"unique_ctr\\",\\"cpc\\",\\"cost_per_unique_click\\",\\"cpm\\",\\"frequency\\",\\"post_engagement\\",\\"page_engagement\\",\\"post_reactions\\",\\"comment\\",\\"share\\",\\"like\\",\\"photo_view\\",\\"video_views\\",\\"video_view_rate\\",\\"cost_per_video_view\\",\\"video_play\\",\\"canvas_avg_view_time\\",\\"canvas_avg_view_percent\\",\\"conversions\\",\\"purchases\\",\\"actions\\",\\"cost_per_action_type\\",\\"website_clicks\\",\\"link_clicks\\",\\"unique_inline_link_clicks\\",\\"inline_link_clicks\\",\\"inline_post_engagement\\",\\"cost_per_inline_link_click\\",\\"cost_per_inline_post_engagement\\",\\"outbound_clicks\\",\\"cost_per_outbound_click\\",\\"unique_outbound_clicks\\",\\"cost_per_unique_outbound_click\\"]}"', NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '2025-06-13 21:21:20.873782+00');
 INSERT INTO system_activity_logs (id, usuario_id, usuario_nome, acao, modulo, detalhes, ip_address, user_agent, created_at) VALUES ('4a231b25-8852-4220-9133-e13463b675a5', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner', 'metrics_config_updated', 'configuracoes', '"{\\"dashboard\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"campaigns\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\",\\"reach\\"],\\"adsets\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"ads\\":[]}"', NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '2025-06-13 21:21:22.36816+00');
 INSERT INTO system_activity_logs (id, usuario_id, usuario_nome, acao, modulo, detalhes, ip_address, user_agent, created_at) VALUES ('dcf5cfbd-3ef3-4424-af68-204bed4e376a', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner', 'metrics_config_updated', 'configuracoes', '"{\\"dashboard\\":[\\"impressions\\",\\"clicks\\",\\"cpm\\"],\\"campaigns\\":[\\"impressions\\",\\"clicks\\",\\"cpm\\"],\\"adsets\\":[\\"impressions\\",\\"clicks\\",\\"spend\\",\\"ctr\\",\\"cpc\\"],\\"ads\\":[]}"', NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '2025-06-14 09:33:20.977805+00');
@@ -3423,36 +5533,45 @@ INSERT INTO system_activity_logs (id, usuario_id, usuario_nome, acao, modulo, de
 INSERT INTO system_activity_logs (id, usuario_id, usuario_nome, acao, modulo, detalhes, ip_address, user_agent, created_at) VALUES ('5a44a08f-1c3c-488f-99bc-9f37ea6ebc79', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'Vagner', 'metrics_config_updated', 'configuracoes', '"{\\"dashboard\\":[\\"impressions\\",\\"clicks\\",\\"reach\\",\\"spend\\"],\\"campaigns\\":[\\"impressions\\",\\"clicks\\",\\"reach\\",\\"spend\\"],\\"adsets\\":[\\"impressions\\",\\"clicks\\",\\"link_clicks\\",\\"frequency\\",\\"spend\\",\\"results\\"],\\"ads\\":[\\"impressions\\",\\"frequency\\",\\"results\\",\\"cost_per_result\\",\\"ctr\\"]}"', NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '2025-06-16 09:24:51.565893+00');
 INSERT INTO system_activity_logs (id, usuario_id, usuario_nome, acao, modulo, detalhes, ip_address, user_agent, created_at) VALUES ('6062fbae-bd5c-45ad-aff7-50cc3c460c04', NULL, 'Sistema', 'password_reset', 'client_management', '{"admin_id": "8c858fa0-380a-4940-bee7-2b302753e6f2", "client_id": "f259c2ad-9af2-4f1f-977a-e07b2c81455f", "timestamp": "2025-06-20T11:19:59.797Z", "client_name": "Cliente teste geral"}', NULL, NULL, '2025-06-20 11:19:59.818409+00');
 INSERT INTO system_activity_logs (id, usuario_id, usuario_nome, acao, modulo, detalhes, ip_address, user_agent, created_at) VALUES ('68cd51ed-0ec9-4b4d-8632-40ffd495a854', NULL, 'Sistema', 'password_reset', 'client_management', '{"admin_id": "8c858fa0-380a-4940-bee7-2b302753e6f2", "client_id": "f259c2ad-9af2-4f1f-977a-e07b2c81455f", "timestamp": "2025-06-20T11:20:56.507Z", "client_name": "Cliente teste geral"}', NULL, NULL, '2025-06-20 11:20:56.540853+00');
+ 
+ 
 
 
---
--- Data for Name: task_comments; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: task_comments; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO task_comments (id, task_id, author_id, content, created_at) VALUES ('f01821b6-ae60-47bc-ad12-841be71d59d2', '562cbbc1-9c84-4b6c-a50e-dacab3410c89', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'teste', '2025-06-30 01:17:36.736769+00');
+ 
+ 
 
 
---
--- Data for Name: task_steps; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: task_steps; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: tasks; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: tasks; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO tasks (id, title, description, status, priority, due_date, tags, project_id, owner_id, created_by, linked_ticket_id, created_at, type, actual_hours, assigned_to, estimated_hours, order_index, section_id, start_date, updated_at) VALUES ('1fda0e62-7b2f-479c-9a6b-d8ef77400d20', 'Otimização para Motores de Busca', 'Otimização para Motores de Busca', 'em_execucao', 'alta', '2025-07-04', '{}', 'f2fa808e-deeb-4f24-88bd-1764aa7e1cea', NULL, '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, '2025-06-27 20:41:47.408701+00', 'geral', NULL, '331154a6-c85f-464b-b840-74448443e470', '0', NULL, NULL, NULL, NULL);
 INSERT INTO tasks (id, title, description, status, priority, due_date, tags, project_id, owner_id, created_by, linked_ticket_id, created_at, type, actual_hours, assigned_to, estimated_hours, order_index, section_id, start_date, updated_at) VALUES ('44ced383-7baf-4f9e-a999-12a438403a37', 'Vídeo para edição - b2bot', 'Vídeo para edição - b2bot', 'backlog', 'baixa', '2025-06-30', '{}', 'f2fa808e-deeb-4f24-88bd-1764aa7e1cea', NULL, '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, '2025-06-27 20:41:12.972492+00', 'geral', NULL, '331154a6-c85f-464b-b840-74448443e470', '0', NULL, NULL, NULL, NULL);
 INSERT INTO tasks (id, title, description, status, priority, due_date, tags, project_id, owner_id, created_by, linked_ticket_id, created_at, type, actual_hours, assigned_to, estimated_hours, order_index, section_id, start_date, updated_at) VALUES ('948740e2-e5cb-4ffd-80be-f0b36ff1886c', 'Renovação de Licença Elementor', 'Renovação de Licença Elementor', 'aguardando', 'media', '2025-07-04', '{}', 'f2fa808e-deeb-4f24-88bd-1764aa7e1cea', NULL, '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, '2025-06-27 20:42:38.197261+00', 'geral', NULL, '536b84a9-6191-430b-ae30-f04bbfd76ebd', '0', NULL, NULL, NULL, NULL);
 INSERT INTO tasks (id, title, description, status, priority, due_date, tags, project_id, owner_id, created_by, linked_ticket_id, created_at, type, actual_hours, assigned_to, estimated_hours, order_index, section_id, start_date, updated_at) VALUES ('b66c9905-3377-4063-9f86-f10482ad79b8', 'Rotina de Manutenção e Atualização de Sites', 'Rotina de Manutenção e Atualização de Sites', 'finalizada', 'urgente', '2025-07-12', '{}', 'f2fa808e-deeb-4f24-88bd-1764aa7e1cea', NULL, '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, '2025-06-27 20:42:11.000039+00', 'geral', NULL, '536b84a9-6191-430b-ae30-f04bbfd76ebd', '0', NULL, NULL, NULL, NULL);
 INSERT INTO tasks (id, title, description, status, priority, due_date, tags, project_id, owner_id, created_by, linked_ticket_id, created_at, type, actual_hours, assigned_to, estimated_hours, order_index, section_id, start_date, updated_at) VALUES ('562cbbc1-9c84-4b6c-a50e-dacab3410c89', 'Otimização de Campanhas', 'Otimização de Campanhas de campanhas para as contas\nCL299 e CL220', 'em_revisao', 'alta', '2025-07-11', '{}', 'f2fa808e-deeb-4f24-88bd-1764aa7e1cea', NULL, '8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, '2025-06-30 01:16:40.310498+00', 'geral', NULL, '536b84a9-6191-430b-ae30-f04bbfd76ebd', '12', NULL, NULL, NULL, NULL);
+ 
+ 
 
 
---
--- Data for Name: user_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: user_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO user_permissions (id, user_id, permission, granted_by, created_at) VALUES ('7d18c472-33c1-4bb5-8246-5a53277caad7', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'access_dashboard', NULL, '2025-06-16 13:00:32.885459+00');
 INSERT INTO user_permissions (id, user_id, permission, granted_by, created_at) VALUES ('ba5f220a-ae48-47f9-9364-28b4e2973ddf', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'access_whatsapp', NULL, '2025-06-16 13:00:32.885459+00');
 INSERT INTO user_permissions (id, user_id, permission, granted_by, created_at) VALUES ('1815249e-aee9-40fc-8ccc-a794c81f5a59', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'create_campaigns', NULL, '2025-06-16 13:00:32.885459+00');
@@ -3488,12 +5607,15 @@ INSERT INTO user_permissions (id, user_id, permission, granted_by, created_at) V
 INSERT INTO user_permissions (id, user_id, permission, granted_by, created_at) VALUES ('cd6f98b8-7ac3-49aa-84b5-4f0758b0a7c8', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'view_billing_settings', NULL, '2025-06-16 13:00:32.885459+00');
 INSERT INTO user_permissions (id, user_id, permission, granted_by, created_at) VALUES ('bc60b1da-1231-4843-ae9b-78f06f030844', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'view_system_logs', NULL, '2025-06-16 13:00:32.885459+00');
 INSERT INTO user_permissions (id, user_id, permission, granted_by, created_at) VALUES ('cf1baafb-4523-454a-b7d3-e293ce6e6905', '8c858fa0-380a-4940-bee7-2b302753e6f2', 'manage_clients', NULL, '2025-06-23 13:18:10.490007+00');
+ 
+ 
 
 
---
--- Data for Name: usuarios; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: usuarios; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO usuarios (id, nome, tipo, criado_em) VALUES ('8c858fa0-380a-4940-bee7-2b302753e6f2', NULL, 'cliente', '2025-06-13 12:14:10.667638+00');
 INSERT INTO usuarios (id, nome, tipo, criado_em) VALUES ('3a307fc7-353f-4ae6-bac9-18029f367487', NULL, 'cliente', '2025-06-24 13:01:58.413253+00');
 INSERT INTO usuarios (id, nome, tipo, criado_em) VALUES ('70b54462-828c-4d86-85da-9be4040e93d7', NULL, 'cliente', '2025-06-24 13:42:48.156832+00');
@@ -3501,70 +5623,82 @@ INSERT INTO usuarios (id, nome, tipo, criado_em) VALUES ('536b84a9-6191-430b-ae3
 INSERT INTO usuarios (id, nome, tipo, criado_em) VALUES ('2154728e-4e56-4530-be02-f009f40de0a6', NULL, 'cliente', '2025-06-24 14:37:23.071255+00');
 INSERT INTO usuarios (id, nome, tipo, criado_em) VALUES ('29a1ac70-4c32-449e-bc92-40e54aab300b', NULL, 'admin', '2025-06-30 11:53:31.005915+00');
 INSERT INTO usuarios (id, nome, tipo, criado_em) VALUES ('331154a6-c85f-464b-b840-74448443e470', NULL, 'cliente', '2025-06-30 11:57:49.353425+00');
+ 
+ 
 
 
---
--- Data for Name: whatsapp_campaign_executions; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
---
--- Data for Name: whatsapp_campaigns; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: whatsapp_campaign_executions; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: whatsapp_config; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: whatsapp_campaigns; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+
+
+ 
+  Data for Name: whatsapp_config; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
+
+ 
 INSERT INTO whatsapp_config (id, phone_number_id, access_token, business_account_id, webhook_verify_token, status, last_verified_at, created_at, updated_at) VALUES ('3624bcf3-7deb-422f-bfd1-05d996d3a251', '372003975999118', 'EAAZAzZBX8ZBOp0BOwwyCPDuNzU9HqTSQ0E8AjUvQZBRm55Ykq2mir5iJDE2Qwmue4WCNAUeZBKvDByOn7OZCm1sjo3lb5hsZCZAZAPkFCdcJlK8TPARV0TajDKbCoyJPAc28lbZBT1s2ZCdir01tYPjX1eORZBRfALj37EWSZAQThkGrxGH0PSYMPpiK6H9Vbm4nq4tqM5Nab155H7dFVX46K6u97SmOA8fTaZAgRI', '', NULL, 'connected', '2025-06-15 19:08:33.237+00', '2025-06-15 15:23:09.899597+00', '2025-06-15 19:07:52.018562+00');
 INSERT INTO whatsapp_config (id, phone_number_id, access_token, business_account_id, webhook_verify_token, status, last_verified_at, created_at, updated_at) VALUES ('4e21e420-e8e5-4e2e-be2b-2b53a7e00446', '372003975999118', 'EAAZAzZBX8ZBOp0BO2SWZAPR6dZBfwdZA2bDSbD20CXVRicN04N0x0ZC9k4xyVKXqbBZAYZB5zwuQbUFBNZBGEne3ipSu3gCJyhIg0ePHHdP11htNP3ULiOwPoyO5QHzXLOK2sZBSX3jC4jbZBT3p9yt6CBHMyxwPu2eywaz5DRFZBbC5L3pITO0EqHDSF2Om6A6DDNTYyqoshUoZCe5kZCxHXlGAi6rZCZCQKawypbGUZD', '404720412715975', NULL, 'connected', '2025-06-15 19:13:58.636+00', '2025-06-15 19:13:12.308482+00', '2025-06-15 19:13:17.207195+00');
 INSERT INTO whatsapp_config (id, phone_number_id, access_token, business_account_id, webhook_verify_token, status, last_verified_at, created_at, updated_at) VALUES ('ed20ef4d-5c6a-473a-a8ed-0d76316dbf00', '372003975999118', 'EAAZAzZBX8ZBOp0BO2SWZAPR6dZBfwdZA2bDSbD20CXVRicN04N0x0ZC9k4xyVKXqbBZAYZB5zwuQbUFBNZBGEne3ipSu3gCJyhIg0ePHHdP11htNP3ULiOwPoyO5QHzXLOK2sZBSX3jC4jbZBT3p9yt6CBHMyxwPu2eywaz5DRFZBbC5L3pITO0EqHDSF2Om6A6DDNTYyqoshUoZCe5kZCxHXlGAi6rZCZCQKawypbGUZD', '404720412715975', NULL, 'connected', '2025-06-15 19:16:27.985+00', '2025-06-15 19:15:40.579602+00', '2025-06-15 19:15:46.519165+00');
 INSERT INTO whatsapp_config (id, phone_number_id, access_token, business_account_id, webhook_verify_token, status, last_verified_at, created_at, updated_at) VALUES ('c6323fbc-1a6d-45f5-9a62-36fb84fb6e36', '372003975999118', 'EAAIUwkUBCqMBO95ZAhK8bAFTi41e0Go2iGyeFyKyCAO6ffHKyXA6ghynihz0fZBzZCmDZBi0rMVEvdVvqxuoitjMT6repalhjRwO7IuWzyGvRBCLbd79IidDPHzzFnOG83AI4AMJTvElahNTiFX0fPe6J1pZCxD2woA6TiDhikjWkWMqeorLDmmNMZANGAdgJZBIJM9giVpN0C1u9DWoIjhIcevKmub45cZD', '404720412715975', NULL, 'connected', '2025-06-16 09:07:10.27+00', '2025-06-16 09:06:24.195452+00', '2025-06-16 09:06:28.23061+00');
 INSERT INTO whatsapp_config (id, phone_number_id, access_token, business_account_id, webhook_verify_token, status, last_verified_at, created_at, updated_at) VALUES ('d66a7a25-fd93-4aa9-8f0c-0f3b5847c723', '372003975999118', 'EAAIUwkUBCqMBO6nA8OlDuZCLJrb7MeBLQ4COZB579TY25V6d9ZBIozDkDrUKjGm9NTKQowTBpIoc1zFCq0q5Ko3M8GZCRm7yGwVhxBdsFxJEKXxoAMocuZAhAELwpS32ZAFIdaffIZBNYGYx2ZCgJnG4I47syoEcxSqRMoZCJBhFs6hw9vZCyG4myARVDZAddzvXgZDZD', '404720412715975', NULL, 'connected', '2025-06-16 09:11:33.197+00', '2025-06-16 09:10:45.549123+00', '2025-06-16 09:10:51.177164+00');
 INSERT INTO whatsapp_config (id, phone_number_id, access_token, business_account_id, webhook_verify_token, status, last_verified_at, created_at, updated_at) VALUES ('a2beb4b4-a31d-4202-b834-44cc5ac8f0de', '372003975999118', 'EAAIUwkUBCqMBO6nA8OlDuZCLJrb7MeBLQ4COZB579TY25V6d9ZBIozDkDrUKjGm9NTKQowTBpIoc1zFCq0q5Ko3M8GZCRm7yGwVhxBdsFxJEKXxoAMocuZAhAELwpS32ZAFIdaffIZBNYGYx2ZCgJnG4I47syoEcxSqRMoZCJBhFs6hw9vZCyG4myARVDZAddzvXgZDZD', '404720412715975', NULL, 'connected', '2025-06-16 09:22:38.573+00', '2025-06-16 09:21:55.155915+00', '2025-06-16 09:21:56.522065+00');
+ 
+ 
 
 
---
--- Data for Name: whatsapp_contacts; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: whatsapp_contacts; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+ 
 INSERT INTO whatsapp_contacts (id, name, phone_number, client_id, tags, is_active, created_at, updated_at, meta_account_id, grupo, observacoes) VALUES ('ce95a461-932d-4bbf-b4c4-05a0fe572bfb', 'Contato 01', '551199112365', NULL, '{Tag01}', 't', '2025-06-15 17:28:54.196281+00', '2025-06-15 17:28:54.196281+00', NULL, NULL, NULL);
+ 
+ 
 
 
---
--- Data for Name: whatsapp_message_logs; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
---
--- Data for Name: whatsapp_messages; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: whatsapp_message_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: whatsapp_templates; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: whatsapp_messages; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Data for Name: workflow_templates; Type: TABLE DATA; Schema: public; Owner: postgres
---
+ 
+  Data for Name: whatsapp_templates; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
 
+
+
+ 
+  Data for Name: workflow_templates; Type: TABLE DATA; Schema: public; Owner: postgres
+ 
+
+ 
 INSERT INTO workflow_templates (id, name, description, category, icon, steps, created_by, is_public, created_at) VALUES ('78e6da0c-c9e9-460b-9f09-031040e493f3', 'Onboarding de Cliente', 'Processo completo para integrar novos clientes', 'Comercial', 'user-plus', '[{"title": "Reunião de kick-off", "description": "Agendar e realizar reunião inicial", "estimated_hours": 2}, {"title": "Documentação de requisitos", "description": "Coletar e documentar todos os requisitos", "estimated_hours": 4}, {"title": "Setup inicial", "description": "Configurar ferramentas e acessos", "estimated_hours": 3}, {"title": "Entrega do material", "description": "Entregar documentação e orientações", "estimated_hours": 1}]', NULL, 't', '2025-06-21 09:01:51.023856+00');
 INSERT INTO workflow_templates (id, name, description, category, icon, steps, created_by, is_public, created_at) VALUES ('af52fb19-59c9-4cb6-b522-aded17a7379d', 'Landing Page', 'Criação completa de landing page', 'Design', 'layout', '[{"title": "Briefing do projeto", "description": "Entender objetivos e público-alvo", "estimated_hours": 2}, {"title": "Wireframe", "description": "Criar estrutura da página", "estimated_hours": 4}, {"title": "Design visual", "description": "Desenvolver layout final", "estimated_hours": 8}, {"title": "Desenvolvimento", "description": "Implementar a página", "estimated_hours": 12}, {"title": "Testes e ajustes", "description": "Testar funcionamento e fazer correções", "estimated_hours": 4}]', NULL, 't', '2025-06-21 09:01:51.023856+00');
 INSERT INTO workflow_templates (id, name, description, category, icon, steps, created_by, is_public, created_at) VALUES ('c4ee1005-52a9-4a39-a097-cd2b06052616', 'Desenvolvimento SEO', 'Otimização completa de SEO para websites', 'Marketing', 'search', '[{"title": "Auditoria SEO", "description": "Análise completa do site atual", "estimated_hours": 6}, {"title": "Pesquisa de palavras-chave", "description": "Identificar termos relevantes", "estimated_hours": 4}, {"title": "Otimização on-page", "description": "Melhorar conteúdo e estrutura", "estimated_hours": 8}, {"title": "Link building", "description": "Estratégia de construção de links", "estimated_hours": 10}]', NULL, 't', '2025-06-21 09:01:51.023856+00');
+ 
+ 
 
 
---
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: realtime; Owner: supabase_admin
---
+ 
+  Data for Name: schema_migrations; Type: TABLE DATA; Schema: realtime; Owner: supabase_admin
+ 
 
+ 
 INSERT INTO realtime.schema_migrations (version, inserted_at) VALUES ('20211116024918', '2025-06-10 06:22:10');
 INSERT INTO realtime.schema_migrations (version, inserted_at) VALUES ('20211116045059', '2025-06-10 06:22:14');
 INSERT INTO realtime.schema_migrations (version, inserted_at) VALUES ('20211116050929', '2025-06-10 06:22:18');
@@ -3627,25 +5761,31 @@ INSERT INTO realtime.schema_migrations (version, inserted_at) VALUES ('202501231
 INSERT INTO realtime.schema_migrations (version, inserted_at) VALUES ('20250128220012', '2025-06-10 06:26:20');
 INSERT INTO realtime.schema_migrations (version, inserted_at) VALUES ('20250506224012', '2025-06-10 06:26:22');
 INSERT INTO realtime.schema_migrations (version, inserted_at) VALUES ('20250523164012', '2025-06-10 06:26:26');
+ 
+ 
 
 
---
--- Data for Name: subscription; Type: TABLE DATA; Schema: realtime; Owner: supabase_admin
---
+ 
+  Data for Name: subscription; Type: TABLE DATA; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+ 
 
+ 
 INSERT INTO storage.buckets (id, name, owner, created_at, updated_at, public, avif_autodetection, file_size_limit, allowed_mime_types, owner_id) VALUES ('ticket-attachments', 'ticket-attachments', NULL, '2025-06-14 15:49:43.782846+00', '2025-06-14 15:49:43.782846+00', 't', 'f', NULL, NULL, NULL);
+ 
+ 
 
 
---
--- Data for Name: migrations; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Data for Name: migrations; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+ 
 
+ 
 INSERT INTO storage.migrations (id, name, hash, executed_at) VALUES ('0', 'create-migrations-table', 'e18db593bcde2aca2a408c4d1100f6abba2195df', '2025-06-10 06:22:03.092208');
 INSERT INTO storage.migrations (id, name, hash, executed_at) VALUES ('1', 'initialmigration', '6ab16121fbaa08bbd11b712d05f358f9b555d777', '2025-06-10 06:22:03.103325');
 INSERT INTO storage.migrations (id, name, hash, executed_at) VALUES ('2', 'storage-schema', '5c7968fd083fcea04050c1b7f6253c9771b99011', '2025-06-10 06:22:03.110945');
@@ -3672,3602 +5812,3725 @@ INSERT INTO storage.migrations (id, name, hash, executed_at) VALUES ('22', 's3-m
 INSERT INTO storage.migrations (id, name, hash, executed_at) VALUES ('23', 'optimize-search-function', '9d7e604cddc4b56a5422dc68c9313f4a1b6f132c', '2025-06-10 06:22:03.341915');
 INSERT INTO storage.migrations (id, name, hash, executed_at) VALUES ('24', 'operation-function', '8312e37c2bf9e76bbe841aa5fda889206d2bf8aa', '2025-06-10 06:22:03.350317');
 INSERT INTO storage.migrations (id, name, hash, executed_at) VALUES ('25', 'custom-metadata', 'd974c6057c3db1c1f847afa0e291e6165693b990', '2025-06-10 06:22:03.358577');
+ 
+ 
 
 
---
--- Data for Name: objects; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
---
-
-
-
---
--- Data for Name: s3_multipart_uploads; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Data for Name: objects; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Data for Name: s3_multipart_uploads_parts; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Data for Name: s3_multipart_uploads; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: supabase_migrations; Owner: postgres
---
-
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613071443', '{"\n-- Criar enum para tipos de usuário\nCREATE TYPE public.user_role AS ENUM (''admin'', ''cliente'');\n\n-- Criar enum para tipos de conta\nCREATE TYPE public.account_type AS ENUM (''meta'', ''google'');\n\n-- Criar enum para status de chamados\nCREATE TYPE public.ticket_status AS ENUM (''aberto'', ''em_andamento'', ''resolvido'');\n\n-- Criar enum para status de criativos\nCREATE TYPE public.creative_status AS ENUM (''pendente'', ''aprovado'', ''reprovado'', ''ajuste_solicitado'');\n\n-- Criar enum para tipo de acesso\nCREATE TYPE public.access_type AS ENUM (''api'', ''sheet'');\n\n-- Tabela de perfis de usuário (vinculada ao auth.users do Supabase)\nCREATE TABLE public.profiles (\n    id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,\n    nome TEXT NOT NULL,\n    email TEXT NOT NULL,\n    role user_role NOT NULL DEFAULT ''cliente'',\n    ativo BOOLEAN NOT NULL DEFAULT true,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    PRIMARY KEY (id)\n);\n\n-- Tabela de clientes (para dados específicos do cliente)\nCREATE TABLE public.clientes (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,\n    nome TEXT NOT NULL,\n    tipo_acesso access_type NOT NULL DEFAULT ''api'',\n    ativo BOOLEAN NOT NULL DEFAULT true,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    UNIQUE(user_id)\n);\n\n-- Tabela de contas vinculadas aos clientes\nCREATE TABLE public.contas (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    cliente_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n    tipo account_type NOT NULL,\n    identificador TEXT NOT NULL, -- ID da conta Meta/Google\n    nome TEXT NOT NULL,\n    ativo BOOLEAN NOT NULL DEFAULT true,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    UNIQUE(cliente_id, tipo, identificador)\n);\n\n-- Tabela de chamados\nCREATE TABLE public.chamados (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    cliente_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n    titulo TEXT NOT NULL,\n    mensagem TEXT NOT NULL,\n    status ticket_status NOT NULL DEFAULT ''aberto'',\n    resposta TEXT,\n    arquivo_url TEXT,\n    respondido_por UUID REFERENCES public.profiles(id),\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Tabela de criativos\nCREATE TABLE public.criativos (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    cliente_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n    titulo TEXT NOT NULL,\n    descricao TEXT,\n    arquivo_url TEXT NOT NULL,\n    tipo_arquivo TEXT NOT NULL, -- image/video\n    status creative_status NOT NULL DEFAULT ''pendente'',\n    resposta TEXT,\n    comentario_cliente TEXT,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Habilitar RLS em todas as tabelas\nALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.contas ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.chamados ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.criativos ENABLE ROW LEVEL SECURITY;\n\n-- Função para verificar se o usuário é admin\nCREATE OR REPLACE FUNCTION public.is_admin()\nRETURNS BOOLEAN\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 FROM public.profiles\n    WHERE id = auth.uid() AND role = ''admin''\n  );\n$$;\n\n-- Função para obter o cliente_id do usuário atual\nCREATE OR REPLACE FUNCTION public.get_user_cliente_id()\nRETURNS UUID\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT c.id FROM public.clientes c\n  WHERE c.user_id = auth.uid();\n$$;\n\n-- Políticas RLS para profiles\nCREATE POLICY \\"Usuários podem ver seu próprio perfil\\"\n  ON public.profiles FOR SELECT\n  USING (auth.uid() = id);\n\nCREATE POLICY \\"Admins podem ver todos os perfis\\"\n  ON public.profiles FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Usuários podem atualizar seu próprio perfil\\"\n  ON public.profiles FOR UPDATE\n  USING (auth.uid() = id);\n\nCREATE POLICY \\"Admins podem inserir perfis\\"\n  ON public.profiles FOR INSERT\n  WITH CHECK (public.is_admin());\n\nCREATE POLICY \\"Admins podem atualizar qualquer perfil\\"\n  ON public.profiles FOR UPDATE\n  USING (public.is_admin());\n\n-- Políticas RLS para clientes\nCREATE POLICY \\"Usuários podem ver seu próprio cliente\\"\n  ON public.clientes FOR SELECT\n  USING (user_id = auth.uid());\n\nCREATE POLICY \\"Admins podem ver todos os clientes\\"\n  ON public.clientes FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar clientes\\"\n  ON public.clientes FOR ALL\n  USING (public.is_admin());\n\n-- Políticas RLS para contas\nCREATE POLICY \\"Usuários podem ver suas próprias contas\\"\n  ON public.contas FOR SELECT\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Admins podem ver todas as contas\\"\n  ON public.contas FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar contas\\"\n  ON public.contas FOR ALL\n  USING (public.is_admin());\n\n-- Políticas RLS para chamados\nCREATE POLICY \\"Usuários podem ver seus próprios chamados\\"\n  ON public.chamados FOR SELECT\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Usuários podem criar chamados\\"\n  ON public.chamados FOR INSERT\n  WITH CHECK (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Usuários podem atualizar seus próprios chamados\\"\n  ON public.chamados FOR UPDATE\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Admins podem ver todos os chamados\\"\n  ON public.chamados FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar chamados\\"\n  ON public.chamados FOR ALL\n  USING (public.is_admin());\n\n-- Políticas RLS para criativos\nCREATE POLICY \\"Usuários podem ver seus próprios criativos\\"\n  ON public.criativos FOR SELECT\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Usuários podem atualizar seus próprios criativos\\"\n  ON public.criativos FOR UPDATE\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Admins podem ver todos os criativos\\"\n  ON public.criativos FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar criativos\\"\n  ON public.criativos FOR ALL\n  USING (public.is_admin());\n\n-- Trigger para criar perfil automaticamente quando usuário se registra\nCREATE OR REPLACE FUNCTION public.handle_new_user()\nRETURNS TRIGGER\nLANGUAGE plpgsql\nSECURITY DEFINER SET search_path = ''''\nAS $$\nBEGIN\n  INSERT INTO public.profiles (id, nome, email, role)\n  VALUES (\n    new.id,\n    COALESCE(new.raw_user_meta_data ->> ''nome'', new.email),\n    new.email,\n    COALESCE((new.raw_user_meta_data ->> ''role'')::user_role, ''cliente'')\n  );\n  RETURN new;\nEND;\n$$;\n\n-- Trigger para executar a função quando um usuário é criado\nCREATE TRIGGER on_auth_user_created\n  AFTER INSERT ON auth.users\n  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();\n\n-- Função para atualizar updated_at\nCREATE OR REPLACE FUNCTION public.update_updated_at_column()\nRETURNS TRIGGER AS $$\nBEGIN\n  NEW.updated_at = now();\n  RETURN NEW;\nEND;\n$$ language ''plpgsql'';\n\n-- Triggers para atualizar updated_at automaticamente\nCREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\nCREATE TRIGGER update_clientes_updated_at BEFORE UPDATE ON public.clientes FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\nCREATE TRIGGER update_chamados_updated_at BEFORE UPDATE ON public.chamados FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\nCREATE TRIGGER update_criativos_updated_at BEFORE UPDATE ON public.criativos FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\n"}', '8131066b-e700-4e37-be32-745036d7e8e6', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613124855', '{"\n-- Primeiro, vamos corrigir as políticas RLS que estão causando os erros 406\n-- Criar políticas para a tabela profiles\nCREATE POLICY \\"Users can view their own profile\\" ON public.profiles\nFOR SELECT USING (auth.uid() = id);\n\nCREATE POLICY \\"Users can update their own profile\\" ON public.profiles\nFOR UPDATE USING (auth.uid() = id);\n\n-- Criar políticas para a tabela clientes\nCREATE POLICY \\"Admins can view all clients\\" ON public.clientes\nFOR SELECT USING (public.is_admin());\n\nCREATE POLICY \\"Users can view their own client data\\" ON public.clientes\nFOR SELECT USING (auth.uid() = user_id);\n\nCREATE POLICY \\"Admins can manage clients\\" ON public.clientes\nFOR ALL USING (public.is_admin());\n\n-- Criar políticas para chamados\nCREATE POLICY \\"Admins can view all tickets\\" ON public.chamados\nFOR SELECT USING (public.is_admin());\n\nCREATE POLICY \\"Users can view tickets from their client\\" ON public.chamados\nFOR SELECT USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\nCREATE POLICY \\"Admins can manage all tickets\\" ON public.chamados\nFOR ALL USING (public.is_admin());\n\nCREATE POLICY \\"Users can create tickets for their client\\" ON public.chamados\nFOR INSERT WITH CHECK (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\nCREATE POLICY \\"Users can update their client tickets\\" ON public.chamados\nFOR UPDATE USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\n-- Criar políticas para criativos\nCREATE POLICY \\"Admins can manage all creatives\\" ON public.criativos\nFOR ALL USING (public.is_admin());\n\nCREATE POLICY \\"Users can view creatives for their client\\" ON public.criativos\nFOR SELECT USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\nCREATE POLICY \\"Users can update creatives for their client\\" ON public.criativos\nFOR UPDATE USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\n-- Atualizar a estrutura da tabela criativos para incluir os novos campos\nALTER TABLE public.criativos \nADD COLUMN IF NOT EXISTS campanha TEXT,\nADD COLUMN IF NOT EXISTS nome_criativo TEXT,\nADD COLUMN IF NOT EXISTS titulo_anuncio TEXT,\nADD COLUMN IF NOT EXISTS descricao_anuncio TEXT;\n\n-- Atualizar a estrutura da tabela chamados para melhor controle de status\nALTER TABLE public.chamados \nADD COLUMN IF NOT EXISTS aberto_por TEXT DEFAULT ''cliente'',\nADD COLUMN IF NOT EXISTS status_detalhado TEXT;\n\n-- Criar função para atualizar status detalhado dos chamados\nCREATE OR REPLACE FUNCTION update_ticket_detailed_status()\nRETURNS TRIGGER AS $$\nBEGIN\n  -- Definir status detalhado baseado no status e outras condições\n  IF NEW.status = ''aberto'' AND NEW.aberto_por = ''admin'' THEN\n    NEW.status_detalhado = ''Aberto pela Equipe'';\n  ELSIF NEW.status = ''aberto'' AND NEW.aberto_por = ''cliente'' THEN\n    NEW.status_detalhado = ''Aberto pelo Cliente'';\n  ELSIF NEW.status = ''em_andamento'' AND NEW.resposta IS NOT NULL AND NEW.respondido_por IS NOT NULL THEN\n    -- Verificar se quem respondeu foi admin\n    IF EXISTS (SELECT 1 FROM public.profiles WHERE id = NEW.respondido_por AND role = ''admin'') THEN\n      NEW.status_detalhado = ''Aguardando Resposta do Cliente'';\n    ELSE\n      NEW.status_detalhado = ''Aguardando resposta da equipe'';\n    END IF;\n  ELSIF NEW.status = ''resolvido'' THEN\n    NEW.status_detalhado = ''Concluído'';\n  ELSE\n    NEW.status_detalhado = NEW.status;\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n-- Criar trigger para atualizar status detalhado\nDROP TRIGGER IF EXISTS update_ticket_status_trigger ON public.chamados;\nCREATE TRIGGER update_ticket_status_trigger\n  BEFORE INSERT OR UPDATE ON public.chamados\n  FOR EACH ROW\n  EXECUTE FUNCTION update_ticket_detailed_status();\n"}', '096449ce-64bc-435c-87de-d87a01dfbf84', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613070518', '{"\n-- Criar tabela activity_logs para registrar ações do sistema\nCREATE TABLE public.activity_logs (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  action TEXT NOT NULL,\n  entity_type TEXT NOT NULL,\n  entity_id TEXT NOT NULL,\n  entity_name TEXT NOT NULL,\n  user_id UUID REFERENCES auth.users(id),\n  user_name TEXT NOT NULL,\n  details JSONB,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Adicionar RLS para que admins vejam todos os logs\nALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;\n\n-- Política para admins verem todos os logs\nCREATE POLICY \\"Admins can view all activity logs\\" ON public.activity_logs\nFOR SELECT USING (public.is_admin());\n\n-- Política para permitir inserção de logs pelo sistema\nCREATE POLICY \\"System can insert activity logs\\" ON public.activity_logs\nFOR INSERT WITH CHECK (true);\n\n-- Criar índices para performance\nCREATE INDEX idx_activity_logs_created_at ON public.activity_logs(created_at DESC);\nCREATE INDEX idx_activity_logs_entity_type ON public.activity_logs(entity_type);\nCREATE INDEX idx_activity_logs_user_id ON public.activity_logs(user_id);\n"}', '9cb15cc5-b5bc-442e-9ee5-fa29566dac42', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613081728', '{"\n-- Melhorar tabela de clientes com campos obrigatórios\nALTER TABLE public.clientes \nADD COLUMN IF NOT EXISTS email TEXT,\nADD COLUMN IF NOT EXISTS telefone TEXT,\nADD COLUMN IF NOT EXISTS empresa TEXT,\nADD COLUMN IF NOT EXISTS observacoes_internas TEXT,\nADD COLUMN IF NOT EXISTS responsavel_conta UUID REFERENCES public.profiles(id),\nADD COLUMN IF NOT EXISTS contas_meta TEXT[]; -- Array de IDs das contas Meta vinculadas\n\n-- Criar tabela para histórico/timeline dos chamados\nCREATE TABLE IF NOT EXISTS public.chamados_historico (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id UUID NOT NULL REFERENCES public.chamados(id) ON DELETE CASCADE,\n  acao TEXT NOT NULL, -- ''criado'', ''respondido'', ''status_alterado'', ''arquivo_anexado''\n  usuario_id UUID REFERENCES public.profiles(id),\n  usuario_nome TEXT NOT NULL,\n  detalhes TEXT,\n  data_acao TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Habilitar RLS na tabela de histórico\nALTER TABLE public.chamados_historico ENABLE ROW LEVEL SECURITY;\n\n-- Políticas para histórico de chamados\nCREATE POLICY \\"Users can view chamados_historico based on access\\" ON public.chamados_historico\n  FOR SELECT USING (\n    CASE \n      WHEN (SELECT role FROM public.profiles WHERE id = auth.uid()) = ''admin'' THEN true\n      ELSE chamado_id IN (\n        SELECT id FROM public.chamados \n        WHERE cliente_id = (SELECT get_user_cliente_id())\n      )\n    END\n  );\n\nCREATE POLICY \\"Only authenticated users can insert historico\\" ON public.chamados_historico\n  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);\n\n-- Trigger para criar histórico automaticamente quando chamado é criado\nCREATE OR REPLACE FUNCTION public.create_chamado_historico()\nRETURNS TRIGGER AS $$\nBEGIN\n  -- Inserir histórico quando chamado é criado\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO public.chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)\n    VALUES (\n      NEW.id, \n      ''criado'', \n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''Chamado criado: '' || NEW.titulo\n    );\n    RETURN NEW;\n  END IF;\n  \n  -- Inserir histórico quando status muda\n  IF TG_OP = ''UPDATE'' AND OLD.status != NEW.status THEN\n    INSERT INTO public.chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)\n    VALUES (\n      NEW.id, \n      ''status_alterado'', \n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"''\n    );\n  END IF;\n  \n  -- Inserir histórico quando resposta é adicionada\n  IF TG_OP = ''UPDATE'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO public.chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)\n    VALUES (\n      NEW.id, \n      ''respondido'', \n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''Nova resposta adicionada''\n    );\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n-- Criar trigger\nDROP TRIGGER IF EXISTS chamado_historico_trigger ON public.chamados;\nCREATE TRIGGER chamado_historico_trigger\n  AFTER INSERT OR UPDATE ON public.chamados\n  FOR EACH ROW EXECUTE FUNCTION public.create_chamado_historico();\n\n-- Melhorar estrutura de logs de atividade\nCREATE TABLE IF NOT EXISTS public.system_activity_logs (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  usuario_id UUID REFERENCES public.profiles(id),\n  usuario_nome TEXT NOT NULL,\n  acao TEXT NOT NULL, -- ''login'', ''api_call'', ''filter_change'', ''export'', etc\n  modulo TEXT NOT NULL, -- ''campanhas'', ''adsets'', ''chamados'', ''clientes'', etc\n  detalhes JSONB,\n  ip_address INET,\n  user_agent TEXT,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- RLS para logs do sistema\nALTER TABLE public.system_activity_logs ENABLE ROW LEVEL SECURITY;\n\n-- Admins podem ver todos os logs, usuários comuns apenas os próprios\nCREATE POLICY \\"Admins can view all logs, users only their own\\" ON public.system_activity_logs\n  FOR SELECT USING (\n    (SELECT role FROM public.profiles WHERE id = auth.uid()) = ''admin'' \n    OR usuario_id = auth.uid()\n  );\n\nCREATE POLICY \\"All authenticated users can insert logs\\" ON public.system_activity_logs\n  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);\n\n-- Função para registrar atividade no sistema\nCREATE OR REPLACE FUNCTION public.log_system_activity(\n  p_acao TEXT,\n  p_modulo TEXT,\n  p_detalhes JSONB DEFAULT NULL,\n  p_ip_address INET DEFAULT NULL,\n  p_user_agent TEXT DEFAULT NULL\n)\nRETURNS UUID AS $$\nDECLARE\n  log_id UUID;\nBEGIN\n  INSERT INTO public.system_activity_logs (\n    usuario_id, \n    usuario_nome, \n    acao, \n    modulo, \n    detalhes, \n    ip_address, \n    user_agent\n  ) VALUES (\n    auth.uid(),\n    COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n    p_acao,\n    p_modulo,\n    p_detalhes,\n    p_ip_address,\n    p_user_agent\n  ) RETURNING id INTO log_id;\n  \n  RETURN log_id;\nEND;\n$$ LANGUAGE plpgsql SECURITY DEFINER;\n"}', 'd0f77029-c2dd-4eac-a645-509965ade5c5', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250614034943', '{"\n-- Adicionar novas colunas à tabela chamados\nALTER TABLE chamados \nADD COLUMN IF NOT EXISTS categoria text DEFAULT ''outros'',\nADD COLUMN IF NOT EXISTS prioridade text DEFAULT ''media'',\nADD COLUMN IF NOT EXISTS nota_interna text,\nADD COLUMN IF NOT EXISTS tempo_resposta_horas integer;\n\n-- Criar tabela para anexos de chamados\nCREATE TABLE IF NOT EXISTS chamados_anexos (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id uuid REFERENCES chamados(id) ON DELETE CASCADE,\n  nome_arquivo text NOT NULL,\n  url_arquivo text NOT NULL,\n  tipo_arquivo text NOT NULL,\n  tamanho_arquivo bigint,\n  created_at timestamp with time zone DEFAULT now(),\n  uploaded_by uuid REFERENCES auth.users(id)\n);\n\n-- Criar tabela para timeline de conversas\nCREATE TABLE IF NOT EXISTS chamados_timeline (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id uuid REFERENCES chamados(id) ON DELETE CASCADE,\n  tipo text NOT NULL DEFAULT ''mensagem'', -- mensagem, status_change, note\n  conteudo text,\n  autor_id uuid REFERENCES auth.users(id),\n  autor_nome text NOT NULL,\n  autor_tipo text NOT NULL DEFAULT ''cliente'', -- cliente, admin, sistema\n  created_at timestamp with time zone DEFAULT now(),\n  metadata jsonb DEFAULT ''{}''::jsonb\n);\n\n-- Habilitar RLS nas novas tabelas\nALTER TABLE chamados_anexos ENABLE ROW LEVEL SECURITY;\nALTER TABLE chamados_timeline ENABLE ROW LEVEL SECURITY;\n\n-- Políticas RLS para anexos\nCREATE POLICY \\"Visualizar anexos próprios\\" ON chamados_anexos\n  FOR SELECT USING (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\nCREATE POLICY \\"Inserir anexos próprios\\" ON chamados_anexos\n  FOR INSERT WITH CHECK (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\n-- Políticas RLS para timeline\nCREATE POLICY \\"Visualizar timeline própria\\" ON chamados_timeline\n  FOR SELECT USING (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\nCREATE POLICY \\"Inserir timeline própria\\" ON chamados_timeline\n  FOR INSERT WITH CHECK (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\n-- Trigger para criar entrada na timeline quando chamado é criado\nCREATE OR REPLACE FUNCTION create_ticket_timeline_entry()\nRETURNS TRIGGER AS $$\nBEGIN\n  -- Entrada para criação do chamado\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id, \n      tipo, \n      conteudo, \n      autor_id, \n      autor_nome, \n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''criacao'',\n      NEW.mensagem,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      NEW.aberto_por,\n      jsonb_build_object(''titulo'', NEW.titulo, ''categoria'', NEW.categoria, ''prioridade'', NEW.prioridade)\n    );\n  END IF;\n\n  -- Entrada para mudança de status\n  IF TG_OP = ''UPDATE'' AND OLD.status != NEW.status THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END,\n      jsonb_build_object(''status_anterior'', OLD.status, ''status_novo'', NEW.status)\n    );\n  END IF;\n\n  -- Entrada para nova resposta\n  IF TG_OP = ''UPDATE'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo\n    ) VALUES (\n      NEW.id,\n      ''resposta'',\n      NEW.resposta,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END\n    );\n  END IF;\n\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n-- Aplicar trigger\nDROP TRIGGER IF EXISTS ticket_timeline_trigger ON chamados;\nCREATE TRIGGER ticket_timeline_trigger\n  AFTER INSERT OR UPDATE ON chamados\n  FOR EACH ROW\n  EXECUTE FUNCTION create_ticket_timeline_entry();\n\n-- Criar storage bucket para anexos se não existir\nINSERT INTO storage.buckets (id, name, public) \nVALUES (''ticket-attachments'', ''ticket-attachments'', true)\nON CONFLICT (id) DO NOTHING;\n"}', 'c3750da7-f88d-423c-a5d5-a0d8f90d8a3a', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250614104119', '{"\n-- Atualizar o enum de status dos chamados\nALTER TYPE ticket_status RENAME TO ticket_status_old;\n\nCREATE TYPE ticket_status AS ENUM (''novo'', ''aguardando_equipe'', ''aguardando_cliente'', ''em_analise'', ''em_andamento'', ''resolvido'');\n\n-- Atualizar a coluna status na tabela chamados\nALTER TABLE chamados ALTER COLUMN status DROP DEFAULT;\nALTER TABLE chamados ALTER COLUMN status TYPE ticket_status USING \n  CASE \n    WHEN status::text = ''aberto'' THEN ''novo''::ticket_status\n    WHEN status::text = ''em_andamento'' THEN ''em_andamento''::ticket_status\n    WHEN status::text = ''resolvido'' THEN ''resolvido''::ticket_status\n    ELSE ''novo''::ticket_status\n  END;\nALTER TABLE chamados ALTER COLUMN status SET DEFAULT ''novo''::ticket_status;\n\n-- Remover o tipo antigo\nDROP TYPE ticket_status_old;\n\n-- Criar tabela para mensagens do timeline (separada das mensagens iniciais)\nCREATE TABLE IF NOT EXISTS public.chamados_mensagens (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id UUID NOT NULL,\n  conteudo TEXT NOT NULL,\n  arquivo_url TEXT,\n  autor_id UUID,\n  autor_nome TEXT NOT NULL,\n  autor_tipo TEXT NOT NULL DEFAULT ''cliente'' CHECK (autor_tipo IN (''cliente'', ''admin'', ''sistema'')),\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  metadata JSONB DEFAULT ''{}''::jsonb\n);\n\n-- Atualizar a função de trigger para os novos status\nCREATE OR REPLACE FUNCTION public.update_ticket_status_on_message()\nRETURNS TRIGGER\nLANGUAGE plpgsql\nAS $$\nBEGIN\n  -- Se é uma mensagem de cliente, alterar status para ''aguardando_equipe''\n  IF NEW.autor_tipo = ''cliente'' THEN\n    UPDATE chamados \n    SET status = ''aguardando_equipe''::ticket_status, updated_at = now()\n    WHERE id = NEW.chamado_id;\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$;\n\n-- Criar trigger para atualizar status quando cliente responde\nCREATE TRIGGER trigger_update_status_on_client_message\n  AFTER INSERT ON chamados_mensagens\n  FOR EACH ROW\n  EXECUTE FUNCTION update_ticket_status_on_message();\n\n-- Atualizar a função create_ticket_timeline_entry para incluir mensagens\nCREATE OR REPLACE FUNCTION public.create_ticket_timeline_entry()\nRETURNS trigger\nLANGUAGE plpgsql\nAS $$\nBEGIN\n  -- Entrada para criação do chamado\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id, \n      tipo, \n      conteudo, \n      autor_id, \n      autor_nome, \n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''criacao'',\n      NEW.mensagem,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      NEW.aberto_por,\n      jsonb_build_object(''titulo'', NEW.titulo, ''categoria'', NEW.categoria, ''prioridade'', NEW.prioridade)\n    );\n  END IF;\n\n  -- Entrada para nova mensagem\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados_mensagens'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.chamado_id,\n      ''mensagem'',\n      NEW.conteudo,\n      NEW.autor_id,\n      NEW.autor_nome,\n      NEW.autor_tipo,\n      NEW.metadata\n    );\n  END IF;\n\n  -- Entrada para mudança de status\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND OLD.status != NEW.status THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END,\n      jsonb_build_object(''status_anterior'', OLD.status, ''status_novo'', NEW.status)\n    );\n  END IF;\n\n  -- Entrada para nova resposta (campo resposta)\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo\n    ) VALUES (\n      NEW.id,\n      ''resposta'',\n      NEW.resposta,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END\n    );\n  END IF;\n\n  RETURN NEW;\nEND;\n$$;\n\n-- Criar trigger para mensagens\nCREATE TRIGGER trigger_timeline_entry_mensagens\n  AFTER INSERT ON chamados_mensagens\n  FOR EACH ROW\n  EXECUTE FUNCTION create_ticket_timeline_entry();\n\n-- Atualizar chamados existentes com status ''aberto'' para ''novo''\nUPDATE chamados SET status = ''novo''::ticket_status WHERE status::text = ''aberto'';\n"}', '176e0d70-2d98-47b5-adff-d5a754a2f47a', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250614113715', '{"\n-- Primeiro, remover o default da coluna\nALTER TABLE chamados ALTER COLUMN status DROP DEFAULT;\n\n-- Atualizar todos os chamados com status antigos para os novos status\nUPDATE chamados \nSET status = ''novo''::ticket_status \nWHERE status::text = ''aberto'';\n\nUPDATE chamados \nSET status = ''aguardando_equipe''::ticket_status \nWHERE status::text = ''respondido'';\n\n-- Criar o novo enum com os status corretos\nDROP TYPE IF EXISTS ticket_status_new CASCADE;\nCREATE TYPE ticket_status_new AS ENUM (''novo'', ''aguardando_equipe'', ''aguardando_cliente'', ''em_analise'', ''em_andamento'', ''resolvido'');\n\n-- Atualizar a coluna para usar o novo enum\nALTER TABLE chamados ALTER COLUMN status TYPE ticket_status_new USING \n  CASE \n    WHEN status::text = ''novo'' THEN ''novo''::ticket_status_new\n    WHEN status::text = ''aguardando_equipe'' THEN ''aguardando_equipe''::ticket_status_new\n    WHEN status::text = ''aguardando_cliente'' THEN ''aguardando_cliente''::ticket_status_new\n    WHEN status::text = ''em_analise'' THEN ''em_analise''::ticket_status_new\n    WHEN status::text = ''em_andamento'' THEN ''em_andamento''::ticket_status_new\n    WHEN status::text = ''resolvido'' THEN ''resolvido''::ticket_status_new\n    ELSE ''novo''::ticket_status_new\n  END;\n\n-- Remover o enum antigo e renomear o novo\nDROP TYPE ticket_status;\nALTER TYPE ticket_status_new RENAME TO ticket_status;\n\n-- Definir o novo valor padrão\nALTER TABLE chamados ALTER COLUMN status SET DEFAULT ''novo''::ticket_status;\n"}', '5f705efc-3d21-480f-be46-be3fcf4d1e1b', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615024415', '{"\n-- Tabela para armazenar configurações do WhatsApp Business API\nCREATE TABLE whatsapp_config (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  phone_number_id TEXT NOT NULL,\n  access_token TEXT NOT NULL,\n  business_account_id TEXT,\n  webhook_verify_token TEXT,\n  status TEXT DEFAULT ''disconnected'' CHECK (status IN (''connected'', ''disconnected'', ''error'')),\n  last_verified_at TIMESTAMPTZ,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n-- Tabela para templates de mensagem aprovados\nCREATE TABLE whatsapp_templates (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  language TEXT NOT NULL DEFAULT ''pt_BR'',\n  category TEXT NOT NULL CHECK (category IN (''MARKETING'', ''UTILITY'', ''AUTHENTICATION'')),\n  status TEXT NOT NULL CHECK (status IN (''APPROVED'', ''PENDING'', ''REJECTED'')),\n  header_type TEXT CHECK (header_type IN (''TEXT'', ''IMAGE'', ''VIDEO'', ''DOCUMENT'')),\n  header_text TEXT,\n  body_text TEXT NOT NULL,\n  footer_text TEXT,\n  variables JSONB DEFAULT ''[]''::jsonb,\n  components JSONB NOT NULL,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n-- Tabela para contatos/clientes\nCREATE TABLE whatsapp_contacts (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  phone_number TEXT NOT NULL,\n  client_id UUID REFERENCES clientes(id) ON DELETE SET NULL,\n  tags TEXT[] DEFAULT ''{}'',\n  is_active BOOLEAN DEFAULT true,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n-- Tabela para campanhas automatizadas\nCREATE TABLE whatsapp_campaigns (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  type TEXT NOT NULL CHECK (type IN (''relatorio'', ''financeiro'', ''promocional'', ''suporte'')),\n  template_id UUID REFERENCES whatsapp_templates(id) ON DELETE CASCADE,\n  meta_account_id TEXT,\n  frequency TEXT NOT NULL CHECK (frequency IN (''diario'', ''semanal'', ''mensal'')),\n  day_of_week INTEGER CHECK (day_of_week BETWEEN 0 AND 6), -- 0 = domingo\n  send_time TIME NOT NULL,\n  data_period_days INTEGER DEFAULT 7,\n  is_active BOOLEAN DEFAULT true,\n  contacts UUID[] DEFAULT ''{}'',\n  variables_mapping JSONB DEFAULT ''{}''::jsonb,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n-- Tabela para histórico de envios\nCREATE TABLE whatsapp_messages (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  campaign_id UUID REFERENCES whatsapp_campaigns(id) ON DELETE SET NULL,\n  template_id UUID REFERENCES whatsapp_templates(id) ON DELETE SET NULL,\n  contact_id UUID REFERENCES whatsapp_contacts(id) ON DELETE CASCADE,\n  phone_number TEXT NOT NULL,\n  message_type TEXT NOT NULL CHECK (message_type IN (''template'', ''text'')),\n  template_name TEXT,\n  template_variables JSONB DEFAULT ''{}''::jsonb,\n  message_content TEXT,\n  whatsapp_message_id TEXT,\n  status TEXT NOT NULL DEFAULT ''pending'' CHECK (status IN (''pending'', ''sent'', ''delivered'', ''read'', ''failed'')),\n  error_message TEXT,\n  sent_at TIMESTAMPTZ,\n  delivered_at TIMESTAMPTZ,\n  read_at TIMESTAMPTZ,\n  created_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n-- Índices para performance\nCREATE INDEX idx_whatsapp_messages_status ON whatsapp_messages(status);\nCREATE INDEX idx_whatsapp_messages_sent_at ON whatsapp_messages(sent_at);\nCREATE INDEX idx_whatsapp_messages_campaign_id ON whatsapp_messages(campaign_id);\nCREATE INDEX idx_whatsapp_contacts_phone ON whatsapp_contacts(phone_number);\nCREATE INDEX idx_whatsapp_campaigns_active ON whatsapp_campaigns(is_active);\n\n-- Trigger para updated_at\nCREATE TRIGGER update_whatsapp_config_updated_at\n  BEFORE UPDATE ON whatsapp_config\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\nCREATE TRIGGER update_whatsapp_templates_updated_at\n  BEFORE UPDATE ON whatsapp_templates\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\nCREATE TRIGGER update_whatsapp_contacts_updated_at\n  BEFORE UPDATE ON whatsapp_contacts\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\nCREATE TRIGGER update_whatsapp_campaigns_updated_at\n  BEFORE UPDATE ON whatsapp_campaigns\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\n-- RLS (Row Level Security)\nALTER TABLE whatsapp_config ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_templates ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_contacts ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_campaigns ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_messages ENABLE ROW LEVEL SECURITY;\n\n-- Políticas RLS (apenas admins podem acessar)\nCREATE POLICY \\"Admins can access whatsapp_config\\" ON whatsapp_config\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_templates\\" ON whatsapp_templates\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_contacts\\" ON whatsapp_contacts\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_campaigns\\" ON whatsapp_campaigns\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_messages\\" ON whatsapp_messages\n  FOR ALL USING (is_admin());\n"}', '272c2790-d849-4c4e-83c3-63e9bb3bb8a3', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615061735', '{"\n-- Adicionar colunas que faltam na tabela whatsapp_contacts para suporte a tags e agrupamento\nALTER TABLE whatsapp_contacts \nADD COLUMN IF NOT EXISTS meta_account_id TEXT,\nADD COLUMN IF NOT EXISTS grupo TEXT,\nADD COLUMN IF NOT EXISTS observacoes TEXT;\n\n-- Criar tabela para logs de mensagens WhatsApp\nCREATE TABLE IF NOT EXISTS whatsapp_message_logs (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  message_id UUID REFERENCES whatsapp_messages(id) ON DELETE CASCADE,\n  status TEXT NOT NULL DEFAULT ''sent'',\n  whatsapp_message_id TEXT,\n  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  error_details JSONB,\n  webhook_data JSONB,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\n-- Criar tabela para execução de campanhas automatizadas\nCREATE TABLE IF NOT EXISTS whatsapp_campaign_executions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  campaign_id UUID REFERENCES whatsapp_campaigns(id) ON DELETE CASCADE,\n  execution_date TIMESTAMP WITH TIME ZONE NOT NULL,\n  status TEXT NOT NULL DEFAULT ''pending'',\n  messages_sent INTEGER DEFAULT 0,\n  messages_delivered INTEGER DEFAULT 0,\n  messages_failed INTEGER DEFAULT 0,\n  execution_details JSONB,\n  error_message TEXT,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  completed_at TIMESTAMP WITH TIME ZONE\n);\n\n-- Adicionar índices para performance\nCREATE INDEX IF NOT EXISTS idx_whatsapp_contacts_tags ON whatsapp_contacts USING GIN(tags);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_contacts_client_id ON whatsapp_contacts(client_id);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_messages_status ON whatsapp_messages(status);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_messages_phone ON whatsapp_messages(phone_number);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_campaign_executions_campaign ON whatsapp_campaign_executions(campaign_id);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_campaign_executions_date ON whatsapp_campaign_executions(execution_date);\n\n-- Habilitar RLS nas novas tabelas\nALTER TABLE whatsapp_message_logs ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_campaign_executions ENABLE ROW LEVEL SECURITY;\n\n-- Criar políticas RLS básicas (assumindo que será usado por admins)\nCREATE POLICY \\"Allow all access to whatsapp_message_logs\\" ON whatsapp_message_logs FOR ALL USING (true);\nCREATE POLICY \\"Allow all access to whatsapp_campaign_executions\\" ON whatsapp_campaign_executions FOR ALL USING (true);\n\n-- Atualizar a tabela whatsapp_campaigns para incluir timezone\nALTER TABLE whatsapp_campaigns \nADD COLUMN IF NOT EXISTS timezone TEXT DEFAULT ''America/Sao_Paulo'',\nADD COLUMN IF NOT EXISTS next_execution TIMESTAMP WITH TIME ZONE,\nADD COLUMN IF NOT EXISTS last_execution TIMESTAMP WITH TIME ZONE;\n"}', 'e98ebf9f-6e85-4c92-8200-8e3eb181deb4', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615070512', '{"\n-- Habilita RLS e cria políticas para as tabelas do WhatsApp e outras tabelas essenciais.\n-- Isso garante que usuários autenticados possam acessar e modificar os dados conforme as regras.\n\n-- Tabela: whatsapp_config\nALTER TABLE public.whatsapp_config ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_config;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_config FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n-- Tabela: whatsapp_templates\nALTER TABLE public.whatsapp_templates ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_templates;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_templates FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n-- Tabela: whatsapp_contacts\nALTER TABLE public.whatsapp_contacts ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_contacts;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_contacts FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n-- Tabela: whatsapp_messages\nALTER TABLE public.whatsapp_messages ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_messages;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_messages FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n-- Tabela: whatsapp_campaigns\nALTER TABLE public.whatsapp_campaigns ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_campaigns;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_campaigns FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n-- Tabela: profiles\nALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Admins can view all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Users can update their own profile\\" ON public.profiles;\nCREATE POLICY \\"Users can view their own profile\\"\nON public.profiles FOR SELECT USING (auth.uid() = id);\nCREATE POLICY \\"Admins can view all profiles\\"\nON public.profiles FOR SELECT USING (public.is_admin());\nCREATE POLICY \\"Users can update their own profile\\"\nON public.profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);\n\n-- Tabela: clientes\nALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Clients can manage their own data\\" ON public.clientes;\nDROP POLICY IF EXISTS \\"Admins can manage all clients\\" ON public.clientes;\nCREATE POLICY \\"Clients can manage their own data\\"\nON public.clientes FOR ALL USING (auth.uid() = user_id)\nWITH CHECK (auth.uid() = user_id);\nCREATE POLICY \\"Admins can manage all clients\\"\nON public.clientes FOR ALL USING (public.is_admin())\nWITH CHECK (public.is_admin());\n"}', 'cbc5dc16-3363-4d32-ae85-ca9f37bbbf30', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615115327', '{"\n-- Criar tabela de projetos para organizar tarefas\nCREATE TABLE public.projetos (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  nome TEXT NOT NULL,\n  descricao TEXT,\n  cliente_id UUID REFERENCES public.clientes(id),\n  cor TEXT DEFAULT ''#3b82f6'',\n  ativo BOOLEAN NOT NULL DEFAULT true,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Criar enum para tipos de tarefa\nCREATE TYPE task_type AS ENUM (''desenvolvimento'', ''design'', ''marketing'', ''suporte'', ''revisao'', ''outros'');\n\n-- Criar enum para prioridades\nCREATE TYPE task_priority AS ENUM (''baixa'', ''media'', ''alta'', ''urgente'');\n\n-- Criar enum para status das tarefas\nCREATE TYPE task_status AS ENUM (''backlog'', ''execucao'', ''revisao'', ''aguardando'', ''finalizada'', ''cancelada'');\n\n-- Criar tabela de templates de tarefa\nCREATE TABLE public.task_templates (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  nome TEXT NOT NULL,\n  descricao TEXT,\n  tipo task_type NOT NULL DEFAULT ''outros'',\n  prioridade task_priority NOT NULL DEFAULT ''media'',\n  fases_padrao JSONB DEFAULT ''[\\"backlog\\", \\"execucao\\", \\"revisao\\", \\"finalizada\\"]'',\n  tempo_estimado INTEGER, -- em horas\n  tags TEXT[] DEFAULT ''{}'',\n  ativo BOOLEAN NOT NULL DEFAULT true,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Criar tabela principal de tarefas\nCREATE TABLE public.tarefas (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  titulo TEXT NOT NULL,\n  descricao TEXT,\n  tipo task_type NOT NULL DEFAULT ''outros'',\n  prioridade task_priority NOT NULL DEFAULT ''media'',\n  status task_status NOT NULL DEFAULT ''backlog'',\n  projeto_id UUID REFERENCES public.projetos(id),\n  template_id UUID REFERENCES public.task_templates(id),\n  \n  -- Integrações\n  chamado_id UUID REFERENCES public.chamados(id),\n  criativo_id UUID REFERENCES public.criativos(id),\n  cliente_id UUID REFERENCES public.clientes(id),\n  \n  -- Atribuições\n  criado_por UUID REFERENCES public.profiles(id),\n  responsavel_id UUID REFERENCES public.profiles(id),\n  aprovador_id UUID REFERENCES public.profiles(id),\n  \n  -- Tempo e cronometragem\n  tempo_estimado INTEGER, -- em horas\n  tempo_gasto INTEGER DEFAULT 0, -- em minutos\n  data_inicio TIMESTAMP WITH TIME ZONE,\n  data_prazo TIMESTAMP WITH TIME ZONE,\n  data_conclusao TIMESTAMP WITH TIME ZONE,\n  \n  -- Metadados\n  tags TEXT[] DEFAULT ''{}'',\n  arquivos_urls TEXT[] DEFAULT ''{}'',\n  observacoes TEXT,\n  motivo_status TEXT, -- para quando status = ''aguardando''\n  resumo_conclusao TEXT, -- obrigatório quando finalizar\n  \n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Criar tabela de fases customizáveis\nCREATE TABLE public.task_fases (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  nome TEXT NOT NULL,\n  cor TEXT DEFAULT ''#6b7280'',\n  ordem INTEGER NOT NULL,\n  projeto_id UUID REFERENCES public.projetos(id),\n  template_id UUID REFERENCES public.task_templates(id),\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  \n  UNIQUE(nome, projeto_id),\n  UNIQUE(nome, template_id)\n);\n\n-- Criar tabela de cronometragem detalhada\nCREATE TABLE public.task_time_logs (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  tarefa_id UUID NOT NULL REFERENCES public.tarefas(id) ON DELETE CASCADE,\n  usuario_id UUID NOT NULL REFERENCES public.profiles(id),\n  fase TEXT NOT NULL,\n  tempo_minutos INTEGER NOT NULL,\n  data_inicio TIMESTAMP WITH TIME ZONE NOT NULL,\n  data_fim TIMESTAMP WITH TIME ZONE,\n  descricao TEXT,\n  ativo BOOLEAN DEFAULT true, -- para pausar/retomar\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Criar tabela de comentários/atividades nas tarefas\nCREATE TABLE public.task_activities (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  tarefa_id UUID NOT NULL REFERENCES public.tarefas(id) ON DELETE CASCADE,\n  usuario_id UUID REFERENCES public.profiles(id),\n  usuario_nome TEXT NOT NULL,\n  tipo TEXT NOT NULL DEFAULT ''comentario'', -- comentario, status_change, assignment, etc\n  conteudo TEXT,\n  status_anterior task_status,\n  status_novo task_status,\n  metadata JSONB DEFAULT ''{}'',\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n-- Habilitar RLS para todas as tabelas\nALTER TABLE public.projetos ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_templates ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.tarefas ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_fases ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_time_logs ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_activities ENABLE ROW LEVEL SECURITY;\n\n-- Políticas para projetos\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.projetos FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n-- Políticas para templates\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_templates FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n-- Políticas para tarefas\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.tarefas FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n-- Políticas para fases\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_fases FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n-- Políticas para time logs\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_time_logs FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n-- Políticas para atividades\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_activities FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n-- Triggers para updated_at\nCREATE TRIGGER update_projetos_updated_at BEFORE UPDATE ON public.projetos\nFOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\n\nCREATE TRIGGER update_tarefas_updated_at BEFORE UPDATE ON public.tarefas\nFOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\n\n-- Função para auto-cronometragem quando mover para execução\nCREATE OR REPLACE FUNCTION public.auto_start_task_timer()\nRETURNS TRIGGER AS $$\nBEGIN\n  -- Se mudou para execução e não tinha data_inicio, definir agora\n  IF NEW.status = ''execucao'' AND OLD.status != ''execucao'' AND NEW.data_inicio IS NULL THEN\n    NEW.data_inicio = now();\n  END IF;\n  \n  -- Se finalizou, definir data_conclusao\n  IF NEW.status = ''finalizada'' AND OLD.status != ''finalizada'' THEN\n    NEW.data_conclusao = now();\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\nCREATE TRIGGER auto_start_task_timer_trigger\nBEFORE UPDATE ON public.tarefas\nFOR EACH ROW EXECUTE FUNCTION public.auto_start_task_timer();\n\n-- Função para criar atividade quando status muda\nCREATE OR REPLACE FUNCTION public.create_task_activity()\nRETURNS TRIGGER AS $$\nBEGIN\n  -- Criar atividade para criação\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO public.task_activities (\n      tarefa_id, usuario_id, usuario_nome, tipo, conteudo, metadata\n    ) VALUES (\n      NEW.id,\n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''criacao'',\n      ''Tarefa criada: '' || NEW.titulo,\n      jsonb_build_object(''prioridade'', NEW.prioridade, ''tipo'', NEW.tipo)\n    );\n    RETURN NEW;\n  END IF;\n  \n  -- Criar atividade para mudança de status\n  IF TG_OP = ''UPDATE'' AND OLD.status != NEW.status THEN\n    INSERT INTO public.task_activities (\n      tarefa_id, usuario_id, usuario_nome, tipo, conteudo,\n      status_anterior, status_novo\n    ) VALUES (\n      NEW.id,\n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      OLD.status,\n      NEW.status\n    );\n  END IF;\n  \n  -- Criar atividade para mudança de responsável\n  IF TG_OP = ''UPDATE'' AND OLD.responsavel_id != NEW.responsavel_id THEN\n    INSERT INTO public.task_activities (\n      tarefa_id, usuario_id, usuario_nome, tipo, conteudo, metadata\n    ) VALUES (\n      NEW.id,\n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''assignment'',\n      ''Responsável alterado'',\n      jsonb_build_object(\n        ''responsavel_anterior'', OLD.responsavel_id,\n        ''responsavel_novo'', NEW.responsavel_id\n      )\n    );\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\nCREATE TRIGGER create_task_activity_trigger\nAFTER INSERT OR UPDATE ON public.tarefas\nFOR EACH ROW EXECUTE FUNCTION public.create_task_activity();\n"}', 'd76d4ecb-a9d4-421d-aa26-c061b70db04e', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616103851', '{"\n-- Criar enum para tipos de permissões\nCREATE TYPE permission_type AS ENUM (\n  ''access_dashboard'',\n  ''access_whatsapp'',\n  ''create_campaigns'',\n  ''edit_campaigns'',\n  ''view_templates'',\n  ''send_messages'',\n  ''view_metrics'',\n  ''access_tasks'',\n  ''create_tasks'',\n  ''assign_tasks'',\n  ''finalize_tasks'',\n  ''edit_execution_time'',\n  ''access_calls'',\n  ''create_calls'',\n  ''finalize_calls'',\n  ''link_calls_to_tasks'',\n  ''access_creatives'',\n  ''create_edit_creatives'',\n  ''approve_creatives'',\n  ''view_change_history'',\n  ''access_paid_media'',\n  ''create_campaigns_media'',\n  ''view_metrics_media'',\n  ''access_reports'',\n  ''create_automatic_reports'',\n  ''manage_user_settings'',\n  ''manage_collaborators'',\n  ''manage_whatsapp_templates'',\n  ''manage_api_settings'',\n  ''manage_appearance_and_visual_identity'',\n  ''manage_external_integrations'',\n  ''manage_variables_and_pre_configurations'',\n  ''view_billing_settings'',\n  ''view_system_logs''\n);\n\n-- Adicionar campos necessários à tabela profiles\nALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_root_admin BOOLEAN DEFAULT FALSE;\nALTER TABLE profiles ADD COLUMN IF NOT EXISTS foto_url TEXT;\nALTER TABLE profiles ADD COLUMN IF NOT EXISTS status TEXT DEFAULT ''ativo'';\n\n-- Tabela de permissões dos usuários\nCREATE TABLE IF NOT EXISTS user_permissions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,\n  permission permission_type NOT NULL,\n  granted_by UUID REFERENCES profiles(id),\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  UNIQUE(user_id, permission)\n);\n\n-- Tabela de templates de permissões\nCREATE TABLE IF NOT EXISTS permission_templates (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  description TEXT,\n  permissions permission_type[] NOT NULL DEFAULT ''{}'',\n  created_by UUID REFERENCES profiles(id),\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\n-- Tabela de logs de alterações de permissões\nCREATE TABLE IF NOT EXISTS permission_logs (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  target_user_id UUID REFERENCES profiles(id),\n  changed_by UUID REFERENCES profiles(id),\n  action TEXT NOT NULL, -- ''granted'', ''revoked'', ''user_created'', ''user_updated''\n  permission permission_type,\n  details JSONB,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\n-- Função para verificar se um usuário tem uma permissão específica\nCREATE OR REPLACE FUNCTION has_permission(user_id UUID, required_permission permission_type)\nRETURNS BOOLEAN\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 FROM user_permissions \n    WHERE user_permissions.user_id = has_permission.user_id \n    AND permission = required_permission\n  ) OR EXISTS (\n    SELECT 1 FROM profiles \n    WHERE id = has_permission.user_id \n    AND is_root_admin = TRUE\n  );\n$$;\n\n-- Função para obter todas as permissões de um usuário\nCREATE OR REPLACE FUNCTION get_user_permissions(user_id UUID)\nRETURNS permission_type[]\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT COALESCE(array_agg(permission), ''{}'') \n  FROM user_permissions \n  WHERE user_permissions.user_id = get_user_permissions.user_id;\n$$;\n\n-- RLS para user_permissions\nALTER TABLE user_permissions ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY \\"Users can view permissions with manage_collaborators permission\\"\n  ON user_permissions FOR SELECT\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\nCREATE POLICY \\"Users can manage permissions with manage_collaborators permission\\"\n  ON user_permissions FOR ALL\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\n-- RLS para permission_templates\nALTER TABLE permission_templates ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY \\"Users can view templates with manage_collaborators permission\\"\n  ON permission_templates FOR SELECT\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\nCREATE POLICY \\"Users can manage templates with manage_collaborators permission\\"\n  ON permission_templates FOR ALL\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\n-- RLS para permission_logs\nALTER TABLE permission_logs ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY \\"Users can view logs with view_system_logs permission\\"\n  ON permission_logs FOR SELECT\n  USING (\n    has_permission(auth.uid(), ''view_system_logs'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\n-- Atualizar a política de profiles para ocultar root admin\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON profiles;\nCREATE POLICY \\"Users can view profiles except root admin\\"\n  ON profiles FOR SELECT\n  USING (\n    (id = auth.uid()) OR \n    (is_root_admin = FALSE AND (\n      has_permission(auth.uid(), ''manage_collaborators'') OR \n      EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n    ))\n  );\n\n-- Trigger para criar logs de alterações\nCREATE OR REPLACE FUNCTION log_permission_changes()\nRETURNS TRIGGER\nLANGUAGE plpgsql\nAS $$\nBEGIN\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO permission_logs (target_user_id, changed_by, action, permission, details)\n    VALUES (NEW.user_id, auth.uid(), ''granted'', NEW.permission, \n            jsonb_build_object(''timestamp'', NOW()));\n    RETURN NEW;\n  ELSIF TG_OP = ''DELETE'' THEN\n    INSERT INTO permission_logs (target_user_id, changed_by, action, permission, details)\n    VALUES (OLD.user_id, auth.uid(), ''revoked'', OLD.permission, \n            jsonb_build_object(''timestamp'', NOW()));\n    RETURN OLD;\n  END IF;\n  RETURN NULL;\nEND;\n$$;\n\nCREATE TRIGGER permission_changes_log\n  AFTER INSERT OR DELETE ON user_permissions\n  FOR EACH ROW EXECUTE FUNCTION log_permission_changes();\n"}', '4719ac7e-4fb4-409b-8fa9-2f004bc05588', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616115239', '{"\n-- Remover políticas existentes que causam recursão\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Admins can view all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Users can update their own profile\\" ON public.profiles;\n\n-- Criar políticas simples sem recursão\nCREATE POLICY \\"Users can view their own profile\\"\nON public.profiles FOR SELECT \nUSING (id = auth.uid());\n\nCREATE POLICY \\"Users can update their own profile\\"\nON public.profiles FOR UPDATE \nUSING (id = auth.uid()) \nWITH CHECK (id = auth.uid());\n\n-- Política para admins visualizarem todos os perfis (usando função segura)\nCREATE POLICY \\"Root admins can view all profiles\\"\nON public.profiles FOR SELECT \nUSING (\n  EXISTS (\n    SELECT 1 FROM public.profiles p \n    WHERE p.id = auth.uid() AND p.is_root_admin = true\n  )\n);\n\n-- Política para admins atualizarem qualquer perfil\nCREATE POLICY \\"Root admins can update all profiles\\"\nON public.profiles FOR UPDATE \nUSING (\n  EXISTS (\n    SELECT 1 FROM public.profiles p \n    WHERE p.id = auth.uid() AND p.is_root_admin = true\n  )\n) \nWITH CHECK (\n  EXISTS (\n    SELECT 1 FROM public.profiles p \n    WHERE p.id = auth.uid() AND p.is_root_admin = true\n  )\n);\n"}', '3ff9f576-2c1a-4902-ad26-acc974f054dc', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616062329', '{"\n-- Primeiro, vamos limpar COMPLETAMENTE todas as políticas problemáticas\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Users can update their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Root admins can view all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Root admins can update all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"view_own_profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"update_own_profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"root_admin_view_all_profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"root_admin_update_all_profiles\\" ON public.profiles;\n\n-- Limpar políticas de permissões\nDROP POLICY IF EXISTS \\"Users can view own permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"Root admins can view all permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"Root admins can manage all permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"view_own_permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"root_admin_view_all_permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"root_admin_manage_all_permissions\\" ON public.user_permissions;\n\n-- Limpar políticas de templates\nDROP POLICY IF EXISTS \\"Root admins can view all templates\\" ON public.permission_templates;\nDROP POLICY IF EXISTS \\"Root admins can manage all templates\\" ON public.permission_templates;\nDROP POLICY IF EXISTS \\"root_admin_view_templates\\" ON public.permission_templates;\nDROP POLICY IF EXISTS \\"root_admin_manage_templates\\" ON public.permission_templates;\n\n-- Limpar políticas de logs\nDROP POLICY IF EXISTS \\"Root admins can view all logs\\" ON public.permission_logs;\nDROP POLICY IF EXISTS \\"root_admin_view_logs\\" ON public.permission_logs;\n\n-- Remover função antiga se existir\nDROP FUNCTION IF EXISTS public.is_root_admin();\n\n-- Primeiro, vamos garantir que seu usuário seja root admin\nUPDATE public.profiles \nSET is_root_admin = true, role = ''admin''\nWHERE id = ''8c858fa0-380a-4940-bee7-2b302753e6f2'' OR email = ''vagner@leadclinic.com.br'';\n\n-- Inserir perfil se não existir\nINSERT INTO public.profiles (id, nome, email, role, is_root_admin, ativo)\nVALUES (''8c858fa0-380a-4940-bee7-2b302753e6f2'', ''Vagner'', ''vagner@leadclinic.com.br'', ''admin'', true, true)\nON CONFLICT (id) DO UPDATE SET\n  is_root_admin = true,\n  role = ''admin'',\n  ativo = true;\n\n-- Criar função MUITO simples para verificar root admin\nCREATE OR REPLACE FUNCTION public.check_is_root_admin(user_id uuid)\nRETURNS boolean\nLANGUAGE sql\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT COALESCE(\n    (SELECT is_root_admin FROM public.profiles WHERE id = user_id LIMIT 1),\n    false\n  );\n$$;\n\n-- Políticas SIMPLES para profiles - SEM RECURSÃO\nCREATE POLICY \\"allow_own_profile_select\\" ON public.profiles \nFOR SELECT \nUSING (id = auth.uid());\n\nCREATE POLICY \\"allow_own_profile_update\\" ON public.profiles \nFOR UPDATE \nUSING (id = auth.uid()) \nWITH CHECK (id = auth.uid());\n\nCREATE POLICY \\"allow_root_admin_select_all\\" ON public.profiles \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\nCREATE POLICY \\"allow_root_admin_update_all\\" ON public.profiles \nFOR UPDATE \nUSING (public.check_is_root_admin(auth.uid())) \nWITH CHECK (public.check_is_root_admin(auth.uid()));\n\n-- Políticas para user_permissions\nCREATE POLICY \\"allow_own_permissions_select\\" ON public.user_permissions \nFOR SELECT \nUSING (user_id = auth.uid());\n\nCREATE POLICY \\"allow_root_admin_permissions_select\\" ON public.user_permissions \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\nCREATE POLICY \\"allow_root_admin_permissions_all\\" ON public.user_permissions \nFOR ALL \nUSING (public.check_is_root_admin(auth.uid()));\n\n-- Políticas para permission_templates\nCREATE POLICY \\"allow_root_admin_templates_select\\" ON public.permission_templates \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\nCREATE POLICY \\"allow_root_admin_templates_all\\" ON public.permission_templates \nFOR ALL \nUSING (public.check_is_root_admin(auth.uid()));\n\n-- Políticas para permission_logs\nCREATE POLICY \\"allow_root_admin_logs_select\\" ON public.permission_logs \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\n-- Garantir que RLS está habilitado\nALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.user_permissions ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.permission_templates ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.permission_logs ENABLE ROW LEVEL SECURITY;\n"}', 'b8a6d049-20a7-4cb8-a4d8-fb5f465c1574', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616063051', '{"\n-- Primeiro, vamos garantir que seu usuário tenha TODAS as permissões necessárias\n-- Inserir todas as permissões para o usuário root admin\nINSERT INTO public.user_permissions (user_id, permission, granted_by)\nSELECT \n  ''8c858fa0-380a-4940-bee7-2b302753e6f2'',\n  permission_name::permission_type,\n  ''8c858fa0-380a-4940-bee7-2b302753e6f2''\nFROM (\n  VALUES \n    (''access_dashboard''),\n    (''access_whatsapp''),\n    (''create_campaigns''),\n    (''edit_campaigns''),\n    (''view_templates''),\n    (''send_messages''),\n    (''view_metrics''),\n    (''access_tasks''),\n    (''create_tasks''),\n    (''assign_tasks''),\n    (''finalize_tasks''),\n    (''edit_execution_time''),\n    (''access_calls''),\n    (''create_calls''),\n    (''finalize_calls''),\n    (''link_calls_to_tasks''),\n    (''access_creatives''),\n    (''create_edit_creatives''),\n    (''approve_creatives''),\n    (''view_change_history''),\n    (''access_paid_media''),\n    (''create_campaigns_media''),\n    (''view_metrics_media''),\n    (''access_reports''),\n    (''create_automatic_reports''),\n    (''manage_user_settings''),\n    (''manage_collaborators''),\n    (''manage_whatsapp_templates''),\n    (''manage_api_settings''),\n    (''manage_appearance_and_visual_identity''),\n    (''manage_external_integrations''),\n    (''manage_variables_and_pre_configurations''),\n    (''view_billing_settings''),\n    (''view_system_logs'')\n) AS permissions(permission_name)\nON CONFLICT (user_id, permission) DO NOTHING;\n\n-- Vamos também TEMPORARIAMENTE desabilitar RLS nas tabelas principais para garantir acesso\nALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;\nALTER TABLE public.user_permissions DISABLE ROW LEVEL SECURITY;\n\n-- E garantir novamente que o perfil está correto\nUPDATE public.profiles \nSET \n  is_root_admin = true,\n  role = ''admin'',\n  ativo = true,\n  nome = ''Vagner Admin'',\n  email = ''vagner@leadclinic.com.br''\nWHERE id = ''8c858fa0-380a-4940-bee7-2b302753e6f2'';\n\n-- Verificar se o registro existe, se não, inserir\nINSERT INTO public.profiles (id, nome, email, role, is_root_admin, ativo)\nVALUES (''8c858fa0-380a-4940-bee7-2b302753e6f2'', ''Vagner Admin'', ''vagner@leadclinic.com.br'', ''admin'', true, true)\nON CONFLICT (id) DO UPDATE SET\n  is_root_admin = true,\n  role = ''admin'',\n  ativo = true,\n  nome = ''Vagner Admin'',\n  email = ''vagner@leadclinic.com.br'';\n"}', '0b913d7d-7af5-4155-930f-6ac232dc0aca', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616071131', '{"\n-- Primeiro, vamos verificar e corrigir o enum ticket_status\nDROP TYPE IF EXISTS ticket_status CASCADE;\n\nCREATE TYPE ticket_status AS ENUM (\n  ''novo'',\n  ''aguardando_equipe'', \n  ''aguardando_cliente'',\n  ''em_analise'',\n  ''em_andamento'',\n  ''resolvido''\n);\n\n-- Recriar a coluna status na tabela chamados com o novo enum\nALTER TABLE chamados \nDROP COLUMN IF EXISTS status CASCADE;\n\nALTER TABLE chamados \nADD COLUMN status ticket_status NOT NULL DEFAULT ''novo'';\n\n-- Atualizar qualquer referência antiga de status\nUPDATE chamados SET status = ''novo'' WHERE status IS NULL;\n\n-- Garantir que as políticas RLS estejam funcionando\nALTER TABLE chamados ENABLE ROW LEVEL SECURITY;\n\n-- Política para admins verem todos os chamados\nDROP POLICY IF EXISTS \\"Admins can view all tickets\\" ON chamados;\nCREATE POLICY \\"Admins can view all tickets\\" ON chamados\n  FOR SELECT USING (is_admin());\n\n-- Política para clientes verem apenas seus chamados\nDROP POLICY IF EXISTS \\"Clients can view their own tickets\\" ON chamados;\nCREATE POLICY \\"Clients can view their own tickets\\" ON chamados\n  FOR SELECT USING (cliente_id = get_user_cliente_id());\n\n-- Política para inserir chamados\nDROP POLICY IF EXISTS \\"Users can create tickets\\" ON chamados;\nCREATE POLICY \\"Users can create tickets\\" ON chamados\n  FOR INSERT WITH CHECK (\n    (is_admin() AND cliente_id IS NOT NULL) OR \n    (cliente_id = get_user_cliente_id())\n  );\n\n-- Política para atualizar chamados\nDROP POLICY IF EXISTS \\"Users can update tickets\\" ON chamados;\nCREATE POLICY \\"Users can update tickets\\" ON chamados\n  FOR UPDATE USING (\n    is_admin() OR cliente_id = get_user_cliente_id()\n  );\n"}', 'f2fc3e55-87af-420f-a580-ddad4efae45c', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250618062522', '{"\n-- Adicionar a nova permissão ''access_client_reports'' ao enum permission_type\nALTER TYPE permission_type ADD VALUE ''access_client_reports'';\n"}', '2bca142d-7b1d-4cd3-836e-8daba4a8ed0c', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250620101642', '{"\n-- 1. Primeiro, vamos verificar se existem registros com status inválidos\nUPDATE chamados \nSET status = ''novo''::ticket_status \nWHERE status::text NOT IN (''novo'', ''aguardando_equipe'', ''aguardando_cliente'', ''em_analise'', ''em_andamento'', ''resolvido'');\n\n-- 2. Atualizar a função create_ticket_timeline_entry para remover qualquer referência a \\"aberto\\"\nCREATE OR REPLACE FUNCTION public.create_ticket_timeline_entry()\nRETURNS trigger\nLANGUAGE plpgsql\nAS $function$\nBEGIN\n  -- Entrada para criação do chamado\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id, \n      tipo, \n      conteudo, \n      autor_id, \n      autor_nome, \n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''criacao'',\n      NEW.mensagem,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      NEW.aberto_por,\n      jsonb_build_object(''titulo'', NEW.titulo, ''categoria'', NEW.categoria, ''prioridade'', NEW.prioridade)\n    );\n  END IF;\n\n  -- Entrada para nova mensagem\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados_mensagens'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.chamado_id,\n      ''mensagem'',\n      NEW.conteudo,\n      NEW.autor_id,\n      NEW.autor_nome,\n      NEW.autor_tipo,\n      NEW.metadata\n    );\n  END IF;\n\n  -- Entrada para mudança de status\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND OLD.status != NEW.status THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END,\n      jsonb_build_object(''status_anterior'', OLD.status, ''status_novo'', NEW.status)\n    );\n  END IF;\n\n  -- Entrada para nova resposta (campo resposta)\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo\n    ) VALUES (\n      NEW.id,\n      ''resposta'',\n      NEW.resposta,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END\n    );\n  END IF;\n\n  RETURN NEW;\nEND;\n$function$;\n\n-- 3. Atualizar função update_ticket_detailed_status para usar apenas os novos status\nCREATE OR REPLACE FUNCTION public.update_ticket_detailed_status()\nRETURNS trigger\nLANGUAGE plpgsql\nAS $function$\nBEGIN\n  -- Definir status detalhado baseado no status e outras condições\n  IF NEW.status = ''novo'' AND NEW.aberto_por = ''admin'' THEN\n    NEW.status_detalhado = ''Novo - Aberto pela Equipe'';\n  ELSIF NEW.status = ''novo'' AND NEW.aberto_por = ''cliente'' THEN\n    NEW.status_detalhado = ''Novo - Aberto pelo Cliente'';\n  ELSIF NEW.status = ''aguardando_equipe'' THEN\n    NEW.status_detalhado = ''Aguardando resposta da equipe'';\n  ELSIF NEW.status = ''aguardando_cliente'' THEN\n    NEW.status_detalhado = ''Aguardando resposta do cliente'';\n  ELSIF NEW.status = ''em_analise'' THEN\n    NEW.status_detalhado = ''Em análise pela equipe'';\n  ELSIF NEW.status = ''em_andamento'' THEN\n    NEW.status_detalhado = ''Em andamento'';\n  ELSIF NEW.status = ''resolvido'' THEN\n    NEW.status_detalhado = ''Resolvido'';\n  ELSE\n    NEW.status_detalhado = NEW.status;\n  END IF;\n  \n  RETURN NEW;\nEND;\n$function$;\n\n-- 4. Verificar se há dados órfãos no histórico e timeline\nUPDATE chamados_historico \nSET detalhes = REPLACE(detalhes, ''\\"aberto\\"'', ''\\"novo\\"'')\nWHERE detalhes LIKE ''%aberto%'';\n\nUPDATE chamados_timeline \nSET conteudo = REPLACE(conteudo, ''\\"aberto\\"'', ''\\"novo\\"'')\nWHERE conteudo LIKE ''%aberto%'';\n"}', 'f52c17b4-5b21-453b-8144-50fabe8102e9', 'vagner@leadclinic.com.br', NULL);
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250620123904', '{"\n-- Criar enum para os módulos que clientes podem acessar\nCREATE TYPE client_module AS ENUM (\n  ''dashboard'',\n  ''chamados'', \n  ''relatorios'',\n  ''criativos''\n);\n\n-- Criar enum para tipos de relatórios específicos\nCREATE TYPE report_type AS ENUM (\n  ''campanhas'',\n  ''conjuntos_anuncios'',\n  ''anuncios'',\n  ''criativos_performance'',\n  ''whatsapp''\n);\n\n-- Tabela para permissões de módulos dos clientes\nCREATE TABLE public.client_permissions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  client_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n  module client_module NOT NULL,\n  enabled BOOLEAN NOT NULL DEFAULT true,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  UNIQUE(client_id, module)\n);\n\n-- Tabela para permissões específicas de relatórios dos clientes\nCREATE TABLE public.client_report_permissions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  client_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n  report_type report_type NOT NULL,\n  enabled BOOLEAN NOT NULL DEFAULT true,\n  account_ids TEXT[] DEFAULT ''{}'', -- IDs das contas específicas que o cliente pode ver neste relatório\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  UNIQUE(client_id, report_type)\n);\n\n-- Habilitar RLS\nALTER TABLE public.client_permissions ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.client_report_permissions ENABLE ROW LEVEL SECURITY;\n\n-- Políticas RLS para client_permissions\nCREATE POLICY \\"Admins can manage all client permissions\\" ON public.client_permissions\n  FOR ALL USING (\n    EXISTS (\n      SELECT 1 FROM public.profiles \n      WHERE id = auth.uid() \n      AND (role = ''admin'' OR is_root_admin = true)\n    )\n  );\n\nCREATE POLICY \\"Clients can view their own permissions\\" ON public.client_permissions\n  FOR SELECT USING (\n    client_id IN (\n      SELECT id FROM public.clientes WHERE user_id = auth.uid()\n    )\n  );\n\n-- Políticas RLS para client_report_permissions\nCREATE POLICY \\"Admins can manage all client report permissions\\" ON public.client_report_permissions\n  FOR ALL USING (\n    EXISTS (\n      SELECT 1 FROM public.profiles \n      WHERE id = auth.uid() \n      AND (role = ''admin'' OR is_root_admin = true)\n    )\n  );\n\nCREATE POLICY \\"Clients can view their own report permissions\\" ON public.client_report_permissions\n  FOR SELECT USING (\n    client_id IN (\n      SELECT id FROM public.clientes WHERE user_id = auth.uid()\n    )\n  );\n\n-- Função para criar permissões padrão quando um cliente é criado\nCREATE OR REPLACE FUNCTION create_default_client_permissions()\nRETURNS TRIGGER AS $$\nBEGIN\n  -- Inserir permissões padrão para módulos básicos\n  INSERT INTO public.client_permissions (client_id, module, enabled) VALUES\n    (NEW.id, ''dashboard'', true),\n    (NEW.id, ''chamados'', true),\n    (NEW.id, ''criativos'', true);\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n-- Trigger para criar permissões padrão\nCREATE TRIGGER create_client_permissions_trigger\n  AFTER INSERT ON public.clientes\n  FOR EACH ROW\n  EXECUTE FUNCTION create_default_client_permissions();\n\n-- Função para verificar se cliente tem permissão para um módulo\nCREATE OR REPLACE FUNCTION client_has_module_permission(client_user_id UUID, module_name client_module)\nRETURNS BOOLEAN\nLANGUAGE sql\nSTABLE SECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 \n    FROM public.client_permissions cp\n    JOIN public.clientes c ON c.id = cp.client_id\n    WHERE c.user_id = client_user_id \n    AND cp.module = module_name \n    AND cp.enabled = true\n  );\n$$;\n\n-- Função para verificar se cliente tem permissão para um tipo de relatório\nCREATE OR REPLACE FUNCTION client_has_report_permission(client_user_id UUID, report_name report_type)\nRETURNS BOOLEAN\nLANGUAGE sql\nSTABLE SECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 \n    FROM public.client_report_permissions crp\n    JOIN public.clientes c ON c.id = crp.client_id\n    WHERE c.user_id = client_user_id \n    AND crp.report_type = report_name \n    AND crp.enabled = true\n  );\n$$;\n\n-- Inserir permissões padrão para clientes existentes\nINSERT INTO public.client_permissions (client_id, module, enabled)\nSELECT id, ''dashboard'', true FROM public.clientes\nWHERE id NOT IN (SELECT client_id FROM public.client_permissions WHERE module = ''dashboard'');\n\nINSERT INTO public.client_permissions (client_id, module, enabled)\nSELECT id, ''chamados'', true FROM public.clientes\nWHERE id NOT IN (SELECT client_id FROM public.client_permissions WHERE module = ''chamados'');\n\nINSERT INTO public.client_permissions (client_id, module, enabled)\nSELECT id, ''criativos'', true FROM public.clientes\nWHERE id NOT IN (SELECT client_id FROM public.client_permissions WHERE module = ''criativos'');\n"}', 'd6bcd090-a8c3-4262-b6e0-047d32629e3e', 'vagner@leadclinic.com.br', NULL);
-
-
---
--- Data for Name: secrets; Type: TABLE DATA; Schema: vault; Owner: supabase_admin
---
+ 
+  Data for Name: s3_multipart_uploads_parts; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Data for Name: schema_migrations; Type: TABLE DATA; Schema: supabase_migrations; Owner: postgres
+ 
+
+ 
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613071443', '{"\n  Criar enum para tipos de usuário\nCREATE TYPE public.user_role AS ENUM (''admin'', ''cliente'');\n\n  Criar enum para tipos de conta\nCREATE TYPE public.account_type AS ENUM (''meta'', ''google'');\n\n  Criar enum para status de chamados\nCREATE TYPE public.ticket_status AS ENUM (''aberto'', ''em_andamento'', ''resolvido'');\n\n  Criar enum para status de criativos\nCREATE TYPE public.creative_status AS ENUM (''pendente'', ''aprovado'', ''reprovado'', ''ajuste_solicitado'');\n\n  Criar enum para tipo de acesso\nCREATE TYPE public.access_type AS ENUM (''api'', ''sheet'');\n\n  Tabela de perfis de usuário (vinculada ao auth.users do Supabase)\nCREATE TABLE public.profiles (\n    id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,\n    nome TEXT NOT NULL,\n    email TEXT NOT NULL,\n    role user_role NOT NULL DEFAULT ''cliente'',\n    ativo BOOLEAN NOT NULL DEFAULT true,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    PRIMARY KEY (id)\n);\n\n  Tabela de clientes (para dados específicos do cliente)\nCREATE TABLE public.clientes (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,\n    nome TEXT NOT NULL,\n    tipo_acesso access_type NOT NULL DEFAULT ''api'',\n    ativo BOOLEAN NOT NULL DEFAULT true,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    UNIQUE(user_id)\n);\n\n  Tabela de contas vinculadas aos clientes\nCREATE TABLE public.contas (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    cliente_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n    tipo account_type NOT NULL,\n    identificador TEXT NOT NULL,   ID da conta Meta/Google\n    nome TEXT NOT NULL,\n    ativo BOOLEAN NOT NULL DEFAULT true,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    UNIQUE(cliente_id, tipo, identificador)\n);\n\n  Tabela de chamados\nCREATE TABLE public.chamados (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    cliente_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n    titulo TEXT NOT NULL,\n    mensagem TEXT NOT NULL,\n    status ticket_status NOT NULL DEFAULT ''aberto'',\n    resposta TEXT,\n    arquivo_url TEXT,\n    respondido_por UUID REFERENCES public.profiles(id),\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Tabela de criativos\nCREATE TABLE public.criativos (\n    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n    cliente_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n    titulo TEXT NOT NULL,\n    descricao TEXT,\n    arquivo_url TEXT NOT NULL,\n    tipo_arquivo TEXT NOT NULL,   image/video\n    status creative_status NOT NULL DEFAULT ''pendente'',\n    resposta TEXT,\n    comentario_cliente TEXT,\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Habilitar RLS em todas as tabelas\nALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.contas ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.chamados ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.criativos ENABLE ROW LEVEL SECURITY;\n\n  Função para verificar se o usuário é admin\nCREATE OR REPLACE FUNCTION public.is_admin()\nRETURNS BOOLEAN\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 FROM public.profiles\n    WHERE id = auth.uid() AND role = ''admin''\n  );\n$$;\n\n  Função para obter o cliente_id do usuário atual\nCREATE OR REPLACE FUNCTION public.get_user_cliente_id()\nRETURNS UUID\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT c.id FROM public.clientes c\n  WHERE c.user_id = auth.uid();\n$$;\n\n  Políticas RLS para profiles\nCREATE POLICY \\"Usuários podem ver seu próprio perfil\\"\n  ON public.profiles FOR SELECT\n  USING (auth.uid() = id);\n\nCREATE POLICY \\"Admins podem ver todos os perfis\\"\n  ON public.profiles FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Usuários podem atualizar seu próprio perfil\\"\n  ON public.profiles FOR UPDATE\n  USING (auth.uid() = id);\n\nCREATE POLICY \\"Admins podem inserir perfis\\"\n  ON public.profiles FOR INSERT\n  WITH CHECK (public.is_admin());\n\nCREATE POLICY \\"Admins podem atualizar qualquer perfil\\"\n  ON public.profiles FOR UPDATE\n  USING (public.is_admin());\n\n  Políticas RLS para clientes\nCREATE POLICY \\"Usuários podem ver seu próprio cliente\\"\n  ON public.clientes FOR SELECT\n  USING (user_id = auth.uid());\n\nCREATE POLICY \\"Admins podem ver todos os clientes\\"\n  ON public.clientes FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar clientes\\"\n  ON public.clientes FOR ALL\n  USING (public.is_admin());\n\n  Políticas RLS para contas\nCREATE POLICY \\"Usuários podem ver suas próprias contas\\"\n  ON public.contas FOR SELECT\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Admins podem ver todas as contas\\"\n  ON public.contas FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar contas\\"\n  ON public.contas FOR ALL\n  USING (public.is_admin());\n\n  Políticas RLS para chamados\nCREATE POLICY \\"Usuários podem ver seus próprios chamados\\"\n  ON public.chamados FOR SELECT\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Usuários podem criar chamados\\"\n  ON public.chamados FOR INSERT\n  WITH CHECK (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Usuários podem atualizar seus próprios chamados\\"\n  ON public.chamados FOR UPDATE\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Admins podem ver todos os chamados\\"\n  ON public.chamados FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar chamados\\"\n  ON public.chamados FOR ALL\n  USING (public.is_admin());\n\n  Políticas RLS para criativos\nCREATE POLICY \\"Usuários podem ver seus próprios criativos\\"\n  ON public.criativos FOR SELECT\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Usuários podem atualizar seus próprios criativos\\"\n  ON public.criativos FOR UPDATE\n  USING (cliente_id = public.get_user_cliente_id());\n\nCREATE POLICY \\"Admins podem ver todos os criativos\\"\n  ON public.criativos FOR SELECT\n  USING (public.is_admin());\n\nCREATE POLICY \\"Admins podem gerenciar criativos\\"\n  ON public.criativos FOR ALL\n  USING (public.is_admin());\n\n  Trigger para criar perfil automaticamente quando usuário se registra\nCREATE OR REPLACE FUNCTION public.handle_new_user()\nRETURNS TRIGGER\nLANGUAGE plpgsql\nSECURITY DEFINER SET search_path = ''''\nAS $$\nBEGIN\n  INSERT INTO public.profiles (id, nome, email, role)\n  VALUES (\n    new.id,\n    COALESCE(new.raw_user_meta_data ->> ''nome'', new.email),\n    new.email,\n    COALESCE((new.raw_user_meta_data ->> ''role'')::user_role, ''cliente'')\n  );\n  RETURN new;\nEND;\n$$;\n\n  Trigger para executar a função quando um usuário é criado\nCREATE TRIGGER on_auth_user_created\n  AFTER INSERT ON auth.users\n  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();\n\n  Função para atualizar updated_at\nCREATE OR REPLACE FUNCTION public.update_updated_at_column()\nRETURNS TRIGGER AS $$\nBEGIN\n  NEW.updated_at = now();\n  RETURN NEW;\nEND;\n$$ language ''plpgsql'';\n\n  Triggers para atualizar updated_at automaticamente\nCREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\nCREATE TRIGGER update_clientes_updated_at BEFORE UPDATE ON public.clientes FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\nCREATE TRIGGER update_chamados_updated_at BEFORE UPDATE ON public.chamados FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\nCREATE TRIGGER update_criativos_updated_at BEFORE UPDATE ON public.criativos FOR EACH ROW EXECUTE PROCEDURE public.update_updated_at_column();\n"}', '8131066b-e700-4e37-be32-745036d7e8e6', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613124855', '{"\n  Primeiro, vamos corrigir as políticas RLS que estão causando os erros 406\n  Criar políticas para a tabela profiles\nCREATE POLICY \\"Users can view their own profile\\" ON public.profiles\nFOR SELECT USING (auth.uid() = id);\n\nCREATE POLICY \\"Users can update their own profile\\" ON public.profiles\nFOR UPDATE USING (auth.uid() = id);\n\n  Criar políticas para a tabela clientes\nCREATE POLICY \\"Admins can view all clients\\" ON public.clientes\nFOR SELECT USING (public.is_admin());\n\nCREATE POLICY \\"Users can view their own client data\\" ON public.clientes\nFOR SELECT USING (auth.uid() = user_id);\n\nCREATE POLICY \\"Admins can manage clients\\" ON public.clientes\nFOR ALL USING (public.is_admin());\n\n  Criar políticas para chamados\nCREATE POLICY \\"Admins can view all tickets\\" ON public.chamados\nFOR SELECT USING (public.is_admin());\n\nCREATE POLICY \\"Users can view tickets from their client\\" ON public.chamados\nFOR SELECT USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\nCREATE POLICY \\"Admins can manage all tickets\\" ON public.chamados\nFOR ALL USING (public.is_admin());\n\nCREATE POLICY \\"Users can create tickets for their client\\" ON public.chamados\nFOR INSERT WITH CHECK (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\nCREATE POLICY \\"Users can update their client tickets\\" ON public.chamados\nFOR UPDATE USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\n  Criar políticas para criativos\nCREATE POLICY \\"Admins can manage all creatives\\" ON public.criativos\nFOR ALL USING (public.is_admin());\n\nCREATE POLICY \\"Users can view creatives for their client\\" ON public.criativos\nFOR SELECT USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\nCREATE POLICY \\"Users can update creatives for their client\\" ON public.criativos\nFOR UPDATE USING (\n  cliente_id IN (\n    SELECT id FROM public.clientes WHERE user_id = auth.uid()\n  )\n);\n\n  Atualizar a estrutura da tabela criativos para incluir os novos campos\nALTER TABLE public.criativos \nADD COLUMN IF NOT EXISTS campanha TEXT,\nADD COLUMN IF NOT EXISTS nome_criativo TEXT,\nADD COLUMN IF NOT EXISTS titulo_anuncio TEXT,\nADD COLUMN IF NOT EXISTS descricao_anuncio TEXT;\n\n  Atualizar a estrutura da tabela chamados para melhor controle de status\nALTER TABLE public.chamados \nADD COLUMN IF NOT EXISTS aberto_por TEXT DEFAULT ''cliente'',\nADD COLUMN IF NOT EXISTS status_detalhado TEXT;\n\n  Criar função para atualizar status detalhado dos chamados\nCREATE OR REPLACE FUNCTION update_ticket_detailed_status()\nRETURNS TRIGGER AS $$\nBEGIN\n    Definir status detalhado baseado no status e outras condições\n  IF NEW.status = ''aberto'' AND NEW.aberto_por = ''admin'' THEN\n    NEW.status_detalhado = ''Aberto pela Equipe'';\n  ELSIF NEW.status = ''aberto'' AND NEW.aberto_por = ''cliente'' THEN\n    NEW.status_detalhado = ''Aberto pelo Cliente'';\n  ELSIF NEW.status = ''em_andamento'' AND NEW.resposta IS NOT NULL AND NEW.respondido_por IS NOT NULL THEN\n      Verificar se quem respondeu foi admin\n    IF EXISTS (SELECT 1 FROM public.profiles WHERE id = NEW.respondido_por AND role = ''admin'') THEN\n      NEW.status_detalhado = ''Aguardando Resposta do Cliente'';\n    ELSE\n      NEW.status_detalhado = ''Aguardando resposta da equipe'';\n    END IF;\n  ELSIF NEW.status = ''resolvido'' THEN\n    NEW.status_detalhado = ''Concluído'';\n  ELSE\n    NEW.status_detalhado = NEW.status;\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n  Criar trigger para atualizar status detalhado\nDROP TRIGGER IF EXISTS update_ticket_status_trigger ON public.chamados;\nCREATE TRIGGER update_ticket_status_trigger\n  BEFORE INSERT OR UPDATE ON public.chamados\n  FOR EACH ROW\n  EXECUTE FUNCTION update_ticket_detailed_status();\n"}', '096449ce-64bc-435c-87de-d87a01dfbf84', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613070518', '{"\n  Criar tabela activity_logs para registrar ações do sistema\nCREATE TABLE public.activity_logs (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  action TEXT NOT NULL,\n  entity_type TEXT NOT NULL,\n  entity_id TEXT NOT NULL,\n  entity_name TEXT NOT NULL,\n  user_id UUID REFERENCES auth.users(id),\n  user_name TEXT NOT NULL,\n  details JSONB,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Adicionar RLS para que admins vejam todos os logs\nALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;\n\n  Política para admins verem todos os logs\nCREATE POLICY \\"Admins can view all activity logs\\" ON public.activity_logs\nFOR SELECT USING (public.is_admin());\n\n  Política para permitir inserção de logs pelo sistema\nCREATE POLICY \\"System can insert activity logs\\" ON public.activity_logs\nFOR INSERT WITH CHECK (true);\n\n  Criar índices para performance\nCREATE INDEX idx_activity_logs_created_at ON public.activity_logs(created_at DESC);\nCREATE INDEX idx_activity_logs_entity_type ON public.activity_logs(entity_type);\nCREATE INDEX idx_activity_logs_user_id ON public.activity_logs(user_id);\n"}', '9cb15cc5-b5bc-442e-9ee5-fa29566dac42', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250613081728', '{"\n  Melhorar tabela de clientes com campos obrigatórios\nALTER TABLE public.clientes \nADD COLUMN IF NOT EXISTS email TEXT,\nADD COLUMN IF NOT EXISTS telefone TEXT,\nADD COLUMN IF NOT EXISTS empresa TEXT,\nADD COLUMN IF NOT EXISTS observacoes_internas TEXT,\nADD COLUMN IF NOT EXISTS responsavel_conta UUID REFERENCES public.profiles(id),\nADD COLUMN IF NOT EXISTS contas_meta TEXT[];   Array de IDs das contas Meta vinculadas\n\n  Criar tabela para histórico/timeline dos chamados\nCREATE TABLE IF NOT EXISTS public.chamados_historico (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id UUID NOT NULL REFERENCES public.chamados(id) ON DELETE CASCADE,\n  acao TEXT NOT NULL,   ''criado'', ''respondido'', ''status_alterado'', ''arquivo_anexado''\n  usuario_id UUID REFERENCES public.profiles(id),\n  usuario_nome TEXT NOT NULL,\n  detalhes TEXT,\n  data_acao TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Habilitar RLS na tabela de histórico\nALTER TABLE public.chamados_historico ENABLE ROW LEVEL SECURITY;\n\n  Políticas para histórico de chamados\nCREATE POLICY \\"Users can view chamados_historico based on access\\" ON public.chamados_historico\n  FOR SELECT USING (\n    CASE \n      WHEN (SELECT role FROM public.profiles WHERE id = auth.uid()) = ''admin'' THEN true\n      ELSE chamado_id IN (\n        SELECT id FROM public.chamados \n        WHERE cliente_id = (SELECT get_user_cliente_id())\n      )\n    END\n  );\n\nCREATE POLICY \\"Only authenticated users can insert historico\\" ON public.chamados_historico\n  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);\n\n  Trigger para criar histórico automaticamente quando chamado é criado\nCREATE OR REPLACE FUNCTION public.create_chamado_historico()\nRETURNS TRIGGER AS $$\nBEGIN\n    Inserir histórico quando chamado é criado\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO public.chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)\n    VALUES (\n      NEW.id, \n      ''criado'', \n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''Chamado criado: '' || NEW.titulo\n    );\n    RETURN NEW;\n  END IF;\n  \n    Inserir histórico quando status muda\n  IF TG_OP = ''UPDATE'' AND OLD.status != NEW.status THEN\n    INSERT INTO public.chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)\n    VALUES (\n      NEW.id, \n      ''status_alterado'', \n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"''\n    );\n  END IF;\n  \n    Inserir histórico quando resposta é adicionada\n  IF TG_OP = ''UPDATE'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO public.chamados_historico (chamado_id, acao, usuario_id, usuario_nome, detalhes)\n    VALUES (\n      NEW.id, \n      ''respondido'', \n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''Nova resposta adicionada''\n    );\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n  Criar trigger\nDROP TRIGGER IF EXISTS chamado_historico_trigger ON public.chamados;\nCREATE TRIGGER chamado_historico_trigger\n  AFTER INSERT OR UPDATE ON public.chamados\n  FOR EACH ROW EXECUTE FUNCTION public.create_chamado_historico();\n\n  Melhorar estrutura de logs de atividade\nCREATE TABLE IF NOT EXISTS public.system_activity_logs (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  usuario_id UUID REFERENCES public.profiles(id),\n  usuario_nome TEXT NOT NULL,\n  acao TEXT NOT NULL,   ''login'', ''api_call'', ''filter_change'', ''export'', etc\n  modulo TEXT NOT NULL,   ''campanhas'', ''adsets'', ''chamados'', ''clientes'', etc\n  detalhes JSONB,\n  ip_address INET,\n  user_agent TEXT,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  RLS para logs do sistema\nALTER TABLE public.system_activity_logs ENABLE ROW LEVEL SECURITY;\n\n  Admins podem ver todos os logs, usuários comuns apenas os próprios\nCREATE POLICY \\"Admins can view all logs, users only their own\\" ON public.system_activity_logs\n  FOR SELECT USING (\n    (SELECT role FROM public.profiles WHERE id = auth.uid()) = ''admin'' \n    OR usuario_id = auth.uid()\n  );\n\nCREATE POLICY \\"All authenticated users can insert logs\\" ON public.system_activity_logs\n  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);\n\n  Função para registrar atividade no sistema\nCREATE OR REPLACE FUNCTION public.log_system_activity(\n  p_acao TEXT,\n  p_modulo TEXT,\n  p_detalhes JSONB DEFAULT NULL,\n  p_ip_address INET DEFAULT NULL,\n  p_user_agent TEXT DEFAULT NULL\n)\nRETURNS UUID AS $$\nDECLARE\n  log_id UUID;\nBEGIN\n  INSERT INTO public.system_activity_logs (\n    usuario_id, \n    usuario_nome, \n    acao, \n    modulo, \n    detalhes, \n    ip_address, \n    user_agent\n  ) VALUES (\n    auth.uid(),\n    COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n    p_acao,\n    p_modulo,\n    p_detalhes,\n    p_ip_address,\n    p_user_agent\n  ) RETURNING id INTO log_id;\n  \n  RETURN log_id;\nEND;\n$$ LANGUAGE plpgsql SECURITY DEFINER;\n"}', 'd0f77029-c2dd-4eac-a645-509965ade5c5', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250614034943', '{"\n  Adicionar novas colunas à tabela chamados\nALTER TABLE chamados \nADD COLUMN IF NOT EXISTS categoria text DEFAULT ''outros'',\nADD COLUMN IF NOT EXISTS prioridade text DEFAULT ''media'',\nADD COLUMN IF NOT EXISTS nota_interna text,\nADD COLUMN IF NOT EXISTS tempo_resposta_horas integer;\n\n  Criar tabela para anexos de chamados\nCREATE TABLE IF NOT EXISTS chamados_anexos (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id uuid REFERENCES chamados(id) ON DELETE CASCADE,\n  nome_arquivo text NOT NULL,\n  url_arquivo text NOT NULL,\n  tipo_arquivo text NOT NULL,\n  tamanho_arquivo bigint,\n  created_at timestamp with time zone DEFAULT now(),\n  uploaded_by uuid REFERENCES auth.users(id)\n);\n\n  Criar tabela para timeline de conversas\nCREATE TABLE IF NOT EXISTS chamados_timeline (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id uuid REFERENCES chamados(id) ON DELETE CASCADE,\n  tipo text NOT NULL DEFAULT ''mensagem'',   mensagem, status_change, note\n  conteudo text,\n  autor_id uuid REFERENCES auth.users(id),\n  autor_nome text NOT NULL,\n  autor_tipo text NOT NULL DEFAULT ''cliente'',   cliente, admin, sistema\n  created_at timestamp with time zone DEFAULT now(),\n  metadata jsonb DEFAULT ''{}''::jsonb\n);\n\n  Habilitar RLS nas novas tabelas\nALTER TABLE chamados_anexos ENABLE ROW LEVEL SECURITY;\nALTER TABLE chamados_timeline ENABLE ROW LEVEL SECURITY;\n\n  Políticas RLS para anexos\nCREATE POLICY \\"Visualizar anexos próprios\\" ON chamados_anexos\n  FOR SELECT USING (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\nCREATE POLICY \\"Inserir anexos próprios\\" ON chamados_anexos\n  FOR INSERT WITH CHECK (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\n  Políticas RLS para timeline\nCREATE POLICY \\"Visualizar timeline própria\\" ON chamados_timeline\n  FOR SELECT USING (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\nCREATE POLICY \\"Inserir timeline própria\\" ON chamados_timeline\n  FOR INSERT WITH CHECK (\n    EXISTS (\n      SELECT 1 FROM chamados c \n      WHERE c.id = chamado_id \n      AND (c.cliente_id = (SELECT get_user_cliente_id()) OR is_admin())\n    )\n  );\n\n  Trigger para criar entrada na timeline quando chamado é criado\nCREATE OR REPLACE FUNCTION create_ticket_timeline_entry()\nRETURNS TRIGGER AS $$\nBEGIN\n    Entrada para criação do chamado\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id, \n      tipo, \n      conteudo, \n      autor_id, \n      autor_nome, \n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''criacao'',\n      NEW.mensagem,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      NEW.aberto_por,\n      jsonb_build_object(''titulo'', NEW.titulo, ''categoria'', NEW.categoria, ''prioridade'', NEW.prioridade)\n    );\n  END IF;\n\n    Entrada para mudança de status\n  IF TG_OP = ''UPDATE'' AND OLD.status != NEW.status THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END,\n      jsonb_build_object(''status_anterior'', OLD.status, ''status_novo'', NEW.status)\n    );\n  END IF;\n\n    Entrada para nova resposta\n  IF TG_OP = ''UPDATE'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo\n    ) VALUES (\n      NEW.id,\n      ''resposta'',\n      NEW.resposta,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END\n    );\n  END IF;\n\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n  Aplicar trigger\nDROP TRIGGER IF EXISTS ticket_timeline_trigger ON chamados;\nCREATE TRIGGER ticket_timeline_trigger\n  AFTER INSERT OR UPDATE ON chamados\n  FOR EACH ROW\n  EXECUTE FUNCTION create_ticket_timeline_entry();\n\n  Criar storage bucket para anexos se não existir\nINSERT INTO storage.buckets (id, name, public) \nVALUES (''ticket-attachments'', ''ticket-attachments'', true)\nON CONFLICT (id) DO NOTHING;\n"}', 'c3750da7-f88d-423c-a5d5-a0d8f90d8a3a', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250614104119', '{"\n  Atualizar o enum de status dos chamados\nALTER TYPE ticket_status RENAME TO ticket_status_old;\n\nCREATE TYPE ticket_status AS ENUM (''novo'', ''aguardando_equipe'', ''aguardando_cliente'', ''em_analise'', ''em_andamento'', ''resolvido'');\n\n  Atualizar a coluna status na tabela chamados\nALTER TABLE chamados ALTER COLUMN status DROP DEFAULT;\nALTER TABLE chamados ALTER COLUMN status TYPE ticket_status USING \n  CASE \n    WHEN status::text = ''aberto'' THEN ''novo''::ticket_status\n    WHEN status::text = ''em_andamento'' THEN ''em_andamento''::ticket_status\n    WHEN status::text = ''resolvido'' THEN ''resolvido''::ticket_status\n    ELSE ''novo''::ticket_status\n  END;\nALTER TABLE chamados ALTER COLUMN status SET DEFAULT ''novo''::ticket_status;\n\n  Remover o tipo antigo\nDROP TYPE ticket_status_old;\n\n  Criar tabela para mensagens do timeline (separada das mensagens iniciais)\nCREATE TABLE IF NOT EXISTS public.chamados_mensagens (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  chamado_id UUID NOT NULL,\n  conteudo TEXT NOT NULL,\n  arquivo_url TEXT,\n  autor_id UUID,\n  autor_nome TEXT NOT NULL,\n  autor_tipo TEXT NOT NULL DEFAULT ''cliente'' CHECK (autor_tipo IN (''cliente'', ''admin'', ''sistema'')),\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  metadata JSONB DEFAULT ''{}''::jsonb\n);\n\n  Atualizar a função de trigger para os novos status\nCREATE OR REPLACE FUNCTION public.update_ticket_status_on_message()\nRETURNS TRIGGER\nLANGUAGE plpgsql\nAS $$\nBEGIN\n    Se é uma mensagem de cliente, alterar status para ''aguardando_equipe''\n  IF NEW.autor_tipo = ''cliente'' THEN\n    UPDATE chamados \n    SET status = ''aguardando_equipe''::ticket_status, updated_at = now()\n    WHERE id = NEW.chamado_id;\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$;\n\n  Criar trigger para atualizar status quando cliente responde\nCREATE TRIGGER trigger_update_status_on_client_message\n  AFTER INSERT ON chamados_mensagens\n  FOR EACH ROW\n  EXECUTE FUNCTION update_ticket_status_on_message();\n\n  Atualizar a função create_ticket_timeline_entry para incluir mensagens\nCREATE OR REPLACE FUNCTION public.create_ticket_timeline_entry()\nRETURNS trigger\nLANGUAGE plpgsql\nAS $$\nBEGIN\n    Entrada para criação do chamado\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id, \n      tipo, \n      conteudo, \n      autor_id, \n      autor_nome, \n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''criacao'',\n      NEW.mensagem,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      NEW.aberto_por,\n      jsonb_build_object(''titulo'', NEW.titulo, ''categoria'', NEW.categoria, ''prioridade'', NEW.prioridade)\n    );\n  END IF;\n\n    Entrada para nova mensagem\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados_mensagens'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.chamado_id,\n      ''mensagem'',\n      NEW.conteudo,\n      NEW.autor_id,\n      NEW.autor_nome,\n      NEW.autor_tipo,\n      NEW.metadata\n    );\n  END IF;\n\n    Entrada para mudança de status\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND OLD.status != NEW.status THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END,\n      jsonb_build_object(''status_anterior'', OLD.status, ''status_novo'', NEW.status)\n    );\n  END IF;\n\n    Entrada para nova resposta (campo resposta)\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo\n    ) VALUES (\n      NEW.id,\n      ''resposta'',\n      NEW.resposta,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END\n    );\n  END IF;\n\n  RETURN NEW;\nEND;\n$$;\n\n  Criar trigger para mensagens\nCREATE TRIGGER trigger_timeline_entry_mensagens\n  AFTER INSERT ON chamados_mensagens\n  FOR EACH ROW\n  EXECUTE FUNCTION create_ticket_timeline_entry();\n\n  Atualizar chamados existentes com status ''aberto'' para ''novo''\nUPDATE chamados SET status = ''novo''::ticket_status WHERE status::text = ''aberto'';\n"}', '176e0d70-2d98-47b5-adff-d5a754a2f47a', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250614113715', '{"\n  Primeiro, remover o default da coluna\nALTER TABLE chamados ALTER COLUMN status DROP DEFAULT;\n\n  Atualizar todos os chamados com status antigos para os novos status\nUPDATE chamados \nSET status = ''novo''::ticket_status \nWHERE status::text = ''aberto'';\n\nUPDATE chamados \nSET status = ''aguardando_equipe''::ticket_status \nWHERE status::text = ''respondido'';\n\n  Criar o novo enum com os status corretos\nDROP TYPE IF EXISTS ticket_status_new CASCADE;\nCREATE TYPE ticket_status_new AS ENUM (''novo'', ''aguardando_equipe'', ''aguardando_cliente'', ''em_analise'', ''em_andamento'', ''resolvido'');\n\n  Atualizar a coluna para usar o novo enum\nALTER TABLE chamados ALTER COLUMN status TYPE ticket_status_new USING \n  CASE \n    WHEN status::text = ''novo'' THEN ''novo''::ticket_status_new\n    WHEN status::text = ''aguardando_equipe'' THEN ''aguardando_equipe''::ticket_status_new\n    WHEN status::text = ''aguardando_cliente'' THEN ''aguardando_cliente''::ticket_status_new\n    WHEN status::text = ''em_analise'' THEN ''em_analise''::ticket_status_new\n    WHEN status::text = ''em_andamento'' THEN ''em_andamento''::ticket_status_new\n    WHEN status::text = ''resolvido'' THEN ''resolvido''::ticket_status_new\n    ELSE ''novo''::ticket_status_new\n  END;\n\n  Remover o enum antigo e renomear o novo\nDROP TYPE ticket_status;\nALTER TYPE ticket_status_new RENAME TO ticket_status;\n\n  Definir o novo valor padrão\nALTER TABLE chamados ALTER COLUMN status SET DEFAULT ''novo''::ticket_status;\n"}', '5f705efc-3d21-480f-be46-be3fcf4d1e1b', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615024415', '{"\n  Tabela para armazenar configurações do WhatsApp Business API\nCREATE TABLE whatsapp_config (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  phone_number_id TEXT NOT NULL,\n  access_token TEXT NOT NULL,\n  business_account_id TEXT,\n  webhook_verify_token TEXT,\n  status TEXT DEFAULT ''disconnected'' CHECK (status IN (''connected'', ''disconnected'', ''error'')),\n  last_verified_at TIMESTAMPTZ,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n  Tabela para templates de mensagem aprovados\nCREATE TABLE whatsapp_templates (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  language TEXT NOT NULL DEFAULT ''pt_BR'',\n  category TEXT NOT NULL CHECK (category IN (''MARKETING'', ''UTILITY'', ''AUTHENTICATION'')),\n  status TEXT NOT NULL CHECK (status IN (''APPROVED'', ''PENDING'', ''REJECTED'')),\n  header_type TEXT CHECK (header_type IN (''TEXT'', ''IMAGE'', ''VIDEO'', ''DOCUMENT'')),\n  header_text TEXT,\n  body_text TEXT NOT NULL,\n  footer_text TEXT,\n  variables JSONB DEFAULT ''[]''::jsonb,\n  components JSONB NOT NULL,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n  Tabela para contatos/clientes\nCREATE TABLE whatsapp_contacts (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  phone_number TEXT NOT NULL,\n  client_id UUID REFERENCES clientes(id) ON DELETE SET NULL,\n  tags TEXT[] DEFAULT ''{}'',\n  is_active BOOLEAN DEFAULT true,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n  Tabela para campanhas automatizadas\nCREATE TABLE whatsapp_campaigns (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  type TEXT NOT NULL CHECK (type IN (''relatorio'', ''financeiro'', ''promocional'', ''suporte'')),\n  template_id UUID REFERENCES whatsapp_templates(id) ON DELETE CASCADE,\n  meta_account_id TEXT,\n  frequency TEXT NOT NULL CHECK (frequency IN (''diario'', ''semanal'', ''mensal'')),\n  day_of_week INTEGER CHECK (day_of_week BETWEEN 0 AND 6),   0 = domingo\n  send_time TIME NOT NULL,\n  data_period_days INTEGER DEFAULT 7,\n  is_active BOOLEAN DEFAULT true,\n  contacts UUID[] DEFAULT ''{}'',\n  variables_mapping JSONB DEFAULT ''{}''::jsonb,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n  Tabela para histórico de envios\nCREATE TABLE whatsapp_messages (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  campaign_id UUID REFERENCES whatsapp_campaigns(id) ON DELETE SET NULL,\n  template_id UUID REFERENCES whatsapp_templates(id) ON DELETE SET NULL,\n  contact_id UUID REFERENCES whatsapp_contacts(id) ON DELETE CASCADE,\n  phone_number TEXT NOT NULL,\n  message_type TEXT NOT NULL CHECK (message_type IN (''template'', ''text'')),\n  template_name TEXT,\n  template_variables JSONB DEFAULT ''{}''::jsonb,\n  message_content TEXT,\n  whatsapp_message_id TEXT,\n  status TEXT NOT NULL DEFAULT ''pending'' CHECK (status IN (''pending'', ''sent'', ''delivered'', ''read'', ''failed'')),\n  error_message TEXT,\n  sent_at TIMESTAMPTZ,\n  delivered_at TIMESTAMPTZ,\n  read_at TIMESTAMPTZ,\n  created_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n  Índices para performance\nCREATE INDEX idx_whatsapp_messages_status ON whatsapp_messages(status);\nCREATE INDEX idx_whatsapp_messages_sent_at ON whatsapp_messages(sent_at);\nCREATE INDEX idx_whatsapp_messages_campaign_id ON whatsapp_messages(campaign_id);\nCREATE INDEX idx_whatsapp_contacts_phone ON whatsapp_contacts(phone_number);\nCREATE INDEX idx_whatsapp_campaigns_active ON whatsapp_campaigns(is_active);\n\n  Trigger para updated_at\nCREATE TRIGGER update_whatsapp_config_updated_at\n  BEFORE UPDATE ON whatsapp_config\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\nCREATE TRIGGER update_whatsapp_templates_updated_at\n  BEFORE UPDATE ON whatsapp_templates\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\nCREATE TRIGGER update_whatsapp_contacts_updated_at\n  BEFORE UPDATE ON whatsapp_contacts\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\nCREATE TRIGGER update_whatsapp_campaigns_updated_at\n  BEFORE UPDATE ON whatsapp_campaigns\n  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();\n\n  RLS (Row Level Security)\nALTER TABLE whatsapp_config ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_templates ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_contacts ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_campaigns ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_messages ENABLE ROW LEVEL SECURITY;\n\n  Políticas RLS (apenas admins podem acessar)\nCREATE POLICY \\"Admins can access whatsapp_config\\" ON whatsapp_config\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_templates\\" ON whatsapp_templates\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_contacts\\" ON whatsapp_contacts\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_campaigns\\" ON whatsapp_campaigns\n  FOR ALL USING (is_admin());\n\nCREATE POLICY \\"Admins can access whatsapp_messages\\" ON whatsapp_messages\n  FOR ALL USING (is_admin());\n"}', '272c2790-d849-4c4e-83c3-63e9bb3bb8a3', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615061735', '{"\n  Adicionar colunas que faltam na tabela whatsapp_contacts para suporte a tags e agrupamento\nALTER TABLE whatsapp_contacts \nADD COLUMN IF NOT EXISTS meta_account_id TEXT,\nADD COLUMN IF NOT EXISTS grupo TEXT,\nADD COLUMN IF NOT EXISTS observacoes TEXT;\n\n  Criar tabela para logs de mensagens WhatsApp\nCREATE TABLE IF NOT EXISTS whatsapp_message_logs (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  message_id UUID REFERENCES whatsapp_messages(id) ON DELETE CASCADE,\n  status TEXT NOT NULL DEFAULT ''sent'',\n  whatsapp_message_id TEXT,\n  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  error_details JSONB,\n  webhook_data JSONB,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\n  Criar tabela para execução de campanhas automatizadas\nCREATE TABLE IF NOT EXISTS whatsapp_campaign_executions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  campaign_id UUID REFERENCES whatsapp_campaigns(id) ON DELETE CASCADE,\n  execution_date TIMESTAMP WITH TIME ZONE NOT NULL,\n  status TEXT NOT NULL DEFAULT ''pending'',\n  messages_sent INTEGER DEFAULT 0,\n  messages_delivered INTEGER DEFAULT 0,\n  messages_failed INTEGER DEFAULT 0,\n  execution_details JSONB,\n  error_message TEXT,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  completed_at TIMESTAMP WITH TIME ZONE\n);\n\n  Adicionar índices para performance\nCREATE INDEX IF NOT EXISTS idx_whatsapp_contacts_tags ON whatsapp_contacts USING GIN(tags);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_contacts_client_id ON whatsapp_contacts(client_id);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_messages_status ON whatsapp_messages(status);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_messages_phone ON whatsapp_messages(phone_number);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_campaign_executions_campaign ON whatsapp_campaign_executions(campaign_id);\nCREATE INDEX IF NOT EXISTS idx_whatsapp_campaign_executions_date ON whatsapp_campaign_executions(execution_date);\n\n  Habilitar RLS nas novas tabelas\nALTER TABLE whatsapp_message_logs ENABLE ROW LEVEL SECURITY;\nALTER TABLE whatsapp_campaign_executions ENABLE ROW LEVEL SECURITY;\n\n  Criar políticas RLS básicas (assumindo que será usado por admins)\nCREATE POLICY \\"Allow all access to whatsapp_message_logs\\" ON whatsapp_message_logs FOR ALL USING (true);\nCREATE POLICY \\"Allow all access to whatsapp_campaign_executions\\" ON whatsapp_campaign_executions FOR ALL USING (true);\n\n  Atualizar a tabela whatsapp_campaigns para incluir timezone\nALTER TABLE whatsapp_campaigns \nADD COLUMN IF NOT EXISTS timezone TEXT DEFAULT ''America/Sao_Paulo'',\nADD COLUMN IF NOT EXISTS next_execution TIMESTAMP WITH TIME ZONE,\nADD COLUMN IF NOT EXISTS last_execution TIMESTAMP WITH TIME ZONE;\n"}', 'e98ebf9f-6e85-4c92-8200-8e3eb181deb4', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615070512', '{"\n  Habilita RLS e cria políticas para as tabelas do WhatsApp e outras tabelas essenciais.\n  Isso garante que usuários autenticados possam acessar e modificar os dados conforme as regras.\n\n  Tabela: whatsapp_config\nALTER TABLE public.whatsapp_config ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_config;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_config FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n  Tabela: whatsapp_templates\nALTER TABLE public.whatsapp_templates ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_templates;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_templates FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n  Tabela: whatsapp_contacts\nALTER TABLE public.whatsapp_contacts ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_contacts;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_contacts FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n  Tabela: whatsapp_messages\nALTER TABLE public.whatsapp_messages ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_messages;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_messages FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n  Tabela: whatsapp_campaigns\nALTER TABLE public.whatsapp_campaigns ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Allow all access for authenticated users\\" ON public.whatsapp_campaigns;\nCREATE POLICY \\"Allow all access for authenticated users\\"\nON public.whatsapp_campaigns FOR ALL\nUSING (auth.role() = ''authenticated'')\nWITH CHECK (auth.role() = ''authenticated'');\n\n  Tabela: profiles\nALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Admins can view all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Users can update their own profile\\" ON public.profiles;\nCREATE POLICY \\"Users can view their own profile\\"\nON public.profiles FOR SELECT USING (auth.uid() = id);\nCREATE POLICY \\"Admins can view all profiles\\"\nON public.profiles FOR SELECT USING (public.is_admin());\nCREATE POLICY \\"Users can update their own profile\\"\nON public.profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);\n\n  Tabela: clientes\nALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS \\"Clients can manage their own data\\" ON public.clientes;\nDROP POLICY IF EXISTS \\"Admins can manage all clients\\" ON public.clientes;\nCREATE POLICY \\"Clients can manage their own data\\"\nON public.clientes FOR ALL USING (auth.uid() = user_id)\nWITH CHECK (auth.uid() = user_id);\nCREATE POLICY \\"Admins can manage all clients\\"\nON public.clientes FOR ALL USING (public.is_admin())\nWITH CHECK (public.is_admin());\n"}', 'cbc5dc16-3363-4d32-ae85-ca9f37bbbf30', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250615115327', '{"\n  Criar tabela de projetos para organizar tarefas\nCREATE TABLE public.projetos (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  nome TEXT NOT NULL,\n  descricao TEXT,\n  cliente_id UUID REFERENCES public.clientes(id),\n  cor TEXT DEFAULT ''#3b82f6'',\n  ativo BOOLEAN NOT NULL DEFAULT true,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Criar enum para tipos de tarefa\nCREATE TYPE task_type AS ENUM (''desenvolvimento'', ''design'', ''marketing'', ''suporte'', ''revisao'', ''outros'');\n\n  Criar enum para prioridades\nCREATE TYPE task_priority AS ENUM (''baixa'', ''media'', ''alta'', ''urgente'');\n\n  Criar enum para status das tarefas\nCREATE TYPE task_status AS ENUM (''backlog'', ''execucao'', ''revisao'', ''aguardando'', ''finalizada'', ''cancelada'');\n\n  Criar tabela de templates de tarefa\nCREATE TABLE public.task_templates (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  nome TEXT NOT NULL,\n  descricao TEXT,\n  tipo task_type NOT NULL DEFAULT ''outros'',\n  prioridade task_priority NOT NULL DEFAULT ''media'',\n  fases_padrao JSONB DEFAULT ''[\\"backlog\\", \\"execucao\\", \\"revisao\\", \\"finalizada\\"]'',\n  tempo_estimado INTEGER,   em horas\n  tags TEXT[] DEFAULT ''{}'',\n  ativo BOOLEAN NOT NULL DEFAULT true,\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Criar tabela principal de tarefas\nCREATE TABLE public.tarefas (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  titulo TEXT NOT NULL,\n  descricao TEXT,\n  tipo task_type NOT NULL DEFAULT ''outros'',\n  prioridade task_priority NOT NULL DEFAULT ''media'',\n  status task_status NOT NULL DEFAULT ''backlog'',\n  projeto_id UUID REFERENCES public.projetos(id),\n  template_id UUID REFERENCES public.task_templates(id),\n  \n    Integrações\n  chamado_id UUID REFERENCES public.chamados(id),\n  criativo_id UUID REFERENCES public.criativos(id),\n  cliente_id UUID REFERENCES public.clientes(id),\n  \n    Atribuições\n  criado_por UUID REFERENCES public.profiles(id),\n  responsavel_id UUID REFERENCES public.profiles(id),\n  aprovador_id UUID REFERENCES public.profiles(id),\n  \n    Tempo e cronometragem\n  tempo_estimado INTEGER,   em horas\n  tempo_gasto INTEGER DEFAULT 0,   em minutos\n  data_inicio TIMESTAMP WITH TIME ZONE,\n  data_prazo TIMESTAMP WITH TIME ZONE,\n  data_conclusao TIMESTAMP WITH TIME ZONE,\n  \n    Metadados\n  tags TEXT[] DEFAULT ''{}'',\n  arquivos_urls TEXT[] DEFAULT ''{}'',\n  observacoes TEXT,\n  motivo_status TEXT,   para quando status = ''aguardando''\n  resumo_conclusao TEXT,   obrigatório quando finalizar\n  \n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Criar tabela de fases customizáveis\nCREATE TABLE public.task_fases (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  nome TEXT NOT NULL,\n  cor TEXT DEFAULT ''#6b7280'',\n  ordem INTEGER NOT NULL,\n  projeto_id UUID REFERENCES public.projetos(id),\n  template_id UUID REFERENCES public.task_templates(id),\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),\n  \n  UNIQUE(nome, projeto_id),\n  UNIQUE(nome, template_id)\n);\n\n  Criar tabela de cronometragem detalhada\nCREATE TABLE public.task_time_logs (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  tarefa_id UUID NOT NULL REFERENCES public.tarefas(id) ON DELETE CASCADE,\n  usuario_id UUID NOT NULL REFERENCES public.profiles(id),\n  fase TEXT NOT NULL,\n  tempo_minutos INTEGER NOT NULL,\n  data_inicio TIMESTAMP WITH TIME ZONE NOT NULL,\n  data_fim TIMESTAMP WITH TIME ZONE,\n  descricao TEXT,\n  ativo BOOLEAN DEFAULT true,   para pausar/retomar\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Criar tabela de comentários/atividades nas tarefas\nCREATE TABLE public.task_activities (\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  tarefa_id UUID NOT NULL REFERENCES public.tarefas(id) ON DELETE CASCADE,\n  usuario_id UUID REFERENCES public.profiles(id),\n  usuario_nome TEXT NOT NULL,\n  tipo TEXT NOT NULL DEFAULT ''comentario'',   comentario, status_change, assignment, etc\n  conteudo TEXT,\n  status_anterior task_status,\n  status_novo task_status,\n  metadata JSONB DEFAULT ''{}'',\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\n);\n\n  Habilitar RLS para todas as tabelas\nALTER TABLE public.projetos ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_templates ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.tarefas ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_fases ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_time_logs ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.task_activities ENABLE ROW LEVEL SECURITY;\n\n  Políticas para projetos\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.projetos FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n  Políticas para templates\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_templates FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n  Políticas para tarefas\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.tarefas FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n  Políticas para fases\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_fases FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n  Políticas para time logs\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_time_logs FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n  Políticas para atividades\nCREATE POLICY \\"Allow all access for authenticated users\\" ON public.task_activities FOR ALL\nUSING (auth.role() = ''authenticated'') WITH CHECK (auth.role() = ''authenticated'');\n\n  Triggers para updated_at\nCREATE TRIGGER update_projetos_updated_at BEFORE UPDATE ON public.projetos\nFOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\n\nCREATE TRIGGER update_tarefas_updated_at BEFORE UPDATE ON public.tarefas\nFOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\n\n  Função para auto-cronometragem quando mover para execução\nCREATE OR REPLACE FUNCTION public.auto_start_task_timer()\nRETURNS TRIGGER AS $$\nBEGIN\n    Se mudou para execução e não tinha data_inicio, definir agora\n  IF NEW.status = ''execucao'' AND OLD.status != ''execucao'' AND NEW.data_inicio IS NULL THEN\n    NEW.data_inicio = now();\n  END IF;\n  \n    Se finalizou, definir data_conclusao\n  IF NEW.status = ''finalizada'' AND OLD.status != ''finalizada'' THEN\n    NEW.data_conclusao = now();\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\nCREATE TRIGGER auto_start_task_timer_trigger\nBEFORE UPDATE ON public.tarefas\nFOR EACH ROW EXECUTE FUNCTION public.auto_start_task_timer();\n\n  Função para criar atividade quando status muda\nCREATE OR REPLACE FUNCTION public.create_task_activity()\nRETURNS TRIGGER AS $$\nBEGIN\n    Criar atividade para criação\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO public.task_activities (\n      tarefa_id, usuario_id, usuario_nome, tipo, conteudo, metadata\n    ) VALUES (\n      NEW.id,\n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''criacao'',\n      ''Tarefa criada: '' || NEW.titulo,\n      jsonb_build_object(''prioridade'', NEW.prioridade, ''tipo'', NEW.tipo)\n    );\n    RETURN NEW;\n  END IF;\n  \n    Criar atividade para mudança de status\n  IF TG_OP = ''UPDATE'' AND OLD.status != NEW.status THEN\n    INSERT INTO public.task_activities (\n      tarefa_id, usuario_id, usuario_nome, tipo, conteudo,\n      status_anterior, status_novo\n    ) VALUES (\n      NEW.id,\n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      OLD.status,\n      NEW.status\n    );\n  END IF;\n  \n    Criar atividade para mudança de responsável\n  IF TG_OP = ''UPDATE'' AND OLD.responsavel_id != NEW.responsavel_id THEN\n    INSERT INTO public.task_activities (\n      tarefa_id, usuario_id, usuario_nome, tipo, conteudo, metadata\n    ) VALUES (\n      NEW.id,\n      auth.uid(),\n      COALESCE((SELECT nome FROM public.profiles WHERE id = auth.uid()), ''Sistema''),\n      ''assignment'',\n      ''Responsável alterado'',\n      jsonb_build_object(\n        ''responsavel_anterior'', OLD.responsavel_id,\n        ''responsavel_novo'', NEW.responsavel_id\n      )\n    );\n  END IF;\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\nCREATE TRIGGER create_task_activity_trigger\nAFTER INSERT OR UPDATE ON public.tarefas\nFOR EACH ROW EXECUTE FUNCTION public.create_task_activity();\n"}', 'd76d4ecb-a9d4-421d-aa26-c061b70db04e', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616103851', '{"\n  Criar enum para tipos de permissões\nCREATE TYPE permission_type AS ENUM (\n  ''access_dashboard'',\n  ''access_whatsapp'',\n  ''create_campaigns'',\n  ''edit_campaigns'',\n  ''view_templates'',\n  ''send_messages'',\n  ''view_metrics'',\n  ''access_tasks'',\n  ''create_tasks'',\n  ''assign_tasks'',\n  ''finalize_tasks'',\n  ''edit_execution_time'',\n  ''access_calls'',\n  ''create_calls'',\n  ''finalize_calls'',\n  ''link_calls_to_tasks'',\n  ''access_creatives'',\n  ''create_edit_creatives'',\n  ''approve_creatives'',\n  ''view_change_history'',\n  ''access_paid_media'',\n  ''create_campaigns_media'',\n  ''view_metrics_media'',\n  ''access_reports'',\n  ''create_automatic_reports'',\n  ''manage_user_settings'',\n  ''manage_collaborators'',\n  ''manage_whatsapp_templates'',\n  ''manage_api_settings'',\n  ''manage_appearance_and_visual_identity'',\n  ''manage_external_integrations'',\n  ''manage_variables_and_pre_configurations'',\n  ''view_billing_settings'',\n  ''view_system_logs''\n);\n\n  Adicionar campos necessários à tabela profiles\nALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_root_admin BOOLEAN DEFAULT FALSE;\nALTER TABLE profiles ADD COLUMN IF NOT EXISTS foto_url TEXT;\nALTER TABLE profiles ADD COLUMN IF NOT EXISTS status TEXT DEFAULT ''ativo'';\n\n  Tabela de permissões dos usuários\nCREATE TABLE IF NOT EXISTS user_permissions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,\n  permission permission_type NOT NULL,\n  granted_by UUID REFERENCES profiles(id),\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  UNIQUE(user_id, permission)\n);\n\n  Tabela de templates de permissões\nCREATE TABLE IF NOT EXISTS permission_templates (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  name TEXT NOT NULL,\n  description TEXT,\n  permissions permission_type[] NOT NULL DEFAULT ''{}'',\n  created_by UUID REFERENCES profiles(id),\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\n  Tabela de logs de alterações de permissões\nCREATE TABLE IF NOT EXISTS permission_logs (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  target_user_id UUID REFERENCES profiles(id),\n  changed_by UUID REFERENCES profiles(id),\n  action TEXT NOT NULL,   ''granted'', ''revoked'', ''user_created'', ''user_updated''\n  permission permission_type,\n  details JSONB,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\n  Função para verificar se um usuário tem uma permissão específica\nCREATE OR REPLACE FUNCTION has_permission(user_id UUID, required_permission permission_type)\nRETURNS BOOLEAN\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 FROM user_permissions \n    WHERE user_permissions.user_id = has_permission.user_id \n    AND permission = required_permission\n  ) OR EXISTS (\n    SELECT 1 FROM profiles \n    WHERE id = has_permission.user_id \n    AND is_root_admin = TRUE\n  );\n$$;\n\n  Função para obter todas as permissões de um usuário\nCREATE OR REPLACE FUNCTION get_user_permissions(user_id UUID)\nRETURNS permission_type[]\nLANGUAGE SQL\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT COALESCE(array_agg(permission), ''{}'') \n  FROM user_permissions \n  WHERE user_permissions.user_id = get_user_permissions.user_id;\n$$;\n\n  RLS para user_permissions\nALTER TABLE user_permissions ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY \\"Users can view permissions with manage_collaborators permission\\"\n  ON user_permissions FOR SELECT\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\nCREATE POLICY \\"Users can manage permissions with manage_collaborators permission\\"\n  ON user_permissions FOR ALL\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\n  RLS para permission_templates\nALTER TABLE permission_templates ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY \\"Users can view templates with manage_collaborators permission\\"\n  ON permission_templates FOR SELECT\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\nCREATE POLICY \\"Users can manage templates with manage_collaborators permission\\"\n  ON permission_templates FOR ALL\n  USING (\n    has_permission(auth.uid(), ''manage_collaborators'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\n  RLS para permission_logs\nALTER TABLE permission_logs ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY \\"Users can view logs with view_system_logs permission\\"\n  ON permission_logs FOR SELECT\n  USING (\n    has_permission(auth.uid(), ''view_system_logs'') OR \n    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n  );\n\n  Atualizar a política de profiles para ocultar root admin\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON profiles;\nCREATE POLICY \\"Users can view profiles except root admin\\"\n  ON profiles FOR SELECT\n  USING (\n    (id = auth.uid()) OR \n    (is_root_admin = FALSE AND (\n      has_permission(auth.uid(), ''manage_collaborators'') OR \n      EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_root_admin = TRUE)\n    ))\n  );\n\n  Trigger para criar logs de alterações\nCREATE OR REPLACE FUNCTION log_permission_changes()\nRETURNS TRIGGER\nLANGUAGE plpgsql\nAS $$\nBEGIN\n  IF TG_OP = ''INSERT'' THEN\n    INSERT INTO permission_logs (target_user_id, changed_by, action, permission, details)\n    VALUES (NEW.user_id, auth.uid(), ''granted'', NEW.permission, \n            jsonb_build_object(''timestamp'', NOW()));\n    RETURN NEW;\n  ELSIF TG_OP = ''DELETE'' THEN\n    INSERT INTO permission_logs (target_user_id, changed_by, action, permission, details)\n    VALUES (OLD.user_id, auth.uid(), ''revoked'', OLD.permission, \n            jsonb_build_object(''timestamp'', NOW()));\n    RETURN OLD;\n  END IF;\n  RETURN NULL;\nEND;\n$$;\n\nCREATE TRIGGER permission_changes_log\n  AFTER INSERT OR DELETE ON user_permissions\n  FOR EACH ROW EXECUTE FUNCTION log_permission_changes();\n"}', '4719ac7e-4fb4-409b-8fa9-2f004bc05588', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616115239', '{"\n  Remover políticas existentes que causam recursão\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Admins can view all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Users can update their own profile\\" ON public.profiles;\n\n  Criar políticas simples sem recursão\nCREATE POLICY \\"Users can view their own profile\\"\nON public.profiles FOR SELECT \nUSING (id = auth.uid());\n\nCREATE POLICY \\"Users can update their own profile\\"\nON public.profiles FOR UPDATE \nUSING (id = auth.uid()) \nWITH CHECK (id = auth.uid());\n\n  Política para admins visualizarem todos os perfis (usando função segura)\nCREATE POLICY \\"Root admins can view all profiles\\"\nON public.profiles FOR SELECT \nUSING (\n  EXISTS (\n    SELECT 1 FROM public.profiles p \n    WHERE p.id = auth.uid() AND p.is_root_admin = true\n  )\n);\n\n  Política para admins atualizarem qualquer perfil\nCREATE POLICY \\"Root admins can update all profiles\\"\nON public.profiles FOR UPDATE \nUSING (\n  EXISTS (\n    SELECT 1 FROM public.profiles p \n    WHERE p.id = auth.uid() AND p.is_root_admin = true\n  )\n) \nWITH CHECK (\n  EXISTS (\n    SELECT 1 FROM public.profiles p \n    WHERE p.id = auth.uid() AND p.is_root_admin = true\n  )\n);\n"}', '3ff9f576-2c1a-4902-ad26-acc974f054dc', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616062329', '{"\n  Primeiro, vamos limpar COMPLETAMENTE todas as políticas problemáticas\nDROP POLICY IF EXISTS \\"Users can view their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Users can update their own profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Root admins can view all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"Root admins can update all profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"view_own_profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"update_own_profile\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"root_admin_view_all_profiles\\" ON public.profiles;\nDROP POLICY IF EXISTS \\"root_admin_update_all_profiles\\" ON public.profiles;\n\n  Limpar políticas de permissões\nDROP POLICY IF EXISTS \\"Users can view own permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"Root admins can view all permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"Root admins can manage all permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"view_own_permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"root_admin_view_all_permissions\\" ON public.user_permissions;\nDROP POLICY IF EXISTS \\"root_admin_manage_all_permissions\\" ON public.user_permissions;\n\n  Limpar políticas de templates\nDROP POLICY IF EXISTS \\"Root admins can view all templates\\" ON public.permission_templates;\nDROP POLICY IF EXISTS \\"Root admins can manage all templates\\" ON public.permission_templates;\nDROP POLICY IF EXISTS \\"root_admin_view_templates\\" ON public.permission_templates;\nDROP POLICY IF EXISTS \\"root_admin_manage_templates\\" ON public.permission_templates;\n\n  Limpar políticas de logs\nDROP POLICY IF EXISTS \\"Root admins can view all logs\\" ON public.permission_logs;\nDROP POLICY IF EXISTS \\"root_admin_view_logs\\" ON public.permission_logs;\n\n  Remover função antiga se existir\nDROP FUNCTION IF EXISTS public.is_root_admin();\n\n  Primeiro, vamos garantir que seu usuário seja root admin\nUPDATE public.profiles \nSET is_root_admin = true, role = ''admin''\nWHERE id = ''8c858fa0-380a-4940-bee7-2b302753e6f2'' OR email = ''vagner@leadclinic.com.br'';\n\n  Inserir perfil se não existir\nINSERT INTO public.profiles (id, nome, email, role, is_root_admin, ativo)\nVALUES (''8c858fa0-380a-4940-bee7-2b302753e6f2'', ''Vagner'', ''vagner@leadclinic.com.br'', ''admin'', true, true)\nON CONFLICT (id) DO UPDATE SET\n  is_root_admin = true,\n  role = ''admin'',\n  ativo = true;\n\n  Criar função MUITO simples para verificar root admin\nCREATE OR REPLACE FUNCTION public.check_is_root_admin(user_id uuid)\nRETURNS boolean\nLANGUAGE sql\nSTABLE\nSECURITY DEFINER\nAS $$\n  SELECT COALESCE(\n    (SELECT is_root_admin FROM public.profiles WHERE id = user_id LIMIT 1),\n    false\n  );\n$$;\n\n  Políticas SIMPLES para profiles - SEM RECURSÃO\nCREATE POLICY \\"allow_own_profile_select\\" ON public.profiles \nFOR SELECT \nUSING (id = auth.uid());\n\nCREATE POLICY \\"allow_own_profile_update\\" ON public.profiles \nFOR UPDATE \nUSING (id = auth.uid()) \nWITH CHECK (id = auth.uid());\n\nCREATE POLICY \\"allow_root_admin_select_all\\" ON public.profiles \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\nCREATE POLICY \\"allow_root_admin_update_all\\" ON public.profiles \nFOR UPDATE \nUSING (public.check_is_root_admin(auth.uid())) \nWITH CHECK (public.check_is_root_admin(auth.uid()));\n\n  Políticas para user_permissions\nCREATE POLICY \\"allow_own_permissions_select\\" ON public.user_permissions \nFOR SELECT \nUSING (user_id = auth.uid());\n\nCREATE POLICY \\"allow_root_admin_permissions_select\\" ON public.user_permissions \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\nCREATE POLICY \\"allow_root_admin_permissions_all\\" ON public.user_permissions \nFOR ALL \nUSING (public.check_is_root_admin(auth.uid()));\n\n  Políticas para permission_templates\nCREATE POLICY \\"allow_root_admin_templates_select\\" ON public.permission_templates \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\nCREATE POLICY \\"allow_root_admin_templates_all\\" ON public.permission_templates \nFOR ALL \nUSING (public.check_is_root_admin(auth.uid()));\n\n  Políticas para permission_logs\nCREATE POLICY \\"allow_root_admin_logs_select\\" ON public.permission_logs \nFOR SELECT \nUSING (public.check_is_root_admin(auth.uid()));\n\n  Garantir que RLS está habilitado\nALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.user_permissions ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.permission_templates ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.permission_logs ENABLE ROW LEVEL SECURITY;\n"}', 'b8a6d049-20a7-4cb8-a4d8-fb5f465c1574', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616063051', '{"\n  Primeiro, vamos garantir que seu usuário tenha TODAS as permissões necessárias\n  Inserir todas as permissões para o usuário root admin\nINSERT INTO public.user_permissions (user_id, permission, granted_by)\nSELECT \n  ''8c858fa0-380a-4940-bee7-2b302753e6f2'',\n  permission_name::permission_type,\n  ''8c858fa0-380a-4940-bee7-2b302753e6f2''\nFROM (\n  VALUES \n    (''access_dashboard''),\n    (''access_whatsapp''),\n    (''create_campaigns''),\n    (''edit_campaigns''),\n    (''view_templates''),\n    (''send_messages''),\n    (''view_metrics''),\n    (''access_tasks''),\n    (''create_tasks''),\n    (''assign_tasks''),\n    (''finalize_tasks''),\n    (''edit_execution_time''),\n    (''access_calls''),\n    (''create_calls''),\n    (''finalize_calls''),\n    (''link_calls_to_tasks''),\n    (''access_creatives''),\n    (''create_edit_creatives''),\n    (''approve_creatives''),\n    (''view_change_history''),\n    (''access_paid_media''),\n    (''create_campaigns_media''),\n    (''view_metrics_media''),\n    (''access_reports''),\n    (''create_automatic_reports''),\n    (''manage_user_settings''),\n    (''manage_collaborators''),\n    (''manage_whatsapp_templates''),\n    (''manage_api_settings''),\n    (''manage_appearance_and_visual_identity''),\n    (''manage_external_integrations''),\n    (''manage_variables_and_pre_configurations''),\n    (''view_billing_settings''),\n    (''view_system_logs'')\n) AS permissions(permission_name)\nON CONFLICT (user_id, permission) DO NOTHING;\n\n  Vamos também TEMPORARIAMENTE desabilitar RLS nas tabelas principais para garantir acesso\nALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;\nALTER TABLE public.user_permissions DISABLE ROW LEVEL SECURITY;\n\n  E garantir novamente que o perfil está correto\nUPDATE public.profiles \nSET \n  is_root_admin = true,\n  role = ''admin'',\n  ativo = true,\n  nome = ''Vagner Admin'',\n  email = ''vagner@leadclinic.com.br''\nWHERE id = ''8c858fa0-380a-4940-bee7-2b302753e6f2'';\n\n  Verificar se o registro existe, se não, inserir\nINSERT INTO public.profiles (id, nome, email, role, is_root_admin, ativo)\nVALUES (''8c858fa0-380a-4940-bee7-2b302753e6f2'', ''Vagner Admin'', ''vagner@leadclinic.com.br'', ''admin'', true, true)\nON CONFLICT (id) DO UPDATE SET\n  is_root_admin = true,\n  role = ''admin'',\n  ativo = true,\n  nome = ''Vagner Admin'',\n  email = ''vagner@leadclinic.com.br'';\n"}', '0b913d7d-7af5-4155-930f-6ac232dc0aca', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250616071131', '{"\n  Primeiro, vamos verificar e corrigir o enum ticket_status\nDROP TYPE IF EXISTS ticket_status CASCADE;\n\nCREATE TYPE ticket_status AS ENUM (\n  ''novo'',\n  ''aguardando_equipe'', \n  ''aguardando_cliente'',\n  ''em_analise'',\n  ''em_andamento'',\n  ''resolvido''\n);\n\n  Recriar a coluna status na tabela chamados com o novo enum\nALTER TABLE chamados \nDROP COLUMN IF EXISTS status CASCADE;\n\nALTER TABLE chamados \nADD COLUMN status ticket_status NOT NULL DEFAULT ''novo'';\n\n  Atualizar qualquer referência antiga de status\nUPDATE chamados SET status = ''novo'' WHERE status IS NULL;\n\n  Garantir que as políticas RLS estejam funcionando\nALTER TABLE chamados ENABLE ROW LEVEL SECURITY;\n\n  Política para admins verem todos os chamados\nDROP POLICY IF EXISTS \\"Admins can view all tickets\\" ON chamados;\nCREATE POLICY \\"Admins can view all tickets\\" ON chamados\n  FOR SELECT USING (is_admin());\n\n  Política para clientes verem apenas seus chamados\nDROP POLICY IF EXISTS \\"Clients can view their own tickets\\" ON chamados;\nCREATE POLICY \\"Clients can view their own tickets\\" ON chamados\n  FOR SELECT USING (cliente_id = get_user_cliente_id());\n\n  Política para inserir chamados\nDROP POLICY IF EXISTS \\"Users can create tickets\\" ON chamados;\nCREATE POLICY \\"Users can create tickets\\" ON chamados\n  FOR INSERT WITH CHECK (\n    (is_admin() AND cliente_id IS NOT NULL) OR \n    (cliente_id = get_user_cliente_id())\n  );\n\n  Política para atualizar chamados\nDROP POLICY IF EXISTS \\"Users can update tickets\\" ON chamados;\nCREATE POLICY \\"Users can update tickets\\" ON chamados\n  FOR UPDATE USING (\n    is_admin() OR cliente_id = get_user_cliente_id()\n  );\n"}', 'f2fc3e55-87af-420f-a580-ddad4efae45c', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250618062522', '{"\n  Adicionar a nova permissão ''access_client_reports'' ao enum permission_type\nALTER TYPE permission_type ADD VALUE ''access_client_reports'';\n"}', '2bca142d-7b1d-4cd3-836e-8daba4a8ed0c', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250620101642', '{"\n  1. Primeiro, vamos verificar se existem registros com status inválidos\nUPDATE chamados \nSET status = ''novo''::ticket_status \nWHERE status::text NOT IN (''novo'', ''aguardando_equipe'', ''aguardando_cliente'', ''em_analise'', ''em_andamento'', ''resolvido'');\n\n  2. Atualizar a função create_ticket_timeline_entry para remover qualquer referência a \\"aberto\\"\nCREATE OR REPLACE FUNCTION public.create_ticket_timeline_entry()\nRETURNS trigger\nLANGUAGE plpgsql\nAS $function$\nBEGIN\n    Entrada para criação do chamado\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id, \n      tipo, \n      conteudo, \n      autor_id, \n      autor_nome, \n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''criacao'',\n      NEW.mensagem,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      NEW.aberto_por,\n      jsonb_build_object(''titulo'', NEW.titulo, ''categoria'', NEW.categoria, ''prioridade'', NEW.prioridade)\n    );\n  END IF;\n\n    Entrada para nova mensagem\n  IF TG_OP = ''INSERT'' AND TG_TABLE_NAME = ''chamados_mensagens'' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.chamado_id,\n      ''mensagem'',\n      NEW.conteudo,\n      NEW.autor_id,\n      NEW.autor_nome,\n      NEW.autor_tipo,\n      NEW.metadata\n    );\n  END IF;\n\n    Entrada para mudança de status\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND OLD.status != NEW.status THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo,\n      metadata\n    ) VALUES (\n      NEW.id,\n      ''status_change'',\n      ''Status alterado de \\"'' || OLD.status || ''\\" para \\"'' || NEW.status || ''\\"'',\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END,\n      jsonb_build_object(''status_anterior'', OLD.status, ''status_novo'', NEW.status)\n    );\n  END IF;\n\n    Entrada para nova resposta (campo resposta)\n  IF TG_OP = ''UPDATE'' AND TG_TABLE_NAME = ''chamados'' AND (OLD.resposta IS NULL OR OLD.resposta = '''') AND NEW.resposta IS NOT NULL AND NEW.resposta != '''' THEN\n    INSERT INTO chamados_timeline (\n      chamado_id,\n      tipo,\n      conteudo,\n      autor_id,\n      autor_nome,\n      autor_tipo\n    ) VALUES (\n      NEW.id,\n      ''resposta'',\n      NEW.resposta,\n      auth.uid(),\n      COALESCE((SELECT nome FROM profiles WHERE id = auth.uid()), ''Sistema''),\n      CASE WHEN is_admin() THEN ''admin'' ELSE ''cliente'' END\n    );\n  END IF;\n\n  RETURN NEW;\nEND;\n$function$;\n\n  3. Atualizar função update_ticket_detailed_status para usar apenas os novos status\nCREATE OR REPLACE FUNCTION public.update_ticket_detailed_status()\nRETURNS trigger\nLANGUAGE plpgsql\nAS $function$\nBEGIN\n    Definir status detalhado baseado no status e outras condições\n  IF NEW.status = ''novo'' AND NEW.aberto_por = ''admin'' THEN\n    NEW.status_detalhado = ''Novo - Aberto pela Equipe'';\n  ELSIF NEW.status = ''novo'' AND NEW.aberto_por = ''cliente'' THEN\n    NEW.status_detalhado = ''Novo - Aberto pelo Cliente'';\n  ELSIF NEW.status = ''aguardando_equipe'' THEN\n    NEW.status_detalhado = ''Aguardando resposta da equipe'';\n  ELSIF NEW.status = ''aguardando_cliente'' THEN\n    NEW.status_detalhado = ''Aguardando resposta do cliente'';\n  ELSIF NEW.status = ''em_analise'' THEN\n    NEW.status_detalhado = ''Em análise pela equipe'';\n  ELSIF NEW.status = ''em_andamento'' THEN\n    NEW.status_detalhado = ''Em andamento'';\n  ELSIF NEW.status = ''resolvido'' THEN\n    NEW.status_detalhado = ''Resolvido'';\n  ELSE\n    NEW.status_detalhado = NEW.status;\n  END IF;\n  \n  RETURN NEW;\nEND;\n$function$;\n\n  4. Verificar se há dados órfãos no histórico e timeline\nUPDATE chamados_historico \nSET detalhes = REPLACE(detalhes, ''\\"aberto\\"'', ''\\"novo\\"'')\nWHERE detalhes LIKE ''%aberto%'';\n\nUPDATE chamados_timeline \nSET conteudo = REPLACE(conteudo, ''\\"aberto\\"'', ''\\"novo\\"'')\nWHERE conteudo LIKE ''%aberto%'';\n"}', 'f52c17b4-5b21-453b-8144-50fabe8102e9', 'vagner@leadclinic.com.br', NULL);
+INSERT INTO supabase_migrations.schema_migrations (version, statements, name, created_by, idempotency_key) VALUES ('20250620123904', '{"\n  Criar enum para os módulos que clientes podem acessar\nCREATE TYPE client_module AS ENUM (\n  ''dashboard'',\n  ''chamados'', \n  ''relatorios'',\n  ''criativos''\n);\n\n  Criar enum para tipos de relatórios específicos\nCREATE TYPE report_type AS ENUM (\n  ''campanhas'',\n  ''conjuntos_anuncios'',\n  ''anuncios'',\n  ''criativos_performance'',\n  ''whatsapp''\n);\n\n  Tabela para permissões de módulos dos clientes\nCREATE TABLE public.client_permissions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  client_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n  module client_module NOT NULL,\n  enabled BOOLEAN NOT NULL DEFAULT true,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  UNIQUE(client_id, module)\n);\n\n  Tabela para permissões específicas de relatórios dos clientes\nCREATE TABLE public.client_report_permissions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  client_id UUID NOT NULL REFERENCES public.clientes(id) ON DELETE CASCADE,\n  report_type report_type NOT NULL,\n  enabled BOOLEAN NOT NULL DEFAULT true,\n  account_ids TEXT[] DEFAULT ''{}'',   IDs das contas específicas que o cliente pode ver neste relatório\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  UNIQUE(client_id, report_type)\n);\n\n  Habilitar RLS\nALTER TABLE public.client_permissions ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.client_report_permissions ENABLE ROW LEVEL SECURITY;\n\n  Políticas RLS para client_permissions\nCREATE POLICY \\"Admins can manage all client permissions\\" ON public.client_permissions\n  FOR ALL USING (\n    EXISTS (\n      SELECT 1 FROM public.profiles \n      WHERE id = auth.uid() \n      AND (role = ''admin'' OR is_root_admin = true)\n    )\n  );\n\nCREATE POLICY \\"Clients can view their own permissions\\" ON public.client_permissions\n  FOR SELECT USING (\n    client_id IN (\n      SELECT id FROM public.clientes WHERE user_id = auth.uid()\n    )\n  );\n\n  Políticas RLS para client_report_permissions\nCREATE POLICY \\"Admins can manage all client report permissions\\" ON public.client_report_permissions\n  FOR ALL USING (\n    EXISTS (\n      SELECT 1 FROM public.profiles \n      WHERE id = auth.uid() \n      AND (role = ''admin'' OR is_root_admin = true)\n    )\n  );\n\nCREATE POLICY \\"Clients can view their own report permissions\\" ON public.client_report_permissions\n  FOR SELECT USING (\n    client_id IN (\n      SELECT id FROM public.clientes WHERE user_id = auth.uid()\n    )\n  );\n\n  Função para criar permissões padrão quando um cliente é criado\nCREATE OR REPLACE FUNCTION create_default_client_permissions()\nRETURNS TRIGGER AS $$\nBEGIN\n    Inserir permissões padrão para módulos básicos\n  INSERT INTO public.client_permissions (client_id, module, enabled) VALUES\n    (NEW.id, ''dashboard'', true),\n    (NEW.id, ''chamados'', true),\n    (NEW.id, ''criativos'', true);\n  \n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n  Trigger para criar permissões padrão\nCREATE TRIGGER create_client_permissions_trigger\n  AFTER INSERT ON public.clientes\n  FOR EACH ROW\n  EXECUTE FUNCTION create_default_client_permissions();\n\n  Função para verificar se cliente tem permissão para um módulo\nCREATE OR REPLACE FUNCTION client_has_module_permission(client_user_id UUID, module_name client_module)\nRETURNS BOOLEAN\nLANGUAGE sql\nSTABLE SECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 \n    FROM public.client_permissions cp\n    JOIN public.clientes c ON c.id = cp.client_id\n    WHERE c.user_id = client_user_id \n    AND cp.module = module_name \n    AND cp.enabled = true\n  );\n$$;\n\n  Função para verificar se cliente tem permissão para um tipo de relatório\nCREATE OR REPLACE FUNCTION client_has_report_permission(client_user_id UUID, report_name report_type)\nRETURNS BOOLEAN\nLANGUAGE sql\nSTABLE SECURITY DEFINER\nAS $$\n  SELECT EXISTS (\n    SELECT 1 \n    FROM public.client_report_permissions crp\n    JOIN public.clientes c ON c.id = crp.client_id\n    WHERE c.user_id = client_user_id \n    AND crp.report_type = report_name \n    AND crp.enabled = true\n  );\n$$;\n\n  Inserir permissões padrão para clientes existentes\nINSERT INTO public.client_permissions (client_id, module, enabled)\nSELECT id, ''dashboard'', true FROM public.clientes\nWHERE id NOT IN (SELECT client_id FROM public.client_permissions WHERE module = ''dashboard'');\n\nINSERT INTO public.client_permissions (client_id, module, enabled)\nSELECT id, ''chamados'', true FROM public.clientes\nWHERE id NOT IN (SELECT client_id FROM public.client_permissions WHERE module = ''chamados'');\n\nINSERT INTO public.client_permissions (client_id, module, enabled)\nSELECT id, ''criativos'', true FROM public.clientes\nWHERE id NOT IN (SELECT client_id FROM public.client_permissions WHERE module = ''criativos'');\n"}', 'd6bcd090-a8c3-4262-b6e0-047d32629e3e', 'vagner@leadclinic.com.br', NULL);
+ 
+ 
+
+
+ 
+  Data for Name: secrets; Type: TABLE DATA; Schema: vault; Owner: supabase_admin
+ 
+
+
+
+ 
+  Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
+ 
 
 SELECT pg_catalog.setval('refresh_tokens_id_seq', 561, true);
 
 
---
--- Name: settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
+ 
+  Name: settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+ 
 
 SELECT pg_catalog.setval('settings_id_seq', 1, false);
 
 
---
--- Name: subscription_id_seq; Type: SEQUENCE SET; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: subscription_id_seq; Type: SEQUENCE SET; Schema: realtime; Owner: supabase_admin
+ 
 
 SELECT pg_catalog.setval('realtime.subscription_id_seq', 1, false);
 
 
---
--- Name: mfa_amr_claims amr_id_pk; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_amr_claims amr_id_pk; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT amr_id_pk PRIMARY KEY (id);
 
 
---
--- Name: audit_log_entries audit_log_entries_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: audit_log_entries audit_log_entries_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT audit_log_entries_pkey PRIMARY KEY (id);
 
 
---
--- Name: flow_state flow_state_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: flow_state flow_state_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT flow_state_pkey PRIMARY KEY (id);
 
 
---
--- Name: identities identities_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: identities identities_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT identities_pkey PRIMARY KEY (id);
 
 
---
--- Name: identities identities_provider_id_provider_unique; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: identities identities_provider_id_provider_unique; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT identities_provider_id_provider_unique UNIQUE (provider_id, provider);
 
 
---
--- Name: instances instances_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: instances instances_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT instances_pkey PRIMARY KEY (id);
 
 
---
--- Name: mfa_amr_claims mfa_amr_claims_session_id_authentication_method_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_amr_claims mfa_amr_claims_session_id_authentication_method_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT mfa_amr_claims_session_id_authentication_method_pkey UNIQUE (session_id, authentication_method);
 
 
---
--- Name: mfa_challenges mfa_challenges_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_challenges mfa_challenges_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT mfa_challenges_pkey PRIMARY KEY (id);
 
 
---
--- Name: mfa_factors mfa_factors_last_challenged_at_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_factors mfa_factors_last_challenged_at_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT mfa_factors_last_challenged_at_key UNIQUE (last_challenged_at);
 
 
---
--- Name: mfa_factors mfa_factors_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_factors mfa_factors_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT mfa_factors_pkey PRIMARY KEY (id);
 
 
---
--- Name: one_time_tokens one_time_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: one_time_tokens one_time_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT one_time_tokens_pkey PRIMARY KEY (id);
 
 
---
--- Name: refresh_tokens refresh_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens refresh_tokens_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT refresh_tokens_pkey PRIMARY KEY (id);
 
 
---
--- Name: refresh_tokens refresh_tokens_token_unique; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens refresh_tokens_token_unique; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT refresh_tokens_token_unique UNIQUE (token);
 
 
---
--- Name: saml_providers saml_providers_entity_id_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_providers saml_providers_entity_id_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT saml_providers_entity_id_key UNIQUE (entity_id);
 
 
---
--- Name: saml_providers saml_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_providers saml_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT saml_providers_pkey PRIMARY KEY (id);
 
 
---
--- Name: saml_relay_states saml_relay_states_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states saml_relay_states_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT saml_relay_states_pkey PRIMARY KEY (id);
 
 
---
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
---
--- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT sessions_pkey PRIMARY KEY (id);
 
 
---
--- Name: sso_domains sso_domains_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_domains sso_domains_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT sso_domains_pkey PRIMARY KEY (id);
 
 
---
--- Name: sso_providers sso_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_providers sso_providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT sso_providers_pkey PRIMARY KEY (id);
 
 
---
--- Name: users users_phone_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users users_phone_key; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT users_phone_key UNIQUE (phone);
 
 
---
--- Name: users users_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users users_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
---
--- Name: activity_logs activity_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: activity_logs activity_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT activity_logs_pkey PRIMARY KEY (id);
 
 
---
--- Name: chamados_anexos chamados_anexos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_anexos chamados_anexos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_anexos_pkey PRIMARY KEY (id);
 
 
---
--- Name: chamados_historico chamados_historico_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_historico chamados_historico_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_historico_pkey PRIMARY KEY (id);
 
 
---
--- Name: chamados_mensagens chamados_mensagens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_mensagens chamados_mensagens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_mensagens_pkey PRIMARY KEY (id);
 
 
---
--- Name: chamados chamados_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados chamados_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_pkey PRIMARY KEY (id);
 
 
---
--- Name: chamados_timeline chamados_timeline_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_timeline chamados_timeline_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_timeline_pkey PRIMARY KEY (id);
 
 
---
--- Name: client_permissions client_permissions_client_id_module_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: client_permissions client_permissions_client_id_module_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT client_permissions_client_id_module_key UNIQUE (client_id, module);
 
 
---
--- Name: client_permissions client_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: client_permissions client_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT client_permissions_pkey PRIMARY KEY (id);
 
 
---
--- Name: client_report_permissions client_report_permissions_client_id_report_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: client_report_permissions client_report_permissions_client_id_report_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
+ 
     ADD CONSTRAINT client_report_permissions_client_id_report_type_key UNIQUE (client_id, ENUM('campanhas','conjuntos_anuncios','anuncios','criativos_performance','whatsapp'));
+ 
+    ADD CONSTRAINT client_report_permissions_client_id_report_type_key UNIQUE (client_id, report_type);
+ 
 
 
---
--- Name: client_report_permissions client_report_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: client_report_permissions client_report_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT client_report_permissions_pkey PRIMARY KEY (id);
 
 
---
--- Name: clientes clientes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: clientes clientes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT clientes_pkey PRIMARY KEY (id);
 
 
---
--- Name: clientes clientes_user_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: clientes clientes_user_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT clientes_user_id_key UNIQUE (user_id);
 
 
---
--- Name: contas contas_cliente_id_tipo_identificador_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: contas contas_cliente_id_tipo_identificador_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT contas_cliente_id_tipo_identificador_key UNIQUE (cliente_id, tipo, identificador);
 
 
---
--- Name: contas contas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: contas contas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT contas_pkey PRIMARY KEY (id);
 
 
---
--- Name: criativos criativos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: criativos criativos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT criativos_pkey PRIMARY KEY (id);
 
 
---
--- Name: meta_api_credentials meta_api_credentials_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: meta_api_credentials meta_api_credentials_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT meta_api_credentials_pkey PRIMARY KEY (id);
 
 
---
--- Name: metrics_config metrics_config_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: metrics_config metrics_config_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT metrics_config_pkey PRIMARY KEY (id);
 
 
---
--- Name: permission_logs permission_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs permission_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT permission_logs_pkey PRIMARY KEY (id);
 
 
---
--- Name: permission_templates permission_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: permission_templates permission_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT permission_templates_pkey PRIMARY KEY (id);
 
 
---
--- Name: profiles profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: profiles profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT profiles_pkey PRIMARY KEY (id);
 
 
---
--- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
 
 
---
--- Name: sections sections_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: sections sections_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT sections_pkey PRIMARY KEY (id);
 
 
---
--- Name: settings settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: settings settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT settings_pkey PRIMARY KEY (id);
 
 
---
--- Name: system_activity_logs system_activity_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: system_activity_logs system_activity_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT system_activity_logs_pkey PRIMARY KEY (id);
 
 
---
--- Name: task_comments task_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: task_comments task_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT task_comments_pkey PRIMARY KEY (id);
 
 
---
--- Name: task_steps task_steps_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: task_steps task_steps_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT task_steps_pkey PRIMARY KEY (id);
 
 
---
--- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT tasks_pkey PRIMARY KEY (id);
 
 
---
--- Name: user_permissions user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT user_permissions_pkey PRIMARY KEY (id);
 
 
---
--- Name: user_permissions user_permissions_user_id_permission_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions user_permissions_user_id_permission_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT user_permissions_user_id_permission_key UNIQUE (user_id, permission);
 
 
---
--- Name: usuarios usuarios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: usuarios usuarios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT usuarios_pkey PRIMARY KEY (id);
 
 
---
--- Name: whatsapp_campaign_executions whatsapp_campaign_executions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaign_executions whatsapp_campaign_executions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_campaign_executions_pkey PRIMARY KEY (id);
 
 
---
--- Name: whatsapp_campaigns whatsapp_campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaigns whatsapp_campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_campaigns_pkey PRIMARY KEY (id);
 
 
---
--- Name: whatsapp_config whatsapp_config_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_config whatsapp_config_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_config_pkey PRIMARY KEY (id);
 
 
---
--- Name: whatsapp_contacts whatsapp_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_contacts whatsapp_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_contacts_pkey PRIMARY KEY (id);
 
 
---
--- Name: whatsapp_message_logs whatsapp_message_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_message_logs whatsapp_message_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_message_logs_pkey PRIMARY KEY (id);
 
 
---
--- Name: whatsapp_messages whatsapp_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages whatsapp_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_messages_pkey PRIMARY KEY (id);
 
 
---
--- Name: whatsapp_templates whatsapp_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_templates whatsapp_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_templates_pkey PRIMARY KEY (id);
 
 
---
--- Name: workflow_templates workflow_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: workflow_templates workflow_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT workflow_templates_pkey PRIMARY KEY (id);
 
 
---
--- Name: messages messages_pkey; Type: CONSTRAINT; Schema: realtime; Owner: supabase_realtime_admin
---
+ 
+  Name: messages messages_pkey; Type: CONSTRAINT; Schema: realtime; Owner: supabase_realtime_admin
+ 
 
     ADD CONSTRAINT messages_pkey PRIMARY KEY (id, inserted_at);
 
 
---
--- Name: subscription pk_subscription; Type: CONSTRAINT; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: subscription pk_subscription; Type: CONSTRAINT; Schema: realtime; Owner: supabase_admin
+ 
 
     ADD CONSTRAINT pk_subscription PRIMARY KEY (id);
 
 
---
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: realtime; Owner: supabase_admin
+ 
 
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
---
--- Name: buckets buckets_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: buckets buckets_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT buckets_pkey PRIMARY KEY (id);
 
 
---
--- Name: migrations migrations_name_key; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: migrations migrations_name_key; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT migrations_name_key UNIQUE (name);
 
 
---
--- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT migrations_pkey PRIMARY KEY (id);
 
 
---
--- Name: objects objects_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: objects objects_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT objects_pkey PRIMARY KEY (id);
 
 
---
--- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT s3_multipart_uploads_parts_pkey PRIMARY KEY (id);
 
 
---
--- Name: s3_multipart_uploads s3_multipart_uploads_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads s3_multipart_uploads_pkey; Type: CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT s3_multipart_uploads_pkey PRIMARY KEY (id);
 
 
---
--- Name: schema_migrations schema_migrations_idempotency_key_key; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
---
+ 
+  Name: schema_migrations schema_migrations_idempotency_key_key; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
+ 
 
     ADD CONSTRAINT schema_migrations_idempotency_key_key UNIQUE (idempotency_key);
 
 
---
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
---
+ 
+  Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
+ 
 
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
---
--- Name: audit_logs_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: audit_logs_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX audit_logs_instance_id_idx ON audit_log_entries USING btree (instance_id);
 
 
---
--- Name: confirmation_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: confirmation_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX confirmation_token_idx ON users USING btree (confirmation_token) WHERE ((confirmation_token)!~ '^[0-9 ]*$');
 
 
---
--- Name: email_change_token_current_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: email_change_token_current_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX email_change_token_current_idx ON users USING btree (email_change_token_current) WHERE ((email_change_token_current)!~ '^[0-9 ]*$');
 
 
---
--- Name: email_change_token_new_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: email_change_token_new_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX email_change_token_new_idx ON users USING btree (email_change_token_new) WHERE ((email_change_token_new)!~ '^[0-9 ]*$');
 
 
---
--- Name: factor_id_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: factor_id_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX factor_id_created_at_idx ON mfa_factors USING btree (user_id, created_at);
 
 
---
--- Name: flow_state_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: flow_state_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX flow_state_created_at_idx ON flow_state USING btree (created_at DESC);
 
 
---
--- Name: identities_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: identities_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX identities_email_idx ON identities USING btree (email text_pattern_ops);
 
 
---
--- Name: INDEX identities_email_idx; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: INDEX identities_email_idx; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 COMMENT ON INDEX identities_email_idx IS 'Auth: Ensures indexed queries on the email column';
 
 
---
--- Name: identities_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: identities_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX identities_user_id_idx ON identities USING btree (user_id);
 
 
---
--- Name: idx_auth_code; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: idx_auth_code; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX idx_auth_code ON flow_state USING btree (auth_code);
 
 
---
--- Name: idx_user_id_auth_method; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: idx_user_id_auth_method; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX idx_user_id_auth_method ON flow_state USING btree (user_id, authentication_method);
 
 
---
--- Name: mfa_challenge_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_challenge_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX mfa_challenge_created_at_idx ON mfa_challenges USING btree (created_at DESC);
 
 
---
--- Name: mfa_factors_user_friendly_name_unique; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_factors_user_friendly_name_unique; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX mfa_factors_user_friendly_name_unique ON mfa_factors USING btree (friendly_name, user_id) WHERE (TRIM(BOTH FROM friendly_name) <> '');
 
 
---
--- Name: mfa_factors_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_factors_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX mfa_factors_user_id_idx ON mfa_factors USING btree (user_id);
 
 
---
--- Name: one_time_tokens_relates_to_hash_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: one_time_tokens_relates_to_hash_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX one_time_tokens_relates_to_hash_idx ON one_time_tokens USING hash (relates_to);
 
 
---
--- Name: one_time_tokens_token_hash_hash_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: one_time_tokens_token_hash_hash_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX one_time_tokens_token_hash_hash_idx ON one_time_tokens USING hash (token_hash);
 
 
---
--- Name: one_time_tokens_user_id_token_type_key; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: one_time_tokens_user_id_token_type_key; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX one_time_tokens_user_id_token_type_key ON one_time_tokens USING btree (user_id, token_type);
 
 
---
--- Name: reauthentication_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: reauthentication_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX reauthentication_token_idx ON users USING btree (reauthentication_token) WHERE ((reauthentication_token)!~ '^[0-9 ]*$');
 
 
---
--- Name: recovery_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: recovery_token_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX recovery_token_idx ON users USING btree (recovery_token) WHERE ((recovery_token)!~ '^[0-9 ]*$');
 
 
---
--- Name: refresh_tokens_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX refresh_tokens_instance_id_idx ON refresh_tokens USING btree (instance_id);
 
 
---
--- Name: refresh_tokens_instance_id_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens_instance_id_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX refresh_tokens_instance_id_user_id_idx ON refresh_tokens USING btree (instance_id, user_id);
 
 
---
--- Name: refresh_tokens_parent_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens_parent_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX refresh_tokens_parent_idx ON refresh_tokens USING btree (parent);
 
 
---
--- Name: refresh_tokens_session_id_revoked_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens_session_id_revoked_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX refresh_tokens_session_id_revoked_idx ON refresh_tokens USING btree (session_id, revoked);
 
 
---
--- Name: refresh_tokens_updated_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens_updated_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX refresh_tokens_updated_at_idx ON refresh_tokens USING btree (updated_at DESC);
 
 
---
--- Name: saml_providers_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_providers_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX saml_providers_sso_provider_id_idx ON saml_providers USING btree (sso_provider_id);
 
 
---
--- Name: saml_relay_states_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX saml_relay_states_created_at_idx ON saml_relay_states USING btree (created_at DESC);
 
 
---
--- Name: saml_relay_states_for_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states_for_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX saml_relay_states_for_email_idx ON saml_relay_states USING btree (for_email);
 
 
---
--- Name: saml_relay_states_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX saml_relay_states_sso_provider_id_idx ON saml_relay_states USING btree (sso_provider_id);
 
 
---
--- Name: sessions_not_after_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sessions_not_after_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX sessions_not_after_idx ON sessions USING btree (not_after DESC);
 
 
---
--- Name: sessions_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sessions_user_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX sessions_user_id_idx ON sessions USING btree (user_id);
 
 
---
--- Name: sso_domains_domain_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_domains_domain_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX sso_domains_domain_idx ON sso_domains USING btree (lower(domain));
 
 
---
--- Name: sso_domains_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_domains_sso_provider_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX sso_domains_sso_provider_id_idx ON sso_domains USING btree (sso_provider_id);
 
 
---
--- Name: sso_providers_resource_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_providers_resource_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX sso_providers_resource_id_idx ON sso_providers USING btree (lower(resource_id));
 
 
---
--- Name: unique_phone_factor_per_user; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: unique_phone_factor_per_user; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX unique_phone_factor_per_user ON mfa_factors USING btree (user_id, phone);
 
 
---
--- Name: user_id_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: user_id_created_at_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX user_id_created_at_idx ON sessions USING btree (user_id, created_at);
 
 
---
--- Name: users_email_partial_key; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users_email_partial_key; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE UNIQUE INDEX users_email_partial_key ON users USING btree (email) WHERE (is_sso_user = false);
 
 
---
--- Name: INDEX users_email_partial_key; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: INDEX users_email_partial_key; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+ 
 
 COMMENT ON INDEX users_email_partial_key IS 'Auth: A partial unique index that applies only when is_sso_user is false';
 
 
---
--- Name: users_instance_id_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users_instance_id_email_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX users_instance_id_email_idx ON users USING btree (instance_id, lower((email)));
 
 
---
--- Name: users_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users_instance_id_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX users_instance_id_idx ON users USING btree (instance_id);
 
 
---
--- Name: users_is_anonymous_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users_is_anonymous_idx; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+ 
 
 CREATE INDEX users_is_anonymous_idx ON users USING btree (is_anonymous);
 
 
---
--- Name: idx_activity_logs_created_at; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_activity_logs_created_at; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_activity_logs_created_at ON activity_logs USING btree (created_at DESC);
 
 
---
--- Name: idx_activity_logs_entity_type; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_activity_logs_entity_type; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_activity_logs_entity_type ON activity_logs USING btree (entity_type);
 
 
---
--- Name: idx_activity_logs_user_id; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_activity_logs_user_id; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_activity_logs_user_id ON activity_logs USING btree (user_id);
 
 
---
--- Name: idx_tasks_assigned_to; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_tasks_assigned_to; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_tasks_assigned_to ON tasks USING btree (assigned_to);
 
 
---
--- Name: idx_tasks_order_index; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_tasks_order_index; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_tasks_order_index ON tasks USING btree (order_index);
 
 
---
--- Name: idx_tasks_section_id; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_tasks_section_id; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_tasks_section_id ON tasks USING btree (section_id);
 
 
---
--- Name: idx_tasks_updated_at; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_tasks_updated_at; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_tasks_updated_at ON tasks USING btree (updated_at);
 
 
---
--- Name: idx_whatsapp_campaign_executions_campaign; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_campaign_executions_campaign; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_campaign_executions_campaign ON whatsapp_campaign_executions USING btree (campaign_id);
 
 
---
--- Name: idx_whatsapp_campaign_executions_date; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_campaign_executions_date; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_campaign_executions_date ON whatsapp_campaign_executions USING btree (execution_date);
 
 
---
--- Name: idx_whatsapp_campaigns_active; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_campaigns_active; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_campaigns_active ON whatsapp_campaigns USING btree (is_active);
 
 
---
--- Name: idx_whatsapp_contacts_client_id; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_contacts_client_id; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_contacts_client_id ON whatsapp_contacts USING btree (client_id);
 
 
---
--- Name: idx_whatsapp_contacts_phone; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_contacts_phone; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_contacts_phone ON whatsapp_contacts USING btree (phone_number);
 
 
---
--- Name: idx_whatsapp_contacts_tags; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_contacts_tags; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_contacts_tags ON whatsapp_contacts USING gin (tags);
 
 
---
--- Name: idx_whatsapp_messages_campaign_id; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_messages_campaign_id; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_messages_campaign_id ON whatsapp_messages USING btree (campaign_id);
 
 
---
--- Name: idx_whatsapp_messages_phone; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_messages_phone; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_messages_phone ON whatsapp_messages USING btree (phone_number);
 
 
---
--- Name: idx_whatsapp_messages_sent_at; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_messages_sent_at; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_messages_sent_at ON whatsapp_messages USING btree (sent_at);
 
 
---
--- Name: idx_whatsapp_messages_status; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_whatsapp_messages_status; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_whatsapp_messages_status ON whatsapp_messages USING btree (status);
 
 
---
--- Name: idx_workflow_templates_category; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_workflow_templates_category; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_workflow_templates_category ON workflow_templates USING btree (category);
 
 
---
--- Name: idx_workflow_templates_created_at; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_workflow_templates_created_at; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_workflow_templates_created_at ON workflow_templates USING btree (created_at);
 
 
---
--- Name: idx_workflow_templates_created_by; Type: INDEX; Schema: public; Owner: postgres
---
+ 
+  Name: idx_workflow_templates_created_by; Type: INDEX; Schema: public; Owner: postgres
+ 
 
 CREATE INDEX idx_workflow_templates_created_by ON workflow_templates USING btree (created_by);
 
 
---
--- Name: ix_realtime_subscription_entity; Type: INDEX; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: ix_realtime_subscription_entity; Type: INDEX; Schema: realtime; Owner: supabase_admin
+ 
 
 CREATE INDEX ix_realtime_subscription_entity ON realtime.subscription USING btree (entity);
 
 
---
--- Name: subscription_subscription_id_entity_filters_key; Type: INDEX; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: subscription_subscription_id_entity_filters_key; Type: INDEX; Schema: realtime; Owner: supabase_admin
+ 
 
 CREATE UNIQUE INDEX subscription_subscription_id_entity_filters_key ON realtime.subscription USING btree (subscription_id, entity, filters);
 
 
---
--- Name: bname; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: bname; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE UNIQUE INDEX bname ON storage.buckets USING btree (name);
 
 
---
--- Name: bucketid_objname; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: bucketid_objname; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE UNIQUE INDEX bucketid_objname ON storage.objects USING btree (bucket_id, name);
 
 
---
--- Name: idx_multipart_uploads_list; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: idx_multipart_uploads_list; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE INDEX idx_multipart_uploads_list ON storage.s3_multipart_uploads USING btree (bucket_id, key, created_at);
 
 
---
--- Name: idx_objects_bucket_id_name; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: idx_objects_bucket_id_name; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE INDEX idx_objects_bucket_id_name ON storage.objects USING btree (bucket_id, name COLLATE `C`);
 
 
---
--- Name: name_prefix_search; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: name_prefix_search; Type: INDEX; Schema: storage; Owner: supabase_storage_admin
+ 
 
 CREATE INDEX name_prefix_search ON storage.objects USING btree (name text_pattern_ops);
 
 
---
--- Name: users on_auth_user_created; Type: TRIGGER; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users on_auth_user_created; Type: TRIGGER; Schema: auth; Owner: supabase_auth_admin
+ 
+
+ 
+ 
+CREATE TRIGGER on_auth_user_created AFTER INSERT ON users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+ 
 
 
+ 
+  Name: chamados chamado_historico_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: chamados chamado_historico_trigger; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: clientes create_client_permissions_trigger; Type: TRIGGER; Schema: public; Owner: postgres
---
+ 
+ 
+CREATE TRIGGER chamado_historico_trigger AFTER INSERT OR UPDATE ON chamados FOR EACH ROW EXECUTE FUNCTION create_chamado_historico();
+ 
 
 
+ 
+  Name: clientes create_client_permissions_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: user_permissions permission_changes_log; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: chamados ticket_timeline_trigger; Type: TRIGGER; Schema: public; Owner: postgres
---
+ 
+ 
+CREATE TRIGGER create_client_permissions_trigger AFTER INSERT ON clientes FOR EACH ROW EXECUTE FUNCTION create_default_client_permissions();
+ 
 
 
+ 
+  Name: user_permissions permission_changes_log; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: chamados_mensagens trigger_timeline_entry_mensagens; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: chamados_mensagens trigger_update_status_on_client_message; Type: TRIGGER; Schema: public; Owner: postgres
---
+ 
+ 
+CREATE TRIGGER permission_changes_log AFTER INSERT OR DELETE ON user_permissions FOR EACH ROW EXECUTE FUNCTION log_permission_changes();
+ 
 
 
+ 
+  Name: chamados ticket_timeline_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: chamados update_chamados_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: clientes update_clientes_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
+ 
+ 
+CREATE TRIGGER ticket_timeline_trigger AFTER INSERT OR UPDATE ON chamados FOR EACH ROW EXECUTE FUNCTION create_ticket_timeline_entry();
+ 
 
 
+ 
+  Name: chamados_mensagens trigger_timeline_entry_mensagens; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: criativos update_criativos_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: profiles update_profiles_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
+ 
+ 
+CREATE TRIGGER trigger_timeline_entry_mensagens AFTER INSERT ON chamados_mensagens FOR EACH ROW EXECUTE FUNCTION create_ticket_timeline_entry();
+ 
 
 
+ 
+  Name: chamados_mensagens trigger_update_status_on_client_message; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: chamados update_ticket_status_trigger; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: whatsapp_campaigns update_whatsapp_campaigns_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
+ 
+ 
+CREATE TRIGGER trigger_update_status_on_client_message AFTER INSERT ON chamados_mensagens FOR EACH ROW EXECUTE FUNCTION update_ticket_status_on_message();
+ 
 
 
+ 
+  Name: chamados update_chamados_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: whatsapp_config update_whatsapp_config_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: whatsapp_contacts update_whatsapp_contacts_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
+ 
+ 
+CREATE TRIGGER update_chamados_updated_at BEFORE UPDATE ON chamados FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
 
 
+ 
+  Name: clientes update_clientes_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: whatsapp_templates update_whatsapp_templates_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: subscription tr_check_filters; Type: TRIGGER; Schema: realtime; Owner: supabase_admin
---
+ 
+ 
+CREATE TRIGGER update_clientes_updated_at BEFORE UPDATE ON clientes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
 
 
+ 
+  Name: criativos update_criativos_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: objects update_objects_updated_at; Type: TRIGGER; Schema: storage; Owner: supabase_storage_admin
---
+ 
+ 
+CREATE TRIGGER update_criativos_updated_at BEFORE UPDATE ON criativos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
 
 
+ 
+  Name: profiles update_profiles_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
 
---
--- Name: identities identities_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+ 
+CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
+
+
+ 
+  Name: chamados update_ticket_status_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+CREATE TRIGGER update_ticket_status_trigger BEFORE INSERT OR UPDATE ON chamados FOR EACH ROW EXECUTE FUNCTION update_ticket_detailed_status();
+ 
+
+
+ 
+  Name: whatsapp_campaigns update_whatsapp_campaigns_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+CREATE TRIGGER update_whatsapp_campaigns_updated_at BEFORE UPDATE ON whatsapp_campaigns FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
+
+
+ 
+  Name: whatsapp_config update_whatsapp_config_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+CREATE TRIGGER update_whatsapp_config_updated_at BEFORE UPDATE ON whatsapp_config FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
+
+
+ 
+  Name: whatsapp_contacts update_whatsapp_contacts_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+CREATE TRIGGER update_whatsapp_contacts_updated_at BEFORE UPDATE ON whatsapp_contacts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
+
+
+ 
+  Name: whatsapp_templates update_whatsapp_templates_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+ 
+
+ 
+ 
+CREATE TRIGGER update_whatsapp_templates_updated_at BEFORE UPDATE ON whatsapp_templates FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 
+
+
+ 
+  Name: subscription tr_check_filters; Type: TRIGGER; Schema: realtime; Owner: supabase_admin
+ 
+
+ 
+ 
+CREATE TRIGGER tr_check_filters BEFORE INSERT OR UPDATE ON realtime.subscription FOR EACH ROW EXECUTE FUNCTION realtime.subscription_check_filters();
+ 
+
+
+ 
+  Name: objects update_objects_updated_at; Type: TRIGGER; Schema: storage; Owner: supabase_storage_admin
+ 
+
+ 
+ 
+CREATE TRIGGER update_objects_updated_at BEFORE UPDATE ON storage.objects FOR EACH ROW EXECUTE FUNCTION storage.update_updated_at_column();
+ 
+
+
+ 
+  Name: identities identities_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT identities_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
---
--- Name: mfa_amr_claims mfa_amr_claims_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_amr_claims mfa_amr_claims_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT mfa_amr_claims_session_id_fkey FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE;
 
 
---
--- Name: mfa_challenges mfa_challenges_auth_factor_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_challenges mfa_challenges_auth_factor_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT mfa_challenges_auth_factor_id_fkey FOREIGN KEY (factor_id) REFERENCES mfa_factors(id) ON DELETE CASCADE;
 
 
---
--- Name: mfa_factors mfa_factors_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_factors mfa_factors_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT mfa_factors_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
---
--- Name: one_time_tokens one_time_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: one_time_tokens one_time_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT one_time_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
---
--- Name: refresh_tokens refresh_tokens_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens refresh_tokens_session_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT refresh_tokens_session_id_fkey FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE;
 
 
---
--- Name: saml_providers saml_providers_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_providers saml_providers_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT saml_providers_sso_provider_id_fkey FOREIGN KEY (sso_provider_id) REFERENCES sso_providers(id) ON DELETE CASCADE;
 
 
---
--- Name: saml_relay_states saml_relay_states_flow_state_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states saml_relay_states_flow_state_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT saml_relay_states_flow_state_id_fkey FOREIGN KEY (flow_state_id) REFERENCES flow_state(id) ON DELETE CASCADE;
 
 
---
--- Name: saml_relay_states saml_relay_states_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states saml_relay_states_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT saml_relay_states_sso_provider_id_fkey FOREIGN KEY (sso_provider_id) REFERENCES sso_providers(id) ON DELETE CASCADE;
 
 
---
--- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
---
--- Name: sso_domains sso_domains_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_domains sso_domains_sso_provider_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+ 
 
     ADD CONSTRAINT sso_domains_sso_provider_id_fkey FOREIGN KEY (sso_provider_id) REFERENCES sso_providers(id) ON DELETE CASCADE;
 
 
---
--- Name: activity_logs activity_logs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: activity_logs activity_logs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT activity_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
 
 
---
--- Name: chamados_anexos chamados_anexos_chamado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_anexos chamados_anexos_chamado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_anexos_chamado_id_fkey FOREIGN KEY (chamado_id) REFERENCES chamados(id) ON DELETE CASCADE;
 
 
---
--- Name: chamados_anexos chamados_anexos_uploaded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_anexos chamados_anexos_uploaded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_anexos_uploaded_by_fkey FOREIGN KEY (uploaded_by) REFERENCES users(id);
 
 
---
--- Name: chamados chamados_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados chamados_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_cliente_id_fkey FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE;
 
 
---
--- Name: chamados_historico chamados_historico_chamado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_historico chamados_historico_chamado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_historico_chamado_id_fkey FOREIGN KEY (chamado_id) REFERENCES chamados(id) ON DELETE CASCADE;
 
 
---
--- Name: chamados_historico chamados_historico_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_historico chamados_historico_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_historico_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES profiles(id);
 
 
---
--- Name: chamados chamados_respondido_por_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados chamados_respondido_por_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_respondido_por_fkey FOREIGN KEY (respondido_por) REFERENCES profiles(id);
 
 
---
--- Name: chamados_timeline chamados_timeline_autor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_timeline chamados_timeline_autor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_timeline_autor_id_fkey FOREIGN KEY (autor_id) REFERENCES users(id);
 
 
---
--- Name: chamados_timeline chamados_timeline_chamado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_timeline chamados_timeline_chamado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT chamados_timeline_chamado_id_fkey FOREIGN KEY (chamado_id) REFERENCES chamados(id) ON DELETE CASCADE;
 
 
---
--- Name: client_permissions client_permissions_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: client_permissions client_permissions_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT client_permissions_client_id_fkey FOREIGN KEY (client_id) REFERENCES clientes(id) ON DELETE CASCADE;
 
 
---
--- Name: client_report_permissions client_report_permissions_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: client_report_permissions client_report_permissions_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT client_report_permissions_client_id_fkey FOREIGN KEY (client_id) REFERENCES clientes(id) ON DELETE CASCADE;
 
 
---
--- Name: clientes clientes_responsavel_conta_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: clientes clientes_responsavel_conta_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT clientes_responsavel_conta_fkey FOREIGN KEY (responsavel_conta) REFERENCES profiles(id);
 
 
---
--- Name: clientes clientes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: clientes clientes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT clientes_user_id_fkey FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
 
---
--- Name: contas contas_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: contas contas_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT contas_cliente_id_fkey FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE;
 
 
---
--- Name: criativos criativos_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: criativos criativos_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT criativos_cliente_id_fkey FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE;
 
 
---
--- Name: projects fk_created_by; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: projects fk_created_by; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT fk_created_by FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE RESTRICT;
 
 
---
--- Name: tasks fk_linked_ticket; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: tasks fk_linked_ticket; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT fk_linked_ticket FOREIGN KEY (linked_ticket_id) REFERENCES chamados(id) ON DELETE SET NULL;
 
 
---
--- Name: projects fk_projects_responsible; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: projects fk_projects_responsible; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT fk_projects_responsible FOREIGN KEY (responsible_id) REFERENCES profiles(id);
 
 
---
--- Name: task_comments fk_task_comments_author; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: task_comments fk_task_comments_author; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT fk_task_comments_author FOREIGN KEY (author_id) REFERENCES profiles(id) ON DELETE SET NULL;
 
 
---
--- Name: task_comments fk_task_comments_task; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: task_comments fk_task_comments_task; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT fk_task_comments_task FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
 
 
---
--- Name: tasks fk_tasks_assigned_to; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: tasks fk_tasks_assigned_to; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT fk_tasks_assigned_to FOREIGN KEY (assigned_to) REFERENCES profiles(id) ON DELETE SET NULL;
 
 
---
--- Name: tasks fk_tasks_section; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: tasks fk_tasks_section; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT fk_tasks_section FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE SET NULL;
 
 
---
--- Name: permission_logs permission_logs_changed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs permission_logs_changed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT permission_logs_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES profiles(id);
 
 
---
--- Name: permission_logs permission_logs_target_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs permission_logs_target_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT permission_logs_target_user_id_fkey FOREIGN KEY (target_user_id) REFERENCES profiles(id);
 
 
---
--- Name: permission_templates permission_templates_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: permission_templates permission_templates_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT permission_templates_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id);
 
 
---
--- Name: profiles profiles_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: profiles profiles_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE;
 
 
---
--- Name: projects projects_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: projects projects_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT projects_client_id_fkey FOREIGN KEY (client_id) REFERENCES clientes(id);
 
 
---
--- Name: projects projects_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: projects projects_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT projects_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE SET NULL;
 
 
---
--- Name: sections sections_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: sections sections_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT sections_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
 
---
--- Name: settings settings_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: settings settings_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT settings_client_id_fkey FOREIGN KEY (client_id) REFERENCES clientes(id);
 
 
---
--- Name: system_activity_logs system_activity_logs_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: system_activity_logs system_activity_logs_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT system_activity_logs_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES profiles(id);
 
 
---
--- Name: task_steps task_steps_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: task_steps task_steps_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT task_steps_task_id_fkey FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
 
 
---
--- Name: tasks tasks_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: tasks tasks_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT tasks_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE SET NULL;
 
 
---
--- Name: tasks tasks_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: tasks tasks_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT tasks_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES profiles(id) ON DELETE SET NULL;
 
 
---
--- Name: tasks tasks_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: tasks tasks_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL;
 
 
---
--- Name: user_permissions user_permissions_granted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions user_permissions_granted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT user_permissions_granted_by_fkey FOREIGN KEY (granted_by) REFERENCES profiles(id);
 
 
---
--- Name: user_permissions user_permissions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions user_permissions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT user_permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
 
---
--- Name: usuarios usuarios_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: usuarios usuarios_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT usuarios_id_fkey FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE;
 
 
---
--- Name: whatsapp_campaign_executions whatsapp_campaign_executions_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaign_executions whatsapp_campaign_executions_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_campaign_executions_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES whatsapp_campaigns(id) ON DELETE CASCADE;
 
 
---
--- Name: whatsapp_campaigns whatsapp_campaigns_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaigns whatsapp_campaigns_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_campaigns_template_id_fkey FOREIGN KEY (template_id) REFERENCES whatsapp_templates(id) ON DELETE CASCADE;
 
 
---
--- Name: whatsapp_contacts whatsapp_contacts_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_contacts whatsapp_contacts_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_contacts_client_id_fkey FOREIGN KEY (client_id) REFERENCES clientes(id) ON DELETE SET NULL;
 
 
---
--- Name: whatsapp_message_logs whatsapp_message_logs_message_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_message_logs whatsapp_message_logs_message_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_message_logs_message_id_fkey FOREIGN KEY (message_id) REFERENCES whatsapp_messages(id) ON DELETE CASCADE;
 
 
---
--- Name: whatsapp_messages whatsapp_messages_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages whatsapp_messages_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_messages_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES whatsapp_campaigns(id) ON DELETE SET NULL;
 
 
---
--- Name: whatsapp_messages whatsapp_messages_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages whatsapp_messages_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_messages_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES whatsapp_contacts(id) ON DELETE CASCADE;
 
 
---
--- Name: whatsapp_messages whatsapp_messages_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages whatsapp_messages_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT whatsapp_messages_template_id_fkey FOREIGN KEY (template_id) REFERENCES whatsapp_templates(id) ON DELETE SET NULL;
 
 
---
--- Name: workflow_templates workflow_templates_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
+ 
+  Name: workflow_templates workflow_templates_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+ 
 
     ADD CONSTRAINT workflow_templates_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE SET NULL;
 
 
---
--- Name: objects objects_bucketId_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: objects objects_bucketId_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT `objects_bucketId_fkey` FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id);
 
 
---
--- Name: s3_multipart_uploads s3_multipart_uploads_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads s3_multipart_uploads_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT s3_multipart_uploads_bucket_id_fkey FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id);
 
 
---
--- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_bucket_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT s3_multipart_uploads_parts_bucket_id_fkey FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id);
 
 
---
--- Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_upload_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads_parts s3_multipart_uploads_parts_upload_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: supabase_storage_admin
+ 
 
     ADD CONSTRAINT s3_multipart_uploads_parts_upload_id_fkey FOREIGN KEY (upload_id) REFERENCES storage.s3_multipart_uploads(id) ON DELETE CASCADE;
 
 
---
--- Name: audit_log_entries; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: audit_log_entries; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE audit_log_entries ENABLE ROW LEVEL SECURITY;
 
---
--- Name: flow_state; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: flow_state; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE flow_state ENABLE ROW LEVEL SECURITY;
 
---
--- Name: identities; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: identities; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE identities ENABLE ROW LEVEL SECURITY;
 
---
--- Name: instances; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: instances; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE instances ENABLE ROW LEVEL SECURITY;
 
---
--- Name: mfa_amr_claims; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_amr_claims; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE mfa_amr_claims ENABLE ROW LEVEL SECURITY;
 
---
--- Name: mfa_challenges; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_challenges; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE mfa_challenges ENABLE ROW LEVEL SECURITY;
 
---
--- Name: mfa_factors; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: mfa_factors; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE mfa_factors ENABLE ROW LEVEL SECURITY;
 
---
--- Name: one_time_tokens; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: one_time_tokens; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE one_time_tokens ENABLE ROW LEVEL SECURITY;
 
---
--- Name: refresh_tokens; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: refresh_tokens; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE refresh_tokens ENABLE ROW LEVEL SECURITY;
 
---
--- Name: saml_providers; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_providers; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE saml_providers ENABLE ROW LEVEL SECURITY;
 
---
--- Name: saml_relay_states; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: saml_relay_states; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE saml_relay_states ENABLE ROW LEVEL SECURITY;
 
---
--- Name: schema_migrations; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: schema_migrations; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE schema_migrations ENABLE ROW LEVEL SECURITY;
 
---
--- Name: sessions; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sessions; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 
---
--- Name: sso_domains; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_domains; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE sso_domains ENABLE ROW LEVEL SECURITY;
 
---
--- Name: sso_providers; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: sso_providers; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE sso_providers ENABLE ROW LEVEL SECURITY;
 
---
--- Name: users; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: users; Type: ROW SECURITY; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
---
--- Name: tasks Admin pode ver todas as tarefas; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: tasks Admin pode ver todas as tarefas; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM profiles p
+ 
   WHERE ((p.id = uid()) AND (p.role = 'admin')))));
+ 
+  WHERE ((p.id = uid()) AND (p.role = 'admin'.user_role)))));
+ 
 
 
---
--- Name: whatsapp_campaigns Admins can access whatsapp_campaigns; Type: POLICY; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: whatsapp_config Admins can access whatsapp_config; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaigns Admins can access whatsapp_campaigns; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_contacts Admins can access whatsapp_contacts; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_config Admins can access whatsapp_config; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_messages Admins can access whatsapp_messages; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_contacts Admins can access whatsapp_contacts; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_templates Admins can access whatsapp_templates; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages Admins can access whatsapp_messages; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: projects Admins can delete projects; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_templates Admins can access whatsapp_templates; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+
+
+ 
+  Name: projects Admins can delete projects; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM user_permissions up
+ 
   WHERE ((up.user_id = uid()) AND (up.permission = 'manage_clients')))));
+ 
+  WHERE ((up.user_id = uid()) AND (up.permission = 'manage_clients'.permission_type)))));
+ 
 
 
---
--- Name: client_permissions Admins can manage all client permissions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: client_permissions Admins can manage all client permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM profiles
+ 
   WHERE ((profiles.id = uid()) AND ((profiles.role = 'admin') OR (profiles.is_root_admin = true))))));
+ 
+  WHERE ((profiles.id = uid()) AND ((profiles.role = 'admin'.user_role) OR (profiles.is_root_admin = true))))));
+ 
 
 
---
--- Name: client_report_permissions Admins can manage all client report permissions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: client_report_permissions Admins can manage all client report permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM profiles
+ 
   WHERE ((profiles.id = uid()) AND ((profiles.role = 'admin') OR (profiles.is_root_admin = true))))));
+ 
+  WHERE ((profiles.id = uid()) AND ((profiles.role = 'admin'.user_role) OR (profiles.is_root_admin = true))))));
+ 
 
 
---
--- Name: clientes Admins can manage all clients; Type: POLICY; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: criativos Admins can manage all creatives; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes Admins can manage all clients; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados Admins can manage all tickets; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: criativos Admins can manage all creatives; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: clientes Admins can manage clients; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Admins can manage all tickets; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: activity_logs Admins can view all activity logs; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes Admins can manage clients; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: clientes Admins can view all clients; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: activity_logs Admins can view all activity logs; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: system_activity_logs Admins can view all logs, users only their own; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes Admins can view all clients; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+
+
+ 
+  Name: system_activity_logs Admins can view all logs, users only their own; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM profiles
+ 
   WHERE (profiles.id = uid())) = 'admin') OR (usuario_id = uid())));
+ 
+  WHERE (profiles.id = uid())) = 'admin'.user_role) OR (usuario_id = uid())));
+ 
 
 
---
--- Name: chamados Admins can view all tickets; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Admins can view all tickets; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles Admins podem atualizar qualquer perfil; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Admins podem atualizar qualquer perfil; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados Admins podem gerenciar chamados; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Admins podem gerenciar chamados; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: clientes Admins podem gerenciar clientes; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes Admins podem gerenciar clientes; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: contas Admins podem gerenciar contas; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: contas Admins podem gerenciar contas; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: criativos Admins podem gerenciar criativos; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: criativos Admins podem gerenciar criativos; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles Admins podem inserir perfis; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Admins podem inserir perfis; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: contas Admins podem ver todas as contas; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: contas Admins podem ver todas as contas; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados Admins podem ver todos os chamados; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Admins podem ver todos os chamados; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: clientes Admins podem ver todos os clientes; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes Admins podem ver todos os clientes; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: criativos Admins podem ver todos os criativos; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: criativos Admins podem ver todos os criativos; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: system_activity_logs All authenticated users can insert logs; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: system_activity_logs All authenticated users can insert logs; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_campaigns Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaigns Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_config Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_config Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_contacts Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_contacts Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_messages Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_templates Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_templates Allow all access for authenticated users; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: metrics_config Allow all access to metrics config; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: metrics_config Allow all access to metrics config; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_campaign_executions Allow all access to whatsapp_campaign_executions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaign_executions Allow all access to whatsapp_campaign_executions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: whatsapp_message_logs Allow all access to whatsapp_message_logs; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_message_logs Allow all access to whatsapp_message_logs; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions Allow authenticated users to read their permissions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Allow authenticated users to read their permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: tasks Allow insert for authenticated users; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: tasks Allow insert for authenticated users; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: usuarios Allow insert for authenticated users; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: usuarios Allow insert for authenticated users; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: permission_logs Allow insert own permission logs; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs Allow insert own permission logs; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: settings Clientes acessam só seus settings; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: settings Clientes acessam só seus settings; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM clientes
   WHERE (clientes.user_id = uid()))));
 
 
---
--- Name: clientes Clients can manage their own data; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes Clients can manage their own data; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: client_permissions Clients can view their own permissions; Type: POLICY; Schema: public; Owner: postgres
---
-
-   FROM clientes
-  WHERE (clientes.user_id = uid()))));
-
-
---
--- Name: client_report_permissions Clients can view their own report permissions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: client_permissions Clients can view their own permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM clientes
   WHERE (clientes.user_id = uid()))));
 
 
---
--- Name: chamados Clients can view their own tickets; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: client_report_permissions Clients can view their own report permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+   FROM clientes
+  WHERE (clientes.user_id = uid()))));
+
+
+ 
+  Name: chamados Clients can view their own tickets; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados_anexos Inserir anexos próprios; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_anexos Inserir anexos próprios; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM chamados c
   WHERE ((c.id = chamados_anexos.chamado_id) AND ((c.cliente_id = ( SELECT get_user_cliente_id() AS get_user_cliente_id)) OR is_admin())))));
 
 
---
--- Name: chamados_timeline Inserir timeline própria; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_timeline Inserir timeline própria; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM chamados c
   WHERE ((c.id = chamados_timeline.chamado_id) AND ((c.cliente_id = ( SELECT get_user_cliente_id() AS get_user_cliente_id)) OR is_admin())))));
 
 
---
--- Name: profiles Ler meu próprio perfil; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Ler meu próprio perfil; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions Ler permissões do usuário; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Ler permissões do usuário; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados_historico Only authenticated users can insert historico; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_historico Only authenticated users can insert historico; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: tasks Permitir deletar tarefas; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: tasks Permitir deletar tarefas; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions Read My Permissions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Read My Permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions Read Own Permissions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Read Own Permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles Read Own Profile; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Read Own Profile; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions Read own permissions; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Read own permissions; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles Read own profile; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Read own profile; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: activity_logs System can insert activity logs; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: activity_logs System can insert activity logs; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: projects Users can create projects; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: projects Users can create projects; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: tasks Users can create tasks; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: tasks Users can create tasks; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM user_permissions up
+ 
   WHERE ((up.user_id = uid()) AND (up.permission = 'access_tasks'))))));
+ 
+  WHERE ((up.user_id = uid()) AND (up.permission = 'access_tasks'.permission_type))))));
+ 
 
 
---
--- Name: chamados Users can create tickets; Type: POLICY; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: chamados Users can create tickets for their client; Type: POLICY; Schema: public; Owner: postgres
---
-
-   FROM clientes
-  WHERE (clientes.user_id = uid()))));
-
-
---
--- Name: task_comments Users can insert their own comments; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Users can create tickets; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions Users can manage permissions with manage_collaborators permissi; Type: POLICY; Schema: public; Owner: postgres
---
-
-   FROM profiles
-  WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
-
-
---
--- Name: permission_templates Users can manage templates with manage_collaborators permission; Type: POLICY; Schema: public; Owner: postgres
---
-
-   FROM profiles
-  WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
-
-
---
--- Name: projects Users can read projects; Type: POLICY; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: tasks Users can read tasks; Type: POLICY; Schema: public; Owner: postgres
---
-
-
-
---
--- Name: criativos Users can update creatives for their client; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Users can create tickets for their client; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM clientes
   WHERE (clientes.user_id = uid()))));
 
 
---
--- Name: projects Users can update own projects; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: task_comments Users can insert their own comments; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: tasks Users can update tasks; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Users can manage permissions with manage_collaborators permissi; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+   FROM profiles
+  WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
+
+
+ 
+  Name: permission_templates Users can manage templates with manage_collaborators permission; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+   FROM profiles
+  WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
+
+
+ 
+  Name: projects Users can read projects; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+
+
+ 
+  Name: tasks Users can read tasks; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+
+
+ 
+  Name: criativos Users can update creatives for their client; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+   FROM clientes
+  WHERE (clientes.user_id = uid()))));
+
+
+ 
+  Name: projects Users can update own projects; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+
+
+ 
+  Name: tasks Users can update tasks; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM user_permissions up
+ 
   WHERE ((up.user_id = uid()) AND (up.permission = 'assign_tasks'))))));
+ 
+  WHERE ((up.user_id = uid()) AND (up.permission = 'assign_tasks'.permission_type))))));
+ 
 
 
---
--- Name: chamados Users can update their client tickets; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Users can update their client tickets; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM clientes
   WHERE (clientes.user_id = uid()))));
 
 
---
--- Name: chamados Users can update tickets; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Users can update tickets; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados_historico Users can view chamados_historico based on access; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_historico Users can view chamados_historico based on access; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 CASE
     WHEN (( SELECT profiles.role
        FROM profiles
+ 
       WHERE (profiles.id = uid())) = 'admin') THEN true
+ 
+      WHERE (profiles.id = uid())) = 'admin'.user_role) THEN true
+ 
     ELSE (chamado_id IN ( SELECT chamados.id
        FROM chamados
       WHERE (chamados.cliente_id = ( SELECT get_user_cliente_id() AS get_user_cliente_id))))
 END);
 
 
---
--- Name: criativos Users can view creatives for their client; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: criativos Users can view creatives for their client; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM clientes
   WHERE (clientes.user_id = uid()))));
 
 
---
--- Name: permission_logs Users can view logs with view_system_logs permission; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs Users can view logs with view_system_logs permission; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM profiles
   WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
 
 
---
--- Name: profiles Users can view own profile or if has permission; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Users can view own profile or if has permission; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM user_permissions
+ 
   WHERE (user_permissions.permission = 'manage_collaborators'))) OR (EXISTS ( SELECT 1
    FROM user_permissions
   WHERE ((user_permissions.user_id = uid()) AND (user_permissions.permission = 'view_system_logs'))))));
+ 
+  WHERE (user_permissions.permission = 'manage_collaborators'.permission_type))) OR (EXISTS ( SELECT 1
+   FROM user_permissions
+  WHERE ((user_permissions.user_id = uid()) AND (user_permissions.permission = 'view_system_logs'.permission_type))))));
+ 
 
 
---
--- Name: user_permissions Users can view permissions with manage_collaborators permission; Type: POLICY; Schema: public; Owner: postgres
---
-
-   FROM profiles
-  WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
-
-
---
--- Name: permission_templates Users can view templates with manage_collaborators permission; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Users can view permissions with manage_collaborators permission; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM profiles
   WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
 
 
---
--- Name: clientes Users can view their own client data; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_templates Users can view templates with manage_collaborators permission; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+   FROM profiles
+  WHERE ((profiles.id = uid()) AND (profiles.is_root_admin = true))))));
+
+
+ 
+  Name: clientes Users can view their own client data; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados Users can view tickets from their client; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Users can view tickets from their client; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM clientes
   WHERE (clientes.user_id = uid()))));
 
 
---
--- Name: profiles Usuários podem atualizar seu próprio perfil; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Usuários podem atualizar seu próprio perfil; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados Usuários podem atualizar seus próprios chamados; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Usuários podem atualizar seus próprios chamados; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: criativos Usuários podem atualizar seus próprios criativos; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: criativos Usuários podem atualizar seus próprios criativos; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados Usuários podem criar chamados; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Usuários podem criar chamados; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: clientes Usuários podem ver seu próprio cliente; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes Usuários podem ver seu próprio cliente; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles Usuários podem ver seu próprio perfil; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Usuários podem ver seu próprio perfil; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados Usuários podem ver seus próprios chamados; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados Usuários podem ver seus próprios chamados; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: criativos Usuários podem ver seus próprios criativos; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: criativos Usuários podem ver seus próprios criativos; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: contas Usuários podem ver suas próprias contas; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: contas Usuários podem ver suas próprias contas; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles Ver perfil se for o dono ou root; Type: POLICY; Schema: public; Owner: postgres
---
-
-   FROM profiles p
-  WHERE ((p.id = uid()) AND (p.is_root_admin = true))))));
-
-
---
--- Name: user_permissions Ver permissões se for o dono ou root; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles Ver perfil se for o dono ou root; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM profiles p
   WHERE ((p.id = uid()) AND (p.is_root_admin = true))))));
 
 
---
--- Name: chamados_anexos Visualizar anexos próprios; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions Ver permissões se for o dono ou root; Type: POLICY; Schema: public; Owner: postgres
+ 
+
+   FROM profiles p
+  WHERE ((p.id = uid()) AND (p.is_root_admin = true))))));
+
+
+ 
+  Name: chamados_anexos Visualizar anexos próprios; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM chamados c
   WHERE ((c.id = chamados_anexos.chamado_id) AND ((c.cliente_id = ( SELECT get_user_cliente_id() AS get_user_cliente_id)) OR is_admin())))));
 
 
---
--- Name: chamados_timeline Visualizar timeline própria; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_timeline Visualizar timeline própria; Type: POLICY; Schema: public; Owner: postgres
+ 
 
    FROM chamados c
   WHERE ((c.id = chamados_timeline.chamado_id) AND ((c.cliente_id = ( SELECT get_user_cliente_id() AS get_user_cliente_id)) OR is_admin())))));
 
 
---
--- Name: activity_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: activity_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
 
---
--- Name: user_permissions allow_own_permissions_select; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions allow_own_permissions_select; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles allow_own_profile_select; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles allow_own_profile_select; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles allow_own_profile_update; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles allow_own_profile_update; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: permission_logs allow_root_admin_logs_select; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs allow_root_admin_logs_select; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions allow_root_admin_permissions_all; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions allow_root_admin_permissions_all; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions allow_root_admin_permissions_select; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions allow_root_admin_permissions_select; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles allow_root_admin_select_all; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles allow_root_admin_select_all; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: permission_templates allow_root_admin_templates_all; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_templates allow_root_admin_templates_all; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: permission_templates allow_root_admin_templates_select; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_templates allow_root_admin_templates_select; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: profiles allow_root_admin_update_all; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: profiles allow_root_admin_update_all; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: chamados; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE chamados ENABLE ROW LEVEL SECURITY;
 
---
--- Name: chamados_anexos; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_anexos; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE chamados_anexos ENABLE ROW LEVEL SECURITY;
 
---
--- Name: chamados_historico; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_historico; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE chamados_historico ENABLE ROW LEVEL SECURITY;
 
---
--- Name: chamados_timeline; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: chamados_timeline; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE chamados_timeline ENABLE ROW LEVEL SECURITY;
 
---
--- Name: client_permissions; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: client_permissions; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE client_permissions ENABLE ROW LEVEL SECURITY;
 
---
--- Name: client_report_permissions; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: client_report_permissions; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE client_report_permissions ENABLE ROW LEVEL SECURITY;
 
---
--- Name: clientes; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: clientes; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
 
---
--- Name: contas; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: contas; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE contas ENABLE ROW LEVEL SECURITY;
 
---
--- Name: criativos; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: criativos; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE criativos ENABLE ROW LEVEL SECURITY;
 
---
--- Name: meta_api_credentials delete_own_credentials; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: meta_api_credentials delete_own_credentials; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: meta_api_credentials insert_own_credentials; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: meta_api_credentials insert_own_credentials; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: metrics_config; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: metrics_config; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE metrics_config ENABLE ROW LEVEL SECURITY;
 
---
--- Name: permission_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE permission_logs ENABLE ROW LEVEL SECURITY;
 
---
--- Name: permission_templates; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: permission_templates; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE permission_templates ENABLE ROW LEVEL SECURITY;
 
---
--- Name: meta_api_credentials select_own_credentials; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: meta_api_credentials select_own_credentials; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: settings; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: settings; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 
---
--- Name: system_activity_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: system_activity_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE system_activity_logs ENABLE ROW LEVEL SECURITY;
 
---
--- Name: tasks; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: tasks; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
---
--- Name: meta_api_credentials update_own_credentials; Type: POLICY; Schema: public; Owner: postgres
---
+ 
+  Name: meta_api_credentials update_own_credentials; Type: POLICY; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: user_permissions; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: user_permissions; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE user_permissions ENABLE ROW LEVEL SECURITY;
 
---
--- Name: usuarios; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: usuarios; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
 
---
--- Name: whatsapp_campaign_executions; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaign_executions; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE whatsapp_campaign_executions ENABLE ROW LEVEL SECURITY;
 
---
--- Name: whatsapp_campaigns; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_campaigns; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE whatsapp_campaigns ENABLE ROW LEVEL SECURITY;
 
---
--- Name: whatsapp_config; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_config; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE whatsapp_config ENABLE ROW LEVEL SECURITY;
 
---
--- Name: whatsapp_contacts; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_contacts; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE whatsapp_contacts ENABLE ROW LEVEL SECURITY;
 
---
--- Name: whatsapp_message_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_message_logs; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE whatsapp_message_logs ENABLE ROW LEVEL SECURITY;
 
---
--- Name: whatsapp_messages; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_messages; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE whatsapp_messages ENABLE ROW LEVEL SECURITY;
 
---
--- Name: whatsapp_templates; Type: ROW SECURITY; Schema: public; Owner: postgres
---
+ 
+  Name: whatsapp_templates; Type: ROW SECURITY; Schema: public; Owner: postgres
+ 
 
 ALTER TABLE whatsapp_templates ENABLE ROW LEVEL SECURITY;
 
---
--- Name: messages; Type: ROW SECURITY; Schema: realtime; Owner: supabase_realtime_admin
---
+ 
+  Name: messages; Type: ROW SECURITY; Schema: realtime; Owner: supabase_realtime_admin
+ 
 
 ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY;
 
---
--- Name: buckets; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: buckets; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+ 
 
 ALTER TABLE storage.buckets ENABLE ROW LEVEL SECURITY;
 
---
--- Name: migrations; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: migrations; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+ 
 
 ALTER TABLE storage.migrations ENABLE ROW LEVEL SECURITY;
 
---
--- Name: objects; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: objects; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+ 
 
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
---
--- Name: s3_multipart_uploads; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+ 
 
 ALTER TABLE storage.s3_multipart_uploads ENABLE ROW LEVEL SECURITY;
 
---
--- Name: s3_multipart_uploads_parts; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: s3_multipart_uploads_parts; Type: ROW SECURITY; Schema: storage; Owner: supabase_storage_admin
+ 
 
 ALTER TABLE storage.s3_multipart_uploads_parts ENABLE ROW LEVEL SECURITY;
 
---
--- Name: supabase_realtime; Type: PUBLICATION; Schema: -; Owner: postgres
---
+ 
+  Name: supabase_realtime; Type: PUBLICATION; Schema: -; Owner: postgres
+ 
 
 CREATE PUBLICATION supabase_realtime WITH (publish = 'insert, update, delete, truncate');
 
 
 ALTER PUBLICATION supabase_realtime OWNER TO postgres;
 
---
--- Name: SCHEMA auth; Type: ACL; Schema: -; Owner: supabase_admin
---
+ 
+  Name: SCHEMA auth; Type: ACL; Schema: -; Owner: supabase_admin
+ 
 
 
 
---
--- Name: SCHEMA extensions; Type: ACL; Schema: -; Owner: postgres
---
+ 
+  Name: SCHEMA extensions; Type: ACL; Schema: -; Owner: postgres
+ 
 
 
 
---
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
---
+ 
+  Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
+ 
 
 
 
---
--- Name: SCHEMA realtime; Type: ACL; Schema: -; Owner: supabase_admin
---
+ 
+  Name: SCHEMA realtime; Type: ACL; Schema: -; Owner: supabase_admin
+ 
 
 
 
---
--- Name: SCHEMA storage; Type: ACL; Schema: -; Owner: supabase_admin
---
+ 
+  Name: SCHEMA storage; Type: ACL; Schema: -; Owner: supabase_admin
+ 
 
 
 
---
--- Name: SCHEMA vault; Type: ACL; Schema: -; Owner: supabase_admin
---
+ 
+  Name: SCHEMA vault; Type: ACL; Schema: -; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION email(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: FUNCTION email(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: FUNCTION jwt(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: FUNCTION jwt(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: FUNCTION role(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: FUNCTION role(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: FUNCTION uid(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: FUNCTION uid(); Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: FUNCTION armor(bytea); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION armor(bytea); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION armor(bytea, text[], text[]); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION armor(bytea, text[], text[]); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION crypt(text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION crypt(text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION dearmor(text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION dearmor(text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION decrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION decrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION decrypt_iv(bytea, bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION decrypt_iv(bytea, bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION digest(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION digest(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION digest(text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION digest(text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION encrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION encrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION encrypt_iv(bytea, bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION encrypt_iv(bytea, bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION gen_random_bytes(integer); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION gen_random_bytes(integer); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION UUID(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+ 
+  Name: FUNCTION UUID(); Type: ACL; Schema: extensions; Owner: postgres
+ 
+  Name: FUNCTION gen_random_uuid(); Type: ACL; Schema: extensions; Owner: postgres
+ 
+ 
 
 
 
---
--- Name: FUNCTION gen_salt(text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION gen_salt(text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION gen_salt(text, integer); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION gen_salt(text, integer); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION grant_pg_cron_access(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION grant_pg_cron_access(); Type: ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION grant_pg_graphql_access(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION grant_pg_graphql_access(); Type: ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION grant_pg_net_access(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION grant_pg_net_access(); Type: ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION hmac(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION hmac(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION hmac(text, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION hmac(text, text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp, OUT minmax_stats_since timestamp); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp, OUT minmax_stats_since timestamp); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pg_stat_statements_reset(userid oid, dbid oid, queryid bigint, minmax_only boolean); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pg_stat_statements_reset(userid oid, dbid oid, queryid bigint, minmax_only boolean); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_armor_headers(text, OUT key text, OUT value text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_armor_headers(text, OUT key text, OUT value text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_key_id(bytea); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_key_id(bytea); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_decrypt(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_decrypt(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_decrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_decrypt(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_decrypt(bytea, bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_decrypt(bytea, bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_decrypt_bytea(bytea, bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_encrypt(text, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_encrypt(text, bytea); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_encrypt(text, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_encrypt(text, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_encrypt_bytea(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_encrypt_bytea(bytea, bytea); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_pub_encrypt_bytea(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_pub_encrypt_bytea(bytea, bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_decrypt(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_decrypt(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_decrypt(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_decrypt(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_decrypt_bytea(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_decrypt_bytea(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_decrypt_bytea(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_decrypt_bytea(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_encrypt(text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_encrypt(text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_encrypt(text, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_encrypt(text, text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_encrypt_bytea(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_encrypt_bytea(bytea, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgp_sym_encrypt_bytea(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION pgp_sym_encrypt_bytea(bytea, text, text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION pgrst_ddl_watch(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION pgrst_ddl_watch(); Type: ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION pgrst_drop_watch(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION pgrst_drop_watch(); Type: ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION set_graphql_placeholder(); Type: ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: FUNCTION set_graphql_placeholder(); Type: ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION uuid_generate_v1(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_generate_v1(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_generate_v1mc(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_generate_v1mc(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_generate_v3(namespace uuid, name text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_generate_v3(namespace uuid, name text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_generate_v4(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_generate_v4(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_generate_v5(namespace uuid, name text); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_generate_v5(namespace uuid, name text); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_nil(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_nil(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_ns_dns(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_ns_dns(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_ns_oid(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_ns_oid(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_ns_url(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_ns_url(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION uuid_ns_x500(); Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: FUNCTION uuid_ns_x500(); Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION graphql(`operationName` text, query text, variables json, extensions json); Type: ACL; Schema: graphql_public; Owner: supabase_admin
---
+ 
+  Name: FUNCTION graphql(`operationName` text, query text, variables json, extensions json); Type: ACL; Schema: graphql_public; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION get_auth(p_usename text); Type: ACL; Schema: pgbouncer; Owner: supabase_admin
---
+ 
+  Name: FUNCTION get_auth(p_usename text); Type: ACL; Schema: pgbouncer; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION assign_default_permissions(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION assign_default_permissions(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION auto_start_task_timer(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION auto_start_task_timer(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION check_is_root_admin(user_id uuid); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION check_is_root_admin(user_id uuid); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION client_has_module_permission(client_user_id uuid, module_name client_module); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION client_has_module_permission(client_user_id uuid, module_name client_module); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION client_has_report_permission(client_user_id uuid, report_name report_type); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION client_has_report_permission(client_user_id uuid, report_name report_type); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION create_chamado_historico(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION create_chamado_historico(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION create_default_client_permissions(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION create_default_client_permissions(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION create_task_activity(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION create_task_activity(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION create_ticket_timeline_entry(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION create_ticket_timeline_entry(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION get_user_cliente_id(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION get_user_cliente_id(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION get_user_permissions(user_id uuid); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION get_user_permissions(user_id uuid); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION handle_new_user(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION handle_new_user(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION has_permission(user_id uuid, required_permission permission_type); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION has_permission(user_id uuid, required_permission permission_type); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION is_admin(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION is_admin(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION log_permission_changes(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION log_permission_changes(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION log_system_activity(p_acao text, p_modulo text, p_detalhes json, p_ip_address inet, p_user_agent text); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION log_system_activity(p_acao text, p_modulo text, p_detalhes json, p_ip_address inet, p_user_agent text); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION update_ticket_detailed_status(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION update_ticket_detailed_status(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION update_ticket_status_on_message(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION update_ticket_status_on_message(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION update_updated_at_column(); Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: FUNCTION update_updated_at_column(); Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: FUNCTION apply_rls(wal json, max_record_bytes integer); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION apply_rls(wal json, max_record_bytes integer); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[]); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION `cast`(val text, type_ regtype); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION `cast`(val text, type_ regtype); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[]); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION quote_wal2json(entity regclass); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION quote_wal2json(entity regclass); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION send(payload json, event text, topic text, private boolean); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION send(payload json, event text, topic text, private boolean); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION subscription_check_filters(); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION subscription_check_filters(); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION to_regrole(role_name text); Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: FUNCTION to_regrole(role_name text); Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION topic(); Type: ACL; Schema: realtime; Owner: supabase_realtime_admin
---
+ 
+  Name: FUNCTION topic(); Type: ACL; Schema: realtime; Owner: supabase_realtime_admin
+ 
 
 
 
---
--- Name: FUNCTION _crypto_aead_det_decrypt(message bytea, additional bytea, key_id bigint, context bytea, nonce bytea); Type: ACL; Schema: vault; Owner: supabase_admin
---
+ 
+  Name: FUNCTION _crypto_aead_det_decrypt(message bytea, additional bytea, key_id bigint, context bytea, nonce bytea); Type: ACL; Schema: vault; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION create_secret(new_secret text, new_name text, new_description text, new_key_id uuid); Type: ACL; Schema: vault; Owner: supabase_admin
---
+ 
+  Name: FUNCTION create_secret(new_secret text, new_name text, new_description text, new_key_id uuid); Type: ACL; Schema: vault; Owner: supabase_admin
+ 
 
 
 
---
--- Name: FUNCTION update_secret(secret_id uuid, new_secret text, new_name text, new_description text, new_key_id uuid); Type: ACL; Schema: vault; Owner: supabase_admin
---
+ 
+  Name: FUNCTION update_secret(secret_id uuid, new_secret text, new_name text, new_description text, new_key_id uuid); Type: ACL; Schema: vault; Owner: supabase_admin
+ 
 
 
 
---
--- Name: TABLE audit_log_entries; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE audit_log_entries; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE flow_state; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE flow_state; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE identities; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE identities; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE instances; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE instances; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE mfa_amr_claims; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE mfa_amr_claims; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE mfa_challenges; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE mfa_challenges; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE mfa_factors; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE mfa_factors; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE one_time_tokens; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE one_time_tokens; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE refresh_tokens; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE refresh_tokens; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: SEQUENCE refresh_tokens_id_seq; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: SEQUENCE refresh_tokens_id_seq; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE saml_providers; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE saml_providers; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE saml_relay_states; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE saml_relay_states; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE schema_migrations; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE schema_migrations; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE sessions; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE sessions; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE sso_domains; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE sso_domains; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE sso_providers; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE sso_providers; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE users; Type: ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: TABLE users; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 
 
---
--- Name: TABLE pg_stat_statements; Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: TABLE pg_stat_statements; Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE pg_stat_statements_info; Type: ACL; Schema: extensions; Owner: postgres
---
+ 
+  Name: TABLE pg_stat_statements_info; Type: ACL; Schema: extensions; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE activity_logs; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE activity_logs; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE chamados; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE chamados; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE chamados_anexos; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE chamados_anexos; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE chamados_historico; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE chamados_historico; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE chamados_mensagens; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE chamados_mensagens; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE chamados_timeline; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE chamados_timeline; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE client_permissions; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE client_permissions; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE client_report_permissions; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE client_report_permissions; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE clientes; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE clientes; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE contas; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE contas; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE criativos; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE criativos; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE meta_api_credentials; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE meta_api_credentials; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE metrics_config; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE metrics_config; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE permission_logs; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE permission_logs; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE permission_templates; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE permission_templates; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE profiles; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE profiles; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE projects; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE projects; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE sections; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE sections; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE settings; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE settings; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: SEQUENCE settings_id_seq; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: SEQUENCE settings_id_seq; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE system_activity_logs; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE system_activity_logs; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE task_comments; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE task_comments; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE task_steps; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE task_steps; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE tasks; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE tasks; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE user_permissions; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE user_permissions; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE usuarios; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE usuarios; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE whatsapp_campaign_executions; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE whatsapp_campaign_executions; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE whatsapp_campaigns; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE whatsapp_campaigns; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE whatsapp_config; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE whatsapp_config; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE whatsapp_contacts; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE whatsapp_contacts; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE whatsapp_message_logs; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE whatsapp_message_logs; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE whatsapp_messages; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE whatsapp_messages; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE whatsapp_templates; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE whatsapp_templates; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE workflow_templates; Type: ACL; Schema: public; Owner: postgres
---
+ 
+  Name: TABLE workflow_templates; Type: ACL; Schema: public; Owner: postgres
+ 
 
 
 
---
--- Name: TABLE messages; Type: ACL; Schema: realtime; Owner: supabase_realtime_admin
---
+ 
+  Name: TABLE messages; Type: ACL; Schema: realtime; Owner: supabase_realtime_admin
+ 
 
 
 
---
--- Name: TABLE schema_migrations; Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: TABLE schema_migrations; Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: TABLE subscription; Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: TABLE subscription; Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: SEQUENCE subscription_id_seq; Type: ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: SEQUENCE subscription_id_seq; Type: ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 
 
---
--- Name: TABLE buckets; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: TABLE buckets; Type: ACL; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Name: TABLE objects; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: TABLE objects; Type: ACL; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Name: TABLE s3_multipart_uploads; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: TABLE s3_multipart_uploads; Type: ACL; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Name: TABLE s3_multipart_uploads_parts; Type: ACL; Schema: storage; Owner: supabase_storage_admin
---
+ 
+  Name: TABLE s3_multipart_uploads_parts; Type: ACL; Schema: storage; Owner: supabase_storage_admin
+ 
 
 
 
---
--- Name: TABLE secrets; Type: ACL; Schema: vault; Owner: supabase_admin
---
+ 
+  Name: TABLE secrets; Type: ACL; Schema: vault; Owner: supabase_admin
+ 
 
 
 
---
--- Name: TABLE decrypted_secrets; Type: ACL; Schema: vault; Owner: supabase_admin
---
+ 
+  Name: TABLE decrypted_secrets; Type: ACL; Schema: vault; Owner: supabase_admin
+ 
 
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON SEQUENCES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON SEQUENCES TO dashboard_user;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON FUNCTIONS TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON FUNCTIONS TO dashboard_user;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: auth; Owner: supabase_auth_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON TABLES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_auth_admin IN SCHEMA auth GRANT ALL ON TABLES TO dashboard_user;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA extensions GRANT ALL ON SEQUENCES TO postgres WITH GRANT OPTION;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA extensions GRANT ALL ON FUNCTIONS TO postgres WITH GRANT OPTION;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: extensions; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA extensions GRANT ALL ON TABLES TO postgres WITH GRANT OPTION;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON SEQUENCES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON SEQUENCES TO anon;
@@ -7275,9 +9538,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON SEQUENCES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON FUNCTIONS TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON FUNCTIONS TO anon;
@@ -7285,9 +9548,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON FUNCTIONS TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: graphql; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON TABLES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON TABLES TO anon;
@@ -7295,9 +9558,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql GRANT ALL ON TABLES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON SEQUENCES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON SEQUENCES TO anon;
@@ -7305,9 +9568,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON SEQUENCES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON FUNCTIONS TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON FUNCTIONS TO anon;
@@ -7315,9 +9578,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON FUNCTIONS TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: graphql_public; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON TABLES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON TABLES TO anon;
@@ -7325,9 +9588,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA graphql_public GRANT ALL ON TABLES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: postgres
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: postgres
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
@@ -7335,9 +9598,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENC
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
@@ -7345,9 +9608,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON S
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: postgres
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: postgres
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
@@ -7355,9 +9618,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIO
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
@@ -7365,9 +9628,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON F
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: postgres
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: postgres
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO anon;
@@ -7375,9 +9638,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO anon;
@@ -7385,33 +9648,33 @@ ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON T
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON SEQUENCES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON SEQUENCES TO dashboard_user;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON FUNCTIONS TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON FUNCTIONS TO dashboard_user;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: realtime; Owner: supabase_admin
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON TABLES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA realtime GRANT ALL ON TABLES TO dashboard_user;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: storage; Owner: postgres
---
+ 
+  Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: storage; Owner: postgres
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUENCES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUENCES TO anon;
@@ -7419,9 +9682,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUEN
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON SEQUENCES TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: storage; Owner: postgres
---
+ 
+  Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: storage; Owner: postgres
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTIONS TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTIONS TO anon;
@@ -7429,9 +9692,9 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTI
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON FUNCTIONS TO service_role;
 
 
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: storage; Owner: postgres
---
+ 
+  Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: storage; Owner: postgres
+ 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON TABLES TO postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON TABLES TO anon;
@@ -7439,59 +9702,102 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON TABLES
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA storage GRANT ALL ON TABLES TO service_role;
 
 
---
--- Name: issue_graphql_placeholder; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
---
+ 
+  Name: issue_graphql_placeholder; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+ 
+
+
+CREATE EVENT TRIGGER issue_graphql_placeholder ON sql_drop
 
          WHEN TAG IN ('DROP EXTENSION')
    EXECUTE FUNCTION extensions.set_graphql_placeholder();
 
 
 
---
--- Name: issue_pg_cron_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
---
+ALTER EVENT TRIGGER issue_graphql_placeholder OWNER TO supabase_admin;
+
+
+ 
+  Name: issue_pg_cron_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+ 
+
+
+CREATE EVENT TRIGGER issue_pg_cron_access ON ddl_command_end
 
          WHEN TAG IN ('CREATE EXTENSION')
    EXECUTE FUNCTION extensions.grant_pg_cron_access();
 
 
+ALTER EVENT TRIGGER issue_pg_cron_access OWNER TO supabase_admin;
 
---
--- Name: issue_pg_graphql_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
---
 
+ 
+  Name: issue_pg_graphql_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+ 
+
+ 
+ 
+CREATE EVENT TRIGGER issue_pg_graphql_access ON ddl_command_end
+ 
          WHEN TAG IN ('CREATE FUNCTION')
    EXECUTE FUNCTION extensions.grant_pg_graphql_access();
 
 
+ 
+ 
+ALTER EVENT TRIGGER issue_pg_graphql_access OWNER TO supabase_admin;
+ 
 
---
--- Name: issue_pg_net_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
---
+ 
+  Name: issue_pg_net_access; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+ 
 
+ 
+ 
+CREATE EVENT TRIGGER issue_pg_net_access ON ddl_command_end
+ 
          WHEN TAG IN ('CREATE EXTENSION')
    EXECUTE FUNCTION extensions.grant_pg_net_access();
 
 
+ 
+ 
+ALTER EVENT TRIGGER issue_pg_net_access OWNER TO supabase_admin;
+ 
 
---
--- Name: pgrst_ddl_watch; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
---
+ 
+  Name: pgrst_ddl_watch; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+ 
 
+ 
    EXECUTE FUNCTION extensions.pgrst_ddl_watch();
 
 
+ 
+CREATE EVENT TRIGGER pgrst_ddl_watch ON ddl_command_end
+   EXECUTE FUNCTION extensions.pgrst_ddl_watch();
 
---
--- Name: pgrst_drop_watch; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
---
 
+ALTER EVENT TRIGGER pgrst_ddl_watch OWNER TO supabase_admin;
+ 
+
+ 
+  Name: pgrst_drop_watch; Type: EVENT TRIGGER; Schema: -; Owner: supabase_admin
+ 
+
+ 
    EXECUTE FUNCTION extensions.pgrst_drop_watch();
 
 
+ 
+CREATE EVENT TRIGGER pgrst_drop_watch ON sql_drop
+   EXECUTE FUNCTION extensions.pgrst_drop_watch();
 
---
--- PostgreSQL database dump complete
---
+
+ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
+ 
+
+ 
+  
+ 
 
