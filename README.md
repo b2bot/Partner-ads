@@ -2,8 +2,7 @@
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-95.7%25-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.x-61dafb)](https://reactjs.org/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)](https://www.mysql.com/)
-[![PHP](https://img.shields.io/badge/PHP-8.x-777bb4)](https://www.php.net/)
+[![Supabase](https://img.shields.io/badge/Supabase-1.0-3ECF8E)](https://supabase.com)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38b2ac)](https://tailwindcss.com/)
 
 ## 📋 Visão Geral
@@ -33,14 +32,13 @@ O **Meta Ads Pro Manager** é uma plataforma empresarial completa que vai muito 
 - **Notifications**: Sonner
 
 ### **Backend**
-- **Database**: MySQL 8.0
-- **API**: PHP 8.x (REST APIs)
-- **Authentication**: JWT + Session Management
+- **Database**: Supabase Postgres
+- **API**: Supabase Edge/REST
+- **Authentication**: Supabase Auth
 - **Email**: Sistema próprio de mailbox
 - **Automations**: Sistema de automações integrado
 
-### **Infraestrutura**
-- **Hosting**: Servidor dedicado com PHP/MySQL
+- **Hosting**: Supabase
 - **Domain**: app2.partnerb2b.com.br
 - **SSL**: Certificado HTTPS configurado
 - **Email Server**: Servidor de email integrado

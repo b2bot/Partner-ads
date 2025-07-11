@@ -1,11 +1,11 @@
 
 import { useEffect, useState } from 'react';
 import { User } from '@apiClient/apiClient-js';
-import { apiClient, setAuthToken } from '@/integrations/apiClient';
-import { useUserProfile } from './useUserProfile';
-import { useUserPermissions } from './useUserPermissions';
-import { useClientPermissions } from './useClientPermissions';
-import { useAuthActions } from './useAuthActions';
+import { apiClient } from '@/integrations/apiClient';
+import { useUserProfile } from '../useUserProfile';
+import { useUserPermissions } from '../useUserPermissions';
+import { useClientPermissions } from '../useClientPermissions';
+import { useAuthActions } from '../useAuthActions';
 import { Permission, ALL_PERMISSIONS } from '@/types/auth';
 import { hasPermission as checkPermission } from '@/utils/permissionUtils';
 
@@ -14,37 +14,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   const { data: profile, isLoading: profileLoading } = useUserProfile(user);
-  const { signIn: rawSignIn, signUp: rawSignUp, signOut: rawSignOut } = useAuthActions();
-
-  const signIn = async (email: string, password: string) => {
-    const result = await rawSignIn(email, password);
-    if (result.data?.user) {
-      setUser(result.data.user);
-      localStorage.setItem('authUser', JSON.stringify(result.data.user));
-    }
-    return result;
-  };
-
-  const signUp = async (
-    email: string,
-    password: string,
-    nome: string,
-    role: 'admin' | 'cliente' = 'cliente'
-  ) => {
-    const result = await rawSignUp(email, password, nome, role);
-    if (result.data?.user) {
-      setUser(result.data.user);
-      localStorage.setItem('authUser', JSON.stringify(result.data.user));
-    }
-    return result;
-  };
-
-  const signOut = async () => {
-    const result = await rawSignOut();
-    setUser(null);
-    localStorage.removeItem('authUser');
-    return result;
-  };
+  const { signIn, signUp, signOut } = useAuthActions();
 
   const isRootAdmin = profile?.is_root_admin === true;
   const isAdmin = profile?.role === 'admin' || isRootAdmin;
@@ -59,19 +29,23 @@ export function useAuth() {
   } = useClientPermissions(user, isCliente);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('authUser');
-    if (token) {
-      setAuthToken(token);
-      if (userData) {
-        try {
-          setUser(JSON.parse(userData));
-        } catch {
-          setUser(null);
-        }
+    console.log('🚀 Inicializando useAuth...');
+    
+    apiClient.auth.getSession().then(({ data: { session } }) => {
+      console.log('📝 Sessão inicial:', session?.user ? 'Usuário logado' : 'Sem usuário');
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+  const { data: { subscription } } = apiClient.auth.onAuthStateChange(
+    async (_event, session) => {
+      console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário');
+      setUser(session?.user ?? null);
+      setLoading(false);
       }
-    }
-    setLoading(false);
+    );
+
+  return () => subscription.unsubscribe();
   }, []);
 
   const hasPermission = (permission: Permission): boolean => {
@@ -130,7 +104,7 @@ export function useAuth() {
     signUp,
     signOut,
     isAdmin,
-    isRootAdmin: profile?.is_root_admin === 1 || profile?.is_root_admin === true,
+    isRootAdmin: profile?.is_root_admin ?? false,
     isCliente,
     permissions: allPermissions,
     hasPermission,

@@ -71,3 +71,7 @@ Com esse esboço, basta criar manualmente o arquivo `AGENTS.md` no repositório 
   com a tabela `profiles`.
 - Adicionado script `tools/convert_to_mysql.py` para converter `supabase_dump.sql`
   em um schema MySQL (`supabase_dump_mysql.sql`).
+- Revertida a migração para MySQL. O projeto volta a usar o Supabase como backend.
+- Instalado `@supabase/supabase-js` e criado `src/integrations/apiClient.ts` com o cliente Supabase.
+- Hooks de autenticação (`useAuthActions.tsx` e `useAuth.tsx`) ajustados para usar `apiClient.auth`.
+- README atualizado para refletir a arquitetura com Supabase.
