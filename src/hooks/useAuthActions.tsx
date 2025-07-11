@@ -1,19 +1,13 @@
 
-import { apiClient, setAuthToken } from '@/integrations/apiClient';
+import { apiClient } from '@/integrations/apiClient';
 
 export function useAuthActions() {
   const signIn = async (email: string, password: string) => {
-    try {
-      const data = await apiClient.post<{ token: string; user: any }>('/api/login.php', {
-        email,
-        password,
-      });
-      setAuthToken(data.token);
-      localStorage.setItem('authUser', JSON.stringify(data.user));
-      return { data, error: null };
-    } catch (error: any) {
-      return { data: null, error };
-    }
+    const { data, error } = await apiClient.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { data, error };
   };
 
   const signUp = async (
@@ -22,29 +16,17 @@ export function useAuthActions() {
     nome: string,
     role: 'admin' | 'cliente' = 'cliente'
   ) => {
-    try {
-      const data = await apiClient.post<{ token: string; user: any }>('/api/register.php', {
-        email,
-        password,
-        nome,
-        role,
-      });
-      setAuthToken(data.token);
-      localStorage.setItem('authUser', JSON.stringify(data.user));
-      return { data, error: null };
-    } catch (error: any) {
-      return { data: null, error };
-    }
+    const { data, error } = await apiClient.auth.signUp({
+      email,
+      password,
+      options: { data: { nome, role } },
+    });
+    return { data, error };
   };
 
   const signOut = async () => {
-    try {
-      await apiClient.post('/api/logout.php');
-    } finally {
-      setAuthToken(null);
-      localStorage.removeItem('authUser');
-    }
-    return { error: null };
+    const { error } = await apiClient.auth.signOut();
+    return { error };
   };
 
   return {
