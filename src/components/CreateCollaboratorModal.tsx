@@ -129,22 +129,25 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       status: string;
       permissions: PermissionType[];
     }) => {
-      // Criar usuário usando supabase.auth.admin.createUser
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: data.email,
-        password: data.senha,
-        email_confirm: true,
-        user_metadata: {
+      // Chamar edge function para criar usuário
+      const { data: result, error } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: data.email,
           nome: data.nome,
-          role: 'admin'
+          role: 'admin',
+          senha: data.senha
         }
       });
 
-      if (authError || !authData.user) {
-        throw new Error(authError?.message || 'Falha ao criar usuário');
+      if (error) {
+        throw error;
       }
 
-      console.log('Usuário criado com sucesso:', authData.user.id);
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao criar usuário');
+      }
+
+      console.log('Usuário criado com sucesso:', result.user.id);
 
       // Aguardar um pouco para a trigger processar
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -156,24 +159,24 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
           foto_url: data.foto_url,
           ativo: data.status === 'ativo',
         })
-        .eq('user_id', authData.user.id);
+        .eq('user_id', result.user.id);
 
       if (colaboradorError) {
         console.error('Erro ao atualizar colaborador:', colaboradorError);
       }
 
-      // Limpar permissões existentes e inserir as novas
-      await supabase
-        .from('user_permissions')
-        .delete()
-        .eq('user_id', authData.user.id);
-
-      // Inserir permissões personalizadas
+      // Inserir permissões personalizadas (se houver)
       if (data.permissions.length > 0) {
+        // Primeiro, remover permissões padrão se necessário
+        await supabase
+          .from('user_permissions')
+          .delete()
+          .eq('user_id', result.user.id);
+
         const permissionsToInsert = data.permissions.map(permission => ({
-          user_id: authData.user.id,
+          user_id: result.user.id,
           permission,
-          granted_by: authData.user.id
+          granted_by: result.user.id
         }));
 
         const { error: permError } = await supabase
@@ -186,7 +189,7 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
         }
       }
 
-      return authData.user;
+      return result.user;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['collaborators'] });

@@ -39,24 +39,27 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
       setIsCreating(true);
       
       try {
-        // Criar usuário usando supabase.auth.admin.createUser
+        // Chamar edge function para criar usuário
         console.log('Criando usuário...', data.email);
 
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: data.email,
-          password: data.senha,
-          email_confirm: true,
-          user_metadata: {
+        const { data: result, error } = await supabase.functions.invoke('create-user', {
+          body: {
+            email: data.email,
             nome: data.nome,
-            role: data.role
+            role: data.role,
+            senha: data.senha
           }
         });
 
-        if (authError || !authData.user) {
-          throw new Error(authError?.message || 'Falha ao criar usuário');
+        if (error) {
+          throw error;
         }
 
-        console.log('Usuário criado com sucesso:', authData.user.id);
+        if (!result.success) {
+          throw new Error(result.error || 'Erro ao criar usuário');
+        }
+
+        console.log('Usuário criado com sucesso:', result.user.id);
 
         // Aguardar um pouco para a trigger processar
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -65,7 +68,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
         const { data: clienteData, error: clienteError } = await supabase
           .from('clientes')
           .select('*')
-          .eq('user_id', authData.user.id)
+          .eq('user_id', result.user.id)
           .single();
 
         if (clienteError) {

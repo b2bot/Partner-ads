@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Lock, Eye, EyeOff } from 'lucide-react';
-import { apiClient } from '@/integrations/apiClient';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export function ResetPasswordForm() {
@@ -43,17 +43,24 @@ export function ResetPasswordForm() {
     }
 
     try {
-      await apiClient.post('/api/reset_password.php', {
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        password,
+      if (!accessToken) {
+        throw new Error('Token de acesso inválido');
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: password
       });
+
+      if (error) {
+        throw error;
+      }
+
       setSuccess('Senha atualizada com sucesso!');
       toast.success('Senha atualizada com sucesso!');
       setTimeout(() => {
         navigate('/');
       }, 2000);
-    } catch {
+    } catch (error: any) {
       setError('Erro ao atualizar senha. Tente novamente.');
     }
 

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Lock, Mail, User, ArrowLeft } from 'lucide-react';
-import { apiClient } from '@/integrations/apiClient';
+import { supabase } from '@/integrations/supabase/client';
 
 export function LoginForm() {
   const { signIn, signUp } = useAuth();
@@ -72,15 +72,20 @@ export function LoginForm() {
     }
 
     try {
-      await apiClient.post('/api/reset_password.php', {
-        email,
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
       });
+      
+      if (error) {
+        throw error;
+      }
+      
       setSuccess('E-mail de redefinição de senha enviado! Verifique sua caixa de entrada.');
       setTimeout(() => {
         setIsForgotPassword(false);
         setSuccess('');
       }, 3000);
-    } catch {
+    } catch (error: any) {
       setError('Erro ao enviar e-mail de redefinição. Verifique o endereço informado.');
     }
 
