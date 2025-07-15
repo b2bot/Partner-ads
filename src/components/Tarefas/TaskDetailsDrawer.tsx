@@ -207,7 +207,7 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
 									  <span>{task.colaborador.nome}</span>
 									</div>
 								  ) : (
-									<span>task.colaborador.nome</span>
+									<span></span>
 								  )}
 								</div>
 
