@@ -489,7 +489,7 @@ export type Database = {
           {
             foreignKeyName: "colaboradores_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1123,7 +1123,7 @@ export type Database = {
             foreignKeyName: "fk_tasks_assigned_to"
             columns: ["assigned_to"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
           {
