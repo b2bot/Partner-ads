@@ -8,48 +8,28 @@ export const useTasks = (projectId?: string) => {
     queryKey: ['tasks', projectId],
     queryFn: async (): Promise<TaskWithDetails[]> => {
       console.log('Fetching tasks, projectId:', projectId);
-
+      
       try {
         let query = supabase
           .from('tasks')
-          .select(`
-            *,
-            assigned_user:assigned_to (
-              id,
-              nome,
-              foto_url
-            )
-          `);
+          .select('*');
 
         if (projectId) {
           query = query.eq('project_id', projectId);
         }
 
         const { data: tasksData, error: tasksError } = await query;
-
+        
         if (tasksError) {
-          console.error('Error fetching tasks:', tasksError);
+          console.error('Error fetching basic tasks:', tasksError);
           throw new Error(tasksError.message);
         }
 
-        console.log('Tasks loaded:', tasksData);
+        console.log('Basic tasks loaded:', tasksData);
 
         if (!tasksData || tasksData.length === 0) {
           return [];
         }
-
-        return tasksData as TaskWithDetails[];
-
-      } catch (error) {
-        console.error('Error in useTasks:', error);
-        throw error;
-      }
-    },
-    enabled: true,
-    staleTime: 1000 * 60 * 5, // 5 minutos
-    gcTime: 1000 * 60 * 10, // 10 minutos
-  });
-};
 
         // Mapear as tarefas para o formato TaskWithDetails
         const tasksWithDetails: TaskWithDetails[] = tasksData.map((task) => ({
