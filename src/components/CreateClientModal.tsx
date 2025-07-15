@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/integrations/apiClient';
+import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,58 +39,51 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
       setIsCreating(true);
       
       try {
-        // Primeiro, criar usuário
+        // Criar usuário usando supabase.auth.admin.createUser
         console.log('Criando usuário...', data.email);
 
-        const authData = await apiClient.post<{ user: { id: string } }>('/api/register.php', {
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: data.email,
           password: data.senha,
-          nome: data.nome,
-          role: data.role,
+          email_confirm: true,
+          user_metadata: {
+            nome: data.nome,
+            role: data.role
+          }
         });
 
-        if (!authData.user) {
-          throw new Error('Falha ao criar usuário - nenhum usuário retornado');
+        if (authError || !authData.user) {
+          throw new Error(authError?.message || 'Falha ao criar usuário');
         }
 
         console.log('Usuário criado com sucesso:', authData.user.id);
 
-        // Criar perfil na tabela profiles
-        console.log('Criando perfil...');
-        const { error: profileError } = await apiClient
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            nome: data.nome,
-            email: data.email,
-            role: data.role,
-            ativo: true,
-          });
+        // Aguardar um pouco para a trigger processar
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
-        if (profileError) {
-          console.error('Erro ao criar perfil:', profileError);
-          throw new Error('Erro ao criar perfil do usuário');
-        }
-
-        // Aguardar um pouco para o perfil ser criado
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Criar cliente
-        console.log('Criando cliente...');
-        const { data: clienteData, error: clienteError } = await apiClient
+        // Buscar o cliente criado pela trigger
+        const { data: clienteData, error: clienteError } = await supabase
           .from('clientes')
-          .insert({
-            user_id: authData.user.id,
-            nome: data.nome,
-            tipo_acesso: data.tipoAcesso,
-            ativo: true,
-          })
-          .select()
+          .select('*')
+          .eq('user_id', authData.user.id)
           .single();
 
         if (clienteError) {
-          console.error('Erro ao criar cliente:', clienteError);
-          throw clienteError;
+          console.error('Erro ao buscar cliente:', clienteError);
+          throw new Error('Cliente não foi criado corretamente');
+        }
+
+        // Atualizar dados específicos do cliente
+        const { error: updateError } = await supabase
+          .from('clientes')
+          .update({
+            email: data.email,
+            tipo_acesso: data.tipoAcesso,
+          })
+          .eq('id', clienteData.id);
+
+        if (updateError) {
+          console.error('Erro ao atualizar cliente:', updateError);
         }
 
         console.log('Cliente criado:', clienteData);
@@ -106,7 +99,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
             ativo: true,
           }));
 
-          const { error: contasError } = await apiClient
+          const { error: contasError } = await supabase
             .from('contas')
             .insert(contasToInsert);
 

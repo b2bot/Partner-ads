@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/integrations/apiClient';
+import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,7 +70,7 @@ const PERMISSION_GROUPS = {
   ]
 };
 
-const PERMISSION_LABELS: Record<PermissionType, string> = {
+const PERMISSION_LABELS: Record<string, string> = {
   'access_dashboard': 'Acessar Dashboard',
   'access_whatsapp': 'Acessar WhatsApp',
   'create_campaigns': 'Criar campanhas',
@@ -129,44 +129,60 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       status: string;
       permissions: PermissionType[];
     }) => {
-      // Criar usuário
-      const authData = await apiClient.post<{ user: { id: string } }>('/api/register.php', {
+      // Criar usuário usando supabase.auth.admin.createUser
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: data.email,
         password: data.senha,
-        nome: data.nome,
-        role: 'admin',
-      });
-      if (!authData.user) throw new Error('Falha ao criar usuário');
-
-      // Criar perfil
-      const { error: profileError } = await apiClient
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
+        email_confirm: true,
+        user_metadata: {
           nome: data.nome,
-          email: data.email,
+          role: 'admin'
+        }
+      });
+
+      if (authError || !authData.user) {
+        throw new Error(authError?.message || 'Falha ao criar usuário');
+      }
+
+      console.log('Usuário criado com sucesso:', authData.user.id);
+
+      // Aguardar um pouco para a trigger processar
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Atualizar dados adicionais do colaborador
+      const { error: colaboradorError } = await supabase
+        .from('colaboradores')
+        .update({
           foto_url: data.foto_url,
-          status: data.status,
-          role: 'admin',
           ativo: data.status === 'ativo',
-        });
+        })
+        .eq('user_id', authData.user.id);
 
-      if (profileError) throw profileError;
+      if (colaboradorError) {
+        console.error('Erro ao atualizar colaborador:', colaboradorError);
+      }
 
-      // Aguardar criação do perfil
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Limpar permissões existentes e inserir as novas
+      await supabase
+        .from('user_permissions')
+        .delete()
+        .eq('user_id', authData.user.id);
 
-      // Atribuir permissões
-      for (const permission of data.permissions) {
-        const { error: permError } = await apiClient
+      // Inserir permissões personalizadas
+      if (data.permissions.length > 0) {
+        const permissionsToInsert = data.permissions.map(permission => ({
+          user_id: authData.user.id,
+          permission,
+          granted_by: authData.user.id
+        }));
+
+        const { error: permError } = await supabase
           .from('user_permissions')
-          .insert({
-            user_id: authData.user.id,
-            permission,
-          });
+          .insert(permissionsToInsert);
 
         if (permError) {
-          console.error('Erro ao atribuir permissão:', permission, permError);
+          console.error('Erro ao inserir permissões:', permError);
+          throw new Error('Erro ao atribuir permissões');
         }
       }
 
