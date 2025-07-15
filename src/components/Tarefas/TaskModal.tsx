@@ -42,40 +42,46 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
 
   const [newTag, setNewTag] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const taskData = {
-      ...formData,
-      created_by: profile?.id,
-      assigned_to: formData.assigned_to || profile?.id,
-    };
-
-    try {
-      if (mode === 'create') {
-        await createTask.mutateAsync(taskData);
-      } else if (task) {
-        await updateTask.mutateAsync({
-          id: task.id,
-          updates: formData
-        });
-      }
-      onOpenChange(false);
-      setFormData({
-        title: '',
-        description: '',
-        project_id: '',
-        status: 'backlog',
-        priority: 'media',
-        assigned_to: '',
-        due_date: '',
-        estimated_hours: 0,
-        tags: [],
-      });
-    } catch (error) {
-      console.error('Erro ao salvar tarefa:', error);
-    }
+  const taskData = {
+    ...formData,
+    created_by: profile?.id,
+    assigned_to: formData.assigned_to || profile?.id,
   };
+
+  console.log('CHAMANDO MUTATE =>', {
+    id: task?.id,
+    updates: taskData
+  });
+
+  try {
+    if (mode === 'create') {
+      await createTask.mutateAsync(taskData);
+    } else if (task) {
+      await updateTask.mutateAsync({
+        id: task.id,
+        updates: taskData
+      });
+    }
+    onOpenChange(false);
+    setFormData({
+      title: '',
+      description: '',
+      project_id: '',
+      status: 'backlog',
+      priority: 'media',
+      assigned_to: '',
+      due_date: '',
+      estimated_hours: 0,
+      tags: [],
+    });
+  } catch (error) {
+    console.error('Erro ao salvar tarefa:', error);
+  }
+};
+
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
