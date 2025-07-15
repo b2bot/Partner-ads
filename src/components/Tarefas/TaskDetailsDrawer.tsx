@@ -54,7 +54,7 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
       title: task?.title || '',
       status: task?.status || 'backlog',
       priority: task?.priority || 'media',
-      assigned_to: task?.assigned_to  || '',
+      assigned_to: task.colaborador?.nome  || '',
       project_id: task?.project_id || '',
       description: task?.description || '',
       due_date: task?.due_date?.slice(0, 10) || '',
