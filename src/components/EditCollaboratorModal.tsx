@@ -64,7 +64,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
     }) => {
       // Atualizar dados básicos
       const { error: profileError } = await apiClient
-        .from('profiles')
+        .from('colaboradores')
         .update({
           nome: data.nome,
           email: data.email,
