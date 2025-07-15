@@ -12,7 +12,14 @@ export const useTasks = (projectId?: string) => {
       try {
         let query = supabase
           .from('tasks')
-          .select('*');
+          .select(`
+            *,
+            assigned_user:assigned_to (
+              id,
+              nome,
+              foto_url
+            )
+          `);
 
         if (projectId) {
           query = query.eq('project_id', projectId);
