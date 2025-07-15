@@ -194,6 +194,12 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
                       <User className="h-4 w-4 text-gray-400" />
                       <span className="text-gray-600">Responsável:</span>
                       <span>{task.colaborador?.nome || 'Não atribuído'}</span>
+                      <Avatar>
+                        <img src={task.colaborador?.foto_url} alt="Avatar" />
+                        <AvatarFallback>
+                          {getInitials(task.colaborador?.nome || '')}
+                        </AvatarFallback>
+                      </Avatar>
                     </div>
 
                     <div className="flex items-center gap-2 text-sm">
