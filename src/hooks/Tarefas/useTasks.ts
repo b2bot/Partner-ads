@@ -7,28 +7,67 @@ export const useTasks = (projectId?: string) => {
   return useQuery({
     queryKey: ['tasks', projectId],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      let query = supabase
-        .from('tasks')
-        .select(`
-          *,
-          assigned_user:profiles!fk_tasks_assigned_to (id, nome, email, foto_url),
-          creator:profiles!tasks_created_by_fkey (id, nome, email),
-          project:projects!tasks_project_id_fkey (id, name, description)
-        `);
+      console.log('Fetching tasks, projectId:', projectId);
+      
+      try {
+        let query = supabase
+          .from('tasks')
+          .select('*');
 
-      if (projectId) {
-        query = query.eq('project_id', projectId);
+        if (projectId) {
+          query = query.eq('project_id', projectId);
+        }
+
+        const { data: tasksData, error: tasksError } = await query;
+        
+        if (tasksError) {
+          console.error('Error fetching basic tasks:', tasksError);
+          throw new Error(tasksError.message);
+        }
+
+        console.log('Basic tasks loaded:', tasksData);
+
+        if (!tasksData || tasksData.length === 0) {
+          return [];
+        }
+
+        // Mapear as tarefas para o formato TaskWithDetails
+        const tasksWithDetails: TaskWithDetails[] = tasksData.map((task) => ({
+          id: task.id,
+          title: task.title,
+          description: task.description,
+          status: task.status as TaskStatus,
+          priority: task.priority as TaskPriority,
+          due_date: task.due_date,
+          start_date: task.start_date,
+          assigned_to: task.assigned_to,
+          created_by: task.created_by,
+          project_id: task.project_id,
+          section_id: task.section_id,
+          tags: task.tags,
+          estimated_hours: task.estimated_hours,
+          actual_hours: task.actual_hours,
+          order_index: task.order_index,
+          type: task.type,
+          linked_ticket_id: task.linked_ticket_id,
+          owner_id: task.owner_id,
+          created_at: task.created_at,
+          updated_at: task.updated_at,
+          assigned_user: null,
+          creator: null,
+          project: null,
+          subtasks: [],
+          comments: [],
+          attachments: []
+        }));
+
+        console.log('Tasks with details loaded:', tasksWithDetails);
+        return tasksWithDetails;
+        
+      } catch (error) {
+        console.error('Error in useTasks:', error);
+        throw error;
       }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching tasks:', error);
-        throw new Error(error.message);
-      }
-
-      console.log('Tasks loaded:', data);
-      return data || [];
     },
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutos

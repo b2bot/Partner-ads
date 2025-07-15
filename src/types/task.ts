@@ -27,8 +27,8 @@ export type WorkflowTemplate = Database['public']['Tables']['workflow_templates'
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 
-export type TaskStatus = Database['public']['Enums']['task_status'];
-export type TaskPriority = Database['public']['Enums']['task_priority'];
+export type TaskStatus = 'backlog' | 'em_execucao' | 'revisao' | 'aguardando' | 'finalizada' | 'cancelada';
+export type TaskPriority = 'baixa' | 'media' | 'alta' | 'urgente';
 export type UserRole = Database['public']['Enums']['user_role'];
 
 export interface TaskWithDetails {

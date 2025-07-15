@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/integrations/apiClient';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Collaborator } from '@/types/collaborator';
 
@@ -9,7 +9,7 @@ export function useCollaborators() {
   const { data: collaborators = [], isLoading } = useQuery<Collaborator[]>({
     queryKey: ['colaboradores'],
     queryFn: async () => {
-      const { data, error } = await apiClient
+      const { data, error } = await supabase
         .from('colaboradores')
         .select(`
           id,
@@ -35,7 +35,7 @@ export function useCollaborators() {
 
   const deactivateCollaboratorMutation = useMutation({
     mutationFn: async (collaboratorId: string) => {
-      const { error } = await apiClient
+      const { error } = await supabase
         .from('colaboradores')
         .update({ ativo: false })
         .eq('id', collaboratorId);

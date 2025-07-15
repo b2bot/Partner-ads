@@ -13,7 +13,7 @@ interface KanbanViewProps {
 
 const statusColumns: { status: TaskStatus; title: string; color: string; description: string }[] = [
   { status: 'backlog', title: 'Backlog', color: 'bg-gray-50 border-gray-200', description: 'Tarefas planejadas' },
-  { status: 'execucao', title: 'Em Execução', color: 'bg-blue-50 border-blue-200', description: 'Trabalho em andamento' },
+  { status: 'em_execucao', title: 'Em Execução', color: 'bg-blue-50 border-blue-200', description: 'Trabalho em andamento' },
   { status: 'revisao', title: 'Em Revisão', color: 'bg-yellow-50 border-yellow-200', description: 'Aguardando aprovação' },
   { status: 'aguardando', title: 'Aguardando', color: 'bg-orange-50 border-orange-200', description: 'Bloqueadas ou pendentes' },
   { status: 'finalizada', title: 'Finalizada', color: 'bg-green-50 border-green-200', description: 'Concluídas' },
