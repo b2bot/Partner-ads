@@ -14,17 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { usePermissions, PermissionType } from '@/hooks/usePermissions';
 import { PERMISSION_LABELS, PERMISSION_GROUPS } from './permissions/PermissionLabels';
-
-interface Collaborator {
-  id: string;
-  nome: string;
-  email: string;
-  foto_url?: string;
-  ativo: boolean;
-  role: string;
-  created_at: string;
-  is_root_admin: boolean;
-}
+import { Collaborator } from '@/types/collaborator';
 
 interface EditCollaboratorModalProps {
   collaborator: Collaborator;
@@ -36,7 +26,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
   const [nome, setNome] = useState(collaborator.nome);
   const [email, setEmail] = useState(collaborator.email);
   const [fotoUrl, setFotoUrl] = useState(collaborator.foto_url || '');
-  const [ativo, setativo] = useState(collaborator.ativo);
+  const [ativo, setAtivo] = useState(collaborator.ativo);
   const [selectedPermissions, setSelectedPermissions] = useState<PermissionType[]>([]);
   const [error, setError] = useState('');
 
@@ -80,7 +70,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
           email: data.email,
           foto_url: data.foto_url,
 
-          ativo: data.ativo === 'ativo',
+          ativo: data.ativo,
         })
         .eq('id', collaborator.id);
 
@@ -218,15 +208,15 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
 
               <div className="space-y-2">
                 <Label htmlFor="ativo">Ativo</Label>
-                <Select value={ativo} onValueChange={setativo}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ativo">Ativo</SelectItem>
-                    <SelectItem value="inativo">Inativo</SelectItem>
-                  </SelectContent>
-                </Select>
+                 <Select value={ativo.toString()} onValueChange={(value) => setAtivo(value === 'true')}>
+                   <SelectTrigger>
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="true">Ativo</SelectItem>
+                     <SelectItem value="false">Inativo</SelectItem>
+                   </SelectContent>
+                 </Select>
               </div>
             </div>
 

@@ -10,17 +10,7 @@ import { CollaboratorsSearch } from './collaborators/CollaboratorsSearch';
 import { CollaboratorsList } from './collaborators/CollaboratorsList';
 import { AccessDenied } from './collaborators/AccessDenied';
 import { LoadingSpinner } from './collaborators/LoadingSpinner';
-
-interface Collaborator {
-  id: string;
-  nome: string;
-  email: string;
-  foto_url?: string;
-  ativo: boolean;
-  role: string;
-  created_at: string;
-  is_root_admin: boolean;
-}
+import { Collaborator } from '@/types/collaborator';
 
 export function CollaboratorsManagement() {
   const [searchTerm, setSearchTerm] = useState('');

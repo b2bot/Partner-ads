@@ -3,17 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Edit, Trash2 } from 'lucide-react';
 import { CollaboratorRow } from './CollaboratorRow';
-
-interface Collaborator {
-  id: string;
-  nome: string;
-  email: string;
-  foto_url?: string;
-  status: string;
-  role: string;
-  created_at: string;
-  is_root_admin: boolean;
-}
+import { Collaborator } from '@/types/collaborator';
 
 interface CollaboratorsListProps {
   collaborators: Collaborator[];

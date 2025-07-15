@@ -1,18 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/integrations/apiClient';
 import { toast } from 'sonner';
-
-type Collaborator = {
-  id: string;
-  nome: string;
-  email: string;
-  foto_url?: string;
-  cargo?: string;
-  setor?: string;
-  ativo: 'ativo' | 'inativo';
-  created_at: string;
-  nivel_acesso: 'admin';
-};
+import { Collaborator } from '@/types/collaborator';
 
 export function useCollaborators() {
   const queryClient = useQueryClient();
@@ -31,7 +20,8 @@ export function useCollaborators() {
           setor,
           ativo,
           created_at,
-          nivel_acesso
+          nivel_acesso,
+          user_id
         `);
 
       if (error) {
@@ -47,7 +37,7 @@ export function useCollaborators() {
     mutationFn: async (collaboratorId: string) => {
       const { error } = await apiClient
         .from('colaboradores')
-        .update({ status: 'inativo' })
+        .update({ ativo: false })
         .eq('id', collaboratorId);
 
       if (error) throw error;
