@@ -14,7 +14,7 @@ export const useTasks = (projectId?: string) => {
           .from('tasks')
           .select(`
             *,
-            colaborador:colaboradores!tasks_assigned_to_fkey (
+            colaborador:colaboradores!fk_tasks_assigned_to (
               id,
               nome,
               foto_url
