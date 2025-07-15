@@ -14,13 +14,17 @@ import {
   BarChart3 
 } from 'lucide-react';
 
-export const ManagerView = () => {
+interface ManagerViewProps {
+  projectId?: string;
+}
+
+export const ManagerView = ({ projectId }: ManagerViewProps = {}) => {
   const { profile } = useAuth();
-  const { data: tasks } = useTasks();
+  const { data: tasks } = useTasks(projectId);
   const { data: projects } = useProjects();
 
   // Verificar se o usuário tem permissão de gestor
-  if (profile?.role !== 'gestor' && profile?.role !== 'admin') {
+  if (profile?.role !== 'admin') {
     return (
       <div className="text-center py-12">
         <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
@@ -50,7 +54,7 @@ export const ManagerView = () => {
 
   const tasksByUser = tasks?.reduce((acc, task) => {
     const userId = task.assigned_to || 'unassigned';
-    const userName = task.assigned_user?.name || 'Não atribuído';
+    const userName = task.assigned_user?.nome || 'Não atribuído';
     
     if (!acc[userId]) {
       acc[userId] = { name: userName, total: 0, completed: 0, overdue: 0 };
@@ -70,7 +74,7 @@ export const ManagerView = () => {
   }, {} as Record<string, { name: string; total: number; completed: number; overdue: number }>) || {};
 
   const projectProgress = projects?.map(project => {
-    const projectTasks = tasks?.filter(task => task.project_id === project.id) || [];
+    const projectTasks = tasks?.filter(task => task.project?.id === project.id) || [];
     const totalTasks = projectTasks.length;
     const completedTasks = projectTasks.filter(task => task.status === 'finalizada').length;
     const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
@@ -169,7 +173,7 @@ export const ManagerView = () => {
                       Vencimento: {task.due_date && new Date(task.due_date).toLocaleDateString('pt-BR')}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Responsável: {task.assigned_user?.name || 'Não atribuído'}
+                      Responsável: {task.assigned_user?.nome || 'Não atribuído'}
                     </p>
                   </div>
                 ))}

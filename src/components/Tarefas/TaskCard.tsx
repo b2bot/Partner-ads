@@ -14,7 +14,7 @@ interface TaskCardProps {
 
 export const TaskCard = ({ task, onClick, compact = false }: TaskCardProps) => {
   const deleteTask = useDeleteTask();
-  const assigneeName = task.assigned_user?.name ?? '??';
+  const assigneeName = task.assigned_user?.nome ?? '??';
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -84,7 +84,7 @@ export const TaskCard = ({ task, onClick, compact = false }: TaskCardProps) => {
             />
             {task.assigned_user && (
               <Avatar className="h-5 w-5">
-                <AvatarImage src={task.assigned_user.avatar_url || ''} />
+                <AvatarImage src={task.assigned_user.foto_url || ''} />
                 <AvatarFallback className="text-[10px]">
                   {assigneeName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>

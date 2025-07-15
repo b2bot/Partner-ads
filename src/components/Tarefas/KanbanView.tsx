@@ -6,21 +6,22 @@ import { Plus, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface KanbanViewProps {
-  onTaskClick: (task: TaskWithDetails) => void;
+  projectId?: string;
+  onTaskClick?: (task: TaskWithDetails) => void;
   onCreateTask?: () => void;
 }
 
 const statusColumns: { status: TaskStatus; title: string; color: string; description: string }[] = [
   { status: 'backlog', title: 'Backlog', color: 'bg-gray-50 border-gray-200', description: 'Tarefas planejadas' },
-  { status: 'em_execucao', title: 'Em Execução', color: 'bg-blue-50 border-blue-200', description: 'Trabalho em andamento' },
-  { status: 'em_revisao', title: 'Em Revisão', color: 'bg-yellow-50 border-yellow-200', description: 'Aguardando aprovação' },
+  { status: 'execucao', title: 'Em Execução', color: 'bg-blue-50 border-blue-200', description: 'Trabalho em andamento' },
+  { status: 'revisao', title: 'Em Revisão', color: 'bg-yellow-50 border-yellow-200', description: 'Aguardando aprovação' },
   { status: 'aguardando', title: 'Aguardando', color: 'bg-orange-50 border-orange-200', description: 'Bloqueadas ou pendentes' },
   { status: 'finalizada', title: 'Finalizada', color: 'bg-green-50 border-green-200', description: 'Concluídas' },
   { status: 'cancelada', title: 'Cancelada', color: 'bg-red-50 border-red-200', description: 'Canceladas' },
 ];
 
-export const KanbanView = ({ onTaskClick, onCreateTask }: KanbanViewProps) => {
-  const { data: tasks, isLoading } = useTasks();
+export const KanbanView = ({ projectId, onTaskClick, onCreateTask }: KanbanViewProps) => {
+  const { data: tasks, isLoading } = useTasks(projectId);
   const updateTask = useUpdateTask();
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
@@ -125,7 +126,7 @@ export const KanbanView = ({ onTaskClick, onCreateTask }: KanbanViewProps) => {
                     >
                       <TaskCard
                         task={task}
-                        onClick={() => onTaskClick(task)}
+                        onClick={() => onTaskClick?.(task)}
                         compact
                       />
                     </div>

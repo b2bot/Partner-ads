@@ -8,10 +8,14 @@ import { TaskPriorityBadge } from './TaskPriorityBadge';
 
 type ViewMode = 'month' | 'week' | 'day';
 
-export const CalendarView = () => {
+interface CalendarViewProps {
+  projectId?: string;
+}
+
+export const CalendarView = ({ projectId }: CalendarViewProps = {}) => {
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { data: tasks } = useTasks();
+  const { data: tasks } = useTasks(projectId);
 
   const goToToday = () => {
     setCurrentDate(new Date());

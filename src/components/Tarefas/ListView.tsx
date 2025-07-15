@@ -61,11 +61,11 @@ export const ListView = ({ projectId, onTaskClick }: ListViewProps) => {
                 {task.assigned_user ? (
                   <div className="flex items-center gap-1 truncate">
                     <img
-                      src={task.assigned_colaborador.foto_url || ''}
-                      alt={task.assigned_colaborador.nome}
+                      src={task.assigned_user.foto_url || ''}
+                      alt={task.assigned_user.nome}
                       className="h-5 w-5 rounded-full object-cover"
                     />
-                    <span className="text-xs truncate">{task.assigned_colaborador.nome}</span>
+                    <span className="text-xs truncate">{task.assigned_user.nome}</span>
                   </div>
                 ) : (
                   <span className="text-gray-400 text-xs">Não atribuído</span>

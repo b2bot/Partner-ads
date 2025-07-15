@@ -1,4 +1,3 @@
-
 import { Database } from '@/types/database';
 
 export type Task = Database['public']['Tables']['tasks']['Row'];
@@ -7,23 +6,22 @@ export type TaskUpdate = Database['public']['Tables']['tasks']['Update'];
 
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type ProjectInsert = Database['public']['Tables']['projects']['Insert'];
+export type ProjectUpdate = Database['public']['Tables']['projects']['Update'];
 
 export type Client = Database['public']['Tables']['clientes']['Row'];
 export type ClientInsert = Database['public']['Tables']['clientes']['Insert'];
 
-export type TaskSection = Database['public']['Tables']['task_sections']['Row'];
-export type TaskSectionInsert = Database['public']['Tables']['task_sections']['Insert'];
+export type TaskSection = Database['public']['Tables']['sections']['Row'];
+export type TaskSectionInsert = Database['public']['Tables']['sections']['Insert'];
 
-export type Subtask = Database['public']['Tables']['subtasks']['Row'];
-export type SubtaskInsert = Database['public']['Tables']['subtasks']['Insert'];
+export type Subtask = Database['public']['Tables']['task_steps']['Row'];
+export type SubtaskInsert = Database['public']['Tables']['task_steps']['Insert'];
 
 export type TaskComment = Database['public']['Tables']['task_comments']['Row'];
 export type TaskCommentInsert = Database['public']['Tables']['task_comments']['Insert'];
 
 export type TaskAttachment = Database['public']['Tables']['task_attachments']['Row'];
 export type TaskAttachmentInsert = Database['public']['Tables']['task_attachments']['Insert'];
-
-export type TaskHistory = Database['public']['Tables']['task_history']['Row'];
 
 export type WorkflowTemplate = Database['public']['Tables']['workflow_templates']['Row'];
 

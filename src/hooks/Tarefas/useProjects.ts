@@ -16,8 +16,8 @@ export const useProjects = () => {
 			  status,
 			  start_date,
 			  end_date,
-			  client:client_id (id, nome),
-			  responsible:colaboradores!projects_responsible_id_fkey (id, nome)
+			  client:clientes!projects_client_id_fkey (id, nome),
+			  responsible:colaboradores!projects_responsible_id_fkey (id, nome),
 			  tasks (
 				id,
 				status

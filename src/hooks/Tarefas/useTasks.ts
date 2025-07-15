@@ -7,25 +7,26 @@ export const useTasks = (projectId?: string) => {
   return useQuery({
     queryKey: ['tasks', projectId],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      const { data, error } = await apiClient
+      let query = apiClient
         .from('tasks')
-        .select('*')
-        .eq('project_id', projectId!); // O ! garante que não será undefined, pois `enabled` controla
+        .select(`
+          *,
+          assigned_user:profiles!tasks_assigned_to_fkey (id, nome, email, foto_url),
+          creator:profiles!tasks_created_by_fkey (id, nome, email),
+          project:projects!tasks_project_id_fkey (id, name, description)
+        `);
+
+      if (projectId) {
+        query = query.eq('project_id', projectId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw new Error(error.message);
 
-      return (data || []).map(task => ({
-        ...task,
-        assigned_user: null,
-        creator: null,
-        project: null,
-        section: null,
-        subtasks: [],
-        comments: [],
-        attachments: [],
-      })) as TaskWithDetails[];
+      return data || [];
     },
-    enabled: !!projectId, // só executa a query se o ID for válido
+    enabled: true, // executa sempre
     staleTime: 0,
     gcTime: 0,
   });

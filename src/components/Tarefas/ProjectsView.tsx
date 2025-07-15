@@ -159,7 +159,7 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
                   {project.client && (
                     <div className="flex items-center gap-2 text-sm">
                       <User className="h-4 w-4 text-gray-400" />
-                      <span>{project.client.name}</span>
+                      <span>{project.client.nome}</span>
                     </div>
                   )}
 
@@ -167,7 +167,7 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
                   {project.responsible && (
                     <div className="flex items-center gap-2 text-sm">
                       <User className="h-4 w-4 text-gray-400" />
-                      <span>Responsável: {projects_responsible_name}</span>
+                      <span>Responsável: {project.responsible?.nome}</span>
                     </div>
                   )}
 
