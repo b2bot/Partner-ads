@@ -193,7 +193,7 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
 								<div className="flex items-center gap-2 text-sm">
 								  <User className="h-4 w-4 text-gray-400" />
 								  <span className="text-gray-600">Responsável:</span>
-								  {task.colaborador.nome ? (
+								  {task.colaborador? (
 									<div className="flex items-center gap-2">
 									  <Avatar>
 										{task.colaborador.foto_url ? (
