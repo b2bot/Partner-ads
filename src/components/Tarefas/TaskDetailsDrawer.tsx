@@ -193,7 +193,7 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
                     <div className="flex items-center gap-2 text-sm">
                       <User className="h-4 w-4 text-gray-400" />
                       <span className="text-gray-600">Responsável:</span>
-                      <span>{task.assigned_user?.nome || 'Não atribuído'}</span>
+                      <span>{task.colaborador?.nome || 'Não atribuído'}</span>
                     </div>
 
                     <div className="flex items-center gap-2 text-sm">
