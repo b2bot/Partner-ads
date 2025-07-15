@@ -22,14 +22,22 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
   const { collaborators: collaboratorsList = [], isLoading: isLoadingCollaborators } = useCollaborators();
   const createProject = useCreateProject();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    client_id: string;
+    responsible_id: string;
+    start_date: string;
+    end_date: string;
+    status: 'ativo' | 'pausado' | 'finalizado';
+  }>({
     name: '',
     description: '',
     client_id: '',
     responsible_id: '',
     start_date: '',
     end_date: '',
-    status: 'ativo' as const,
+    status: 'ativo',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

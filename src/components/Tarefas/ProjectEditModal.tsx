@@ -19,17 +19,25 @@ interface ProjectEditModalProps {
 
 export const ProjectEditModal = ({ open, onOpenChange, project }: ProjectEditModalProps) => {
   const { data: clients } = useClientes();
-  const { data: collaborators } = useCollaborators();
+  const { collaborators } = useCollaborators();
   const updateProject = useUpdateProject();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    client_id: string;
+    responsible_id: string;
+    start_date: string;
+    end_date: string;
+    status: 'ativo' | 'pausado' | 'finalizado';
+  }>({
     name: '',
     description: '',
     client_id: '',
     responsible_id: '',
     start_date: '',
     end_date: '',
-    status: 'ativo' as const,
+    status: 'ativo',
   });
 
   useEffect(() => {

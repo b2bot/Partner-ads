@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useCreateTask, useUpdateTask } from '@/hooks/Tarefas/useTasks';
 import { useProjects } from '@/hooks/Tarefas/useProjects';
 import { useAuth } from '@/hooks/useAuth';
+import { useCollaborators } from '@/hooks/useCollaborators';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ interface TaskModalProps {
 export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) => {
   const { profile } = useAuth();
   const { data: projects } = useProjects();
+  const { collaborators } = useCollaborators();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
 
@@ -31,6 +33,7 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
     project_id: task?.project_id || '',
     status: task?.status || 'backlog' as TaskStatus,
     priority: task?.priority || 'media' as TaskPriority,
+    assigned_to: task?.assigned_to || '',
     due_date: task?.due_date || '',
     estimated_hours: task?.estimated_hours || 0,
     tags: task?.tags || [],
@@ -44,7 +47,7 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
     const taskData = {
       ...formData,
       created_by: profile?.id,
-      assigned_to: profile?.id, // Por simplicidade, atribuindo ao criador
+      assigned_to: formData.assigned_to || profile?.id,
     };
 
     try {
@@ -64,6 +67,7 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
         project_id: '',
         status: 'backlog',
         priority: 'media',
+        assigned_to: '',
         due_date: '',
         estimated_hours: 0,
         tags: [],
@@ -152,6 +156,26 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
                 {projects?.map((project) => (
                   <SelectItem key={project.id} value={project.id}>
                     {project.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Responsável */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Responsável</label>
+            <Select
+              value={formData.assigned_to}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, assigned_to: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um responsável" />
+              </SelectTrigger>
+              <SelectContent>
+                {collaborators?.map((collaborator) => (
+                  <SelectItem key={collaborator.id} value={collaborator.id}>
+                    {collaborator.nome}
                   </SelectItem>
                 ))}
               </SelectContent>
