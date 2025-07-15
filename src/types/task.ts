@@ -31,7 +31,27 @@ export type TaskStatus = Database['public']['Enums']['task_status'];
 export type TaskPriority = Database['public']['Enums']['task_priority'];
 export type UserRole = Database['public']['Enums']['user_role'];
 
-export interface TaskWithDetails extends Task {
+export interface TaskWithDetails {
+  id: string;
+  title: string;
+  description?: string | null;
+  status?: TaskStatus | null;
+  priority?: TaskPriority | null;
+  due_date?: string | null;
+  start_date?: string | null;
+  assigned_to?: string | null;
+  created_by?: string | null;
+  project_id?: string | null;
+  section_id?: string | null;
+  tags?: string[] | null;
+  estimated_hours?: number | null;
+  actual_hours?: number | null;
+  order_index?: number | null;
+  type?: string | null;
+  linked_ticket_id?: string | null;
+  owner_id?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
   project?: Project | null;
   section?: TaskSection | null;
   assigned_user?: Profile | null;
@@ -41,7 +61,17 @@ export interface TaskWithDetails extends Task {
   attachments?: TaskAttachment[];
 }
 
-export interface ProjectWithDetails extends Project {
+export interface ProjectWithDetails {
+  id: string;
+  name: string;
+  description?: string | null;
+  status?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  created_at?: string | null;
+  created_by: string;
+  client_id?: string | null;
+  responsible_id?: string | null;
   client?: Client | null;
   responsible?: Profile | null;
   creator?: Profile | null;

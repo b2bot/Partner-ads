@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/integrations/apiClient';
+import { supabase } from '@/integrations/supabase/client';
 import { Task, TaskInsert, TaskUpdate, TaskWithDetails } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
@@ -7,11 +7,11 @@ export const useTasks = (projectId?: string) => {
   return useQuery({
     queryKey: ['tasks', projectId],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      let query = apiClient
+      let query = supabase
         .from('tasks')
         .select(`
           *,
-          assigned_user:profiles!tasks_assigned_to_fkey (id, nome, email, foto_url),
+          assigned_user:profiles!fk_tasks_assigned_to (id, nome, email, foto_url),
           creator:profiles!tasks_created_by_fkey (id, nome, email),
           project:projects!tasks_project_id_fkey (id, name, description)
         `);
@@ -22,13 +22,17 @@ export const useTasks = (projectId?: string) => {
 
       const { data, error } = await query;
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error('Error fetching tasks:', error);
+        throw new Error(error.message);
+      }
 
+      console.log('Tasks loaded:', data);
       return data || [];
     },
-    enabled: true, // executa sempre
-    staleTime: 0,
-    gcTime: 0,
+    enabled: true,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    gcTime: 1000 * 60 * 10, // 10 minutos
   });
 };
 
@@ -37,7 +41,7 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
-      const { data, error } = await apiClient.from('tasks').insert(task).select().single();
+      const { data, error } = await supabase.from('tasks').insert(task).select().single();
       if (error) throw new Error(error.message);
       return data;
     },
@@ -66,7 +70,7 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: TaskUpdate }) => {
-      const { data, error } = await apiClient
+      const { data, error } = await supabase
         .from('tasks')
         .update(updates)
         .eq('id', id)
@@ -101,7 +105,7 @@ export const useDeleteTask = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await apiClient.from('tasks').delete().eq('id', id);
+      const { error } = await supabase.from('tasks').delete().eq('id', id);
       if (error) throw new Error(error.message);
     },
     onSuccess: (_, id) => {

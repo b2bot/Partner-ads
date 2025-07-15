@@ -139,7 +139,7 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[600px] sm:max-w-[600px] overflow-y-auto">
         <div className="p-2">
-          <h5 className="text-xl font-semibold mb-2">{task?.titulo ?? 'Informações da Tarefa '}</h5>
+          <h5 className="text-xl font-semibold mb-2">{task?.title ?? 'Informações da Tarefa '}</h5>
 
 			<Tabs defaultValue="resumo" className="w-full">
 			  <TabsList className="grid w-full grid-cols-4 mb-1 bg-transparent border border-gray-200 rounded-lg shadow-none items-stretch">
