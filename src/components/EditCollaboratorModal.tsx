@@ -35,12 +35,12 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
 
   // Buscar permissões atuais do colaborador
   const { data: currentPermissions } = useQuery({
-    queryKey: ['collaborator-permissions', collaborator.id],
+    queryKey: ['collaborator-permissions', collaborator.user_id],
     queryFn: async () => {
       const { data, error } = await apiClient
         .from('user_permissions')
         .select('permission')
-        .eq('user_id', collaborator.id);
+        .eq('user_id', collaborator.user_id);
       
       if (error) throw error;
       return data.map(p => p.permission as PermissionType);
@@ -72,7 +72,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
 
           ativo: data.ativo,
         })
-        .eq('id', collaborator.id);
+        .eq('id', collaborator.user_id);
 
       if (profileError) throw profileError;
 
@@ -92,7 +92,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
           const { error } = await apiClient
             .from('user_permissions')
             .delete()
-            .eq('user_id', collaborator.id)
+            .eq('user_id', collaborator.user_id)
             .eq('permission', permission as any);
 
           if (error) {
@@ -109,7 +109,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
           const { error } = await apiClient
             .from('user_permissions')
             .insert({
-              user_id: collaborator.id,
+              user_id: collaborator.user_id,
               permission: permission as any,
             });
 
