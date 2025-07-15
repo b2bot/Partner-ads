@@ -30,16 +30,14 @@ serve(async (req) => {
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      console.error("🚨 Sem authorization header na requisição.")
-      throw new Error('No authorization header')
+      throw new Error('Authorization header ausente')
     }
 
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    )
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
 
     if (authError || !user) {
-      console.error("❌ Erro na autenticação do usuário:", authError)
+      console.error('Erro de autenticação:', authError)
       throw new Error('Unauthorized')
     }
 
@@ -49,58 +47,43 @@ serve(async (req) => {
       .eq('id', user.id)
       .single()
 
-    console.log("🔍 Usuário autenticado:", user.email)
-    console.log("📄 Perfil encontrado:", profile)
-
     if (profileError) {
-      console.error("❌ Erro ao buscar perfil:", profileError)
-      throw new Error('Failed to fetch user profile')
+      console.error('Erro ao buscar perfil:', profileError)
+      throw new Error('Erro ao verificar perfil do usuário')
     }
 
     if (!profile.is_root_admin && profile.role !== 'admin') {
-      console.warn("🚫 Permissões insuficientes:", profile)
-      throw new Error('Insufficient permissions')
+      throw new Error('Permissão insuficiente')
     }
 
     const body = await req.json()
-    console.log("📨 Payload recebido:", body)
-
     const { email, nome, role = 'admin', senha } = body
 
     if (!email || !nome) {
-      console.warn("❗ Dados incompletos: email ou nome ausentes.")
-      throw new Error('Email and nome are required')
+      console.error('Body inválido:', body)
+      throw new Error('Campos obrigatórios: email e nome')
     }
 
     const password = senha || Math.random().toString(36).slice(-12) + 'A1!'
 
-    console.log('🛠 Criando usuário com email:', email, '| Role:', role)
+    console.log('Iniciando criação de usuário:', { email, nome, role })
 
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: {
-        nome,
-        role
-      }
+      user_metadata: { nome, role },
     })
 
-    console.log("🧠 Resultado do createUser:", { newUser, createError })
-
     if (createError) {
-      console.error('❌ Erro ao criar usuário:', createError)
-      throw createError
+      console.error('Erro ao criar usuário:', createError)
+      throw new Error(createError.message)
     }
 
-    console.log('✅ Usuário criado com sucesso:', newUser.user?.id)
+    console.log('Usuário criado com sucesso:', newUser.user?.id)
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        user: newUser.user,
-        message: 'Usuário criado com sucesso'
-      }),
+      JSON.stringify({ success: true, user: newUser.user }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -108,12 +91,12 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('🔥 Erro final na create-user:', error)
+    console.error('Erro geral na função create-user:', error)
 
     return new Response(
-      JSON.stringify({ 
-        error: error.message || 'Internal server error',
-        success: false
+      JSON.stringify({
+        success: false,
+        error: error.message || 'Erro interno'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
