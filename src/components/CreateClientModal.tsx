@@ -48,6 +48,9 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
             nome: data.nome,
             role: data.role,
             senha: data.senha
+          },
+          headers: {
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
           }
         });
 

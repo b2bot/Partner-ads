@@ -136,6 +136,9 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
           nome: data.nome,
           role: 'admin',
           senha: data.senha
+        },
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
         }
       });
 
