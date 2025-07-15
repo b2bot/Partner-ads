@@ -1,3 +1,4 @@
+// TaskModal.tsx
 
 import { useState } from 'react';
 import { useCreateTask, useUpdateTask } from '@/hooks/Tarefas/useTasks';
@@ -11,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/task';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 
 interface TaskModalProps {
   open: boolean;
@@ -43,7 +44,7 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const taskData = {
       ...formData,
       created_by: profile?.id,
@@ -60,7 +61,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
         });
       }
       onOpenChange(false);
-      // Reset form
       setFormData({
         title: '',
         description: '',
@@ -120,7 +120,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Título */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Título *</label>
             <Input
@@ -131,7 +130,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
             />
           </div>
 
-          {/* Descrição */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Descrição</label>
             <Textarea
@@ -142,7 +140,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
             />
           </div>
 
-          {/* Projeto */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Projeto</label>
             <Select
@@ -162,7 +159,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
             </Select>
           </div>
 
-          {/* Responsável */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Responsável</label>
             <Select
@@ -174,7 +170,7 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
               </SelectTrigger>
               <SelectContent>
                 {collaborators?.map((collaborator) => (
-                  <SelectItem key={collaborator.id} value={collaborator.id}>
+                  <SelectItem key={collaborator.user_id} value={collaborator.user_id}>
                     {collaborator.nome}
                   </SelectItem>
                 ))}
@@ -182,7 +178,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
             </Select>
           </div>
 
-          {/* Status e Prioridade */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Status</label>
@@ -223,7 +218,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
             </div>
           </div>
 
-          {/* Data de entrega e horas estimadas */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Data de Entrega</label>
@@ -246,7 +240,6 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
             </div>
           </div>
 
-          {/* Tags */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Tags</label>
             <div className="flex gap-2 mb-2">
@@ -278,27 +271,16 @@ export const TaskModal = ({ open, onOpenChange, task, mode }: TaskModalProps) =>
             </div>
           </div>
 
-          {/* Ações */}
           <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={createTask.isPending || updateTask.isPending}
-            >
+            <Button type="submit" className="flex-1" disabled={createTask.isPending || updateTask.isPending}>
               {createTask.isPending || updateTask.isPending
                 ? 'Salvando...'
                 : mode === 'create'
                 ? 'Criar Tarefa'
-                : 'Salvar Alterações'
-              }
+                : 'Salvar Alterações'}
             </Button>
           </div>
         </form>
