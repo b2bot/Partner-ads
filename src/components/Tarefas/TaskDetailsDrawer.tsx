@@ -54,7 +54,7 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
       title: task?.title || '',
       status: task?.status || 'backlog',
       priority: task?.priority || 'media',
-      assigned_to: task.assigned_to  || '',
+      assigned_to: task?.assigned_to  || '',
       project_id: task?.project_id || '',
       description: task?.description || '',
       due_date: task?.due_date?.slice(0, 10) || '',
@@ -178,93 +178,78 @@ export const TaskDetailsDrawer: React.FC<TaskDetailsDrawerProps> = ({
               </TabsTrigger>
             </TabsList>
 
-			<TabsContent value="resumo">
-			  <SheetHeader className="space-y-4">
-				<div className="grid grid-cols-2 gap-4">
-				  <div className="space-y-3">
-					<div className="flex items-center gap-2 text-sm">
-					  <FolderOpen className="h-4 w-4 text-gray-400" />
-					  <span className="text-gray-600">Projeto:</span>
-					  <span className="font-medium">
-						{projects?.find((p) => p.id === task.project_id)?.name || 'Não atribuído'}
-					  </span>
-					</div>
+            <TabsContent value="resumo">
+              <SheetHeader className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <FolderOpen className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-600">Projeto:</span>
+                      <span className="font-medium">
+                        {projects?.find(p => p.id === task.project_id)?.name || 'Não atribuído'}
+                      </span>
+                    </div>
 
-					<div className="flex items-center gap-2 text-sm">
-					  <User className="h-4 w-4 text-gray-400" />
-					  <span className="text-gray-600">Responsável:</span>
-					  {task.colaborador.nome ? (
-						<div className="flex items-center gap-2">
-						  <Avatar>
-							{task.colaborador.foto_url ? (
-							  <img src={task.colaborador.foto_url} alt={task.colaborador.nome} />
-							) : (
-							  <AvatarFallback>
-								{getInitials(task.colaborador.nome)}
-							  </AvatarFallback>
-							)}
-						  </Avatar>
-						  <span>{task.colaborador.nome}</span>
-						</div>
-					  ) : (
-						<span>Não atribuido</span>
-					  )}
-					</div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <User className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-600">Responsável:</span>
+                      <span>{task.colaborador?.nome || 'Não atribuído'}</span>
+                    </div>
 
-					<div className="flex items-center gap-2 text-sm">
-					  <Calendar className="h-4 w-4 text-gray-400" />
-					  <span className="text-gray-600">Data de entrega:</span>
-					  <span>{formatDate(task.due_date)}</span>
-					</div>
-				  </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-600">Data de entrega:</span>
+                      <span>{formatDate(task.due_date)}</span>
+                    </div>
+                  </div>
+                
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-600">Horas estimadas:</span>
+                      <span>{task.estimated_hours || 0}h</span>
+                    </div>
 
-				  <div className="space-y-3">
-					<div className="flex items-center gap-2 text-sm">
-					  <Clock className="h-4 w-4 text-gray-400" />
-					  <span className="text-gray-600">Horas estimadas:</span>
-					  <span>{task.estimated_hours || 0}h</span>
-					</div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-600">Criada em:</span>
+                      <span>{formatDate(task.created_at)}</span>
+                    </div>
 
-					<div className="flex items-center gap-2 text-sm">
-					  <Calendar className="h-4 w-4 text-gray-400" />
-					  <span className="text-gray-600">Criada em:</span>
-					  <span>{formatDate(task.created_at)}</span>
-					</div>
+                    <div className="flex items-center gap-3">
+                      <TaskStatusBadge status={task.status} />
+                      <TaskPriorityBadge priority={task.priority} />
+                    </div>
+                  </div>
+                </div>  
+                
+                <div className="space-y-3 mt-4">
+                  <div className="text-sm">
+                    <div className="flex items-center gap-2">
+                      <Pencil className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-600">Descrição:</span>
+                    </div>
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                      {task?.description || 'Sem descrição detalhada.'}
+                    </p>
+                  </div>
+                </div>
 
-					<div className="flex items-center gap-3">
-					  <TaskStatusBadge status={task.status} />
-					  <TaskPriorityBadge priority={task.priority} />
-					</div>
-				  </div>
-				</div>
-
-				<div className="space-y-3 mt-4">
-				  <div className="text-sm">
-					<div className="flex items-center gap-2">
-					  <Pencil className="h-4 w-4 text-gray-400" />
-					  <span className="text-gray-600">Descrição:</span>
-					</div>
-					<p className="text-sm text-gray-700 whitespace-pre-wrap">
-					  {task?.description || 'Sem descrição detalhada.'}
-					</p>
-				  </div>
-				</div>
-
-				{/* Tags */}
-				{task.tags && task.tags.length > 0 && (
-				  <div className="space-y-2 mt-6">
-					<h3 className="font-medium">Tags</h3>
-					<div className="flex flex-wrap gap-2">
-					  {task.tags.map((tag) => (
-						<Badge key={tag} variant="secondary">
-						  {tag}
-						</Badge>
-					  ))}
-					</div>
-				  </div>
-				)}
-			  </SheetHeader>
-			</TabsContent>
+                {/* Tags */}
+                {task.tags && task.tags.length > 0 && (
+                  <div className="space-y-2 mt-6">
+                    <h3 className="font-medium">Tags</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {task.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </SheetHeader>
+            </TabsContent>
 
             <TabsContent value="comentarios">
               <div className="space-y-4">
