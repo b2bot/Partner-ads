@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Task, TaskInsert, TaskUpdate, TaskWithDetails } from '@/types/task';
+import { Task, TaskInsert, TaskUpdate, TaskWithDetails, TaskStatus, TaskPriority } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
 export const useTasks = (projectId?: string) => {
@@ -80,7 +80,16 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
-      const { data, error } = await supabase.from('tasks').insert(task).select().single();
+      // Limpar campos null/undefined que podem causar problemas de FK
+      const cleanTask = {
+        ...task,
+        assigned_to: task.assigned_to || null,
+        created_by: task.created_by || null,
+        owner_id: task.owner_id || null,
+        project_id: task.project_id || null
+      };
+
+      const { data, error } = await supabase.from('tasks').insert(cleanTask).select().single();
       if (error) throw new Error(error.message);
       return data;
     },
@@ -108,14 +117,17 @@ export const useUpdateTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: TaskUpdate }) => {
-      const { data, error } = await supabase
-        .from('tasks')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<TaskWithDetails> }) => {
+      // Limpar campos null/undefined que podem causar problemas de FK
+      const cleanUpdates = {
+        ...updates,
+        assigned_to: updates.assigned_to || null,
+        created_by: updates.created_by || null,
+        owner_id: updates.owner_id || null,
+        project_id: updates.project_id || null
+      };
 
+      const { data, error } = await supabase.from('tasks').update(cleanUpdates).eq('id', id).select().single();
       if (error) throw new Error(error.message);
       return data;
     },

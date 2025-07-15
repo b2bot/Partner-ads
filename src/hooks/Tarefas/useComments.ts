@@ -1,19 +1,38 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/integrations/apiClient';
-import { TaskComment, TaskCommentInsert } from '@/types/task';
-import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface TaskComment {
+  id: string;
+  task_id: string;
+  author_id: string;
+  content: string;
+  created_at: string;
+  author?: {
+    id: string;
+    nome: string;
+    email: string;
+  };
+}
 
 export const useTaskComments = (taskId: string) => {
   return useQuery({
     queryKey: ['task-comments', taskId],
     queryFn: async () => {
-      const { data, error } = await apiClient
+      if (!taskId) return [];
+      
+      const { data, error } = await supabase
         .from('task_comments')
-        .select('*')
+        .select(`
+          *,
+          author:profiles(id, nome, email)
+        `)
         .eq('task_id', taskId)
         .order('created_at', { ascending: true });
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error('Erro ao buscar comentários:', error);
+        throw new Error(error.message);
+      }
 
       return data || [];
     },
@@ -25,25 +44,22 @@ export const useCreateComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (comment: TaskCommentInsert) => {
-      const { data, error } = await apiClient
+    mutationFn: async ({ task_id, author_id, content }: { task_id: string; author_id: string; content: string }) => {
+      const { data, error } = await supabase
         .from('task_comments')
-        .insert(comment)
+        .insert({
+          task_id,
+          author_id,
+          content,
+        })
         .select()
         .single();
 
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['task-comments', data.task_id] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Erro ao criar comentário",
-        description: error.message,
-        variant: "destructive",
-      });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['task-comments', variables.task_id] });
     },
   });
 };
