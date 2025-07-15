@@ -118,6 +118,8 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<TaskWithDetails> }) => {
+      console.log('UPDATES PAYLOAD =>', updates);
+
       // Limpar campos null/undefined que podem causar problemas de FK
       const cleanUpdates = {
         ...updates,
