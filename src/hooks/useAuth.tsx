@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 import { User } from '@apiClient/apiClient-js';
 import { apiClient } from '@/integrations/apiClient';
-import { useUserProfile } from '../useUserProfile';
-import { useUserPermissions } from '../useUserPermissions';
-import { useClientPermissions } from '../useClientPermissions';
-import { useAuthActions } from '../useAuthActions';
+import { useUserProfile } from './useUserProfile';
+import { useUserPermissions } from './useUserPermissions';
+import { useClientPermissions } from './useClientPermissions';
+import { useAuthActions } from './useAuthActions';
 import { Permission, ALL_PERMISSIONS } from '@/types/auth';
 import { hasPermission as checkPermission } from '@/utils/permissionUtils';
 
@@ -29,17 +29,17 @@ export function useAuth() {
   } = useClientPermissions(user, isCliente);
 
   useEffect(() => {
-    console.log('🚀 Inicializando useAuth...');
+    {/*console.log('🚀 Inicializando useAuth...');*/}
     
     apiClient.auth.getSession().then(({ data: { session } }) => {
-      console.log('📝 Sessão inicial:', session?.user ? 'Usuário logado' : 'Sem usuário');
+      {/*console.log('📝 Sessão inicial:', session?.user ? 'Usuário logado' : 'Sem usuário'); */}
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
   const { data: { subscription } } = apiClient.auth.onAuthStateChange(
     async (_event, session) => {
-      console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário');
+      {/*console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário'); */}
       setUser(session?.user ?? null);
       setLoading(false);
       }
@@ -94,7 +94,7 @@ export function useAuth() {
     profile: profile
   };
 
-  console.log('🔐 Auth state detalhado:', authState);
+  {/*console.log('🔐 Auth state detalhado:', authState);*/}
 
   return {
     user,

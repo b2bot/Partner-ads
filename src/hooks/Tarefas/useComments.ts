@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/integrations/apiClient';
 import { TaskComment, TaskCommentInsert } from '@/types/task';
@@ -8,14 +7,15 @@ export const useTaskComments = (taskId: string) => {
   return useQuery({
     queryKey: ['task-comments', taskId],
     queryFn: async () => {
-      const data = await apiClient.get<TaskComment[]>(
-        `/api/task_comments.php?task_id=${taskId}`
-      );
+      const { data, error } = await apiClient
+        .from('task_comments')
+        .select('*')
+        .eq('task_id', taskId)
+        .order('created_at', { ascending: true });
 
-      return (data || []).map(comment => ({
-        ...comment,
-        author: Array.isArray(comment.author) ? comment.author[0] || null : comment.author
-      }));
+      if (error) throw new Error(error.message);
+
+      return data || [];
     },
     enabled: !!taskId,
   });
@@ -23,13 +23,16 @@ export const useTaskComments = (taskId: string) => {
 
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (comment: TaskCommentInsert) => {
-      const data = await apiClient.post<TaskComment>(
-        '/api/task_comments.php',
-        comment
-      );
+      const { data, error } = await apiClient
+        .from('task_comments')
+        .insert(comment)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: (data) => {

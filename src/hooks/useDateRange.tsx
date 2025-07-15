@@ -25,10 +25,10 @@ export function useDateRange() {
   // Log para debug quando o range de data muda
   useEffect(() => {
     const apiRange = getApiDateRange();
-    console.log('Date range changed:', {
-      dateRange,
-      apiRange
-    });
+    //console.log('Date range changed:', {
+    //  dateRange,
+    //  apiRange
+    //});
   }, [dateRange]);
 
   return {

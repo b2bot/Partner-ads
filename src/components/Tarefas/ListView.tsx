@@ -1,3 +1,4 @@
+
 import { useTasks } from '@/hooks/Tarefas/useTasks';
 import { TaskWithDetails } from '@/types/task';
 import { Loader2, MessageCircle } from 'lucide-react';
@@ -60,11 +61,11 @@ export const ListView = ({ projectId, onTaskClick }: ListViewProps) => {
                 {task.assigned_user ? (
                   <div className="flex items-center gap-1 truncate">
                     <img
-                      src={task.assigned_user.avatar_url || ''}
-                      alt={task.assigned_user.name}
+                      src={task.assigned_colaborador.foto_url || ''}
+                      alt={task.assigned_colaborador.nome}
                       className="h-5 w-5 rounded-full object-cover"
                     />
-                    <span className="text-xs truncate">{task.assigned_user.name}</span>
+                    <span className="text-xs truncate">{task.assigned_colaborador.nome}</span>
                   </div>
                 ) : (
                   <span className="text-gray-400 text-xs">Não atribuído</span>

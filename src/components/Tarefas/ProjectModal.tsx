@@ -19,7 +19,7 @@ interface ProjectModalProps {
 export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
   const { profile } = useAuth();
   const { data: clients } = useClientes();
-  const { collaborators } = useCollaborators();
+  const { collaborators: collaboratorsList = [], isLoading: isLoadingCollaborators } = useCollaborators();
   const createProject = useCreateProject();
 
   const [formData, setFormData] = useState({
@@ -34,7 +34,7 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) return;
 
     const projectData: ProjectInsert = {
@@ -104,6 +104,9 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
                 <SelectValue placeholder="Selecione um cliente (opcional)" />
               </SelectTrigger>
               <SelectContent>
+                {clients?.length === 0 && (
+                  <SelectItem disabled value="">Nenhum cliente encontrado</SelectItem>
+                )}
                 {clients?.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
                     {client.nome}
@@ -124,7 +127,13 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
                 <SelectValue placeholder="Selecione um responsável" />
               </SelectTrigger>
               <SelectContent>
-                {collaborators.map((user) => (
+                {isLoadingCollaborators && (
+                  <SelectItem disabled value="">Carregando colaboradores...</SelectItem>
+                )}
+                {!isLoadingCollaborators && collaboratorsList.length === 0 && (
+                  <SelectItem disabled value="">Nenhum colaborador encontrado</SelectItem>
+                )}
+                {collaboratorsList.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.nome}
                   </SelectItem>
@@ -138,7 +147,7 @@ export const ProjectModal = ({ open, onOpenChange }: ProjectModalProps) => {
             <label className="text-sm font-medium">Status</label>
             <Select
               value={formData.status}
-              onValueChange={(value: 'ativo' | 'pausado' | 'finalizado') => 
+              onValueChange={(value: 'ativo' | 'pausado' | 'finalizado') =>
                 setFormData(prev => ({ ...prev, status: value }))
               }
             >

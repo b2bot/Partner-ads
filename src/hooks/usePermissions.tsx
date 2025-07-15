@@ -1,11 +1,9 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/integrations/apiClient';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Permission } from '@/types/auth';
 
-// Exportar o tipo Permission para compatibilidad
 export type PermissionType = Permission;
 
 export interface UserPermission {
@@ -40,57 +38,66 @@ export function usePermissions() {
   const { user, profile, hasPermission: authHasPermission } = useAuth();
   const queryClient = useQueryClient();
 
-  // Verificar se usuário tem uma permissão específica
   const hasPermission = (permission: Permission): boolean => {
     return authHasPermission(permission);
   };
 
-  // Obter permissões do usuário atual
   const { data: userPermissions } = useQuery({
     queryKey: ['user-permissions-list', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      
-      const data = await apiClient.get<{ permission: Permission }[]>(
-        `/api/user_permissions.php?user_id=${user.id}`
-      );
-      return data.map(p => p.permission as Permission);
+
+      const { data, error } = await apiClient
+        .from('user_permissions')
+        .select('permission')
+        .eq('user_id', user.id);
+
+      if (error) throw new Error(error.message);
+
+      return (data || []).map(p => p.permission as Permission);
     },
     enabled: !!user?.id,
   });
 
-  // Listar todas as permissões de todos os usuários
   const { data: userPermissionsList } = useQuery({
     queryKey: ['all-user-permissions'],
     queryFn: async () => {
-      const data = await apiClient.get<UserPermission[]>(
-        '/api/user_permissions.php'
-      );
+      const { data, error } = await apiClient
+        .from('user_permissions')
+        .select('*');
+
+      if (error) throw new Error(error.message);
+
       return data as UserPermission[];
     },
     enabled: hasPermission('manage_collaborators'),
   });
 
-  // Listar templates de permissões
   const { data: permissionTemplates } = useQuery({
     queryKey: ['permission-templates'],
     queryFn: async () => {
-      const data = await apiClient.get<PermissionTemplate[]>(
-        '/api/permission_templates.php'
-      );
+      const { data, error } = await apiClient
+        .from('permission_templates')
+        .select('*');
+
+      if (error) throw new Error(error.message);
+
       return data as PermissionTemplate[];
     },
     enabled: hasPermission('manage_collaborators'),
   });
 
-  // Mutation para conceder permissão
   const grantPermissionMutation = useMutation({
     mutationFn: async ({ userId, permission }: { userId: string; permission: Permission }) => {
-      await apiClient.post('/api/user_permissions.php', {
-        user_id: userId,
-        permission,
-        granted_by: user?.id
-      });
+      const { error } = await apiClient
+        .from('user_permissions')
+        .insert({
+          user_id: userId,
+          permission,
+          granted_by: user?.id,
+        });
+
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-user-permissions'] });
@@ -102,12 +109,14 @@ export function usePermissions() {
     },
   });
 
-  // Mutation para revogar permissão
   const revokePermissionMutation = useMutation({
     mutationFn: async ({ userId, permission }: { userId: string; permission: Permission }) => {
-      await apiClient.delete(
-        `/api/user_permissions.php?user_id=${userId}&permission=${permission}`
-      );
+      const { error } = await apiClient
+        .from('user_permissions')
+        .delete()
+        .match({ user_id: userId, permission });
+
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-user-permissions'] });
@@ -119,13 +128,18 @@ export function usePermissions() {
     },
   });
 
-  // Mutation para criar template de permissões
   const createTemplateMutation = useMutation({
-    mutationFn: async (template: Omit<PermissionTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => {
-      await apiClient.post('/api/permission_templates.php', {
-        ...template,
-        created_by: user?.id
-      });
+    mutationFn: async (
+      template: Omit<PermissionTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>
+    ) => {
+      const { error } = await apiClient
+        .from('permission_templates')
+        .insert({
+          ...template,
+          created_by: user?.id,
+        });
+
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['permission-templates'] });

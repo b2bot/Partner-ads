@@ -1,29 +1,36 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/integrations/apiClient';
-import { Client, ClientInsert } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 
 export const useClientes = () => {
   return useQuery({
     queryKey: ['clientes'],
     queryFn: async () => {
-      const data = await apiClient.get<Client[]>('/api/clientes.php');
+      const { data, error } = await apiClient
+        .from('clientes')
+        .select('id, nome');
+
+      if (error) throw new Error(error.message);
       return data || [];
-    }
+    },
   });
 };
 
-
 export const useCreateClient = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async (client: ClientInsert) => {
-      const data = await apiClient.post<Client>('/api/clientes.php', client);
+    mutationFn: async (cliente: { nome: string }) => {
+      const { data, error } = await apiClient
+        .from('clientes')
+        .insert(cliente)
+        .single();
+
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
       toast({
         title: "Cliente criado",
         description: "O cliente foi criado com sucesso.",

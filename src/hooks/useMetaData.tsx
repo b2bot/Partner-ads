@@ -20,9 +20,9 @@ export function useMetaData() {
   const { data: credentials, isLoading: credentialsLoading, error: credentialsError } = useQuery({
     queryKey: ['meta-credentials'],
     queryFn: async () => {
-      console.log('Buscando credenciais Meta...');
+      //console.log('Buscando credenciais Meta...');
       const creds = await getMetaCredentials();
-      console.log('Credenciais encontradas:', creds ? 'Sim' : 'Não');
+      //console.log('Credenciais encontradas:', creds ? 'Sim' : 'Não');
       return creds;
     },
     retry: 2,
@@ -37,10 +37,10 @@ export function useMetaData() {
         return [];
       }
       
-      console.log('Buscando contas de anúncios com rate limiting...');
+      //console.log('Buscando contas de anúncios com rate limiting...');
       try {
         const accounts = await getAdAccountsWithRateLimit(credentials.access_token);
-        console.log('Contas encontradas:', accounts.length);
+        //console.log('Contas encontradas:', accounts.length);
         return accounts;
       } catch (error: any) {
         console.error('Erro ao buscar contas:', error);
@@ -133,17 +133,17 @@ export function useMetaData() {
 
   // Log para debug
   useEffect(() => {
-    console.log('Meta Data Debug:', {
-      hasCredentials: !!credentials,
-      credentialsLoading,
-      credentialsError: credentialsError?.message,
-      adAccountsCount: adAccounts?.length || 0,
-      accessibleAccountsCount: accessibleAccounts?.length || 0,
-      loadingAdAccounts,
-      adAccountsError: adAccountsError?.message,
-      selectedAdAccount,
-      isAdmin
-    });
+	 // console.log('Meta Data Debug:', {
+     // hasCredentials: !!credentials,
+     // credentialsLoading,
+     // credentialsError: credentialsError?.message,
+     // adAccountsCount: adAccounts?.length || 0,
+     // accessibleAccountsCount: accessibleAccounts?.length || 0,
+     // loadingAdAccounts,
+     // adAccountsError: adAccountsError?.message,
+     // selectedAdAccount,
+     // isAdmin
+    //});
   }, [credentials, credentialsLoading, credentialsError, adAccounts, accessibleAccounts, loadingAdAccounts, adAccountsError, selectedAdAccount, isAdmin]);
 
   return {

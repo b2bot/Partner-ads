@@ -52,15 +52,15 @@ const Index = ({ initialTab = 'dashboard' }: IndexProps) => {
     localStorage.removeItem('react-query-cache');
   }, []);
 
-  console.log('Index render - Auth state:', {
-    isAdmin,
-    isRootAdmin,
-    isCliente,
-    loading,
-    hasPermission,
-    user,
-    hasAccessDashboard: hasPermission('access_dashboard')
-  });
+  //console.log('Index render - Auth state:', {
+   // isAdmin,
+   // isRootAdmin,
+   // isCliente,
+   // loading,
+   // hasPermission,
+   // user,
+   // hasAccessDashboard: hasPermission('access_dashboard')
+ // });
 
   if (loading) {
     return (

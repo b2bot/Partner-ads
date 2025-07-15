@@ -10,7 +10,7 @@ interface Collaborator {
   nome: string;
   email: string;
   foto_url?: string;
-  status: string;
+  ativo: boolean;
   role: string;
   created_at: string;
   is_root_admin: boolean;
@@ -45,10 +45,10 @@ export function CollaboratorRow({
       <TableCell>{collaborator.email}</TableCell>
       <TableCell>
         <Badge 
-          variant={collaborator.status === 'ativo' ? 'default' : 'secondary'}
-          className={collaborator.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
+          variant={collaborator.ativo === 'ativo' ? 'default' : 'secondary'}
+          className={collaborator.ativo === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
         >
-          {collaborator.status === 'ativo' ? 'Ativo' : 'Inativo'}
+          {collaborator.ativo === 'ativo' ? 'Ativo' : 'Inativo'}
         </Badge>
       </TableCell>
       <TableCell>

@@ -23,7 +23,8 @@ export function UserMenu() {
     setLoading(false);
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
+	if (!name) return '?';
     return name
       .split(' ')
       .map(n => n[0])
@@ -31,6 +32,8 @@ export function UserMenu() {
       .toUpperCase()
       .slice(0, 2);
   };
+  
+  
 
   if (!profile) return null;
 

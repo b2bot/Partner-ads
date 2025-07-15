@@ -122,9 +122,9 @@ export const ProjectEditModal = ({ open, onOpenChange, project }: ProjectEditMod
                 <SelectValue placeholder="Selecione um responsável" />
               </SelectTrigger>
               <SelectContent>
-                {collaborators?.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.name}
+                {collaborators?.map((colaboradores) => (
+                  <SelectItem key={colaboradores.id} value={colaboradores.id}>
+                    {colaboradores.nome}
                   </SelectItem>
                 ))}
               </SelectContent>

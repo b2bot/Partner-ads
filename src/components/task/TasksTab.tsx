@@ -27,7 +27,7 @@ export function TasksTab() {
   const { hasPermission } = useAuth();
   
   const [activeTab, setActiveTab] = useState<TabType>("lista");
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // ✅ NOVO
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); 
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
@@ -43,8 +43,8 @@ export function TasksTab() {
   };
 
   useEffect(() => {
-    console.log("TAB ATIVA:", activeTab);
-    console.log("PROFILE:", profile);
+   // console.log("TAB ATIVA:", activeTab);
+   // console.log("PROFILE:", profile);
   }, [activeTab, profile]);
 
   return (
@@ -67,7 +67,7 @@ export function TasksTab() {
 
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  Olá, {profile?.name}
+                  Olá, {profile?.nome}
                 </span>
                 <Button variant="outline" size="sm" onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />

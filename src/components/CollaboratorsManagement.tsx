@@ -16,7 +16,7 @@ interface Collaborator {
   nome: string;
   email: string;
   foto_url?: string;
-  status: string;
+  ativo: boolean;
   role: string;
   created_at: string;
   is_root_admin: boolean;

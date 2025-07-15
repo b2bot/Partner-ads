@@ -7,8 +7,11 @@ export interface WhatsAppConfig {
   phone_number_id: string;
   access_token: string;
   business_account_id?: string;
+  webhook_verify_token?: string;
   status: 'connected' | 'disconnected' | 'error' | string;
   last_verified_at?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export function useWhatsAppConfig() {
@@ -18,21 +21,21 @@ export function useWhatsAppConfig() {
 
   const fetchConfig = async () => {
     try {
-      const data = await apiClient.get<WhatsAppConfig | null>(
-        '/api/whatsapp_config.php'
-      );
+      const { data, error } = await apiClient
+        .from('whatsapp_config')
+        .select('*')
+        .limit(1)
+        .single();
 
-      setConfig(data);
+      if (error) throw new Error(error.message);
+
+      setConfig(data ?? null);
     } catch (error: any) {
-      console.error('Error fetching WhatsApp config:', {
-        message: error.message,
-        details: error.details,
-        code: error.code,
-      });
+      console.error('Erro ao carregar configuração do WhatsApp:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao carregar configuração do WhatsApp. Verifique as permissões da tabela.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao carregar configuração do WhatsApp. Verifique permissões.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -41,39 +44,38 @@ export function useWhatsAppConfig() {
 
   const updateConfig = async (configData: Partial<WhatsAppConfig>) => {
     try {
-      // Garantir que os campos obrigatórios estão presentes para upsert
-      const upsertData = {
-        phone_number_id: configData.phone_number_id || '',
-        access_token: configData.access_token || '',
+      const payload = {
+        phone_number_id: configData.phone_number_id ?? '',
+        access_token: configData.access_token ?? '',
         business_account_id: configData.business_account_id,
-        status: configData.status,
+        webhook_verify_token: configData.webhook_verify_token,
+        status: configData.status ?? 'disconnected',
         last_verified_at: configData.last_verified_at,
-        ...(configData.id && { id: configData.id }),
+        updated_at: new Date().toISOString(),
       };
 
-      const data = await apiClient.post<WhatsAppConfig>(
-        '/api/whatsapp_config.php',
-        upsertData
-      );
+      const { data, error } = await apiClient
+        .from('whatsapp_config')
+        .upsert([{
+          ...payload,
+          ...(configData.id ? { id: configData.id } : {}),
+        }])
+        .select()
+        .single();
 
-      setConfig(data ? {
-        id: data.id,
-        phone_number_id: data.phone_number_id,
-        access_token: data.access_token,
-        business_account_id: data.business_account_id ?? "",
-        status: (data.status === 'connected' || data.status === 'disconnected' || data.status === 'error') ? data.status : 'disconnected',
-        last_verified_at: data.last_verified_at ?? "",
-      } : null);
+      if (error) throw new Error(error.message);
+
+      setConfig(data);
       toast({
-        title: "Sucesso",
-        description: "Configuração do WhatsApp atualizada",
+        title: 'Sucesso',
+        description: 'Configuração do WhatsApp atualizada',
       });
     } catch (error) {
-      console.error('Error updating WhatsApp config:', error);
+      console.error('Erro ao atualizar configuração:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao atualizar configuração",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao atualizar configuração',
+        variant: 'destructive',
       });
     }
   };
@@ -82,8 +84,7 @@ export function useWhatsAppConfig() {
     if (!config) return false;
 
     try {
-      // Simulação de teste de conexão
-      const isConnected = true; // TODO: chamada real API WhatsApp
+      const isConnected = true; // ✅ Substituir futuramente por chamada real ao WhatsApp
       await updateConfig({
         ...config,
         status: isConnected ? 'connected' : 'error',
@@ -92,7 +93,7 @@ export function useWhatsAppConfig() {
 
       return isConnected;
     } catch (error) {
-      console.error('Error testing connection:', error);
+      console.error('Erro ao testar conexão:', error);
       return false;
     }
   };

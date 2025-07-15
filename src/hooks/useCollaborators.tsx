@@ -1,42 +1,59 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/integrations/apiClient';
 import { toast } from 'sonner';
 
-interface Collaborator {
+type Collaborator = {
   id: string;
   nome: string;
   email: string;
   foto_url?: string;
-  status: string;
-  role: string;
+  cargo?: string;
+  setor?: string;
+  ativo: 'ativo' | 'inativo';
   created_at: string;
-  is_root_admin: boolean;
-}
+  nivel_acesso: 'admin';
+};
 
 export function useCollaborators() {
   const queryClient = useQueryClient();
 
-  // Buscar colaboradores (excluindo root admin)
-  const { data: collaborators, isLoading } = useQuery({
-    queryKey: ['collaborators'],
+  const { data: collaborators = [], isLoading } = useQuery<Collaborator[]>({
+    queryKey: ['colaboradores'],
     queryFn: async () => {
-      const data = await apiClient.get<Collaborator[]>(
-        '/api/collaborators.php'
-      );
-      return data as Collaborator[];
+      const { data, error } = await apiClient
+        .from('colaboradores')
+        .select(`
+          id,
+          nome,
+          email,
+          foto_url,
+          cargo,
+          setor,
+          ativo,
+          created_at,
+          nivel_acesso
+        `);
+
+      if (error) {
+        console.error('Erro ao buscar colaboradores:', error);
+        throw new Error('Erro ao carregar colaboradores');
+      }
+
+      return data || [];
     },
   });
 
-  // Mutation para desativar colaborador
   const deactivateCollaboratorMutation = useMutation({
     mutationFn: async (collaboratorId: string) => {
-      await apiClient.put(`/api/collaborators.php?id=${collaboratorId}`, {
-        status: 'inativo',
-      });
+      const { error } = await apiClient
+        .from('colaboradores')
+        .update({ status: 'inativo' })
+        .eq('id', collaboratorId);
+
+      if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
+      queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
       toast.success('Colaborador desativado com sucesso');
     },
     onError: (error) => {
@@ -46,7 +63,7 @@ export function useCollaborators() {
   });
 
   return {
-    collaborators: collaborators || [],
+    collaborators,
     isLoading,
     deactivateCollaborator: deactivateCollaboratorMutation.mutate,
     isDeactivating: deactivateCollaboratorMutation.isPending,

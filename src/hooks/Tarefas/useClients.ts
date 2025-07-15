@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/integrations/apiClient';
 import { Client, ClientInsert } from '@/types/task';
@@ -8,7 +7,8 @@ export const useClients = () => {
   return useQuery({
     queryKey: ['clients'],
     queryFn: async (): Promise<Client[]> => {
-      const data = await apiClient.get<Client[]>('/api/clientes.php');
+      const { data, error } = await apiClient.from('clientes').select('*');
+      if (error) throw new Error(error.message);
       return data || [];
     },
   });
@@ -16,10 +16,16 @@ export const useClients = () => {
 
 export const useCreateClient = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (client: ClientInsert) => {
-      const data = await apiClient.post<Client>('/api/clientes.php', client);
+      const { data, error } = await apiClient
+        .from('clientes')
+        .insert(client)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: () => {

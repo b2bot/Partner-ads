@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/integrations/apiClient';
 import { useToast } from '@/hooks/use-toast';
@@ -24,14 +23,19 @@ export function useWhatsAppContacts() {
 
   const fetchContacts = async () => {
     try {
-      const data = await apiClient.get<WhatsAppContact[]>('/api/whatsapp_contacts.php');
+      const { data, error } = await apiClient
+        .from('whatsapp_contacts')
+        .select('*');
+
+      if (error) throw new Error(error.message);
+
       setContacts(data || []);
     } catch (error) {
       console.error('Error fetching contacts:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao carregar contatos",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao carregar contatos',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -40,35 +44,39 @@ export function useWhatsAppContacts() {
 
   const createContact = async (contactData: Partial<WhatsAppContact>) => {
     try {
-      const data = await apiClient.post<WhatsAppContact>(
-        '/api/whatsapp_contacts.php',
-        {
-          name: contactData.name,
-          phone_number: contactData.phone_number,
-          client_id: contactData.client_id,
-          meta_account_id: contactData.meta_account_id,
-          grupo: contactData.grupo,
-          observacoes: contactData.observacoes,
-          tags: contactData.tags || [],
-          is_active: true,
-        }
-      );
+      const { data, error } = await apiClient
+        .from('whatsapp_contacts')
+        .insert([
+          {
+            name: contactData.name,
+            phone_number: contactData.phone_number,
+            client_id: contactData.client_id,
+            meta_account_id: contactData.meta_account_id,
+            grupo: contactData.grupo,
+            observacoes: contactData.observacoes,
+            tags: contactData.tags || [],
+            is_active: true,
+          },
+        ])
+        .select()
+        .single();
 
-      // Atualizar lista local
+      if (error) throw new Error(error.message);
+
       setContacts(prev => [...prev, data]);
 
       toast({
-        title: "Sucesso",
-        description: "Contato criado com sucesso",
+        title: 'Sucesso',
+        description: 'Contato criado com sucesso',
       });
 
       return data;
     } catch (error) {
       console.error('Error creating contact:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao criar contato",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao criar contato',
+        variant: 'destructive',
       });
       throw error;
     }
@@ -76,31 +84,34 @@ export function useWhatsAppContacts() {
 
   const updateContact = async (id: string, contactData: Partial<WhatsAppContact>) => {
     try {
-      const data = await apiClient.put<WhatsAppContact>(
-        `/api/whatsapp_contacts.php?id=${id}`,
-        {
+      const { data, error } = await apiClient
+        .from('whatsapp_contacts')
+        .update({
           ...contactData,
           updated_at: new Date().toISOString(),
-        }
-      );
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
-      // Atualizar lista local
-      setContacts(prev => prev.map(contact => 
+      if (error) throw new Error(error.message);
+
+      setContacts(prev => prev.map(contact =>
         contact.id === id ? { ...contact, ...data } : contact
       ));
 
       toast({
-        title: "Sucesso",
-        description: "Contato atualizado com sucesso",
+        title: 'Sucesso',
+        description: 'Contato atualizado com sucesso',
       });
 
       return data;
     } catch (error) {
       console.error('Error updating contact:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao atualizar contato",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao atualizar contato',
+        variant: 'destructive',
       });
       throw error;
     }
@@ -108,21 +119,25 @@ export function useWhatsAppContacts() {
 
   const deleteContact = async (id: string) => {
     try {
-      await apiClient.delete(`/api/whatsapp_contacts.php?id=${id}`);
+      const { error } = await apiClient
+        .from('whatsapp_contacts')
+        .delete()
+        .eq('id', id);
 
-      // Remover da lista local
+      if (error) throw new Error(error.message);
+
       setContacts(prev => prev.filter(contact => contact.id !== id));
 
       toast({
-        title: "Sucesso",
-        description: "Contato removido com sucesso",
+        title: 'Sucesso',
+        description: 'Contato removido com sucesso',
       });
     } catch (error) {
       console.error('Error deleting contact:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao remover contato",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao remover contato',
+        variant: 'destructive',
       });
       throw error;
     }

@@ -167,7 +167,7 @@ export const ProjectsView = ({ setActiveTab, setSelectedProjectId }: ProjectsVie
                   {project.responsible && (
                     <div className="flex items-center gap-2 text-sm">
                       <User className="h-4 w-4 text-gray-400" />
-                      <span>Responsável: {project.responsible.name}</span>
+                      <span>Responsável: {projects_responsible_name}</span>
                     </div>
                   )}
 

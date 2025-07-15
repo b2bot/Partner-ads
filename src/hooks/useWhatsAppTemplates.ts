@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/integrations/apiClient';
 import { useToast } from '@/hooks/use-toast';
@@ -19,7 +18,7 @@ export interface WhatsAppTemplate {
       text?: string;
     }>;
   }[];
-  variables: string[]; // Campos dinâmicos extraídos do template
+  variables: string[];
 }
 
 export function useWhatsAppTemplates() {
@@ -30,10 +29,8 @@ export function useWhatsAppTemplates() {
 
   const extractVariables = (components: any[]): string[] => {
     const variables: string[] = [];
-    
     components.forEach(component => {
       if (component.text) {
-        // Extrair variáveis no formato {{variavel}}
         const matches = component.text.match(/\{\{(\w+)\}\}/g);
         if (matches) {
           matches.forEach((match: string) => {
@@ -45,7 +42,6 @@ export function useWhatsAppTemplates() {
         }
       }
     });
-    
     return variables;
   };
 
@@ -60,18 +56,12 @@ export function useWhatsAppTemplates() {
       const response = await fetch(
         `https://graph.facebook.com/v18.0/${config.business_account_id}/message_templates?access_token=${config.access_token}`
       );
-      
-      if (!response.ok) {
-        throw new Error('Erro ao buscar templates do WhatsApp');
-      }
-      
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error.message);
-      }
 
-      // Filtrar apenas templates aprovados
+      if (!response.ok) throw new Error('Erro ao buscar templates do WhatsApp');
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+
       const approvedTemplates = data.data
         .filter((template: any) => template.status === 'APPROVED')
         .map((template: any) => ({
@@ -86,21 +76,21 @@ export function useWhatsAppTemplates() {
 
       setTemplates(approvedTemplates);
 
-      // Sincronizar com banco local para cache
-      await apiClient.post('/api/whatsapp_templates.php', approvedTemplates);
+      await apiClient
+        .from('whatsapp_templates')
+        .upsert(approvedTemplates, { onConflict: 'id' });
 
     } catch (error: any) {
-      console.error('Error fetching WhatsApp templates:', { 
+      console.error('Error fetching WhatsApp templates:', {
         message: error.message,
         business_account_id: config.business_account_id,
       });
       toast({
-        title: "Erro",
-        description: "Erro ao buscar templates do WhatsApp. Usando cache local.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao buscar templates do WhatsApp. Usando cache local.',
+        variant: 'destructive',
       });
-      
-      // Fallback para templates locais
+
       await fetchLocalTemplates();
     } finally {
       setLoading(false);
@@ -109,9 +99,12 @@ export function useWhatsAppTemplates() {
 
   const fetchLocalTemplates = async () => {
     try {
-      const data = await apiClient.get<WhatsAppTemplate[]>(
-        '/api/whatsapp_templates.php?status=APPROVED'
-      );
+      const { data, error } = await apiClient
+        .from('whatsapp_templates')
+        .select('*')
+        .eq('status', 'APPROVED');
+
+      if (error) throw new Error(error.message);
 
       const localTemplates: WhatsAppTemplate[] = (data || []).map(template => ({
         id: template.id,
@@ -127,22 +120,23 @@ export function useWhatsAppTemplates() {
     } catch (error) {
       console.error('Error fetching local templates:', error);
       toast({
-        title: "Erro de Fallback",
-        description: "Não foi possível carregar templates do cache local.",
-        variant: "destructive",
+        title: 'Erro de Fallback',
+        description: 'Não foi possível carregar templates do cache local.',
+        variant: 'destructive',
       });
     }
   };
 
-  const getTemplatePreview = (template: WhatsAppTemplate, variables: Record<string, string> = {}) => {
+  const getTemplatePreview = (
+    template: WhatsAppTemplate,
+    variables: Record<string, string> = {}
+  ) => {
     let preview = '';
-    
     template.components.forEach(component => {
       if (component.type === 'HEADER' && component.text) {
         preview += `*${component.text}*\n\n`;
       } else if (component.type === 'BODY' && component.text) {
         let bodyText = component.text;
-        // Substituir variáveis no preview
         Object.entries(variables).forEach(([key, value]) => {
           bodyText = bodyText.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value || `{{${key}}}`);
         });
@@ -151,7 +145,6 @@ export function useWhatsAppTemplates() {
         preview += `_${component.text}_`;
       }
     });
-    
     return preview.trim();
   };
 

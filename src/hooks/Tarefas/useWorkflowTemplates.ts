@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/integrations/apiClient';
 import { WorkflowTemplate } from '@/types/Tarefas';
@@ -8,9 +7,8 @@ export const useWorkflowTemplates = () => {
   return useQuery({
     queryKey: ['workflow-templates'],
     queryFn: async (): Promise<WorkflowTemplate[]> => {
-      const data = await apiClient.get<WorkflowTemplate[]>(
-        '/api/workflow_templates.php'
-      );
+      const { data, error } = await apiClient.from('workflow_templates').select('*');
+      if (error) throw new Error(error.message);
       return data || [];
     },
   });
@@ -21,22 +19,39 @@ export const useCreateTasksFromTemplate = () => {
   
   return useMutation({
     mutationFn: async ({ templateId, projectId }: { templateId: string; projectId?: string }) => {
-      const template = await apiClient.get<WorkflowTemplate>(
-        `/api/workflow_templates.php?id=${templateId}`
-      );
+      const { data: template, error } = await apiClient
+        .from('workflow_templates')
+        .select('steps')
+        .eq('id', templateId)
+        .single();
 
-      const steps = template.steps as any[];
-      const tasksToCreate = steps.map((step, index) => ({
+      if (error) throw new Error(error.message);
+      if (!template?.steps || !Array.isArray(template.steps)) throw new Error('Template inválido.');
+
+      const steps = template.steps;
+      const tasksToCreate = steps.map((step: any, index: number) => ({
         title: step.title,
         description: step.description,
-        estimated_hours: step.estimated_hours,
         project_id: projectId,
-        order_index: index,
-        status: 'backlog' as const
+        actual_hours: step.estimated_hours || null,
+        status: 'backlog',
+        priority: null,
+        due_date: null,
+        tags: [],
+        owner_id: null,
+        created_by: null,
+        linked_ticket_id: null,
+        type: null,
+        assigned_to: null,
       }));
 
-      const data = await apiClient.post('/api/tasks.php', tasksToCreate);
-      return data as any;
+      const { data: createdTasks, error: insertError } = await apiClient
+        .from('tasks')
+        .insert(tasksToCreate)
+        .select();
+
+      if (insertError) throw new Error(insertError.message);
+      return createdTasks;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });

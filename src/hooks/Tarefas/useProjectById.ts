@@ -7,9 +7,37 @@ export function useProjectById(projectId: string | undefined) {
     queryFn: async () => {
       if (!projectId) return null;
 
-      const data = await apiClient.get(
-        `/api/projects.php?id=${projectId}`
-      );
+      const { data, error } = await apiClient
+        .from('projects')
+        .select(`
+          id,
+          name,
+          description,
+          status,
+          start_date,
+          end_date,
+          client:client_id (
+            id,
+            nome
+          ),
+          colaboradores:responsible_id (
+            id,
+            nome
+          ),
+          tasks (
+            id,
+            title,
+            status,
+            due_date
+          )
+        `)
+        .eq('id', projectId)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar projeto:', error.message);
+        throw new Error(error.message);
+      }
 
       return data;
     },

@@ -7,24 +7,27 @@ export const useTasks = (projectId?: string) => {
   return useQuery({
     queryKey: ['tasks', projectId],
     queryFn: async (): Promise<TaskWithDetails[]> => {
-      const data = await apiClient.get<TaskWithDetails[]>(
-        `/api/tasks.php${projectId ? `?project_id=${projectId}` : ''}`
-      );
+      const { data, error } = await apiClient
+        .from('tasks')
+        .select('*')
+        .eq('project_id', projectId!); // O ! garante que não será undefined, pois `enabled` controla
+
+      if (error) throw new Error(error.message);
 
       return (data || []).map(task => ({
         ...task,
-        assigned_user: Array.isArray(task.assigned_user) ? task.assigned_user[0] || null : task.assigned_user,
-        creator: Array.isArray(task.creator) ? task.creator[0] || null : task.creator,
-        project: Array.isArray(task.project) ? task.project[0] || null : task.project,
+        assigned_user: null,
+        creator: null,
+        project: null,
         section: null,
         subtasks: [],
         comments: [],
-        attachments: []
-      }));
+        attachments: [],
+      })) as TaskWithDetails[];
     },
-    enabled: true, // Se quiser evitar execução sem projectId, use: !!projectId
-    staleTime: 0,  // 👈 força atualização sempre que necessário
-    gcTime: 0,     // 👈 ajuda a garantir que a tarefa deletada "some"
+    enabled: !!projectId, // só executa a query se o ID for válido
+    staleTime: 0,
+    gcTime: 0,
   });
 };
 
@@ -33,7 +36,8 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
-      const data = await apiClient.post<Task>('/api/tasks.php', task);
+      const { data, error } = await apiClient.from('tasks').insert(task).select().single();
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: (_, variables) => {
@@ -61,7 +65,14 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: TaskUpdate }) => {
-      const data = await apiClient.put<Task>(`/api/tasks.php?id=${id}`, updates);
+      const { data, error } = await apiClient
+        .from('tasks')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: (_, variables) => {
@@ -89,15 +100,12 @@ export const useDeleteTask = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await apiClient.delete(`/api/tasks.php?id=${id}`);
+      const { error } = await apiClient.from('tasks').delete().eq('id', id);
+      if (error) throw new Error(error.message);
     },
     onSuccess: (_, id) => {
-      // Remove tarefas em geral
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-
-      // Se possível, remove tarefa específica do cache local
       queryClient.removeQueries({ queryKey: ['tasks'] });
-
       toast({
         title: "Tarefa excluída",
         description: "A tarefa foi excluída com sucesso.",

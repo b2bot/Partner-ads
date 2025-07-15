@@ -20,7 +20,7 @@ interface Collaborator {
   nome: string;
   email: string;
   foto_url?: string;
-  status: string;
+  ativo: boolean;
   role: string;
   created_at: string;
   is_root_admin: boolean;
@@ -36,7 +36,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
   const [nome, setNome] = useState(collaborator.nome);
   const [email, setEmail] = useState(collaborator.email);
   const [fotoUrl, setFotoUrl] = useState(collaborator.foto_url || '');
-  const [status, setStatus] = useState(collaborator.status);
+  const [ativo, setativo] = useState(collaborator.ativo);
   const [selectedPermissions, setSelectedPermissions] = useState<PermissionType[]>([]);
   const [error, setError] = useState('');
 
@@ -69,7 +69,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
       nome: string;
       email: string;
       foto_url?: string;
-      status: string;
+      ativo: boolean;
       permissions: PermissionType[];
     }) => {
       // Atualizar dados básicos
@@ -79,8 +79,8 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
           nome: data.nome,
           email: data.email,
           foto_url: data.foto_url,
-          status: data.status,
-          ativo: data.status === 'ativo',
+
+          ativo: data.ativo === 'ativo',
         })
         .eq('id', collaborator.id);
 
@@ -166,7 +166,7 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
       nome: nome.trim(),
       email: email.trim(),
       foto_url: fotoUrl.trim() || undefined,
-      status,
+      ativo,
       permissions: selectedPermissions,
     });
   };
@@ -217,8 +217,8 @@ export function EditCollaboratorModal({ collaborator, open, onClose }: EditColla
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select value={status} onValueChange={setStatus}>
+                <Label htmlFor="ativo">Ativo</Label>
+                <Select value={ativo} onValueChange={setativo}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
