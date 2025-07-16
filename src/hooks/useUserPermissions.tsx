@@ -1,5 +1,6 @@
+
 import { useQuery } from '@tanstack/react-query';
-import { User } from '@apiClient/apiClient-js';
+import { User } from '@supabase/supabase-js';
 import { apiClient } from '@/integrations/apiClient';
 import { Permission, ALL_PERMISSIONS } from '@/types/auth';
 
@@ -10,11 +11,8 @@ export function useUserPermissions(user: User | null, isRootAdmin: boolean) {
       if (!user?.id) return [];
 
       if (isRootAdmin) {
-        //console.log('✅ Root admin - returning all permissions');
         return ALL_PERMISSIONS;
       }
-
-      //console.log('🔄 Loading permissions for user:', user.id);
 
       const { data, error } = await apiClient
         .from('user_permissions')
@@ -27,7 +25,6 @@ export function useUserPermissions(user: User | null, isRootAdmin: boolean) {
       }
 
       const permissions = (data || []).map((p) => p.permission as Permission);
-      //console.log('✅ User permissions loaded:', permissions);
       return permissions;
     },
     enabled: !!user?.id,

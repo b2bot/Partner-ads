@@ -1,4 +1,4 @@
-// src/hooks/useUserProfile.ts
+
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/integrations/apiClient'
 import { UserProfile } from '@/types/auth'
@@ -13,7 +13,7 @@ export function useUserProfile(user: { id: string; email: string } | null) {
       if (!user?.id) return null
 
       const { data, error } = await apiClient
-        .from<UserProfile>('profiles')
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single()
@@ -21,22 +21,23 @@ export function useUserProfile(user: { id: string; email: string } | null) {
       if (error) {
         // se não existir, cria
         const { data: created, error: insertError } = await apiClient
-          .from<UserProfile>('profiles')
+          .from('profiles')
           .insert({
             id: user.id,
             nome: user.email.split('@')[0] || 'Usuário',
             email: user.email,
-            role: 'colaborador',
+            role: 'cliente',
             is_root_admin: false,
             ativo: true,
           })
+          .select()
           .single()
 
         if (insertError) throw insertError
-        return created
+        return created as UserProfile
       }
 
-      return data
+      return data as UserProfile
     },
   })
 }

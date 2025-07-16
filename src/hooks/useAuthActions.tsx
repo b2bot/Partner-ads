@@ -19,7 +19,10 @@ export function useAuthActions() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { nome, role } },
+      options: { 
+        data: { nome, role },
+        emailRedirectTo: `${window.location.origin}/`
+      },
     });
     return { data, error };
   };

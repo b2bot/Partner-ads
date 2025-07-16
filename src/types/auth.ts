@@ -12,8 +12,8 @@ export interface UserProfile {
   status?: string;
   funcao?: string;
   cliente_id?: string;
-  permissions: Permission[];
-  modules: Module[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Session {
@@ -22,6 +22,13 @@ export interface Session {
   expires_in: number;
   refresh_token: string;
   user: User;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  nome?: string;
+  role?: 'admin' | 'cliente';
 }
 
 export type Module =
