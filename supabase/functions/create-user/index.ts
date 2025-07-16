@@ -24,61 +24,30 @@ serve(async (req) => {
       }
     )
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    )
-
-    // Validação interna de permissões
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error('Authorization header ausente')
-      throw new Error('Authorization header é obrigatório')
-    }
-
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
-
-    if (authError || !user) {
-      console.error('Erro de autenticação:', authError)
-      throw new Error('Token de autenticação inválido')
-    }
-
-    // Verificar se o usuário tem permissão para criar outros usuários
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('role, is_root_admin')
-      .eq('id', user.id)
-      .single()
-
-    if (profileError) {
-      console.error('Erro ao buscar perfil:', profileError)
-      throw new Error('Erro ao verificar perfil do usuário')
-    }
-
-    if (!profile.is_root_admin && profile.role !== 'admin') {
-      console.error('Usuário sem permissão:', { user_id: user.id, role: profile.role, is_root_admin: profile.is_root_admin })
-      throw new Error('Permissão insuficiente para criar usuários')
-    }
-
     const body = await req.json()
     const { email, nome, role = 'admin', senha } = body
 
+    // Validação básica dos dados
     if (!email || !nome) {
       console.error('Dados obrigatórios ausentes:', { email: !!email, nome: !!nome })
       throw new Error('Email e nome são obrigatórios')
+    }
+
+    // Validar se o role é válido
+    if (!['admin', 'cliente'].includes(role)) {
+      throw new Error('Role deve ser "admin" ou "cliente"')
     }
 
     const password = senha || Math.random().toString(36).slice(-12) + 'A1!'
 
     console.log('Iniciando criação de usuário:', { email, nome, role })
 
-    // Usar user_metadata ao invés de raw_user_meta_data
+    // Criar usuário usando user_metadata (não raw_user_meta_data)
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: { nome, role }, // Corrigido para user_metadata
+      user_metadata: { nome, role },
     })
 
     if (createError) {
@@ -96,6 +65,11 @@ serve(async (req) => {
       email: newUser.user.email,
       metadata: newUser.user.user_metadata
     })
+
+    // A trigger handle_new_user() automaticamente criará:
+    // - Perfil na tabela profiles
+    // - Permissões na tabela user_permissions  
+    // - Registro na tabela colaboradores (se admin) ou clientes (se cliente)
 
     return new Response(
       JSON.stringify({ 

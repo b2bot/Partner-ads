@@ -131,24 +131,15 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
     }) => {
       console.log('Iniciando criação de colaborador...', data.email);
 
-      // Obter token de autenticação atual
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session?.access_token) {
-        throw new Error('Usuário não autenticado');
-      }
+      console.log('Chamando Edge Function...');
 
-      console.log('Token obtido, chamando Edge Function...');
-
-      // Chamar edge function (agora pública, mas com validação interna)
+      // Chamar edge function (agora pública)
       const { data: result, error } = await supabase.functions.invoke('create-user', {
         body: {
           email: data.email,
           nome: data.nome,
           role: 'admin',
           senha: data.senha
-        },
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`
         }
       });
 
