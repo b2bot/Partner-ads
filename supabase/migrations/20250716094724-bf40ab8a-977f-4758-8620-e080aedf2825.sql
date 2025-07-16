@@ -1,4 +1,5 @@
 
+
 -- Corrigir a função handle_new_user() com sintaxe adequada e referências corretas
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
@@ -11,10 +12,10 @@ DECLARE
   user_role_enum user_role;
   user_name text;
 BEGIN
-  -- Extrair dados
-  user_role_text := COALESCE(NEW.raw_user_meta_data ->> 'role', 'cliente');
+  -- Extrair dados do user_metadata (não raw_user_meta_data)
+  user_role_text := COALESCE(NEW.user_metadata ->> 'role', 'cliente');
   user_role_enum := user_role_text::user_role;
-  user_name := COALESCE(NEW.raw_user_meta_data ->> 'nome', split_part(NEW.email, '@', 1));
+  user_name := COALESCE(NEW.user_metadata ->> 'nome', split_part(NEW.email, '@', 1));
   
   RAISE NOTICE 'Criando usuário: email=%, role=%, nome=%', NEW.email, user_role_text, user_name;
   
@@ -64,3 +65,4 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+

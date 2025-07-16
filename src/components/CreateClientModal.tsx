@@ -42,13 +42,15 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
       try {
         console.log('Criando cliente...', data.email);
 
-        // Obter token de autenticação
+        // Obter token de autenticação atual
         const { data: sessionData } = await supabase.auth.getSession();
         if (!sessionData.session?.access_token) {
           throw new Error('Usuário não autenticado');
         }
 
-        // Chamar edge function para criar usuário
+        console.log('Token obtido, chamando Edge Function...');
+
+        // Chamar edge function (agora pública, mas com validação interna)
         const { data: result, error } = await supabase.functions.invoke('create-user', {
           body: {
             email: data.email,
@@ -63,7 +65,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
 
         if (error) {
           console.error('Erro na Edge Function:', error);
-          throw error;
+          throw new Error(error.message || 'Erro ao chamar função de criação');
         }
 
         if (!result?.success) {
@@ -73,7 +75,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
 
         console.log('Usuário criado com sucesso:', result.user.id);
 
-        // Aguardar um pouco para a trigger processar
+        // Aguardar processamento da trigger
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         // Buscar o cliente criado pela trigger

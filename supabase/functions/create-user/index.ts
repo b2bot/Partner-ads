@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -28,9 +29,11 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
+    // Validação interna de permissões
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      throw new Error('Authorization header ausente')
+      console.error('Authorization header ausente')
+      throw new Error('Authorization header é obrigatório')
     }
 
     const token = authHeader.replace('Bearer ', '')
@@ -38,9 +41,10 @@ serve(async (req) => {
 
     if (authError || !user) {
       console.error('Erro de autenticação:', authError)
-      throw new Error('Unauthorized')
+      throw new Error('Token de autenticação inválido')
     }
 
+    // Verificar se o usuário tem permissão para criar outros usuários
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('role, is_root_admin')
@@ -53,37 +57,52 @@ serve(async (req) => {
     }
 
     if (!profile.is_root_admin && profile.role !== 'admin') {
-      throw new Error('Permissão insuficiente')
+      console.error('Usuário sem permissão:', { user_id: user.id, role: profile.role, is_root_admin: profile.is_root_admin })
+      throw new Error('Permissão insuficiente para criar usuários')
     }
 
     const body = await req.json()
     const { email, nome, role = 'admin', senha } = body
 
     if (!email || !nome) {
-      console.error('Body inválido:', body)
-      throw new Error('Campos obrigatórios: email e nome')
+      console.error('Dados obrigatórios ausentes:', { email: !!email, nome: !!nome })
+      throw new Error('Email e nome são obrigatórios')
     }
 
     const password = senha || Math.random().toString(36).slice(-12) + 'A1!'
 
     console.log('Iniciando criação de usuário:', { email, nome, role })
 
+    // Usar user_metadata ao invés de raw_user_meta_data
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: { nome, role },
+      user_metadata: { nome, role }, // Corrigido para user_metadata
     })
 
     if (createError) {
-      console.error('Erro ao criar usuário:', createError)
-      throw new Error(createError.message)
+      console.error('Erro ao criar usuário no Supabase Auth:', createError)
+      throw new Error(`Erro ao criar usuário: ${createError.message}`)
     }
 
-    console.log('Usuário criado com sucesso:', newUser.user?.id)
+    if (!newUser.user) {
+      console.error('Usuário não foi criado corretamente')
+      throw new Error('Falha na criação do usuário')
+    }
+
+    console.log('Usuário criado com sucesso:', {
+      id: newUser.user.id,
+      email: newUser.user.email,
+      metadata: newUser.user.user_metadata
+    })
 
     return new Response(
-      JSON.stringify({ success: true, user: newUser.user }),
+      JSON.stringify({ 
+        success: true, 
+        user: newUser.user,
+        message: 'Usuário criado com sucesso'
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -96,7 +115,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message || 'Erro interno'
+        error: error.message || 'Erro interno do servidor'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

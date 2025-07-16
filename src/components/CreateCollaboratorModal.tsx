@@ -131,13 +131,15 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
     }) => {
       console.log('Iniciando criação de colaborador...', data.email);
 
-      // Obter token de autenticação
+      // Obter token de autenticação atual
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session?.access_token) {
         throw new Error('Usuário não autenticado');
       }
 
-      // Chamar edge function para criar usuário
+      console.log('Token obtido, chamando Edge Function...');
+
+      // Chamar edge function (agora pública, mas com validação interna)
       const { data: result, error } = await supabase.functions.invoke('create-user', {
         body: {
           email: data.email,
@@ -152,7 +154,7 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
 
       if (error) {
         console.error('Erro na Edge Function:', error);
-        throw error;
+        throw new Error(error.message || 'Erro ao chamar função de criação');
       }
 
       if (!result?.success) {
@@ -162,10 +164,10 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
 
       console.log('Usuário criado com sucesso:', result.user.id);
 
-      // Aguardar um pouco para a trigger processar
+      // Aguardar processamento da trigger
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Atualizar dados adicionais do colaborador
+      // Atualizar dados adicionais do colaborador se necessário
       if (data.foto_url) {
         const { error: colaboradorError } = await supabase
           .from('colaboradores')
@@ -180,16 +182,17 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
         }
       }
 
-      // Inserir permissões personalizadas (se houver)
+      // Gerenciar permissões personalizadas se houver
       if (data.permissions.length > 0) {
-        console.log('Adicionando permissões personalizadas...');
+        console.log('Atualizando permissões personalizadas...');
         
-        // Primeiro, remover permissões padrão se necessário
+        // Primeiro, remover permissões padrão
         await supabase
           .from('user_permissions')
           .delete()
           .eq('user_id', result.user.id);
 
+        // Inserir permissões personalizadas
         const permissionsToInsert = data.permissions.map(permission => ({
           user_id: result.user.id,
           permission,
@@ -202,7 +205,6 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
 
         if (permError) {
           console.error('Erro ao inserir permissões:', permError);
-          // Não quebrar o fluxo por erro de permissões
         }
       }
 
