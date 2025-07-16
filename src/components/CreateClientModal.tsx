@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
+import { processNewUser } from '@/services/userCreationService';
 
 interface CreateClientModalProps {
   open: boolean;
@@ -73,8 +74,12 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
 
       console.log('Cliente criado com sucesso!', data.user.id);
       
-      // Aguardar um pouco para a trigger processar
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Processar usuário e verificar se foi configurado corretamente
+      const success = await processNewUser(data.user.id);
+      
+      if (!success) {
+        throw new Error('Erro ao configurar perfil do usuário. Tente novamente.');
+      }
 
       // Atualizar tipo de acesso se necessário
       if (tipoAcesso === 'sheet') {
