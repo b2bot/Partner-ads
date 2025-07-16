@@ -130,12 +130,16 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       permissions: PermissionType[];
     }) => {
       console.log('Iniciando criação de colaborador...', data.email);
-
       console.log('Chamando Edge Function...');
 
-      // Chamar edge function (agora pública)
-      const session = supabase.auth.getSession();
-      const token = session.data?.session?.access_token;
+      // 1) obter sessão corretamente
+      const { data: { session }, error: sessErr } = await supabase.auth.getSession();
+      if (sessErr || !session) {
+        throw new Error('Não foi possível obter sessão. Refaça login.');
+      }
+      const token = session.access_token;
+
+      // 2) chamar a Edge Function com o token no header e body como string
       const { data: result, error } = await supabase.functions.invoke('create-user', {
         headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -143,23 +147,6 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
           nome: data.nome,
           role: 'admin',
           senha: data.senha
-        })
-      });
-
-      // 1) pegar sessão corretamente
-      const { data: { session }, error: sessErr } = await supabase.auth.getSession();
-      if (sessErr || !session) {
-        throw new Error('Não foi possível obter sessão. Refaça login.');
-      }
-      const token = session.access_token;
-
-	  const { data: result, error } = await supabase.functions.invoke('create-user', {
-        headers: { Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-           email: data.email,
-           nome: data.nome,
-           role: 'admin',
-           senha: data.senha
         })
       });
 
