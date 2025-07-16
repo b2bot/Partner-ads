@@ -54,8 +54,7 @@ export function CreateCollaboratorModal({ open, onClose, onSuccess }: CreateColl
         options: {
           data: {
             nome: nome.trim(),
-            role: 'admin',
-            email_confirm: true
+            role: 'admin'
           },
           emailRedirectTo: `${window.location.origin}/`
         }

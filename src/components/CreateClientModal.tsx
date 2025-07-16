@@ -58,7 +58,6 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
           data: {
             nome: nome.trim(),
             role: 'cliente',
-            email_confirm: true,
             tipo_acesso: tipoAcesso
           },
           emailRedirectTo: `${window.location.origin}/`
