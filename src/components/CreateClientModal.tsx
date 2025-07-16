@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,9 +40,15 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
       setIsCreating(true);
       
       try {
-        // Chamar edge function para criar usuário
-        console.log('Criando usuário...', data.email);
+        console.log('Criando cliente...', data.email);
 
+        // Obter token de autenticação
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session?.access_token) {
+          throw new Error('Usuário não autenticado');
+        }
+
+        // Chamar edge function para criar usuário
         const { data: result, error } = await supabase.functions.invoke('create-user', {
           body: {
             email: data.email,
@@ -50,16 +57,18 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
             senha: data.senha
           },
           headers: {
-            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+            Authorization: `Bearer ${sessionData.session.access_token}`
           }
         });
 
         if (error) {
+          console.error('Erro na Edge Function:', error);
           throw error;
         }
 
-        if (!result.success) {
-          throw new Error(result.error || 'Erro ao criar usuário');
+        if (!result?.success) {
+          console.error('Edge Function retornou erro:', result?.error);
+          throw new Error(result?.error || 'Erro ao criar usuário');
         }
 
         console.log('Usuário criado com sucesso:', result.user.id);
@@ -91,8 +100,6 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
         if (updateError) {
           console.error('Erro ao atualizar cliente:', updateError);
         }
-
-        console.log('Cliente criado:', clienteData);
 
         // Criar contas vinculadas se existirem
         if (data.contas.length > 0) {

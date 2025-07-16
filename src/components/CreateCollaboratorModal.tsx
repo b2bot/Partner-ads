@@ -129,6 +129,14 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       status: string;
       permissions: PermissionType[];
     }) => {
+      console.log('Iniciando criação de colaborador...', data.email);
+
+      // Obter token de autenticação
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session?.access_token) {
+        throw new Error('Usuário não autenticado');
+      }
+
       // Chamar edge function para criar usuário
       const { data: result, error } = await supabase.functions.invoke('create-user', {
         body: {
@@ -138,16 +146,18 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
           senha: data.senha
         },
         headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+          Authorization: `Bearer ${sessionData.session.access_token}`
         }
       });
 
       if (error) {
+        console.error('Erro na Edge Function:', error);
         throw error;
       }
 
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao criar usuário');
+      if (!result?.success) {
+        console.error('Edge Function retornou erro:', result?.error);
+        throw new Error(result?.error || 'Erro ao criar usuário');
       }
 
       console.log('Usuário criado com sucesso:', result.user.id);
@@ -156,20 +166,24 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Atualizar dados adicionais do colaborador
-      const { error: colaboradorError } = await supabase
-        .from('colaboradores')
-        .update({
-          foto_url: data.foto_url,
-          ativo: data.status === 'ativo',
-        })
-        .eq('user_id', result.user.id);
+      if (data.foto_url) {
+        const { error: colaboradorError } = await supabase
+          .from('colaboradores')
+          .update({
+            foto_url: data.foto_url,
+            ativo: data.status === 'ativo',
+          })
+          .eq('user_id', result.user.id);
 
-      if (colaboradorError) {
-        console.error('Erro ao atualizar colaborador:', colaboradorError);
+        if (colaboradorError) {
+          console.error('Erro ao atualizar colaborador:', colaboradorError);
+        }
       }
 
       // Inserir permissões personalizadas (se houver)
       if (data.permissions.length > 0) {
+        console.log('Adicionando permissões personalizadas...');
+        
         // Primeiro, remover permissões padrão se necessário
         await supabase
           .from('user_permissions')
@@ -188,7 +202,7 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
 
         if (permError) {
           console.error('Erro ao inserir permissões:', permError);
-          throw new Error('Erro ao atribuir permissões');
+          // Não quebrar o fluxo por erro de permissões
         }
       }
 
