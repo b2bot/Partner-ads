@@ -134,13 +134,16 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
       console.log('Chamando Edge Function...');
 
       // Chamar edge function (agora pública)
+      const session = supabase.auth.getSession();
+      const token = session.data?.session?.access_token;
       const { data: result, error } = await supabase.functions.invoke('create-user', {
-        body: {
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
           email: data.email,
           nome: data.nome,
           role: 'admin',
           senha: data.senha
-        }
+        })
       });
 
       if (error) {
