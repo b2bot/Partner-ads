@@ -146,6 +146,23 @@ export function CreateCollaboratorModal({ open, onClose }: CreateCollaboratorMod
         })
       });
 
+      // 1) pegar sessão corretamente
+      const { data: { session }, error: sessErr } = await supabase.auth.getSession();
+      if (sessErr || !session) {
+        throw new Error('Não foi possível obter sessão. Refaça login.');
+      }
+      const token = session.access_token;
+
+	  const { data: result, error } = await supabase.functions.invoke('create-user', {
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+           email: data.email,
+           nome: data.nome,
+           role: 'admin',
+           senha: data.senha
+        })
+      });
+
       if (error) {
         console.error('Erro na Edge Function:', error);
         throw new Error(error.message || 'Erro ao chamar função de criação');
