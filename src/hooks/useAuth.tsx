@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
-import { User } from '@apiClient/apiClient-js';
-import { apiClient } from '@/integrations/apiClient';
+import { User } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 import { useUserPermissions } from './useUserPermissions';
 import { useClientPermissions } from './useClientPermissions';
@@ -31,13 +31,13 @@ export function useAuth() {
   useEffect(() => {
     console.log('🚀 Inicializando useAuth...');
     
-    apiClient.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('📝 Sessão inicial:', session?.user ? 'Usuário logado' : 'Sem usuário'); 
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-  const { data: { subscription } } = apiClient.auth.onAuthStateChange(
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
     async (_event, session) => {
       console.log('🔄 Mudança de auth state:', _event, session?.user ? 'Usuário logado' : 'Sem usuário'); 
       setUser(session?.user ?? null);
