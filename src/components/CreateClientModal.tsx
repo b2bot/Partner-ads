@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -13,175 +12,27 @@ import { toast } from 'sonner';
 interface CreateClientModalProps {
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
+export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModalProps) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [tipoAcesso, setTipoAcesso] = useState<'api' | 'sheet'>('api');
-  const [role, setRole] = useState<'admin' | 'cliente'>('cliente');
-  const [contasMeta, setContasMeta] = useState<Array<{ identificador: string; nome: string }>>([]);
-  const [contasGoogle, setContasGoogle] = useState<Array<{ identificador: string; nome: string }>>([]);
   const [error, setError] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  
-  const queryClient = useQueryClient();
-
-  const createClientMutation = useMutation({
-    mutationFn: async (data: {
-      nome: string;
-      email: string;
-      senha: string;
-      tipoAcesso: 'api' | 'sheet';
-      role: 'admin' | 'cliente';
-      contas: Array<{ tipo: 'meta' | 'google'; identificador: string; nome: string }>;
-    }) => {
-      setIsCreating(true);
-      
-      try {
-        console.log('Criando cliente...', data.email);
-
-        console.log('Chamando Edge Function...');
-
-        // Chamar edge function (agora pública)
-        const { data: result, error } = await supabase.functions.invoke('create-user', {
-          body: {
-            email: data.email,
-            nome: data.nome,
-            role: data.role,
-            senha: data.senha
-          }
-        });
-
-        if (error) {
-          console.error('Erro na Edge Function:', error);
-          throw new Error(error.message || 'Erro ao chamar função de criação');
-        }
-
-        if (!result?.success) {
-          console.error('Edge Function retornou erro:', result?.error);
-          throw new Error(result?.error || 'Erro ao criar usuário');
-        }
-
-        console.log('Usuário criado com sucesso:', result.user.id);
-
-        // Aguardar processamento da trigger
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Buscar o cliente criado pela trigger
-        const { data: clienteData, error: clienteError } = await supabase
-          .from('clientes')
-          .select('*')
-          .eq('user_id', result.user.id)
-          .single();
-
-        if (clienteError) {
-          console.error('Erro ao buscar cliente:', clienteError);
-          throw new Error('Cliente não foi criado corretamente');
-        }
-
-        // Atualizar dados específicos do cliente
-        const { error: updateError } = await supabase
-          .from('clientes')
-          .update({
-            email: data.email,
-            tipo_acesso: data.tipoAcesso,
-          })
-          .eq('id', clienteData.id);
-
-        if (updateError) {
-          console.error('Erro ao atualizar cliente:', updateError);
-        }
-
-        // Criar contas vinculadas se existirem
-        if (data.contas.length > 0) {
-          console.log('Criando contas vinculadas...');
-          const contasToInsert = data.contas.map(conta => ({
-            cliente_id: clienteData.id,
-            tipo: conta.tipo,
-            identificador: conta.identificador,
-            nome: conta.nome,
-            ativo: true,
-          }));
-
-          const { error: contasError } = await supabase
-            .from('contas')
-            .insert(contasToInsert);
-
-          if (contasError) {
-            console.error('Erro ao criar contas:', contasError);
-            throw contasError;
-          }
-        }
-
-        console.log('Cliente criado com sucesso!');
-        return clienteData;
-
-      } catch (error) {
-        console.error('Erro geral na criação:', error);
-        throw error;
-      } finally {
-        setIsCreating(false);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients-management'] });
-      toast.success('Cliente criado com sucesso!');
-      onClose();
-      resetForm();
-    },
-    onError: (error: any) => {
-      console.error('Erro ao criar cliente:', error);
-      const errorMessage = error.message || 'Erro ao criar cliente. Verifique os dados e tente novamente.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    },
-  });
 
   const resetForm = () => {
     setNome('');
     setEmail('');
     setSenha('');
     setTipoAcesso('api');
-    setRole('cliente');
-    setContasMeta([]);
-    setContasGoogle([]);
     setError('');
     setIsCreating(false);
   };
 
-  const addMetaAccount = () => {
-    setContasMeta([...contasMeta, { identificador: '', nome: '' }]);
-  };
-
-  const removeMetaAccount = (index: number) => {
-    setContasMeta(contasMeta.filter((_, i) => i !== index));
-  };
-
-  const updateMetaAccount = (index: number, field: 'identificador' | 'nome', value: string) => {
-    const updated = contasMeta.map((conta, i) => 
-      i === index ? { ...conta, [field]: value } : conta
-    );
-    setContasMeta(updated);
-  };
-
-  const addGoogleAccount = () => {
-    setContasGoogle([...contasGoogle, { identificador: '', nome: '' }]);
-  };
-
-  const removeGoogleAccount = (index: number) => {
-    setContasGoogle(contasGoogle.filter((_, i) => i !== index));
-  };
-
-  const updateGoogleAccount = (index: number, field: 'identificador' | 'nome', value: string) => {
-    const updated = contasGoogle.map((conta, i) => 
-      i === index ? { ...conta, [field]: value } : conta
-    );
-    setContasGoogle(updated);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -195,83 +46,108 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
       return;
     }
 
-    const allContas = [
-      ...contasMeta.filter(c => c.identificador && c.nome).map(c => ({ ...c, tipo: 'meta' as const })),
-      ...contasGoogle.filter(c => c.identificador && c.nome).map(c => ({ ...c, tipo: 'google' as const })),
-    ];
+    setIsCreating(true);
 
-    createClientMutation.mutate({
-      nome: nome.trim(),
-      email: email.trim(),
-      senha,
-      tipoAcesso,
-      role,
-      contas: allContas,
-    });
+    try {
+      console.log('Criando cliente via signUp...', email);
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: {
+          data: {
+            nome: nome.trim(),
+            role: 'cliente'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Erro no signUp:', error);
+        throw new Error(error.message);
+      }
+
+      if (!data.user) {
+        throw new Error('Usuário não foi criado');
+      }
+
+      console.log('Cliente criado com sucesso!', data.user.id);
+      
+      // Aguardar um pouco para a trigger processar
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Atualizar tipo de acesso se necessário
+      if (tipoAcesso === 'sheet') {
+        const { error: updateError } = await supabase
+          .from('clientes')
+          .update({ tipo_acesso: tipoAcesso })
+          .eq('user_id', data.user.id);
+
+        if (updateError) {
+          console.error('Erro ao atualizar tipo de acesso:', updateError);
+        }
+      }
+
+      toast.success('Cliente criado com sucesso!');
+      onSuccess?.();
+      onClose();
+      resetForm();
+
+    } catch (error: any) {
+      console.error('Erro ao criar cliente:', error);
+      const errorMessage = error.message || 'Erro ao criar cliente. Verifique os dados e tente novamente.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Novo Cliente</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nome">Nome completo</Label>
-              <Input
-                id="nome"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Nome do cliente"
-                required
-                disabled={isCreating}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@exemplo.com"
-                required
-                disabled={isCreating}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="nome">Nome completo *</Label>
+            <Input
+              id="nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Nome do cliente"
+              required
+              disabled={isCreating}
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="senha">Senha</Label>
-              <Input
-                id="senha"
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                minLength={6}
-                required
-                disabled={isCreating}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@exemplo.com"
+              required
+              disabled={isCreating}
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="role">Tipo de usuário</Label>
-              <Select value={role} onValueChange={(value: 'admin' | 'cliente') => setRole(value)} disabled={isCreating}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cliente">Cliente</SelectItem>
-                  <SelectItem value="admin">Administrador</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="senha">Senha *</Label>
+            <Input
+              id="senha"
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+              minLength={6}
+              required
+              disabled={isCreating}
+            />
           </div>
 
           <div className="space-y-2">
@@ -285,64 +161,6 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
                 <SelectItem value="sheet">Google Sheets</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          {/* Contas Meta */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label>Contas Meta</Label>
-              <Button type="button" variant="outline" size="sm" onClick={addMetaAccount} disabled={isCreating}>
-                Adicionar Conta Meta
-              </Button>
-            </div>
-            {contasMeta.map((conta, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  placeholder="ID da conta Meta"
-                  value={conta.identificador}
-                  onChange={(e) => updateMetaAccount(index, 'identificador', e.target.value)}
-                  disabled={isCreating}
-                />
-                <Input
-                  placeholder="Nome da conta"
-                  value={conta.nome}
-                  onChange={(e) => updateMetaAccount(index, 'nome', e.target.value)}
-                  disabled={isCreating}
-                />
-                <Button type="button" variant="outline" size="sm" onClick={() => removeMetaAccount(index)} disabled={isCreating}>
-                  Remover
-                </Button>
-              </div>
-            ))}
-          </div>
-
-          {/* Contas Google */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label>Contas Google</Label>
-              <Button type="button" variant="outline" size="sm" onClick={addGoogleAccount} disabled={isCreating}>
-                Adicionar Conta Google
-              </Button>
-            </div>
-            {contasGoogle.map((conta, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  placeholder="ID da conta Google"
-                  value={conta.identificador}
-                  onChange={(e) => updateGoogleAccount(index, 'identificador', e.target.value)}
-                  disabled={isCreating}
-                />
-                <Input
-                  placeholder="Nome da conta"
-                  value={conta.nome}
-                  onChange={(e) => updateGoogleAccount(index, 'nome', e.target.value)}
-                  disabled={isCreating}
-                />
-                <Button type="button" variant="outline" size="sm" onClick={() => removeGoogleAccount(index)} disabled={isCreating}>
-                  Remover
-                </Button>
-              </div>
-            ))}
           </div>
 
           {error && (
@@ -360,7 +178,7 @@ export function CreateClientModal({ open, onClose }: CreateClientModalProps) {
               disabled={isCreating}
               className="flex-1"
             >
-              {isCreating ? 'Criando usuário...' : 'Criar Cliente'}
+              {isCreating ? 'Criando...' : 'Criar Cliente'}
             </Button>
           </div>
         </form>
