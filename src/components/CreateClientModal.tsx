@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
-import { processNewUser } from '@/services/userCreationService';
 
 interface CreateClientModalProps {
   open: boolean;
@@ -58,8 +57,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
         options: {
           data: {
             nome: nome.trim(),
-            role: 'cliente'
-          }
+            role: 'cliente',
+            email_confirm: true,
+            tipo_acesso: tipoAcesso
+          },
+          emailRedirectTo: `${window.location.origin}/`
         }
       });
 
@@ -72,15 +74,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
         throw new Error('Usuário não foi criado');
       }
 
-      console.log('Cliente criado com sucesso!', data.user.id);
+      console.log('Cliente criado com sucesso! A trigger do banco irá configurar automaticamente.', data.user.id);
       
-      // Processar usuário e verificar se foi configurado corretamente
-      const success = await processNewUser(data.user.id);
+      // Aguardar um pouco para a trigger processar
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (!success) {
-        throw new Error('Erro ao configurar perfil do usuário. Tente novamente.');
-      }
-
       // Atualizar tipo de acesso se necessário
       if (tipoAcesso === 'sheet') {
         const { error: updateError } = await supabase

@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
-import { processNewUser } from '@/services/userCreationService';
 
 interface CreateCollaboratorModalProps {
   open: boolean;
@@ -55,8 +54,10 @@ export function CreateCollaboratorModal({ open, onClose, onSuccess }: CreateColl
         options: {
           data: {
             nome: nome.trim(),
-            role: 'admin'
-          }
+            role: 'admin',
+            email_confirm: true
+          },
+          emailRedirectTo: `${window.location.origin}/`
         }
       });
 
@@ -69,14 +70,7 @@ export function CreateCollaboratorModal({ open, onClose, onSuccess }: CreateColl
         throw new Error('Usuário não foi criado');
       }
 
-      console.log('Colaborador criado com sucesso!', data.user.id);
-
-      // Processar usuário e verificar se foi configurado corretamente
-      const success = await processNewUser(data.user.id);
-      
-      if (!success) {
-        throw new Error('Erro ao configurar perfil do usuário. Tente novamente.');
-      }
+      console.log('Colaborador criado com sucesso! A trigger do banco irá configurar automaticamente.', data.user.id);
 
       toast.success('Colaborador criado com sucesso!');
       onSuccess?.();
